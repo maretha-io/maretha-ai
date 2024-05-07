@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.operation.interactionsoperation">
+
+  <extension point="operations" target="org.nuxeo.ecm.core.operation.OperationServiceComponent">
+    <operation class="io.maretha.cp.core.InteractionsOperation"/>
+  </extension>
+
+</component>
