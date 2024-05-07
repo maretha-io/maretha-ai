@@ -9,7 +9,7 @@
 
   <artifactId>maretha-cp-package</artifactId>
   <packaging>zip</packaging>
-  <name>Maretha cp package - Maretha cp integration addon package</name>
+  <name>Maretha CP package</name>
 
   <dependencies>
     <!-- Base distribution(s) for the MP -->

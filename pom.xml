@@ -23,6 +23,7 @@
   <modules>
     <module>maretha-cp-core</module>
     <module>maretha-cp-package</module>
+    <module>maretha-cp-web</module>
   </modules>
 
   <scm />

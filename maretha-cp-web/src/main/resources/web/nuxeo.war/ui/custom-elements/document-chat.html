@@ -1,0 +1,147 @@
+<dom-module id="document-chat">
+  <template>
+    <nuxeo-operation op="Document.ChatOperation" id="chatWithDocument" input="[[document.uid]]">
+    </nuxeo-operation>
+
+    <style include="nuxeo-action-button-styles">
+      .content {
+        @apply --layout-vertical;
+        min-height: 400px;
+        height: 400px;
+      }
+
+      #dialog {
+        width: 80%;
+        min-height: 50%;
+        margin: auto;
+      }
+
+      .textarea {
+        max-height: 400px;
+        overflow-y: auto;
+        overflow-x: auto;
+      }
+    </style>
+
+    <paper-icon-button icon="communication:chat" label="Chat with document" on-tap="_toggleDialog">
+      <nuxeo-tooltip>Chat with document</nuxeo-tooltip>
+    </paper-icon-button>
+
+    <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
+      <div class="content">
+        <div style="width: 90%; margin:auto;">
+          <template is="dom-if" if="[[readyDocuments]]">
+            <nuxeo-input role="widget" value="{{question}}" label="Question" type="text" name="question"
+                         on-change="_chatWithDocument"></nuxeo-input>
+            <div class="info">{{readyDocuments}} / {{totalDocuments}} documents ready for chat.</div>
+            <div class="textarea" inner-h-t-m-l="{{chatResponse}}"></div>
+          </template>
+          <template is="dom-if" if="[[!readyDocuments]]">
+            <div class="info" style="text-align:center;">Processing documents in progress... {{readyDocuments}} /
+              {{totalDocuments}}</div>
+          </template>
+        </div>
+      </div>
+      <div class="buttons">
+        <paper-icon-button id="regenerateButton" icon="icons:autorenew" on-tap="_regenerateEmbeddings"
+                           aria-label="Re-Generate Embeddings">
+        </paper-icon-button>
+        <nuxeo-tooltip for="regenerateButton" position="top">Re-Generate Embeddings</nuxeo-tooltip>
+        <paper-button noink dialog-dismiss on-tap="_close">Close</paper-button>
+        <paper-icon-button id="chat" icon="communication:chat" on-tap="_chatWithDocument"
+                           aria-label="Chat with document">
+        </paper-icon-button>
+      </div>
+    </nuxeo-dialog>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'document-chat',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+        document: {
+          type: Object,
+        },
+
+        opened: {
+          type: Boolean,
+          value: false,
+          observer: '_popupOpenedObserver'
+        },
+
+        chatResponse: {
+          type: String,
+        },
+
+        question: {
+          type: String,
+        },
+
+        totalDocuments: {
+          type: String
+        },
+
+        readyDocuments: {
+          type: String
+        }
+      },
+
+      _toggleDialog: function () {
+        this.$.dialog.toggle();
+      },
+
+      _close: function () {
+      },
+
+      _dialogClosed: function () {
+        this.question = '';
+        this.totalDocuments = '';
+        this.readyDocuments = '';
+        this.chatResponse = '';
+      },
+
+      _popupOpenedObserver: function () {
+        if (this.document) {
+          const operation = this.$.chatWithDocument;
+          operation.params = { question: '' };
+          operation.execute().then((response) => {
+            console.log(response.value);
+            this.totalDocuments = response.value.totalCount;
+            this.readyDocuments = response.value.doneCount;
+          }).catch((error) => {
+            console.error('Error triggering operation:', error);
+          });
+        }
+      },
+
+      _regenerateEmbeddings: function() {
+        console.log("Regenerate embeddings");
+        const operation = this.$.chatWithDocument;
+        operation.params = { regenerate: "true", question: "" };
+        operation.execute().then((response) => {
+          console.log(response.value);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _chatWithDocument: function () {
+        console.log("Asking the question: ", this.question);
+        const operation = this.$.chatWithDocument;
+        operation.params = { question: this.question };
+
+        operation.execute().then((response) => {
+          console.log(response.value);
+          this.chatResponse = response.value.chat;
+          this.totalDocuments = response.value.totalCount;
+          this.readyDocuments = response.value.doneCount;
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+    });
+  </script>
+</dom-module>
