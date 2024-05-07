@@ -1,0 +1,62 @@
+<dom-module id="maretha-cp-interactions">
+  <template>
+    <nuxeo-operation op="InteractionsOperation" id="interactionsOperation" input="[[document.uid]]">
+    </nuxeo-operation>
+
+    <nuxeo-page>
+      <div slot="header">
+        <span>Interactions Management</span>
+      </div>
+
+      <div id="main slot">
+        <nuxeo-card>
+          <div class="content">
+            <table class="interactions">
+              <caption>AI Interactions</caption>
+              <thead>
+                <th scope="col">
+                  Interaction
+                </th>
+                <th scope="col">
+                  Document Types
+                </th>
+              </thead>
+              <tbody>
+                <template is="dom-repeat" items="[[interactions]]" as="interaction">
+                  <tr>
+                    <td>{{interaction.name}}</td>
+                    <td class="highlighted">{{interaction.documentTypes}}</td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </nuxeo-card>
+      </div>
+    </nuxeo-page>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'maretha-cp-interactions',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+        interactions: {
+          type: Array,
+          value: []
+        }
+      },
+
+      ready: function () {
+        const operation = this.$.interactionsOperation;
+        operation.params = {};
+        operation.execute().then((response) => {
+          console.log(response.value);
+          this.set('interactions', response.value.interactions);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+    });
+  </script>
+</dom-module>

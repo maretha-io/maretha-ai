@@ -1,8 +1,25 @@
 <link rel="import" href="configuration-behaviour.html">
-<link rel="import" href="custom-elements/document-chat.html">
+<link rel="import" href="custom-elements/maretha-cp-interactions.html">
 
-<nuxeo-slot-content name="documentChat" slot="DOCUMENT_ACTIONS" order="2">
+<nuxeo-slot-content name="maretha-cp-menu-item" slot="ADMINISTRATION_MENU" order="125">
     <template>
-        <document-chat document="[[document]]"></document-chat>
+        <nuxeo-filter user="[[user]]" expression="user.isAdministrator">
+            <template>
+                <nuxeo-menu-item name="maretha-cp-menu" label="Maretha Composable Prompts"
+                                 route="page:maretha-cp"></nuxeo-menu-item>
+            </template>
+        </nuxeo-filter>
+    </template>
+</nuxeo-slot-content>
+
+
+
+<nuxeo-slot-content name="maretha-cp-page" slot="PAGES">
+    <template>
+        <nuxeo-filter user="[[user]]" expression="user.isAdministrator">
+            <template>
+                <maretha-cp-interactions name="maretha-cp" user="user"></maretha-cp-interactions>
+            </template>
+        </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
