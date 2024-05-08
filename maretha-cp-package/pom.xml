@@ -25,6 +25,10 @@
       <groupId>io.maretha.cp</groupId>
       <artifactId>maretha-cp-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.maretha.cp</groupId>
+      <artifactId>maretha-cp-web</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

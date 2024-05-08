@@ -6,5 +6,5 @@ Bundle-Version: 1.0.0
 Bundle-Name: maretha-cp-web
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: io.maretha.cp.maretha-cp-web;singleton=true
-Nuxeo-Component: OSGI-INF/assistant-addon-bundle-contrib.xml,
+Nuxeo-Component: OSGI-INF/maretha-cp-bundle-contrib.xml,
  OSGI-INF/web-ui-properties.xml

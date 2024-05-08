@@ -1,7 +1,39 @@
 <dom-module id="maretha-cp-interactions">
   <template>
-    <nuxeo-operation op="InteractionsOperation" id="interactionsOperation" input="[[document.uid]]">
-    </nuxeo-operation>
+    <nuxeo-operation op="InteractionsOperation" id="interactionsOperation"></nuxeo-operation>
+    <nuxeo-operation op="DocumentTypesOperation" id="docTypesOp"></nuxeo-operation>
+    <nuxeo-operation id="queryOp" op="Repository.Query"></nuxeo-operation>
+    <nuxeo-resource id="res" path="/config/types" response="{{documentTypes}}"></nuxeo-resource>
+
+    <style include="nuxeo-styles">
+      .content {
+        width: 90%;
+      }
+
+      /* Styling for the dropdown */
+      paper-dropdown-menu {
+        width: 50%;
+        display: block;
+      }
+
+      paper-checkbox {
+        padding: 10px;
+        width: 50%;
+      }
+
+      paper-toggle-button {
+        --paper-toggle-button-checked-bar-color: var(--paper-green-500);
+        --paper-toggle-button-checked-button-color: var(--paper-green-500);
+        --paper-toggle-button-checked-ink-color: var(--paper-green-500);
+        --paper-toggle-button-unchecked-bar-color: var(--paper-red-500);
+        --paper-toggle-button-unchecked-button-color: var(--paper-red-500);
+        --paper-toggle-button-unchecked-ink-color: var(--paper-red-500);
+      }
+
+      .table {
+        width: 100%;
+      }
+    </style>
 
     <nuxeo-page>
       <div slot="header">
@@ -11,23 +43,41 @@
       <div id="main slot">
         <nuxeo-card>
           <div class="content">
-            <table class="interactions">
+            <table class="table">
               <caption>AI Interactions</caption>
               <thead>
-                <th scope="col">
-                  Interaction
-                </th>
-                <th scope="col">
-                  Document Types
-                </th>
+              <th scope="col">
+                Interaction
+              </th>
+              <th scope="col">
+                Document Types
+              </th>
+              <th scope="col">
+                Enabled
+              </th>
               </thead>
               <tbody>
-                <template is="dom-repeat" items="[[interactions]]" as="interaction">
-                  <tr>
-                    <td>{{interaction.name}}</td>
-                    <td class="highlighted">{{interaction.documentTypes}}</td>
-                  </tr>
-                </template>
+              <template is="dom-repeat" items="[[interactions]]" as="interaction">
+                <tr>
+                  <td>
+                    <a href="https://app.composableprompts.com/interactions/{{interaction.id}}"
+                       target="_blank">{{interaction.name}}</a>
+                  </td>
+                  <td class="highlighted">
+                    <paper-dropdown-menu label="Select Multiple Options" multi>
+                      <paper-listbox slot="dropdown-content" multi selectable="paper-checkbox"
+                                     selected-values="{{selectedValues}}">
+                        <template is="dom-repeat" items="{{documentTypes}}" as="option">
+                          <paper-checkbox value="{{option}}">{{option}}</paper-checkbox>
+                        </template>
+                      </paper-listbox>
+                    </paper-dropdown-menu>
+                  </td>
+                  <td>
+                    <paper-toggle-button checked="{{isActive}}">Active</paper-toggle-button>
+                  </td>
+                </tr>
+              </template>
               </tbody>
             </table>
           </div>
@@ -43,20 +93,86 @@
       properties: {
         interactions: {
           type: Array,
-          value: []
-        }
+          value: [],
+          observer: '_interactionsObserver'
+        },
+
+        documentTypes: {
+          type: Array,
+          value: [],
+          observer: '_documentTypesObserver'
+        },
+
+        selectedValues: {
+          type: Array,
+          notify: true
+        },
+
+        isActive: {
+          type: Boolean,
+          notify: true,
+          value: false, // default value
+          reflectToAttribute: true,
+          observer: '_activeChanged'
+        },
+
       },
 
       ready: function () {
+        this._getInteractions();
+        this._getDocumentTypes();
+      },
+
+      _getInteractions: function () {
         const operation = this.$.interactionsOperation;
         operation.params = {};
         operation.execute().then((response) => {
-          console.log(response.value);
-          this.set('interactions', response.value.interactions);
+          console.log(response);
+          this.set('interactions', response);
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });
       },
+
+      _getDocumentTypes: function () {
+        const operation = this.$.docTypesOp;
+        operation.params = {};
+        operation.execute().then((response) => {
+          console.log(response);
+          this.set('documentTypes', response.value);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _getResourceDocumentTypes: function () {
+        this.$.res.get().then((response) => {
+          console.log(JSON.stringify(response));
+          this.set('documentTypes', response.docTypes);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _interactionsObserver: function (obs) {
+        console.log(`_interactionsObserver: '${obs}'`);
+      },
+
+      _documentTypesObserver: function (obs) {
+        console.log(`_documentTypesObserver: '${obs}'`);
+      },
+
+      _activeChanged: function (newVal, oldVal) {
+        console.log('Toggle state is now: ' + (newVal ? 'Active' : 'Inactive'));
+      },
+
+      _query: function (nxql) {
+        queryOP.params = {
+          query: nxql,
+        };
+        return queryOP.execute();
+      },
+
     });
   </script>
 </dom-module>
