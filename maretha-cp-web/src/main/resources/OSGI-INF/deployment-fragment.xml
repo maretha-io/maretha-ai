@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<fragment version="1">
+
+    <require>all</require>
+    <install>
+        <unzip from="${bundle.fileName}" to="/" prefix="web">
+            <include>web/**</include>
+        </unzip>
+    </install>
+
+</fragment>

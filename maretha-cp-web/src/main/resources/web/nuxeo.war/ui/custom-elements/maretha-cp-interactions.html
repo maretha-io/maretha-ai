@@ -1,0 +1,183 @@
+<dom-module id="maretha-cp-interactions">
+  <template>
+    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
+    <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation" ></nuxeo-operation>
+    <nuxeo-operation id="docTypesOp" op="DocumentTypesOperation" ></nuxeo-operation>
+
+    <style include="nuxeo-styles">
+      .content {
+        width: 90%;
+      }
+
+      /* Styling for the dropdown */
+      paper-dropdown-menu {
+        width: 50%;
+        display: block;
+      }
+
+      paper-checkbox {
+        padding: 10px;
+        width: 50%;
+      }
+
+      paper-toggle-button {
+        --paper-toggle-button-checked-bar-color: var(--paper-green-500);
+        --paper-toggle-button-checked-button-color: var(--paper-green-500);
+        --paper-toggle-button-checked-ink-color: var(--paper-green-500);
+        --paper-toggle-button-unchecked-bar-color: var(--paper-red-500);
+        --paper-toggle-button-unchecked-button-color: var(--paper-red-500);
+        --paper-toggle-button-unchecked-ink-color: var(--paper-red-500);
+      }
+
+      .toast-error {
+        background-color: #f44336; /* Red */
+        color: white;
+      }
+
+      .toast-success {
+        background-color: #4caf50; /* Green */
+        color: white;
+      }
+
+      .toast-warning {
+        background-color: #ff9800; /* Orange */
+        color: white;
+      }
+
+      .table {
+        width: 100%;
+      }
+    </style>
+
+    <nuxeo-page>
+      <div slot="header">
+        <span>Interactions Management</span>
+      </div>
+
+      <div id="main slot">
+        <paper-toast id="toast"></paper-toast>
+
+        <nuxeo-card>
+          <div class="content">
+            <table class="table">
+              <caption>AI Interactions</caption>
+              <thead>
+              <th scope="col">Interaction</th>
+              <th scope="col">Document Types</th>
+              <th scope="col">Enabled</th>
+              </thead>
+              <tbody>
+              <template is="dom-repeat" items="{{interactions}}" as="interaction">
+                <tr>
+                  <td>
+                    <a href="https://app.composableprompts.com/interactions/{{interaction.id}}"
+                       target="_blank">{{interaction.name}}</a>
+                  </td>
+                  <td class="highlighted">
+                    <nuxeo-selectivity
+                            class="selectivity-container"
+                            multiple
+                            min-chars="0"
+                            data="{{documentTypes}}"
+                            value="{{interaction.activeOnDocumentTypes}}"
+                            placeholder="Select Document Types"
+                    ></nuxeo-selectivity>
+                  </td>
+                  <td>
+                    <paper-toggle-button checked="{{interaction.isActive}}">Active</paper-toggle-button>
+                  </td>
+                </tr>
+              </template>
+              </tbody>
+            </table>
+          </div>
+        </nuxeo-card>
+      </div>
+    </nuxeo-page>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'maretha-cp-interactions',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+        interactions: {
+          type: Array,
+          value: [],
+          observer: '_interactionsObserver',
+          notify: true
+        },
+
+        documentTypes: {
+          type: Array,
+          value: [],
+          observer: '_documentTypesObserver'
+        },
+      },
+
+      observers: ['_interactionsChangeObserver(interactions.*)'],
+
+      ready: function () {
+        this._getInteractions();
+        this._getDocumentTypes();
+      },
+
+      _getInteractions: function () {
+        const operation = this.$.getInteractionsOperation;
+        operation.params = {};
+        operation.execute().then((response) => {
+          this.set('interactions', response.value);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _getDocumentTypes: function () {
+        const operation = this.$.docTypesOp;
+        operation.params = {};
+        operation.execute().then((response) => {
+          this.set('documentTypes', response.value);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _saveInteractions: function () {
+        const operation = this.$.saveInteractionsOperation;
+        operation.params = {'interactions': this.interactions};
+        operation.execute().then((response) => {
+          console.log(`_saveInteractions`, response.value);
+          this._showNotification('Changes Saved!', 'success');
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+          this._showNotification('Changes NOT Saved!', 'error');
+        });
+      },
+
+      _interactionsObserver: function (obs) {
+        console.log(`_interactionsObserver:`, obs);
+      },
+
+      _interactionsChangeObserver: function (obs) {
+        console.log(`_interactionsObserver:`, obs);
+        if(!this.interactions) return;
+        this._saveInteractions();
+      },
+
+      _documentTypesObserver: function (obs) {
+        console.log(`_documentTypesObserver:`, obs);
+      },
+
+      _showNotification(message, type) {
+        const toast = this.$.toast;
+        toast.text = message;
+        toast.classList.remove('toast-error', 'toast-success', 'toast-warning'); // Remove existing classes
+        if (type) {
+          toast.classList.add(`toast-${type}`);
+        }
+        toast.open();
+      }
+
+    });
+  </script>
+</dom-module>

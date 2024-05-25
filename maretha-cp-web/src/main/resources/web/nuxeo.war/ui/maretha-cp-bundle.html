@@ -1,0 +1,22 @@
+<link rel="import" href="configuration-behaviour.html">
+<link rel="import" href="custom-elements/maretha-cp-interactions.html">
+
+<nuxeo-slot-content name="maretha-cp-interactions" slot="PAGES" order="100">
+    <template>
+        <maretha-cp-interactions name="maretha-cp-interactions" user="user"></maretha-cp-interactions>
+    </template>
+</nuxeo-slot-content>
+
+<nuxeo-slot-content name="maretha-cp" slot="DRAWER_ITEMS" order="100">
+    <template>
+        <nuxeo-menu-icon name="maretha-cp" label="AI Composable Prompts"
+                         icon="icons:extension"></nuxeo-menu-icon>
+    </template>
+</nuxeo-slot-content>
+
+<nuxeo-slot-content name="maretha-cp" slot="DRAWER_PAGES">
+    <template>
+        <nuxeo-menu-item name="maretha-cp" label="Interactions Settings"
+                         route="page:maretha-cp-interactions"></nuxeo-menu-item>
+    </template>
+</nuxeo-slot-content>
