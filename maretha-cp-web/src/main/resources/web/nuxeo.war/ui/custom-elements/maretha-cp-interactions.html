@@ -1,6 +1,7 @@
 <dom-module id="maretha-cp-interactions">
   <template>
-    <nuxeo-operation id="interactionsOperation" op="InteractionsOperation" ></nuxeo-operation>
+    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
+    <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation" ></nuxeo-operation>
     <nuxeo-operation id="docTypesOp" op="DocumentTypesOperation" ></nuxeo-operation>
 
     <style include="nuxeo-styles">
@@ -28,6 +29,21 @@
         --paper-toggle-button-unchecked-ink-color: var(--paper-red-500);
       }
 
+      .toast-error {
+        background-color: #f44336; /* Red */
+        color: white;
+      }
+
+      .toast-success {
+        background-color: #4caf50; /* Green */
+        color: white;
+      }
+
+      .toast-warning {
+        background-color: #ff9800; /* Orange */
+        color: white;
+      }
+
       .table {
         width: 100%;
       }
@@ -39,6 +55,8 @@
       </div>
 
       <div id="main slot">
+        <paper-toast id="toast"></paper-toast>
+
         <nuxeo-card>
           <div class="content">
             <table class="table">
@@ -97,7 +115,7 @@
         },
       },
 
-      observers: ['_interactionsObserver(interactions.*)'],
+      observers: ['_interactionsChangeObserver(interactions.*)'],
 
       ready: function () {
         this._getInteractions();
@@ -105,7 +123,7 @@
       },
 
       _getInteractions: function () {
-        const operation = this.$.interactionsOperation;
+        const operation = this.$.getInteractionsOperation;
         operation.params = {};
         operation.execute().then((response) => {
           this.set('interactions', response.value);
@@ -124,13 +142,41 @@
         });
       },
 
+      _saveInteractions: function () {
+        const operation = this.$.saveInteractionsOperation;
+        operation.params = {'interactions': this.interactions};
+        operation.execute().then((response) => {
+          console.log(`_saveInteractions`, response.value);
+          this._showNotification('Changes Saved!', 'success');
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+          this._showNotification('Changes NOT Saved!', 'error');
+        });
+      },
+
       _interactionsObserver: function (obs) {
         console.log(`_interactionsObserver:`, obs);
+      },
+
+      _interactionsChangeObserver: function (obs) {
+        console.log(`_interactionsObserver:`, obs);
+        if(!this.interactions) return;
+        this._saveInteractions();
       },
 
       _documentTypesObserver: function (obs) {
         console.log(`_documentTypesObserver:`, obs);
       },
+
+      _showNotification(message, type) {
+        const toast = this.$.toast;
+        toast.text = message;
+        toast.classList.remove('toast-error', 'toast-success', 'toast-warning'); // Remove existing classes
+        if (type) {
+          toast.classList.add(`toast-${type}`);
+        }
+        toast.open();
+      }
 
     });
   </script>
