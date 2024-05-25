@@ -1,0 +1,4 @@
+nuxeo.template.includes=common
+
+cp.api.url=https://api.composableprompts.com/api/v1
+cp.auth.token=

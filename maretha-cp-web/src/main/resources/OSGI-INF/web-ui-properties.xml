@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.web.ui.properties.assistant.contrib">
+  <require>org.nuxeo.web.ui.properties.contrib</require>
+
+  <extension target="org.nuxeo.runtime.ConfigurationService" point="configuration">
+    <property name="org.nuxeo.web.ui.assistant.auto.generation.enabled">${feature.assistant.auto.generation.enabled}</property>
+    <property name="org.nuxeo.web.ui.assistant.supported.mimeTypes">${assistant.enable.mime-types}</property>
+  </extension>
+</component>

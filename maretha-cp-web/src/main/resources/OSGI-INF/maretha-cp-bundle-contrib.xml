@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.bundle">
+    <extension target="org.nuxeo.ecm.platform.WebResources" point="resources">
+        <resource name="maretha-cp-bundle.html" type="import">
+            <uri>/ui/maretha-cp-bundle.html</uri>
+        </resource>
+    </extension>
+    <extension target="org.nuxeo.ecm.platform.WebResources" point="bundles">
+        <bundle name="web-ui">
+            <resources append="true">
+                <resource>maretha-cp-bundle.html</resource>
+            </resources>
+        </bundle>
+    </extension>
+
+</component>
