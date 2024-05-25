@@ -2,6 +2,7 @@ package io.maretha.cp.core.operations;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.maretha.cp.core.models.CpInteraction;
 import io.maretha.cp.core.services.ComposablePromptsServiceInterface;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
@@ -34,10 +35,10 @@ public class InteractionsOperation {
     ObjectMapper objectMapper = new ObjectMapper();
 
     @OperationMethod
-    public Blob run() {
+    public List<CpInteraction> run() {
         ComposablePromptsServiceInterface cpService = Framework.getService(ComposablePromptsServiceInterface.class);
-        String interactions = cpService.getInteractions();
-        return new StringBlob(interactions, "application/json");
+        return cpService.getInteractions();
+//        return new StringBlob(interactions, "application/json");
     }
 
 }
