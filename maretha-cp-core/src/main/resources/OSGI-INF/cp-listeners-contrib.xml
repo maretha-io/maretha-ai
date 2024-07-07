@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.listener.cpListener">
+
+  <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+    <listener name="cpListener" class="io.maretha.cp.core.listeners.DocumentChangeListener"
+              async="false" postCommit="false" priority="99">
+        <event>beforeDocumentModification</event>
+        <event>documentCreated</event>
+        <event>documentImported</event>
+    </listener>
+  </extension>
+
+</component>

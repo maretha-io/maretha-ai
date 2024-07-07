@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.services.CPSettingsService">
+
+  <documentation>
+    Composable Prompts Settings Service.
+  </documentation>
+
+  <implementation class="io.maretha.cp.core.services.CPLocalSettingsService" />
+
+  <service>
+    <provide interface="io.maretha.cp.core.services.CPLocalSettingsServiceInterface" />
+  </service>
+</component>

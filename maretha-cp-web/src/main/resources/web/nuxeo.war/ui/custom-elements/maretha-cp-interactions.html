@@ -160,7 +160,7 @@
 
       _interactionsChangeObserver: function (obs) {
         console.log(`_interactionsObserver:`, obs);
-        if(!this.interactions) return;
+        if(!this.interactions.length > 0) return;
         this._saveInteractions();
       },
 

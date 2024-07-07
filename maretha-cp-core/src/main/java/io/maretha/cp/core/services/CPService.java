@@ -14,11 +14,10 @@ import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
-public class ComposablePromptsService implements ComposablePromptsServiceInterface {
-    private static final Log log = LogFactory.getLog(ComposablePromptsService.class);
+public class CPService implements CPServiceInterface {
+    private static final Log log = LogFactory.getLog(CPService.class);
     String API_URL = Framework.getProperty("cp.api.url", "https://api.composableprompts.com/api/v1");
     String AUTH_TOKEN = Framework.getProperty("cp.auth.token");
     OkHttpClient client = new OkHttpClient();
@@ -33,6 +32,12 @@ public class ComposablePromptsService implements ComposablePromptsServiceInterfa
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public String getInteractionResult(String request) {
+        //TODO
+        return null;
     }
 
     private String getRequest(String apiToken, String url) {
