@@ -1,21 +1,17 @@
 package io.maretha.cp.core.operations;
 
 import io.maretha.cp.core.models.CpInteraction;
-import io.maretha.cp.core.services.ComposablePromptsServiceInterface;
+import io.maretha.cp.core.services.CPLocalSettingsServiceInterface;
+import io.maretha.cp.core.services.CPServiceInterface;
+import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.runtime.api.Framework;
 
 import java.util.List;
-import java.util.Optional;
-
-import static io.maretha.cp.core.operations.SaveInteractionsOperation.CP_SETTINGS_DOCUMENT_TYPE;
-import static io.maretha.cp.core.operations.SaveInteractionsOperation.CPS_INTERACTIONS_PATH;
 
 /**
  *
@@ -30,18 +26,14 @@ public class GetInteractionsOperation {
     @OperationMethod
     public List<CpInteraction> run() {
         //TODO Return local settings + check new CP Interactions and merge the results
-        if (getExistingSettingsDocument().isPresent()) {
-            DocumentModel documentModel = getExistingSettingsDocument().get();
-            return (List<CpInteraction>) documentModel.getPropertyValue(CPS_INTERACTIONS_PATH);
+        CPLocalSettingsServiceInterface cpLocalSettingsService = Framework.getService(CPLocalSettingsServiceInterface.class);
+        List<CpInteraction> interactionSettings = cpLocalSettingsService.getInteractionSettings();
+        if (!CollectionUtils.isEmpty(interactionSettings)) {
+            return interactionSettings;
         }
-        ComposablePromptsServiceInterface cpService = Framework.getService(ComposablePromptsServiceInterface.class);
+        CPServiceInterface cpService = Framework.getService(CPServiceInterface.class);
         return cpService.getInteractions();
     }
 
-    private Optional<DocumentModel> getExistingSettingsDocument() {
-        String query = String.format("SELECT * FROM %s WHERE ecm:isProxy = 0", CP_SETTINGS_DOCUMENT_TYPE);
-        DocumentModelList documents = session.query(query);
-        return documents.stream().findFirst();
-    }
 
 }
