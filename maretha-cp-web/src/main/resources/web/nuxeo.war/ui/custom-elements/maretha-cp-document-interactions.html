@@ -1,0 +1,162 @@
+<dom-module id="maretha-cp-document-interactions">
+  <template>
+    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
+    <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]"></nuxeo-operation>
+    <nuxeo-operation id="getInteractionParameters" op="GetInteractionParametersOperation" ></nuxeo-operation>
+
+
+    <style include="nuxeo-action-button-styles">
+      .content {
+        @apply --layout-vertical;
+        min-height: 400px;
+        height: 400px;
+      }
+
+      #dialog {
+        width: 80%;
+        min-height: 50%;
+        margin: auto;
+      }
+
+      .textarea {
+        max-height: 400px;
+        overflow-y: auto;
+        overflow-x: auto;
+      }
+    </style>
+
+    <paper-icon-button icon="communication:chat" label="Interact with document" on-tap="_toggleDialog">
+      <nuxeo-tooltip>AI Interact with document</nuxeo-tooltip>
+    </paper-icon-button>
+
+    <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
+      <div class="content">
+        <div style="width: 90%; margin:auto;">
+          <paper-dropdown-menu label="Select AI Interaction">
+            <paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
+              <template is="dom-repeat" items="[[interactions]]">
+                <paper-item>[[item.name]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+
+          <nuxeo-input role="widget" value="{{question}}" label="Question" type="text"></nuxeo-input>
+          <div class="textarea" inner-h-t-m-l="[[interactionResponse]]"></div>
+        </div>
+      </div>
+      <div class="buttons">
+        <paper-button noink dialog-dismiss on-tap="_close">Close</paper-button>
+        <paper-icon-button id="chat" icon="communication:chat" on-tap="_interactWithDocument"
+                           aria-label="Interact with document">
+        </paper-icon-button>
+      </div>
+    </nuxeo-dialog>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'maretha-cp-document-interactions',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+        interactions: {
+          type: Array,
+          value: [],
+          observer: '_interactionsObserver',
+          notify: true
+        },
+
+        selectedInteraction: {
+          type: Object,
+          computed: '_computeSelectedValue(selectedIndex, interactions)',
+          observer: '_selectedInteractionObserver',
+        },
+
+        interactionResponse: {
+          type: Object
+        },
+
+        interactionParameters: {
+          type: Array
+        },
+
+        // Holds the selected index from the dropdown
+        selectedIndex: {
+          type: Number,
+          value: -1,
+          observer: '_selectedIndexChanged'
+        },
+      },
+
+      observers: [],
+
+      ready: function () {
+        this._getInteractions();
+      },
+
+      _getInteractions: function () {
+        const operation = this.$.getInteractionsOperation;
+        operation.params = {};
+        operation.execute().then((response) => {
+          this.set('interactions', response.value);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _getInteractionParameters: function () {
+        const operation = this.$.getInteractionParameters;
+        operation.params = {"interactionId": this.selectedInteraction.id};
+        operation.execute().then((response) => {
+          this.set('interactionParameters', response.value);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _interactWithDocument: function () {
+        const operation = this.$.runInteractionOperation;
+        operation.params = {"interactionId": this.selectedInteraction.id, data: {}};
+        operation.execute().then((response) => {
+          this.set('interactionResponse', response.value);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _interactionsObserver: function (obs) {
+        console.log(`_interactionsObserver:`, obs);
+      },
+
+      _selectedInteractionObserver: function () {
+        console.log(this.selectedInteraction);
+        this._getInteractionParameters();
+      },
+
+      // Observer method to handle when the selected index changes
+      _selectedIndexChanged: function(newIndex, oldIndex) {
+        console.log('Selected index changed to: ', newIndex);
+      },
+
+      // Compute the selected value based on the selected index
+      _computeSelectedValue: function(selectedIndex, jsonData) {
+        if (selectedIndex >= 0 && jsonData && jsonData[selectedIndex]) {
+          return jsonData[selectedIndex];
+        }
+        return '';
+      },
+
+      _toggleDialog: function () {
+        this.$.dialog.toggle();
+      },
+
+      _close: function () {
+      },
+
+      _dialogClosed: function () {
+
+      },
+
+    });
+  </script>
+</dom-module>

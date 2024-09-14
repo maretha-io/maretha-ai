@@ -42,7 +42,7 @@ import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.*;
 public class DocumentChangeListener implements EventListener {
     public static final String DISABLE_DOCUMENT_CHANGE_LISTENER = "disableDocumentChangeListener";
     private static final Log log = LogFactory.getLog(DocumentChangeListener.class);
-    String FILE_CONTENT = "file:content";
+    public static String FILE_CONTENT = "file:content";
 
     @Override
     public void handleEvent(Event event) {
@@ -84,12 +84,13 @@ public class DocumentChangeListener implements EventListener {
     }
 
     private void processDocument(DocumentModel doc, CoreSession session) {
-        BulkService bulkService = Framework.getService(BulkService.class);
-        String commandId = bulkService.submit(
-                new BulkCommand.Builder(StreamDocumentProcessor.ACTION_NAME, "ignored", "system")
-                        .param("docId", doc.getId())
-                        .useExternalScroller()
-                        .build());
+        //TODO disable for now
+//        BulkService bulkService = Framework.getService(BulkService.class);
+//        String commandId = bulkService.submit(
+//                new BulkCommand.Builder(StreamDocumentProcessor.ACTION_NAME, "ignored", "system")
+//                        .param("docId", doc.getId())
+//                        .useExternalScroller()
+//                        .build());
     }
 
     private boolean blobIsSupportedMimeType(DocumentModel doc) {
