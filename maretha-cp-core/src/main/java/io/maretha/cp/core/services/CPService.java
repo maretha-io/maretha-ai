@@ -47,15 +47,11 @@ public class CPService implements CPServiceInterface {
         List<Object> paramsList = new ArrayList<>();
         try {
             JsonNode jsonNode = objectMapper.readTree(interactionParametersResponse);
-            JsonNode parameters = jsonNode.get("parameters");
-            if (parameters.isArray()) {
-                for (JsonNode parameterNode : parameters) {
-                    try {
+            JsonNode prompts = jsonNode.get("prompts");
+            if (prompts.isArray()) {
+                for (JsonNode parameterNode : prompts) {
                         Object params = parameterNode.get("template").get("inputSchema").get("properties");
-                        paramsList.add(params);
-                    }catch (Exception e){
-                        //ignore
-                    }
+                        if (params != null) paramsList.add(params);
                 }
             }
         } catch (JsonProcessingException e) {

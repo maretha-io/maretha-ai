@@ -31,7 +31,7 @@
 
     <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
       <div class="content">
-        <div style="width: 90%; margin:auto;">
+        <div style="width: 90%; margin:auto; text-align: center;">
           <paper-dropdown-menu label="Select AI Interaction">
             <paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
               <template is="dom-repeat" items="[[interactions]]">
@@ -40,7 +40,10 @@
             </paper-listbox>
           </paper-dropdown-menu>
 
-          <nuxeo-input role="widget" value="{{question}}" label="Question" type="text"></nuxeo-input>
+          <template is="dom-repeat" items="[[interactionParameters]]">
+            <nuxeo-input role="widget" value="{{item.value}}" label="[[item.label]]" readonly="[[item.readOnly]]" type="text"></nuxeo-input>
+          </template>
+
           <div class="textarea" inner-h-t-m-l="[[interactionResponse]]"></div>
         </div>
       </div>
@@ -77,14 +80,14 @@
         },
 
         interactionParameters: {
-          type: Array
+          type: Array,
+          observer: '_interactionParametersObserver'
         },
 
         // Holds the selected index from the dropdown
         selectedIndex: {
           type: Number,
           value: -1,
-          observer: '_selectedIndexChanged'
         },
       },
 
@@ -105,18 +108,32 @@
       },
 
       _getInteractionParameters: function () {
+        if(!this.selectedInteraction) return;
         const operation = this.$.getInteractionParameters;
         operation.params = {"interactionId": this.selectedInteraction.id};
         operation.execute().then((response) => {
-          this.set('interactionParameters', response.value);
+          const params = Object.keys(response.value[0]);
+          const paramsObj = params.map(item => ({
+            value: item === 'text' ? 'Text is automatically sent from document file:content' : '',
+            label: item,
+            readOnly: item === 'text' ? true : false
+          }));
+          this.set('interactionParameters', paramsObj);
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });
       },
 
       _interactWithDocument: function () {
+        if(!this.selectedInteraction) return;
         const operation = this.$.runInteractionOperation;
-        operation.params = {"interactionId": this.selectedInteraction.id, data: {}};
+        const transformedData = {
+          data: this.interactionParameters.reduce((acc, item) => {
+            acc[item.label] = item.value;
+            return acc;
+          }, {})
+        };
+        operation.params = {"interactionId": this.selectedInteraction.id, "data": transformedData.data};
         operation.execute().then((response) => {
           this.set('interactionResponse', response.value);
         }).catch((error) => {
@@ -129,13 +146,11 @@
       },
 
       _selectedInteractionObserver: function () {
-        console.log(this.selectedInteraction);
         this._getInteractionParameters();
       },
 
-      // Observer method to handle when the selected index changes
-      _selectedIndexChanged: function(newIndex, oldIndex) {
-        console.log('Selected index changed to: ', newIndex);
+      _interactionParametersObserver: function() {
+        console.log(this.interactionParameters);
       },
 
       // Compute the selected value based on the selected index
