@@ -38,8 +38,8 @@ public class CPInteractionComputation extends AbstractBulkComputation {
     @Override
     protected void compute(CoreSession session, List<String> texts, Map<String, Serializable> properties) {
         texts.forEach(text -> {
-            String interactionResult = Framework.getService(CPServiceInterface.class).getInteractionResult(text);
-            log.debug("InteractionResult: " + interactionResult);
+//            String interactionResult = Framework.getService(CPServiceInterface.class).getInteractionResult(text, data);
+//            log.debug("InteractionResult: " + interactionResult);
         });
     }
 

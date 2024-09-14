@@ -1,5 +1,6 @@
 <link rel="import" href="configuration-behaviour.html">
 <link rel="import" href="custom-elements/maretha-cp-interactions.html">
+<link rel="import" href="custom-elements/maretha-cp-document-interactions.html">
 
 <nuxeo-slot-content name="maretha-cp-interactions" slot="PAGES" order="100">
     <template>
@@ -18,5 +19,11 @@
     <template>
         <nuxeo-menu-item name="maretha-cp" label="Interactions Settings"
                          route="page:maretha-cp-interactions"></nuxeo-menu-item>
+    </template>
+</nuxeo-slot-content>
+
+<nuxeo-slot-content name="documentInteractions" slot="DOCUMENT_ACTIONS" order="2">
+    <template>
+        <maretha-cp-document-interactions document="[[document]]"></maretha-cp-document-interactions>
     </template>
 </nuxeo-slot-content>
