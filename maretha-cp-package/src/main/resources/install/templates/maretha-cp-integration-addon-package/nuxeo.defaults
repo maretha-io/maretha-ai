@@ -2,3 +2,5 @@ nuxeo.template.includes=common
 
 cp.api.url=https://api.composableprompts.com/api/v1
 cp.auth.token=
+
+cp.supported.mime-types=text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document
