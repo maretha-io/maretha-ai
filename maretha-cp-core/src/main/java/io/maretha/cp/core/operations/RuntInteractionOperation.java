@@ -1,6 +1,10 @@
 package io.maretha.cp.core.operations;
 
 import io.maretha.cp.core.services.CPServiceInterface;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
@@ -35,9 +39,36 @@ public class RuntInteractionOperation {
     public String run(DocumentModel doc) throws IOException {
         Property blobProperty = doc.getProperty(FILE_CONTENT);
         Blob blob = (Blob) blobProperty.getValue();
-        String docText = blob.getString();
-        data.put("text", docText);
+        data.put("text", getText(blob));
         return Framework.getService(CPServiceInterface.class).getInteractionResult(interactionId, data);
+    }
+
+    private String getText(Blob blob) throws IOException {
+        String text = "";
+        if (blob != null) {
+            // Extract text based on the blob type (Word, PDF, etc.)
+            String mimeType = blob.getMimeType();
+            if (mimeType.equals("application/pdf")) {
+                // Use PDFBox to extract text from PDF
+                try (PDDocument pdfDocument = PDDocument.load(blob.getStream())) {
+                    PDFTextStripper pdfStripper = new PDFTextStripper();
+                    text = pdfStripper.getText(pdfDocument);
+                }
+            } else if (mimeType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+                // Use Apache POI to extract text from Word document
+                try (XWPFDocument doc = new XWPFDocument(blob.getStream())) {
+                    XWPFWordExtractor extractor = new XWPFWordExtractor(doc);
+                    text = extractor.getText();
+                }
+            } else {
+                throw new RuntimeException("Cannot extract text from document");
+            }
+        }
+        return removeRepetitiveCharacters(text);
+    }
+
+    protected String removeRepetitiveCharacters(String text) {
+        return text.replaceAll("(\\s*(.)\\s*)\\1+", "$1");
     }
 
 
