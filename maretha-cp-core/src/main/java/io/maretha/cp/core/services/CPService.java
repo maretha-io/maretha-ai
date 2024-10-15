@@ -20,12 +20,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class CPService implements CPServiceInterface {
     private static final Log log = LogFactory.getLog(CPService.class);
     String API_URL = Framework.getProperty("cp.api.url", "https://api.composableprompts.com/api/v1");
     String AUTH_TOKEN = Framework.getProperty("cp.auth.token");
-    OkHttpClient client = new OkHttpClient();
+    OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build();
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
