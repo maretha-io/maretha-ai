@@ -1,5 +1,6 @@
 package io.maretha.cp.core.operations;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.maretha.cp.core.services.CPServiceInterface;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -36,7 +37,7 @@ public class RuntInteractionOperation {
     protected String interactionId;
 
     @OperationMethod
-    public String run(DocumentModel doc) throws IOException {
+    public JsonNode run(DocumentModel doc) throws IOException {
         Property blobProperty = doc.getProperty(FILE_CONTENT);
         Blob blob = (Blob) blobProperty.getValue();
         data.put("text", getText(blob));
