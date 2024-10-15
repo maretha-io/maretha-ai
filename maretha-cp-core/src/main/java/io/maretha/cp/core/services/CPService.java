@@ -66,7 +66,7 @@ public class CPService implements CPServiceInterface {
     }
 
     @Override
-    public String getInteractionResult(String interaction, Map<String, String> data) {
+    public JsonNode getInteractionResult(String interaction, Map<String, String> data) {
         // Variables to be used in the JSON string
         boolean stream = false;
         String dataParameters = "";
@@ -86,9 +86,9 @@ public class CPService implements CPServiceInterface {
         String url = API_URL + "/runs";
         String response = postRequest(AUTH_TOKEN, url, jsonBody);
         try {
-            return objectMapper.readTree(response).get("result").toPrettyString();
+            return objectMapper.readTree(response).get("result");
         } catch (JsonProcessingException e) {
-            return e.getMessage();
+            throw new NuxeoException(e); //TODO ADD logging
         }
     }
 

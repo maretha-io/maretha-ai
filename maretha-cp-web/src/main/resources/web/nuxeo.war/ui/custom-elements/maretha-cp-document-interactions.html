@@ -44,7 +44,7 @@
             <nuxeo-input role="widget" value="{{item.value}}" label="[[item.label]]" readonly="[[item.readOnly]]" type="text"></nuxeo-input>
           </template>
 
-          <div class="textarea" inner-h-t-m-l="[[interactionResponse]]"></div>
+          <div id="response"></div>
         </div>
       </div>
       <div class="buttons">
@@ -136,6 +136,10 @@
         operation.params = {"interactionId": this.selectedInteraction.id, "data": transformedData.data};
         operation.execute().then((response) => {
           this.set('interactionResponse', response.value);
+          console.log(response.value);
+          const htmlFormatted = this.jsonToHtml(response.value);
+          console.log(htmlFormatted);
+          this.$.response.innerHTML = htmlFormatted;
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });
@@ -171,6 +175,20 @@
       _dialogClosed: function () {
 
       },
+
+      jsonToHtml: function(json) {
+        let htmlOutput = '';
+        for (let key in json) {
+            if (json.hasOwnProperty(key)) {
+                htmlOutput += `<p><b>${this.capitalizeFirstLetter(key)}:</b> ${json[key]}</p>`;
+            }
+        }
+        return htmlOutput;
+      },
+
+      capitalizeFirstLetter: function(string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+      }
 
     });
   </script>
