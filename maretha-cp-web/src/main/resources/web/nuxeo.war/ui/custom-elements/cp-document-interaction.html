@@ -38,9 +38,11 @@
             </paper-listbox>
           </paper-dropdown-menu>
 
-          <template is="dom-repeat" items="[[interactionParameters]]">
-            <nuxeo-input role="widget" value="{{item.value}}" label="[[item.label]]" readonly="[[item.readOnly]]" type="text"></nuxeo-input>
-          </template>
+          <div style="width: 50%; margin:auto; text-align: center;">
+            <template is="dom-repeat" items="[[selectedInteraction.parameters]]">
+              <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
+            </template>
+          </div>
 
           <div id="response"></div>
         </div>
@@ -77,11 +79,6 @@
           type: Object
         },
 
-        interactionParameters: {
-          type: Array,
-          observer: '_interactionParametersObserver'
-        },
-
         // Holds the selected index from the dropdown
         selectedIndex: {
           type: Number,
@@ -105,27 +102,10 @@
         });
       },
 
-      _getInteractionParameters: function () {
-        if(!this.selectedInteraction) return;
-          const params = Object.keys(this.selectedInteraction.parameters[0]);
-          const paramsObj = params.map(item => ({
-            value: item === 'text' ? 'Text is automatically sent from document file:content' : '',
-            label: item,
-            readOnly: item === 'text' ? true : false
-          }));
-          this.set('interactionParameters', paramsObj);
-      },
-
       _interactWithDocument: function () {
         if(!this.selectedInteraction) return;
         const operation = this.$.runInteractionOperation;
-        const transformedData = {
-          data: this.interactionParameters.reduce((acc, item) => {
-            acc[item.label] = item.value;
-            return acc;
-          }, {})
-        };
-        operation.params = {"interactionId": this.selectedInteraction.id, "data": transformedData.data};
+        operation.params = {"interactionId": this.selectedInteraction.id, "data": this.selectedInteraction.parameters};
         operation.execute().then((response) => {
           this.set('interactionResponse', response.value);
           const htmlFormatted = this.jsonToHtml(response.value);
@@ -139,12 +119,8 @@
         console.log(`_interactionsObserver:`, obs);
       },
 
-      _selectedInteractionObserver: function () {
-        this._getInteractionParameters();
-      },
-
-      _interactionParametersObserver: function() {
-        console.log(this.interactionParameters);
+      _selectedInteractionObserver: function (obs) {
+        console.log('_selectedInteractionObserver', obs);
       },
 
       // Compute the selected value based on the selected index

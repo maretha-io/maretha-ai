@@ -56,7 +56,7 @@ public class TestSaveInteractionsOperation {
         interaction1.put("status", "draft");
         interaction1.put("updatedAt", "2024-04-24T18:16:13.492Z");
         interaction1.put("activeOnDocumentTypes", new ArrayList<String>());
-        interaction1.put("isActive", true);
+        interaction1.put("active", true);
         interactions.add(interaction1);
 
         HashMap<String, Object> interaction2 = new HashMap<>();
@@ -65,7 +65,7 @@ public class TestSaveInteractionsOperation {
         interaction2.put("name", "Metadata Extraction");
         interaction2.put("status", "draft");
         interaction2.put("activeOnDocumentTypes", null);
-        interaction2.put("isActive", false);
+        interaction2.put("active", false);
         interactions.add(interaction2);
 
         DocumentModel doc = session.createDocumentModel("/", "testDocument", CP_SETTINGS_DOCUMENT_TYPE);

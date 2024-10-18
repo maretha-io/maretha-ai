@@ -18,7 +18,7 @@ public class Interaction {
     private String name;
     private String status;
     private String updated_at;
-    private List<InteractionParameters> parameters;
+    private List<InteractionParameter> parameters;
     private List<String> activeOnDocumentTypes = new ArrayList<>();
     private boolean isActive;
 }

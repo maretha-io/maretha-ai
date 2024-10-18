@@ -80,7 +80,7 @@
 
               <nuxeo-data-table-column name="Status">
                 <template>
-                  status
+                  [[item.status]]
                 </template>
               </nuxeo-data-table-column>
 
@@ -94,6 +94,9 @@
             </nuxeo-data-table>
             <paper-icon-button icon="icons:delete-forever" on-tap="_reset"
                                aria-label="Delete and Reset">
+            </paper-icon-button>
+            <paper-icon-button id="chat" icon="icons:save" on-tap="_saveInteractions"
+                               aria-label="Save Configuration">
             </paper-icon-button>
           </div>
         </nuxeo-card>
@@ -114,7 +117,7 @@
           <div style="width: 30%; margin:auto;">
             <p>Parameters</p>
             <template is="dom-repeat" items="[[selectedInteraction.parameters]]" as="item">
-              <nuxeo-input role="widget" value="{{item.defaultValue}}" label="[[item.name]]" readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
+              <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
             </template>
           </div>
         </div>
@@ -224,11 +227,9 @@
       },
 
       _close: function () {
-        this.$.dialog.toggle();
       },
 
       _dialogClosed: function () {
-        this.$.dialog.toggle();
       },
 
       _reset: function () {
