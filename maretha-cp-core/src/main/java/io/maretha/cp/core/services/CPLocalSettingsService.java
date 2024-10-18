@@ -35,6 +35,7 @@ public class CPLocalSettingsService implements CPLocalSettingsServiceInterface {
     }
 
     private Optional<DocumentModel> getExistingSettingsDocument() {
+        //TODO and deleted = false
         String query = String.format("SELECT * FROM %s WHERE ecm:isProxy = 0", CP_SETTINGS_DOCUMENT_TYPE);
         DocumentModelList documents = openSession().query(query);
         return documents.stream().findFirst();

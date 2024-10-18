@@ -16,10 +16,6 @@
  */
 package io.maretha.cp.core.listeners;
 
-import io.maretha.cp.core.models.CpInteraction;
-import io.maretha.cp.core.services.CPLocalSettingsServiceInterface;
-import io.maretha.cp.core.stream.StreamDocumentProcessor;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
@@ -27,17 +23,15 @@ import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.PropertyException;
 import org.nuxeo.ecm.core.api.model.Property;
-import org.nuxeo.ecm.core.bulk.BulkService;
-import org.nuxeo.ecm.core.bulk.message.BulkCommand;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.runtime.api.Framework;
 
-import java.util.List;
-
-import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.*;
+import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.BEFORE_DOC_UPDATE;
+import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.DOCUMENT_CREATED;
+import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.DOCUMENT_IMPORTED;
 
 public class DocumentChangeListener implements EventListener {
     public static final String DISABLE_DOCUMENT_CHANGE_LISTENER = "disableDocumentChangeListener";
@@ -46,6 +40,7 @@ public class DocumentChangeListener implements EventListener {
 
     @Override
     public void handleEvent(Event event) {
+        log.debug("HandleEvent DocumentChangeListener");
         EventContext ctx = event.getContext();
         if (!(ctx instanceof DocumentEventContext)) {
             return;
@@ -59,12 +54,12 @@ public class DocumentChangeListener implements EventListener {
             return;
         }
 
-        CPLocalSettingsServiceInterface cpSettingsService = Framework.getService(CPLocalSettingsServiceInterface.class);
-        List<CpInteraction> interactionsForDocumentType = cpSettingsService.getActiveInteractionsForDocumentType(doc.getType());
-        if (CollectionUtils.isEmpty(interactionsForDocumentType)) {
-            log.debug("No interactions for this documentType" + doc.getType());
-            return;
-        }
+//        CPLocalSettingsServiceInterface cpSettingsService = Framework.getService(CPLocalSettingsServiceInterface.class);
+//        List<CpInteraction> interactionsForDocumentType = cpSettingsService.getActiveInteractionsForDocumentType(doc.getType());
+//        if (CollectionUtils.isEmpty(interactionsForDocumentType)) {
+//            log.debug("No interactions for this documentType" + doc.getType());
+//            return;
+//        }
 
         if (!doc.hasSchema("file")) {
             return;
@@ -105,7 +100,7 @@ public class DocumentChangeListener implements EventListener {
     }
 
     private String getSupportedMimeTyes() {
-        return Framework.getProperty("cp.supported.mime-types", "");
+        return Framework.getProperty("cp.supported.mime-types", "text/plain,application/pdf");
     }
 
     private boolean blobIsDirty(DocumentModel doc) {

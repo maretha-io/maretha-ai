@@ -2,7 +2,7 @@
   <template>
     <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
     <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation" ></nuxeo-operation>
-    <nuxeo-operation id="docTypesOp" op="DocumentTypesOperation" ></nuxeo-operation>
+    <nuxeo-operation id="docTypesOp" op="GetDocumentTypesOperation" ></nuxeo-operation>
 
     <style include="nuxeo-styles">
       .content {
@@ -70,7 +70,7 @@
               <template is="dom-repeat" items="{{interactions}}" as="interaction">
                 <tr>
                   <td>
-                    <a href="https://app.composableprompts.com/interactions/{{interaction.id}}"
+                    <a href="https://cloud.becomposable.com/studio/interactions/{{interaction.id}}"
                        target="_blank">{{interaction.name}}</a>
                   </td>
                   <td class="highlighted">

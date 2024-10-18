@@ -19,6 +19,7 @@ public class CpInteraction {
     private String status;
     private String updated_at;
     private List<Object> prompts;
+    private List<Object> parameters;
 
     private List<String> activeOnDocumentTypes = new ArrayList<>();
     private Boolean isActive = Boolean.FALSE;

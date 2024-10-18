@@ -21,10 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class CPService implements CPServiceInterface {
     private static final Log log = LogFactory.getLog(CPService.class);
-    String API_URL = Framework.getProperty("cp.api.url", "https://api.composableprompts.com/api/v1");
+    String API_URL = Framework.getProperty("cp.api.url", "https://api.becomposable.com/api/v1");
     String AUTH_TOKEN = Framework.getProperty("cp.auth.token");
     OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
@@ -38,15 +39,17 @@ public class CPService implements CPServiceInterface {
         String url = API_URL + "/interactions";
         String interactions = getRequest(AUTH_TOKEN, url);
         try {
-            return objectMapper.readValue(interactions, new TypeReference<List<CpInteraction>>() {
-            });
+            List<CpInteraction> cpInteractions = objectMapper.readValue(interactions, new TypeReference<>() {});
+            return cpInteractions.stream().peek(interaction -> {
+                List<Object> interactionParameters = getInteractionParameters(interaction.getId());
+                interaction.setParameters(interactionParameters);
+            }).collect(Collectors.toList());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Override
-    public List<Object> getInteractionParameters(String interactionId) {
+    private List<Object> getInteractionParameters(String interactionId) {
         String url = API_URL + "/interactions/" + interactionId;
         String interactionParametersResponse = getRequest(AUTH_TOKEN, url);
         List<Object> paramsList = new ArrayList<>();
