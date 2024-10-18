@@ -1,4 +1,4 @@
-<dom-module id="maretha-cp-document-interactions">
+<dom-module id="cp-document-interaction">
   <template>
     <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]"></nuxeo-operation>
@@ -57,7 +57,7 @@
 
   <script>
     Polymer({
-      is: 'maretha-cp-document-interactions',
+      is: 'cp-document-interaction',
       behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
       properties: {
         interactions: {

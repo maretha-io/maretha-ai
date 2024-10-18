@@ -1,4 +1,4 @@
-<dom-module id="maretha-cp-interactions">
+<dom-module id="cp-settings">
   <template>
     <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
     <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation" ></nuxeo-operation>
@@ -6,13 +6,7 @@
 
     <style include="nuxeo-styles">
       .content {
-        width: 90%;
-      }
-
-      /* Styling for the dropdown */
-      paper-dropdown-menu {
-        width: 50%;
-        display: block;
+        width: 100%;
       }
 
       paper-checkbox {
@@ -59,37 +53,58 @@
 
         <nuxeo-card>
           <div class="content">
-            <table class="table">
-              <caption>AI Interactions</caption>
-              <thead>
-              <th scope="col">Interaction</th>
-              <th scope="col">Document Types</th>
-              <th scope="col">Enabled</th>
-              </thead>
-              <tbody>
-              <template is="dom-repeat" items="{{interactions}}" as="interaction">
-                <tr>
-                  <td>
-                    <a href="https://cloud.becomposable.com/studio/interactions/{{interaction.id}}"
-                       target="_blank">{{interaction.name}}</a>
-                  </td>
-                  <td class="highlighted">
-                    <nuxeo-selectivity
-                            class="selectivity-container"
-                            multiple
-                            min-chars="0"
-                            data="{{documentTypes}}"
-                            value="{{interaction.activeOnDocumentTypes}}"
-                            placeholder="Select Document Types"
-                    ></nuxeo-selectivity>
-                  </td>
-                  <td>
-                    <paper-toggle-button checked="{{interaction.isActive}}">Active</paper-toggle-button>
-                  </td>
-                </tr>
-              </template>
-              </tbody>
-            </table>
+            <nuxeo-data-table items="[[interactions]]" class="results-table">
+              <nuxeo-data-table-column name="Name">
+                <template>
+                  <a href="https://cloud.becomposable.com/studio/interactions/{{interaction.id}}"
+                     target="_blank">{{item.name}}</a>
+                </template>
+              </nuxeo-data-table-column>
+
+              <nuxeo-data-table-column name="Description">
+                <template>
+                  [[item.description]]
+                </template>
+              </nuxeo-data-table-column>
+
+              <!--TODO move in configuration pop-up-->
+<!--              <nuxeo-data-table-column name="Document Types">-->
+<!--                <template>-->
+<!--                  <nuxeo-select label="Select Item" value="{{item.activeOnDocumentTypes}}">-->
+<!--                    &lt;!&ndash; nuxeo-repeat to iterate over the list of items for the dropdown &ndash;&gt;-->
+<!--                    <nuxeo-repeat items="[[documentTypes]]" as="item">-->
+<!--                      <paper-item name="[[item]]">[[item]]</paper-item>-->
+<!--                    </nuxeo-repeat>-->
+<!--                  </nuxeo-select>-->
+<!--                    <nuxeo-selectivity-->
+<!--                            class="selectivity-container"-->
+<!--                            multiple-->
+<!--                            min-chars="0"-->
+<!--                            data="{{documentTypes}}"-->
+<!--                            value="{{item.activeOnDocumentTypes}}"-->
+<!--                            placeholder="Select Document Types"-->
+<!--                    ></nuxeo-selectivity>-->
+<!--                </template>-->
+<!--              </nuxeo-data-table-column>-->
+
+              <nuxeo-data-table-column name="Active">
+                <template>
+                  <paper-toggle-button checked="{{item.isActive}}">Active</paper-toggle-button>
+                </template>
+              </nuxeo-data-table-column>
+
+              <nuxeo-data-table-column name="Status">
+                <template>
+                  status
+                </template>
+              </nuxeo-data-table-column>
+
+              <nuxeo-data-table-column name="Configuration">
+                <template>
+                  configuration
+                </template>
+              </nuxeo-data-table-column>
+            </nuxeo-data-table>
           </div>
         </nuxeo-card>
       </div>
@@ -98,7 +113,7 @@
 
   <script>
     Polymer({
-      is: 'maretha-cp-interactions',
+      is: 'cp-settings',
       behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
       properties: {
         interactions: {
