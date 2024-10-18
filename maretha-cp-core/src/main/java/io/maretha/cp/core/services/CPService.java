@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.maretha.cp.core.models.CpInteraction;
+import io.maretha.cp.core.models.Interaction;
+import io.maretha.cp.core.models.InteractionParameters;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -24,24 +25,25 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class CPService implements CPServiceInterface {
-    private static final Log log = LogFactory.getLog(CPService.class);
-    String API_URL = Framework.getProperty("cp.api.url", "https://api.becomposable.com/api/v1");
-    String AUTH_TOKEN = Framework.getProperty("cp.auth.token");
-    OkHttpClient client = new OkHttpClient.Builder()
+    private final Log log = LogFactory.getLog(CPService.class);
+    private final String API_URL = Framework.getProperty("cp.api.url", "https://api.becomposable.com/api/v1");
+    private final String AUTH_TOKEN = Framework.getProperty("cp.auth.token");
+    private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .build();
-    ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public List<CpInteraction> getInteractions() {
+    public List<Interaction> getInteractions() {
         String url = API_URL + "/interactions";
         String interactions = getRequest(AUTH_TOKEN, url);
         try {
-            List<CpInteraction> cpInteractions = objectMapper.readValue(interactions, new TypeReference<>() {});
+            List<Interaction> cpInteractions = objectMapper.readValue(interactions, new TypeReference<>() {
+            });
             return cpInteractions.stream().peek(interaction -> {
-                List<Object> interactionParameters = getInteractionParameters(interaction.getId());
+                List<InteractionParameters> interactionParameters = getInteractionParameters(interaction.getId());
                 interaction.setParameters(interactionParameters);
             }).collect(Collectors.toList());
         } catch (JsonProcessingException e) {
@@ -49,23 +51,31 @@ public class CPService implements CPServiceInterface {
         }
     }
 
-    private List<Object> getInteractionParameters(String interactionId) {
+    private List<InteractionParameters> getInteractionParameters(String interactionId) {
         String url = API_URL + "/interactions/" + interactionId;
         String interactionParametersResponse = getRequest(AUTH_TOKEN, url);
-        List<Object> paramsList = new ArrayList<>();
+        List<InteractionParameters> paramsList = new ArrayList<>();
         try {
             JsonNode jsonNode = objectMapper.readTree(interactionParametersResponse);
             JsonNode prompts = jsonNode.get("prompts");
             if (prompts.isArray()) {
                 for (JsonNode parameterNode : prompts) {
-                        Object params = parameterNode.get("template").get("inputSchema").get("properties");
-                        if (params != null) paramsList.add(params);
+                    JsonNode params = parameterNode.get("template").get("inputSchema").get("properties");
+                    if (params != null) {
+                        params.forEach(p -> p.fields().forEachRemaining(field -> {
+                            String name = field.getKey();
+                            JsonNode value = field.getValue();
+                            String type = value.has("type") ? value.get("type").asText() : "";
+                            String format = value.has("format") ? value.get("format").asText() : "";
+                            paramsList.add(new InteractionParameters(name, type, format));
+                        }));
+                    }
                 }
             }
+            return paramsList;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        return paramsList;
     }
 
     @Override

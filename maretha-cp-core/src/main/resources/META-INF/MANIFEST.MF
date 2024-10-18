@@ -7,7 +7,8 @@ Bundle-Name: maretha-cp-core
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: io.maretha.cp.core.maretha-cp-core;singleton=true
 Nuxeo-Component: OSGI-INF/cp-operations-contrib.xml,
- OSGI-INF/types-contrib.xml,
+ OSGI-INF/cp-types-contrib.xml,
  OSGI-INF/cp-service-contrib.xml,
  OSGI-INF/cp-settings-service-contrib.xml,
- OSGI-INF/cp-listeners-contrib.xml
+ OSGI-INF/cp-listeners-contrib.xml,
+ OSGI-INF/cp-adapters-contrib.xml

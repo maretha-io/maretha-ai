@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static io.maretha.cp.core.operations.SaveInteractionsOperation.CP_SETTINGS_DOCUMENT_TYPE;
-import static io.maretha.cp.core.operations.SaveInteractionsOperation.CPS_INTERACTIONS_PATH;
+import static io.maretha.cp.core.services.LocalSettingsService.CPS_INTERACTIONS_PATH;
+import static io.maretha.cp.core.services.LocalSettingsService.CP_SETTINGS_DOCUMENT_TYPE;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 

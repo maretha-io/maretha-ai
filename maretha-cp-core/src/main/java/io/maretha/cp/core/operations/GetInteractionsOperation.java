@@ -1,13 +1,21 @@
 package io.maretha.cp.core.operations;
 
-import io.maretha.cp.core.models.CpInteraction;
+import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.services.CPServiceInterface;
+import io.maretha.cp.core.services.LocalSettingsServiceInterface;
+import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.automation.core.Constants;
+import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
+import org.nuxeo.ecm.automation.core.annotations.Param;
+import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.runtime.api.Framework;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -16,17 +24,33 @@ import java.util.List;
 public class GetInteractionsOperation {
 
     public static final String ID = "GetInteractionsOperation";
+    private final CPServiceInterface cpService = Framework.getService(CPServiceInterface.class);
+    private final LocalSettingsServiceInterface cpLocalSettingsService = Framework.getService(LocalSettingsServiceInterface.class);
+
+    @Param(name = "refresh", required = false)
+    protected boolean refresh;
+    @Context
+    protected CoreSession session;
 
     @OperationMethod
-    public List<CpInteraction> run() {
-        //TODO Return local settings + check new CP Interactions and merge the results
-//        CPLocalSettingsServiceInterface cpLocalSettingsService = Framework.getService(CPLocalSettingsServiceInterface.class);
-//        List<CpInteraction> interactionSettings = cpLocalSettingsService.getInteractionSettings();
-//        if (!CollectionUtils.isEmpty(interactionSettings)) {
-//            return interactionSettings;
-//        }
-        CPServiceInterface cpService = Framework.getService(CPServiceInterface.class);
-        return cpService.getInteractions();
+    public Collection<Interaction> run() {
+        Map<String, Interaction> interactionsById = new HashMap<>();
+        if (refresh) {
+            return cpService.getInteractions(); //reset and return all from remote (hard update)
+        }
+        //Get local interactions
+        List<Interaction> interactionSettings = cpLocalSettingsService.getLocalSettings(session);
+        if (!CollectionUtils.isEmpty(interactionSettings)) {
+            interactionSettings.forEach(interaction -> interactionsById.put(interaction.getId(), interaction));
+        } else { //Get remote interactions
+            List<Interaction> remoteInteractions = cpService.getInteractions();
+            remoteInteractions.forEach(interaction -> {
+                if (!interactionsById.containsKey(interaction.getId())) {
+                    interactionsById.put(interaction.getId(), interaction);
+                }
+            });
+        }
+        return interactionsById.values();
     }
 
 

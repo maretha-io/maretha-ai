@@ -12,15 +12,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CpInteraction {
+public class Interaction {
     private String id;
     private String description;
     private String name;
     private String status;
     private String updated_at;
-    private List<Object> prompts;
-    private List<Object> parameters;
-
+    private List<InteractionParameters> parameters;
     private List<String> activeOnDocumentTypes = new ArrayList<>();
-    private Boolean isActive = Boolean.FALSE;
+    private boolean isActive;
 }

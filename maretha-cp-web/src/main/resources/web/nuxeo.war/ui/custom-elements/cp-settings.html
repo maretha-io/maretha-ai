@@ -41,13 +41,18 @@
       .table {
         width: 100%;
       }
+
+      #dialog {
+        width: 80%;
+        min-height: 50%;
+        margin: auto;
+      }
     </style>
 
     <nuxeo-page>
       <div slot="header">
-        <span>Interactions Management</span>
+        <span>AI Interactions Management</span>
       </div>
-
       <div id="main slot">
         <paper-toast id="toast"></paper-toast>
 
@@ -67,29 +72,9 @@
                 </template>
               </nuxeo-data-table-column>
 
-              <!--TODO move in configuration pop-up-->
-<!--              <nuxeo-data-table-column name="Document Types">-->
-<!--                <template>-->
-<!--                  <nuxeo-select label="Select Item" value="{{item.activeOnDocumentTypes}}">-->
-<!--                    &lt;!&ndash; nuxeo-repeat to iterate over the list of items for the dropdown &ndash;&gt;-->
-<!--                    <nuxeo-repeat items="[[documentTypes]]" as="item">-->
-<!--                      <paper-item name="[[item]]">[[item]]</paper-item>-->
-<!--                    </nuxeo-repeat>-->
-<!--                  </nuxeo-select>-->
-<!--                    <nuxeo-selectivity-->
-<!--                            class="selectivity-container"-->
-<!--                            multiple-->
-<!--                            min-chars="0"-->
-<!--                            data="{{documentTypes}}"-->
-<!--                            value="{{item.activeOnDocumentTypes}}"-->
-<!--                            placeholder="Select Document Types"-->
-<!--                    ></nuxeo-selectivity>-->
-<!--                </template>-->
-<!--              </nuxeo-data-table-column>-->
-
               <nuxeo-data-table-column name="Active">
                 <template>
-                  <paper-toggle-button checked="{{item.isActive}}">Active</paper-toggle-button>
+                  <paper-toggle-button checked="{{item.active}}">Active</paper-toggle-button>
                 </template>
               </nuxeo-data-table-column>
 
@@ -101,13 +86,46 @@
 
               <nuxeo-data-table-column name="Configuration">
                 <template>
-                  configuration
+                  <paper-icon-button icon="editor:border-color" label="Configuration" interaction="{{item}}" on-tap="_toggleDialog">
+                    <nuxeo-tooltip>Configuration</nuxeo-tooltip>
+                  </paper-icon-button>
                 </template>
               </nuxeo-data-table-column>
             </nuxeo-data-table>
+            <paper-icon-button icon="icons:delete-forever" on-tap="_reset"
+                               aria-label="Delete and Reset">
+            </paper-icon-button>
           </div>
         </nuxeo-card>
       </div>
+
+      <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
+        <div class="content">
+          <div style="width: 30%; margin:auto;">
+            <nuxeo-selectivity
+                    class="selectivity-container"
+                    multiple
+                    min-chars="0"
+                    data="{{documentTypes}}"
+                    value="{{selectedInteraction.activeOnDocumentTypes}}"
+                    placeholder="Select Document Types"
+            ></nuxeo-selectivity>
+          </div>
+          <div style="width: 30%; margin:auto;">
+            <p>Parameters</p>
+            <template is="dom-repeat" items="[[selectedInteraction.parameters]]" as="item">
+              <nuxeo-input role="widget" value="{{item.defaultValue}}" label="[[item.name]]" readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
+            </template>
+          </div>
+        </div>
+        <div class="buttons">
+          <paper-button noink dialog-dismiss on-tap="_close">Close</paper-button>
+          <paper-icon-button id="chat" icon="icons:save" on-tap="_saveInteractions"
+                             aria-label="Save Configuration">
+          </paper-icon-button>
+        </div>
+      </nuxeo-dialog>
+
     </nuxeo-page>
   </template>
 
@@ -121,6 +139,11 @@
           value: [],
           observer: '_interactionsObserver',
           notify: true
+        },
+
+        selectedInteraction: {
+          type: Object,
+          observer: '_selectedInteractionObserver',
         },
 
         documentTypes: {
@@ -173,10 +196,12 @@
         console.log(`_interactionsObserver:`, obs);
       },
 
+      _selectedInteractionObserver: function (obs) {
+        console.log(`_selectedInteractionObserver`, obs);
+      },
+
       _interactionsChangeObserver: function (obs) {
         console.log(`_interactionsObserver:`, obs);
-        if(!this.interactions.length > 0) return;
-        this._saveInteractions();
       },
 
       _documentTypesObserver: function (obs) {
@@ -191,7 +216,30 @@
           toast.classList.add(`toast-${type}`);
         }
         toast.open();
-      }
+      },
+
+      _toggleDialog: function (e) {
+        this.set('selectedInteraction', e.currentTarget.interaction);
+        this.$.dialog.toggle();
+      },
+
+      _close: function () {
+        this.$.dialog.toggle();
+      },
+
+      _dialogClosed: function () {
+        this.$.dialog.toggle();
+      },
+
+      _reset: function () {
+        const operation = this.$.getInteractionsOperation;
+        operation.params = {"refresh": true};
+        operation.execute().then((response) => {
+          this.set('interactions', response.value);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
 
     });
   </script>

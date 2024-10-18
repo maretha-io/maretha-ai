@@ -3,13 +3,6 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:nxs="http://www.nuxeo.core/ecm/schemas/interactions/">
 
-    <!-- Definition for a list of strings -->
-    <xs:complexType name="stringList">
-        <xs:sequence>
-            <xs:element name="item" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
     <!-- Definition for the interactions complex type -->
     <xs:complexType name="interactionType">
         <xs:sequence>
@@ -19,7 +12,15 @@
             <xs:element name="status" type="xs:string"/>
             <xs:element name="updatedAt" type="xs:dateTime"/>
             <xs:element name="activeOnDocumentTypes" type="nxs:stringList"/>
-            <xs:element name="isActive" type="xs:boolean"/>
+            <xs:element name="active" type="xs:boolean"/>
+            <xs:element name="parameters" type="nxs:interactionParameterList"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Definition for a list of strings -->
+    <xs:complexType name="stringList">
+        <xs:sequence>
+            <xs:element name="item" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -32,4 +33,20 @@
             <xs:element name="interaction" type="nxs:interactionType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
+
+    <xs:complexType name="interactionParameterList">
+        <xs:sequence>
+            <xs:element name="parameter" type="nxs:interactionParameter" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="interactionParameter">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="type" type="xs:string"/>
+            <xs:element name="format" type="xs:string"/>
+            <xs:element name="defaultValue" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
 </xs:schema>
