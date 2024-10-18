@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.Interaction;
-import io.maretha.cp.core.models.InteractionParameters;
+import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
 import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.core.api.CoreInstance;
@@ -36,6 +36,11 @@ public class LocalSettingsService implements LocalSettingsServiceInterface {
     public static final String INTERACTION_SCHEMA_UPDATED_AT = "updatedAt";
     public static final String INTERACTION_SCHEMA_ACTIVE = "active";
     public static final String INTERACTION_SCHEMA_PARAMETERS = "parameters";
+
+    public static final String INTERACTION_PARAMETER_SCHEMA_NAME = "name";
+    public static final String INTERACTION_PARAMETER_SCHEMA_TYPE = "type";
+    public static final String INTERACTION_PARAMETER_SCHEMA_FORMAT = "format";
+    public static final String INTERACTION_PARAMETER_SCHEMA_VALUE = "value";
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
@@ -108,20 +113,21 @@ public class LocalSettingsService implements LocalSettingsServiceInterface {
         interactionMap.put(INTERACTION_SCHEMA_ID, interaction.getId());
         interactionMap.put(INTERACTION_SCHEMA_DESCRIPTION, interaction.getDescription());
         interactionMap.put(INTERACTION_SCHEMA_NAME, interaction.getName());
-        interactionMap.put(INTERACTION_SCHEMA_STATUS, interaction.getName());
+        interactionMap.put(INTERACTION_SCHEMA_STATUS, interaction.getStatus());
         interactionMap.put(INTERACTION_SCHEMA_ACTIVE_ON_DOCUMENTS, interaction.getActiveOnDocumentTypes());
-        interactionMap.put(INTERACTION_SCHEMA_UPDATED_AT, interaction.getUpdated_at());
+        interactionMap.put(INTERACTION_SCHEMA_UPDATED_AT, interaction.getUpdated_at()); //TODO update all at the same time or send isolated interactions?
         interactionMap.put(INTERACTION_SCHEMA_ACTIVE, interaction.isActive());
         interactionMap.put(INTERACTION_SCHEMA_PARAMETERS, convertParameters(interaction.getParameters()));
         return interactionMap;
     }
 
-    private List<Map<String, Object>> convertParameters(List<InteractionParameters> parameters) {
+    private List<Map<String, Object>> convertParameters(List<InteractionParameter> parameters) {
         return parameters.stream().map(param -> {
             Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("name", param.getName());
-            paramMap.put("type", param.getType());
-            paramMap.put("format", param.getFormat());
+            paramMap.put(INTERACTION_PARAMETER_SCHEMA_NAME, param.getName());
+            paramMap.put(INTERACTION_PARAMETER_SCHEMA_TYPE, param.getType());
+            paramMap.put(INTERACTION_PARAMETER_SCHEMA_FORMAT, param.getFormat());
+            paramMap.put(INTERACTION_PARAMETER_SCHEMA_VALUE, param.getValue());
             return paramMap;
         }).collect(Collectors.toList());
     }

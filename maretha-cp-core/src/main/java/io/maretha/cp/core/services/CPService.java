@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.Interaction;
-import io.maretha.cp.core.models.InteractionParameters;
+import io.maretha.cp.core.models.InteractionParameter;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -43,7 +43,7 @@ public class CPService implements CPServiceInterface {
             List<Interaction> cpInteractions = objectMapper.readValue(interactions, new TypeReference<>() {
             });
             return cpInteractions.stream().peek(interaction -> {
-                List<InteractionParameters> interactionParameters = getInteractionParameters(interaction.getId());
+                List<InteractionParameter> interactionParameters = getInteractionParameters(interaction.getId());
                 interaction.setParameters(interactionParameters);
             }).collect(Collectors.toList());
         } catch (JsonProcessingException e) {
@@ -51,10 +51,10 @@ public class CPService implements CPServiceInterface {
         }
     }
 
-    private List<InteractionParameters> getInteractionParameters(String interactionId) {
+    private List<InteractionParameter> getInteractionParameters(String interactionId) {
         String url = API_URL + "/interactions/" + interactionId;
         String interactionParametersResponse = getRequest(AUTH_TOKEN, url);
-        List<InteractionParameters> paramsList = new ArrayList<>();
+        List<InteractionParameter> paramsList = new ArrayList<>();
         try {
             JsonNode jsonNode = objectMapper.readTree(interactionParametersResponse);
             JsonNode prompts = jsonNode.get("prompts");
@@ -62,13 +62,13 @@ public class CPService implements CPServiceInterface {
                 for (JsonNode parameterNode : prompts) {
                     JsonNode params = parameterNode.get("template").get("inputSchema").get("properties");
                     if (params != null) {
-                        params.forEach(p -> p.fields().forEachRemaining(field -> {
+                        params.fields().forEachRemaining(field -> {
                             String name = field.getKey();
                             JsonNode value = field.getValue();
                             String type = value.has("type") ? value.get("type").asText() : "";
                             String format = value.has("format") ? value.get("format").asText() : "";
-                            paramsList.add(new InteractionParameters(name, type, format));
-                        }));
+                            paramsList.add(new InteractionParameter(name, type, format, ""));
+                        });
                     }
                 }
             }
@@ -80,17 +80,14 @@ public class CPService implements CPServiceInterface {
 
     @Override
     public JsonNode getInteractionResult(String interaction, Map<String, String> data) {
-        // Variables to be used in the JSON string
         boolean stream = false;
         String dataParameters = "";
-        // Convert map to JSON string
         try {
             dataParameters = objectMapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
 
-        // Construct the JSON string with variable values
         String jsonBody = "{\n" +
                 "    \"interaction\": \"" + interaction + "\",\n" +
                 "    \"data\": " + dataParameters + ",\n" +
@@ -116,7 +113,6 @@ public class CPService implements CPServiceInterface {
             log.debug(responseString);
             return responseString;
         } catch (IOException | JSONException e) {
-            // Handle IO or JSON exception
             throw new NuxeoException(e);
         }
     }
@@ -133,7 +129,6 @@ public class CPService implements CPServiceInterface {
             log.debug(responseString);
             return responseString;
         } catch (IOException | JSONException e) {
-            // Handle IO or JSON exception
             throw new NuxeoException(e);
         }
     }

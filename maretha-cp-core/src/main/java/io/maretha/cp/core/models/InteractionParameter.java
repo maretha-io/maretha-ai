@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class InteractionParameters {
+public class InteractionParameter {
     private String name;
     private String type;
     private String format;
+    private String value;
 }

@@ -45,7 +45,7 @@
             <xs:element name="name" type="xs:string"/>
             <xs:element name="type" type="xs:string"/>
             <xs:element name="format" type="xs:string"/>
-            <xs:element name="defaultValue" type="xs:string"/>
+            <xs:element name="value" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
