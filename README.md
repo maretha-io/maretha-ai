@@ -7,3 +7,6 @@
 ```
 find . -name '.DS_Store' -type f -delete
 ```
+
+### Settings Document 
+http://localhost:8080/nuxeo/ui/#!/browse/CPSettings

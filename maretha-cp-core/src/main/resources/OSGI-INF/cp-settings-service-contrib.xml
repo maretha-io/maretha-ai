@@ -5,9 +5,9 @@
     Composable Prompts Settings Service.
   </documentation>
 
-  <implementation class="io.maretha.cp.core.services.CPLocalSettingsService" />
+  <implementation class="io.maretha.cp.core.services.LocalSettingsService" />
 
   <service>
-    <provide interface="io.maretha.cp.core.services.CPLocalSettingsServiceInterface" />
+    <provide interface="io.maretha.cp.core.services.LocalSettingsServiceInterface" />
   </service>
 </component>

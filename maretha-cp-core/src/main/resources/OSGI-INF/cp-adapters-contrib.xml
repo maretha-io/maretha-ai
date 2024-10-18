@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.adapters">
+  <extension target="org.nuxeo.ecm.core.api.DocumentAdapterService" point="adapters">
+    <adapter factory="io.maretha.cp.core.adapters.SettingsAdapterFactory"
+             class="io.maretha.cp.core.models.Settings"
+             document="CPSettings" />
+  </extension>
+</component>
