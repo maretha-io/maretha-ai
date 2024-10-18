@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 /**
  *
  */
-@Operation(id = DocumentTypesOperation.ID, category = Constants.CAT_DOCUMENT, label = "Get Document Types", description = "Get all docTypes")
-public class DocumentTypesOperation {
+@Operation(id = GetDocumentTypesOperation.ID, category = Constants.CAT_DOCUMENT, label = "Get Document Types", description = "Get all docTypes")
+public class GetDocumentTypesOperation {
 
-    public static final String ID = "DocumentTypesOperation";
+    public static final String ID = "GetDocumentTypesOperation";
 
     @OperationMethod
     public List<String> run() {

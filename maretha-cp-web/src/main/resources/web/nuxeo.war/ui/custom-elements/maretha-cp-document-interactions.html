@@ -2,7 +2,6 @@
   <template>
     <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]"></nuxeo-operation>
-    <nuxeo-operation id="getInteractionParameters" op="GetInteractionParametersOperation" ></nuxeo-operation>
 
 
     <style include="nuxeo-action-button-styles">
@@ -109,19 +108,13 @@
 
       _getInteractionParameters: function () {
         if(!this.selectedInteraction) return;
-        const operation = this.$.getInteractionParameters;
-        operation.params = {"interactionId": this.selectedInteraction.id};
-        operation.execute().then((response) => {
-          const params = Object.keys(response.value[0]);
+          const params = Object.keys(this.selectedInteraction.parameters);
           const paramsObj = params.map(item => ({
             value: item === 'text' ? 'Text is automatically sent from document file:content' : '',
             label: item,
             readOnly: item === 'text' ? true : false
           }));
           this.set('interactionParameters', paramsObj);
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-        });
       },
 
       _interactWithDocument: function () {

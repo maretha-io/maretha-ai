@@ -8,6 +8,5 @@ import java.util.Map;
 
 public interface CPServiceInterface {
     List<CpInteraction> getInteractions();
-    List<Object> getInteractionParameters(String interactionId);
     JsonNode getInteractionResult(String request, Map<String, String> data);
 }

@@ -47,6 +47,7 @@ public class SaveInteractionsOperation {
         if (getExistingSettingsDocument().isPresent()) {
             cpSettingsDoc = getExistingSettingsDocument().get();
         } else {
+            //TODO Create a folder and add permissions?
             cpSettingsDoc = session.createDocumentModel("/", "CPSettings", CP_SETTINGS_DOCUMENT_TYPE);
             cpSettingsDoc = session.createDocument(cpSettingsDoc);
         }
