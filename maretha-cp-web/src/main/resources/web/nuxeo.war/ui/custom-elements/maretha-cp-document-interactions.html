@@ -3,7 +3,6 @@
     <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]"></nuxeo-operation>
 
-
     <style include="nuxeo-action-button-styles">
       .content {
         @apply --layout-vertical;
@@ -108,7 +107,7 @@
 
       _getInteractionParameters: function () {
         if(!this.selectedInteraction) return;
-          const params = Object.keys(this.selectedInteraction.parameters);
+          const params = Object.keys(this.selectedInteraction.parameters[0]);
           const paramsObj = params.map(item => ({
             value: item === 'text' ? 'Text is automatically sent from document file:content' : '',
             label: item,
@@ -129,9 +128,7 @@
         operation.params = {"interactionId": this.selectedInteraction.id, "data": transformedData.data};
         operation.execute().then((response) => {
           this.set('interactionResponse', response.value);
-          console.log(response.value);
           const htmlFormatted = this.jsonToHtml(response.value);
-          console.log(htmlFormatted);
           this.$.response.innerHTML = htmlFormatted;
         }).catch((error) => {
           console.error('Error triggering operation:', error);
