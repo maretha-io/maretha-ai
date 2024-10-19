@@ -1,18 +1,29 @@
 <?xml version="1.0"?>
-<xs:schema targetNamespace="http://www.nuxeo.core/ecm/schemas/interactions/"
+<xs:schema targetNamespace="http://www.nuxeo.core/ecm/schemas/interactionResults/"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:nxs="http://www.nuxeo.core/ecm/schemas/interactions/">
+           xmlns:nxs="http://www.nuxeo.core/ecm/schemas/interactionResults/">
+
+    <!-- Root element definition for interactions -->
+    <xs:element name="interactions" type="nxs:interactionResultList"/>
+
+    <!-- Definition for a list of interactions -->
+    <xs:complexType name="interactionResultList">
+        <xs:sequence>
+            <xs:element name="interaction" type="nxs:interactionResultType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- Definition for the interactions complex type -->
-    <xs:complexType name="interactionType">
+    <xs:complexType name="interactionResultType">
         <xs:sequence>
             <xs:element name="id" type="xs:string"/>
-            <xs:element name="description" type="xs:string"/>
+            <xs:element name="interactionId" type="xs:string"/>
+            <xs:element name="documentId" type="xs:string"/>
+            <xs:element name="jsonResponse" type="xs:string"/>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="status" type="xs:string"/>
-            <xs:element name="updatedAt" type="xs:dateTime"/>
-            <xs:element name="activeOnDocumentTypes" type="nxs:stringList"/>
-            <xs:element name="active" type="xs:boolean"/>
+            <xs:element name="createdAt" type="xs:dateTime"/>
+            <xs:element name="createdBy" type="xs:string"/>
             <xs:element name="parameters" type="nxs:interactionParameterList"/>
         </xs:sequence>
     </xs:complexType>
@@ -21,16 +32,6 @@
     <xs:complexType name="stringList">
         <xs:sequence>
             <xs:element name="item" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <!-- Root element definition for interactions -->
-    <xs:element name="interactions" type="nxs:interactionList"/>
-
-    <!-- Definition for a list of interactions -->
-    <xs:complexType name="interactionList">
-        <xs:sequence>
-            <xs:element name="interaction" type="nxs:interactionType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 

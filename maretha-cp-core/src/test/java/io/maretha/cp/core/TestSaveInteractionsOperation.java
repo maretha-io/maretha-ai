@@ -24,8 +24,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static io.maretha.cp.core.services.LocalSettingsService.CPS_INTERACTIONS_PATH;
-import static io.maretha.cp.core.services.LocalSettingsService.CP_SETTINGS_DOCUMENT_TYPE;
+import static io.maretha.cp.core.services.SavedSettingsService.CPS_INTERACTIONS_PATH;
+import static io.maretha.cp.core.services.SavedSettingsService.CP_SETTINGS_DOCUMENT_TYPE;
+import static io.maretha.cp.core.services.SavedSettingsService.CP_SETTINGS_SCHEMA_NAME;
+import static io.maretha.cp.core.services.SavedSettingsService.INTERACTION_RESULTS_DOCUMENT_TYPE;
+import static io.maretha.cp.core.services.SavedSettingsService.INTERACTION_RESULTS_FACET;
+import static io.maretha.cp.core.services.SavedSettingsService.INTERACTION_RESULTS_PATH;
+import static io.maretha.cp.core.services.SavedSettingsService.INTERACTION_RESULTS_SCHEMA;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -44,7 +49,7 @@ public class TestSaveInteractionsOperation {
     protected AutomationService automationService;
 
     @Test
-    public void shouldCreateCPSettingsDocument() {
+    public void shouldCreateInteractionSettingsDocument() {
         // Create the interaction objects
         List<HashMap<String, Object>> interactions = new ArrayList<>();
 
@@ -78,6 +83,69 @@ public class TestSaveInteractionsOperation {
         // Fetch the document to check if it was created correctly
         DocumentModel fetchedDoc = session.getDocument(doc.getRef());
         assertNotNull(fetchedDoc);
-        assertTrue(fetchedDoc.hasSchema("interactions"));
+        assertTrue(fetchedDoc.hasSchema(CP_SETTINGS_SCHEMA_NAME));
+    }
+
+    @Test
+    public void shouldAddInteractionResultsFacetToDocument() {
+        // Create the interaction objects
+        List<HashMap<String, Object>> interactions = new ArrayList<>();
+
+        // First interaction
+        HashMap<String, Object> interaction1 = new HashMap<>();
+        interaction1.put("id", "65f460c0fbdcc28ee99b65c9");
+        interactions.add(interaction1);
+
+        HashMap<String, Object> interaction2 = new HashMap<>();
+        interaction2.put("id", "65f460c0fbdcc28ee99b65c8");
+        interactions.add(interaction2);
+
+        DocumentModel doc = session.createDocumentModel("/", "testDocument", "Document");
+        doc.addFacet(INTERACTION_RESULTS_FACET);
+        doc.setPropertyValue(INTERACTION_RESULTS_PATH, (Serializable) interactions);
+        doc = session.createDocument(doc);
+        doc = session.saveDocument(doc);
+        session.save();
+        assertNotNull(doc);
+
+        // Fetch the document to check if it was created correctly
+        DocumentModel fetchedDoc = session.getDocument(doc.getRef());
+        assertNotNull(fetchedDoc);
+        assertTrue(fetchedDoc.hasSchema(INTERACTION_RESULTS_SCHEMA));
+    }
+
+
+    @Test
+    public void shouldCreateInteractionResponseDocument() {
+        // Create the interaction objects
+        List<HashMap<String, Object>> interactions = new ArrayList<>();
+
+        // First interaction
+        HashMap<String, Object> interaction1 = new HashMap<>();
+        interaction1.put("id", "65f460c0fbdcc28ee99b65c9");
+        interaction1.put("description", "Extracts metadata from a given text");
+        interaction1.put("name", "Metadata Extraction");
+        interaction1.put("status", "draft");
+        interaction1.put("updatedAt", "2024-04-24T18:16:13.492Z");
+        interactions.add(interaction1);
+
+        HashMap<String, Object> interaction2 = new HashMap<>();
+        interaction2.put("id", "65f460c0fbdcc28ee99b65c8");
+        interaction2.put("description", "Extracts metadata from a given text");
+        interaction2.put("name", "Metadata Extraction");
+        interaction2.put("status", "draft");
+        interactions.add(interaction2);
+
+        DocumentModel doc = session.createDocumentModel("/", "InteractionResults", INTERACTION_RESULTS_DOCUMENT_TYPE);
+        doc.setPropertyValue(INTERACTION_RESULTS_PATH, (Serializable) interactions);
+        doc = session.createDocument(doc);
+        doc = session.saveDocument(doc);
+        session.save();
+        assertNotNull(doc);
+
+        // Fetch the document to check if it was created correctly
+        DocumentModel fetchedDoc = session.getDocument(doc.getRef());
+        assertNotNull(fetchedDoc);
+        assertTrue(fetchedDoc.hasSchema(CP_SETTINGS_SCHEMA_NAME));
     }
 }

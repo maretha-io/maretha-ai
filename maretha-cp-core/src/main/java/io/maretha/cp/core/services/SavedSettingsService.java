@@ -24,10 +24,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class LocalSettingsService implements LocalSettingsServiceInterface {
-
-    public static final String CP_SETTINGS_DOCUMENT_TYPE = "CPSettings";
-    public static final String CPS_INTERACTIONS_PATH = "cps:interactions";
+public class SavedSettingsService implements SavedSettingsServiceInterface {
+    public static final String INTERACTION_RESULTS_DOCUMENT_TYPE = "InteractionResults";
+    public static final String INTERACTION_RESULTS_PATH = "interactionresults:interactions";
+    public static final String INTERACTION_RESULTS_FACET = "InteractionResultsFacet";
+    public static final String INTERACTION_RESULTS_SCHEMA = "interactionresults";
+    public static final String CP_SETTINGS_DOCUMENT_TYPE = "InteractionSettings";
+    public static final String CP_SETTINGS_SCHEMA_NAME = "interactionSettings";
+    public static final String CPS_INTERACTIONS_PATH = "interactionsettings:interactions";
     public static final String INTERACTION_SCHEMA_ID = "id";
     public static final String INTERACTION_SCHEMA_DESCRIPTION = "description";
     public static final String INTERACTION_SCHEMA_NAME = "name";
@@ -36,11 +40,11 @@ public class LocalSettingsService implements LocalSettingsServiceInterface {
     public static final String INTERACTION_SCHEMA_UPDATED_AT = "updatedAt";
     public static final String INTERACTION_SCHEMA_ACTIVE = "active";
     public static final String INTERACTION_SCHEMA_PARAMETERS = "parameters";
-
     public static final String INTERACTION_PARAMETER_SCHEMA_NAME = "name";
     public static final String INTERACTION_PARAMETER_SCHEMA_TYPE = "type";
     public static final String INTERACTION_PARAMETER_SCHEMA_FORMAT = "format";
     public static final String INTERACTION_PARAMETER_SCHEMA_VALUE = "value";
+    public static String INTERACTION_SETTINGS_DOCUMENT_NAME = "InteractionSettings";
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
@@ -71,7 +75,7 @@ public class LocalSettingsService implements LocalSettingsServiceInterface {
             cpSettingsDoc = existingSettingsDocument.get();
         } else {
             //TODO Create a folder and add permissions?
-            cpSettingsDoc = session.createDocumentModel("/", "CPSettings", CP_SETTINGS_DOCUMENT_TYPE);
+            cpSettingsDoc = session.createDocumentModel("/", INTERACTION_SETTINGS_DOCUMENT_NAME, CP_SETTINGS_DOCUMENT_TYPE);
             cpSettingsDoc = session.createDocument(cpSettingsDoc);
         }
         List<HashMap<String, Object>> interactionsMap = interactions.stream()

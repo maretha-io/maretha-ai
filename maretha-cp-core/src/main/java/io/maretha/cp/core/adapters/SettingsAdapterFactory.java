@@ -8,8 +8,8 @@ import org.nuxeo.ecm.core.api.adapter.DocumentAdapterFactory;
 
 import java.util.List;
 
-import static io.maretha.cp.core.services.LocalSettingsService.CPS_INTERACTIONS_PATH;
-import static io.maretha.cp.core.services.LocalSettingsService.CP_SETTINGS_DOCUMENT_TYPE;
+import static io.maretha.cp.core.services.SavedSettingsService.CPS_INTERACTIONS_PATH;
+import static io.maretha.cp.core.services.SavedSettingsService.CP_SETTINGS_DOCUMENT_TYPE;
 
 public class SettingsAdapterFactory implements DocumentAdapterFactory {
     private final ObjectMapper objectMapper = new ObjectMapper();

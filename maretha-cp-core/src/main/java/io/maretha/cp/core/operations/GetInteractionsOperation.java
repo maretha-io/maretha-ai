@@ -2,7 +2,7 @@ package io.maretha.cp.core.operations;
 
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.services.CPServiceInterface;
-import io.maretha.cp.core.services.LocalSettingsServiceInterface;
+import io.maretha.cp.core.services.SavedSettingsServiceInterface;
 import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
@@ -25,7 +25,7 @@ public class GetInteractionsOperation {
 
     public static final String ID = "GetInteractionsOperation";
     private final CPServiceInterface cpService = Framework.getService(CPServiceInterface.class);
-    private final LocalSettingsServiceInterface cpLocalSettingsService = Framework.getService(LocalSettingsServiceInterface.class);
+    private final SavedSettingsServiceInterface cpLocalSettingsService = Framework.getService(SavedSettingsServiceInterface.class);
 
     @Param(name = "refresh", required = false)
     protected boolean refresh;
