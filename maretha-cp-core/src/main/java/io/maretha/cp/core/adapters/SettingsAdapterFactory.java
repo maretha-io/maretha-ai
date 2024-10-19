@@ -8,16 +8,16 @@ import org.nuxeo.ecm.core.api.adapter.DocumentAdapterFactory;
 
 import java.util.List;
 
-import static io.maretha.cp.core.services.SavedSettingsService.CPS_INTERACTIONS_PATH;
-import static io.maretha.cp.core.services.SavedSettingsService.CP_SETTINGS_DOCUMENT_TYPE;
+import static io.maretha.cp.core.services.RepositoryService.SETTINGS_SCHEMA_PATH;
+import static io.maretha.cp.core.services.RepositoryService.SETTINGS_DOCUMENT_TYPE;
 
 public class SettingsAdapterFactory implements DocumentAdapterFactory {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Object getAdapter(DocumentModel doc, Class<?> aClass) {
-        if (CP_SETTINGS_DOCUMENT_TYPE.equals(doc.getType())) {
-            Object interactions = doc.getPropertyValue(CPS_INTERACTIONS_PATH);
+        if (SETTINGS_DOCUMENT_TYPE.equals(doc.getType())) {
+            Object interactions = doc.getPropertyValue(SETTINGS_SCHEMA_PATH);
             List<Interaction> cpInteractions = objectMapper
                     .convertValue(interactions, objectMapper.getTypeFactory().constructCollectionType(List.class, Interaction.class));
             return new Settings(cpInteractions);

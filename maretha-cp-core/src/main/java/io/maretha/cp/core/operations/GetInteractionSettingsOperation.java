@@ -2,7 +2,7 @@ package io.maretha.cp.core.operations;
 
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.services.CPServiceInterface;
-import io.maretha.cp.core.services.SavedSettingsServiceInterface;
+import io.maretha.cp.core.services.RepositoryServiceInterface;
 import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
@@ -20,12 +20,12 @@ import java.util.Map;
 /**
  *
  */
-@Operation(id = GetInteractionsOperation.ID, category = Constants.CAT_DOCUMENT, label = "Get CP Interactions", description = "Get Composable Prompts Interaction by API")
-public class GetInteractionsOperation {
+@Operation(id = GetInteractionSettingsOperation.ID, category = Constants.CAT_DOCUMENT, label = "Get CP Interactions", description = "Get Composable Prompts Interaction by API")
+public class GetInteractionSettingsOperation {
 
     public static final String ID = "GetInteractionsOperation";
     private final CPServiceInterface cpService = Framework.getService(CPServiceInterface.class);
-    private final SavedSettingsServiceInterface cpLocalSettingsService = Framework.getService(SavedSettingsServiceInterface.class);
+    private final RepositoryServiceInterface cpLocalSettingsService = Framework.getService(RepositoryServiceInterface.class);
 
     @Param(name = "refresh", required = false)
     protected boolean refresh;
@@ -39,7 +39,7 @@ public class GetInteractionsOperation {
             return cpService.getInteractions(); //reset and return all from remote (hard update)
         }
         //Get local interactions
-        List<Interaction> interactionSettings = cpLocalSettingsService.getLocalSettings(session);
+        List<Interaction> interactionSettings = cpLocalSettingsService.getLocalInteractionSettings(session);
         if (!CollectionUtils.isEmpty(interactionSettings)) {
             interactionSettings.forEach(interaction -> interactionsById.put(interaction.getId(), interaction));
         } else { //Get remote interactions

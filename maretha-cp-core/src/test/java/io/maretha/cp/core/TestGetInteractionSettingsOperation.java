@@ -19,7 +19,7 @@ import javax.inject.Inject;
 @Features(AutomationFeature.class)
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 @Deploy("io.maretha.cp.core.maretha-cp-core")
-public class TestGetInteractionsOperation {
+public class TestGetInteractionSettingsOperation {
 
     @Inject
     protected CoreSession session;
