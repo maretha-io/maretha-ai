@@ -2,10 +2,11 @@
 <component name="io.maretha.cp.core.operation.interactionsoperation">
 
   <extension point="operations" target="org.nuxeo.ecm.core.operation.OperationServiceComponent">
-    <operation class="io.maretha.cp.core.operations.GetInteractionsOperation"/>
-    <operation class="io.maretha.cp.core.operations.SaveInteractionsOperation"/>
+    <operation class="io.maretha.cp.core.operations.GetInteractionSettingsOperation"/>
+    <operation class="io.maretha.cp.core.operations.SaveInteractionSettingsOperation"/>
     <operation class="io.maretha.cp.core.operations.GetDocumentTypesOperation"/>
     <operation class="io.maretha.cp.core.operations.RuntInteractionOperation"/>
+    <operation class="io.maretha.cp.core.operations.SaveInteractionResponseOperation"/>
   </extension>
 
 </component>

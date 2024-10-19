@@ -24,13 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.maretha.cp.core.services.SavedSettingsService.CPS_INTERACTIONS_PATH;
-import static io.maretha.cp.core.services.SavedSettingsService.CP_SETTINGS_DOCUMENT_TYPE;
-import static io.maretha.cp.core.services.SavedSettingsService.CP_SETTINGS_SCHEMA_NAME;
-import static io.maretha.cp.core.services.SavedSettingsService.INTERACTION_RESULTS_DOCUMENT_TYPE;
-import static io.maretha.cp.core.services.SavedSettingsService.INTERACTION_RESULTS_FACET;
-import static io.maretha.cp.core.services.SavedSettingsService.INTERACTION_RESULTS_PATH;
-import static io.maretha.cp.core.services.SavedSettingsService.INTERACTION_RESULTS_SCHEMA;
+import static io.maretha.cp.core.services.RepositoryService.SETTINGS_SCHEMA_PATH;
+import static io.maretha.cp.core.services.RepositoryService.SETTINGS_DOCUMENT_TYPE;
+import static io.maretha.cp.core.services.RepositoryService.SETTINGS_SCHEMA_NAME;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_DOCUMENT_TYPE;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_SCHEMA_PATH;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_SCHEMA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -71,8 +71,8 @@ public class TestCustomDocumentSchemas {
         interaction2.put("active", false);
         interactions.add(interaction2);
 
-        DocumentModel doc = session.createDocumentModel("/", "testDocument", CP_SETTINGS_DOCUMENT_TYPE);
-        doc.setPropertyValue(CPS_INTERACTIONS_PATH, (Serializable) interactions);
+        DocumentModel doc = session.createDocumentModel("/", "testDocument", SETTINGS_DOCUMENT_TYPE);
+        doc.setPropertyValue(SETTINGS_SCHEMA_PATH, (Serializable) interactions);
         doc = session.createDocument(doc);
         doc = session.saveDocument(doc);
         session.save();
@@ -81,7 +81,7 @@ public class TestCustomDocumentSchemas {
         // Fetch the document to check if it was created correctly
         DocumentModel fetchedDoc = session.getDocument(doc.getRef());
         assertNotNull(fetchedDoc);
-        assertTrue(fetchedDoc.hasSchema(CP_SETTINGS_SCHEMA_NAME));
+        assertTrue(fetchedDoc.hasSchema(SETTINGS_SCHEMA_NAME));
     }
 
     @Test
@@ -100,8 +100,8 @@ public class TestCustomDocumentSchemas {
 
         DocumentModel doc = session.createDocumentModel("/", "testDocument", "File");
         doc = session.createDocument(doc);
-        doc.addFacet(INTERACTION_RESULTS_FACET);
-        doc.setPropertyValue(INTERACTION_RESULTS_PATH, (Serializable) interactions);
+        doc.addFacet(RESULTS_FACET);
+        doc.setPropertyValue(RESULTS_SCHEMA_PATH, (Serializable) interactions);
         doc = session.saveDocument(doc);
         session.save();
         assertNotNull(doc);
@@ -109,7 +109,7 @@ public class TestCustomDocumentSchemas {
         // Fetch the document to check if it was created correctly
         DocumentModel fetchedDoc = session.getDocument(doc.getRef());
         assertNotNull(fetchedDoc);
-        assertTrue(fetchedDoc.hasSchema(INTERACTION_RESULTS_SCHEMA));
+        assertTrue(fetchedDoc.hasSchema(RESULTS_SCHEMA));
     }
 
 
@@ -141,7 +141,7 @@ public class TestCustomDocumentSchemas {
         interaction1.put("id", "random-id-1");
         interaction1.put("interactionId", "interaction-1");
         interaction1.put("documentId", "document-id-1");
-        interaction1.put("jsonResponse", "This is a response");
+        interaction1.put("response", "This is a response");
         interaction1.put("name", "Name 1");
         interaction1.put("status", "Completed");
         interaction1.put("createdAt", null);
@@ -153,7 +153,7 @@ public class TestCustomDocumentSchemas {
         interaction2.put("id", "random-id-2");
         interaction2.put("interactionId", "interaction-2");
         interaction2.put("documentId", "document-id-2");
-        interaction2.put("jsonResponse", "This is another response");
+        interaction2.put("response", "This is another response");
         interaction2.put("name", "Name 2");
         interaction2.put("status", "In Progress");
         interaction2.put("createdAt", null);
@@ -161,9 +161,9 @@ public class TestCustomDocumentSchemas {
         interaction2.put("parameters", parameters);
         interactions.add(interaction2);
 
-        DocumentModel doc = session.createDocumentModel("/", "InteractionResults", INTERACTION_RESULTS_DOCUMENT_TYPE);
+        DocumentModel doc = session.createDocumentModel("/", "InteractionResults", RESULTS_DOCUMENT_TYPE);
         doc = session.createDocument(doc);
-        doc.setPropertyValue(INTERACTION_RESULTS_PATH, (Serializable) interactions);
+        doc.setPropertyValue(RESULTS_SCHEMA_PATH, (Serializable) interactions);
         doc = session.saveDocument(doc);
         assertNotNull(doc);
         session.save();
@@ -171,8 +171,8 @@ public class TestCustomDocumentSchemas {
         // Fetch the document to check if it was created correctly
         DocumentModel fetchedDoc = session.getDocument(doc.getRef());
         assertNotNull(fetchedDoc);
-        assertTrue(fetchedDoc.hasSchema(INTERACTION_RESULTS_SCHEMA));
-        assertEquals(interactions, doc.getPropertyValue(INTERACTION_RESULTS_PATH));
+        assertTrue(fetchedDoc.hasSchema(RESULTS_SCHEMA));
+        assertEquals(interactions, doc.getPropertyValue(RESULTS_SCHEMA_PATH));
     }
 
     @Test

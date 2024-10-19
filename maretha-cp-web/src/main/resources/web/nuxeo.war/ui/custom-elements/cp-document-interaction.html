@@ -2,6 +2,9 @@
   <template>
     <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]"></nuxeo-operation>
+    <nuxeo-operation id="getRelationsOp" op="Relations.GetRelations" input="[[document]]"
+                     params='{"outgoing": "true", "predicate": "http://www.nuxeo.org/ecm/schemas/relation#isRelatedTo"}'>
+    </nuxeo-operation>
 
     <style include="nuxeo-action-button-styles">
       .content {
@@ -45,16 +48,31 @@
           </div>
 
           <div id="response"></div>
+
+          <template is="dom-if" if="[[interactionResponse]]">
+            <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]" interaction-response="[[interactionResponse.response]]"></cp-save-response>
+          </template>
+
+          <div class="buttons">
+            <paper-button noink dialog-dismiss on-tap="_close">Close</paper-button>
+            <paper-icon-button id="chat" icon="communication:chat" on-tap="_interactWithDocument"
+                               aria-label="Interact with document">
+            </paper-icon-button>
+          </div>
+
+          <div class="related-documents">
+            <template is="dom-if" if="[[relatedDocuments]]">
+              <h3>Related Documents</h3>
+              <template is="dom-repeat" items="[[relatedDocuments]]">
+                <div class="related-doc">
+                  <a class="ellipsis" href$="[[urlFor(item)]]" on-click="_navigate" target="_blank">[[item.title]]</a>
+                </div>
+              </template>
+            </template>
+          </div>
+
         </div>
       </div>
-      <div class="buttons">
-        <paper-button noink dialog-dismiss on-tap="_close">Close</paper-button>
-        <paper-icon-button id="chat" icon="communication:chat" on-tap="_interactWithDocument"
-                           aria-label="Interact with document">
-        </paper-icon-button>
-      </div>
-
-      <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]" interaction-response="[[interactionResponse.response]]"></cp-save-response>
     </nuxeo-dialog>
 
   </template>
@@ -64,6 +82,11 @@
       is: 'cp-document-interaction',
       behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
       properties: {
+        document: {
+          type: Object,
+          observer: '_documentObserver'
+        },
+
         interactions: {
           type: Array,
           value: [],
@@ -81,6 +104,10 @@
           type: Object
         },
 
+        relatedDocuments: {
+          type: Array
+        },
+
         // Holds the selected index from the dropdown
         selectedIndex: {
           type: Number,
@@ -89,6 +116,10 @@
       },
 
       observers: [],
+
+      _documentObserver() {
+        this._fetchRelatedDocuments();
+      },
 
       ready: function () {
         this._getInteractions();
@@ -144,6 +175,18 @@
 
       _dialogClosed: function () {
 
+      },
+
+      _fetchRelatedDocuments() {
+        if (this.document) {
+          this.$.getRelationsOp.execute()
+            .then((response) => {
+              this.relatedDocuments = response.entries || [];
+            })
+            .catch((error) => {
+              console.error('Error fetching related documents:', error);
+            });
+        }
       },
 
       jsonToHtml: function(json) {

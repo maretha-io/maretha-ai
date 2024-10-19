@@ -5,9 +5,9 @@
     AI Interaction Settings Service.
   </documentation>
 
-  <implementation class="io.maretha.cp.core.services.SavedSettingsService" />
+  <implementation class="io.maretha.cp.core.services.RepositoryService" />
 
   <service>
-    <provide interface="io.maretha.cp.core.services.SavedSettingsServiceInterface" />
+    <provide interface="io.maretha.cp.core.services.RepositoryServiceInterface" />
   </service>
 </component>

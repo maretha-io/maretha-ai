@@ -1,17 +1,8 @@
 <dom-module id="cp-save-response">
   <template>
 
-    <nuxeo-operation id="updateDocument" op="Document.Update" input="[[document]]"
+    <nuxeo-operation id="saveResponse" op="SaveInteractionResponseOperation" input="[[document]]"
       sync-indexing="true"></nuxeo-operation>
-    <nuxeo-operation id="createDocument" op="Document.Create"></nuxeo-operation>
-    <nuxeo-operation id="addFacetOp" op="Document.AddFacet" input="[[document]]"
-      params='{"facet": "InteractionResultsFacet"}'></nuxeo-operation>
-    <nuxeo-operation id="addRelationOp" op="Document.AddRelation"
-      params='{"relationType": "related", "relatedDocument": "[[relatedDocument]]"}' input="[[document]]">
-    </nuxeo-operation>
-    <nuxeo-operation id="getRelationsOp" op="Document.GetDocumentRelations" input="[[document]]"
-      params='{"direction": "outgoing", "relationType": "related"}'>
-    </nuxeo-operation>
 
     <style include="nuxeo-action-button-styles">
       /* Flexbox container for the buttons */
@@ -59,23 +50,9 @@
       }
     </style>
 
-    <!-- Container to hold both buttons -->
     <div class="button-container">
-      <!-- Button to save as Metadata -->
       <paper-button raised class="save-metadata" on-click="_saveAsMetadata">Save as Metadata</paper-button>
-
-      <!-- Button to save as Related Document -->
-      <paper-button raised class="save-related" on-click="_saveAsRelated">Save as Related Document</paper-button>
-    </div>
-
-    <div class="related-documents">
-      <h3>Related Documents</h3>
-      <template is="dom-repeat" items="[[relatedDocuments]]">
-        <div class="related-doc">
-          <a href$="[[getDocumentLink(item)]]">[[item.title]]</a>
-          <p>Type: [[item.type]]</p>
-        </div>
-      </template>
+      <paper-button raised class="save-related" on-click="_saveAsRelatedDocument">Save as Related Document</paper-button>
     </div>
 
   </template>
@@ -101,9 +78,6 @@
           observer: '_interactionObserver',
         },
 
-        relatedDocuments: {
-          type: Array
-        }
       },
 
       observers: [],
@@ -118,107 +92,40 @@
 
       _saveAsMetadata() {
         console.log('_saveAsMetadata');
-        this.$.addFacetOp.execute()
-          .then((response) => {
-            console.log('Facet added successfully:', response);
-            this._updateDocument();
-          })
-          .catch((error) => {
-            console.error('Error adding facet:', error);
-          });
+        this.$.saveResponse.params.saveOnMetadata = true;
+        this._saveInteractionResponse();
       },
 
-      _saveAsRelated() {
-        this._createDocument().then((res) => {
-          if (res) {
-            this.fire('notify', { message: 'Document Created' });
-            this._addRelation();
-            this._fetchRelatedDocuments();
-          }
-        }).catch((error) => {
-          this.notify(error);
-        });
+      _saveAsRelatedDocument() {
+        console.log('_saveAsRelatedDocument');
+        this.$.saveResponse.params.saveOnMetadata = false;
+        this._saveInteractionResponse();
       },
 
-      _updateDocument(e) {
-        this.$.updateDocument.params = {
-          'properties': {
-            "interactionresults:interactions": [{
-              "id": "random-id",
-              "interactionId": this.interaction.id,
-              "documentId": this.document.uid,
-              "jsonResponse": this.interactionResponse,
-              "name": "name",
-              "status": "status",
-              "createdAt": Date.now(),
-              "createdBy": "user",
-              "parameters": this.interaction.parameters
-            }],
-          },
-        };
-        this.$.updateDocument.execute().then((response) => {
-          console.log("document updated");
+      _saveInteractionResponse(e) {
+        if(!this.interactionResponse) {
+          this.fire('notify', 'Cannot save without a response.', {close: true});
+          return;
+        }
+        this.$.saveResponse.params.interactions =  [{
+          "id": "random-id",
+          "interactionId": this.interaction.id,
+          "documentId": this.document.uid,
+          "response": this.interactionResponse,
+          "name": "name",
+          "status": "status",
+          "createdAt": Date.now(),
+          "createdBy": "user",
+          "parameters": this.interaction.parameters
+        }];
+        this.$.saveResponse.execute().then((response) => {
+          console.log("document saved");
           this.fire('notify', { message: 'Document Updated' });
         }).catch((error) => {
           console.log(error);
           this.notify(error);
         })
       },
-
-      _createDocument() {
-        this.$.createDocument.input = this.document.uid;
-        this.$.createDocument.params = {
-          'type': "InteractionResults",
-          "properties": {
-            "dc:title": 'AI Interaction Result',
-            "dc:description": 'AI Interaction Result',
-            "interactionresults:interactions": [{
-              "id": "random-id",
-              "interactionId": this.interaction.id,
-              "documentId": this.document.uid,
-              "jsonResponse": this.interactionResponse,
-              "name": "name",
-              "status": "status",
-              "createdAt": Date.now(),
-              "createdBy": "user",
-              "parameters": this.interaction.parameters
-            }],
-          }
-        };
-        return this.$.createDocument.execute();
-      },
-
-      _addFacet() {
-        this.$.addFacetOp.execute()
-          .then((response) => {
-            console.log('Facet added successfully:', response);
-          })
-          .catch((error) => {
-            console.error('Error adding facet:', error);
-          });
-      },
-
-      _addRelation() {
-        this.$.addRelationOp.execute()
-          .then((response) => {
-            console.log('Relation added successfully:', response);
-          })
-          .catch((error) => {
-            console.error('Error adding relation:', error);
-          });
-      },
-
-      _fetchRelatedDocuments() {
-        if (this.document) {
-          this.$.getRelationsOp.execute()
-            .then((response) => {
-              this.relatedDocuments = response.entries || [];
-            })
-            .catch((error) => {
-              console.error('Error fetching related documents:', error);
-            });
-        }
-      }
 
     });
   </script>

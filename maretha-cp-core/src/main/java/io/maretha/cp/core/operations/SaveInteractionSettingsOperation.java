@@ -1,7 +1,7 @@
 package io.maretha.cp.core.operations;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.maretha.cp.core.services.SavedSettingsServiceInterface;
+import io.maretha.cp.core.services.RepositoryServiceInterface;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
@@ -16,11 +16,11 @@ import java.util.List;
 /**
  *
  */
-@Operation(id = SaveInteractionsOperation.ID, category = Constants.CAT_DOCUMENT, label = "Save CP Interactions", description = "Save Composable Prompts Interactions")
-public class SaveInteractionsOperation {
+@Operation(id = SaveInteractionSettingsOperation.ID, category = Constants.CAT_DOCUMENT, label = "Save CP Interactions", description = "Save Composable Prompts Interactions")
+public class SaveInteractionSettingsOperation {
 
     public static final String ID = "SaveInteractionsOperation";
-    private final SavedSettingsServiceInterface cpLocalSettingsService = Framework.getService(SavedSettingsServiceInterface.class);
+    private final RepositoryServiceInterface cpLocalSettingsService = Framework.getService(RepositoryServiceInterface.class);
 
     @Context
     protected CoreSession session;
@@ -29,7 +29,7 @@ public class SaveInteractionsOperation {
 
     @OperationMethod
     public DocumentModel run() {
-        return cpLocalSettingsService.saveSettings(session, interactions);
+        return cpLocalSettingsService.saveInteractionSettings(session, interactions);
     }
 
 }
