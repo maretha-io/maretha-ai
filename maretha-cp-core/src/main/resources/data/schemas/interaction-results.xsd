@@ -9,7 +9,7 @@
     <!-- Definition for a list of interactions -->
     <xs:complexType name="interactionResultList">
         <xs:sequence>
-            <xs:element name="interaction" type="nxs:interactionResultType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="interactionResult" type="nxs:interactionResultType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -28,20 +28,13 @@
         </xs:sequence>
     </xs:complexType>
 
-    <!-- Definition for a list of strings -->
-    <xs:complexType name="stringList">
-        <xs:sequence>
-            <xs:element name="item" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
     <xs:complexType name="interactionParameterList">
         <xs:sequence>
-            <xs:element name="parameter" type="nxs:interactionParameter" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="parameterResult" type="nxs:interactionResultParameter" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="interactionParameter">
+    <xs:complexType name="interactionResultParameter">
         <xs:sequence>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="type" type="xs:string"/>
