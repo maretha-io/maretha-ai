@@ -28,7 +28,7 @@ public class SavedSettingsService implements SavedSettingsServiceInterface {
     public static final String INTERACTION_RESULTS_DOCUMENT_TYPE = "InteractionResults";
     public static final String INTERACTION_RESULTS_PATH = "interactionresults:interactions";
     public static final String INTERACTION_RESULTS_FACET = "InteractionResultsFacet";
-    public static final String INTERACTION_RESULTS_SCHEMA = "interactionresults";
+    public static final String INTERACTION_RESULTS_SCHEMA = "interactionResults";
     public static final String CP_SETTINGS_DOCUMENT_TYPE = "InteractionSettings";
     public static final String CP_SETTINGS_SCHEMA_NAME = "interactionSettings";
     public static final String CPS_INTERACTIONS_PATH = "interactionsettings:interactions";
