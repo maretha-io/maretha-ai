@@ -7,7 +7,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 
 import java.util.List;
 
-public interface LocalSettingsServiceInterface {
+public interface SavedSettingsServiceInterface {
     List<Interaction> getLocalSettings(CoreSession session);
 
     List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType);

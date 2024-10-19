@@ -53,6 +53,8 @@
                            aria-label="Interact with document">
         </paper-icon-button>
       </div>
+
+      <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]" interaction-response="[[interactionResponse.response]]"></cp-save-response>
     </nuxeo-dialog>
 
   </template>
@@ -104,6 +106,7 @@
 
       _interactWithDocument: function () {
         if(!this.selectedInteraction) return;
+        this.$.response.innerHTML = '<p>Waiting for AI response...</p>';
         const operation = this.$.runInteractionOperation;
         operation.params = {"interactionId": this.selectedInteraction.id, "data": this.selectedInteraction.parameters};
         operation.execute().then((response) => {
@@ -112,6 +115,7 @@
           this.$.response.innerHTML = htmlFormatted;
         }).catch((error) => {
           console.error('Error triggering operation:', error);
+          this.$.response.innerHTML = `<p>Error: ${error}</p>`;
         });
       },
 

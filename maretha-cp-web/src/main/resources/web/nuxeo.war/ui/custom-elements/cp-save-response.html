@@ -1,0 +1,225 @@
+<dom-module id="cp-save-response">
+  <template>
+
+    <nuxeo-operation id="updateDocument" op="Document.Update" input="[[document]]"
+      sync-indexing="true"></nuxeo-operation>
+    <nuxeo-operation id="createDocument" op="Document.Create"></nuxeo-operation>
+    <nuxeo-operation id="addFacetOp" op="Document.AddFacet" input="[[document]]"
+      params='{"facet": "InteractionResultsFacet"}'></nuxeo-operation>
+    <nuxeo-operation id="addRelationOp" op="Document.AddRelation"
+      params='{"relationType": "related", "relatedDocument": "[[relatedDocument]]"}' input="[[document]]">
+    </nuxeo-operation>
+    <nuxeo-operation id="getRelationsOp" op="Document.GetDocumentRelations" input="[[document]]"
+      params='{"direction": "outgoing", "relationType": "related"}'>
+    </nuxeo-operation>
+
+    <style include="nuxeo-action-button-styles">
+      /* Flexbox container for the buttons */
+      .button-container {
+        display: flex;
+        gap: 16px; /* Spacing between the buttons */
+      }
+
+      /* Base button styles for both buttons */
+      paper-button {
+        background-color: #e0f7fa; /* Light cyan background */
+        color: #00796b; /* Dark teal text */
+        border-radius: 4px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: background-color 0.3s ease;
+      }
+
+      /* Slightly different background color for hover effect */
+      paper-button:hover {
+        background-color: #b2ebf2;
+      }
+
+      /* Make buttons slightly more distinct but still light */
+      paper-button.save-metadata {
+        background-color: #f1f8e9; /* Light green background */
+        color: #558b2f; /* Olive text */
+      }
+
+      paper-button.save-related {
+        background-color: #e0f7fa; /* Light cyan background */
+        color: #00796b; /* Dark teal text */
+      }
+
+      /* Hover effect for the Save as Metadata button */
+      paper-button.save-metadata:hover {
+        background-color: #dcedc8; /* Slightly darker green */
+      }
+
+      /* Hover effect for Save as Related Document */
+      paper-button.save-related:hover {
+        background-color: #b2ebf2; /* Slightly darker cyan */
+      }
+    </style>
+
+    <!-- Container to hold both buttons -->
+    <div class="button-container">
+      <!-- Button to save as Metadata -->
+      <paper-button raised class="save-metadata" on-click="_saveAsMetadata">Save as Metadata</paper-button>
+
+      <!-- Button to save as Related Document -->
+      <paper-button raised class="save-related" on-click="_saveAsRelated">Save as Related Document</paper-button>
+    </div>
+
+    <div class="related-documents">
+      <h3>Related Documents</h3>
+      <template is="dom-repeat" items="[[relatedDocuments]]">
+        <div class="related-doc">
+          <a href$="[[getDocumentLink(item)]]">[[item.title]]</a>
+          <p>Type: [[item.type]]</p>
+        </div>
+      </template>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cp-save-response',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+
+        document: {
+          type: Object,
+          observer: '_documentObserver',
+        },
+
+        interaction: {
+          type: Object,
+          observer: '_interactionObserver',
+        },
+
+        interactionResponse: {
+          type: Object,
+          observer: '_interactionObserver',
+        },
+
+        relatedDocuments: {
+          type: Array
+        }
+      },
+
+      observers: [],
+
+      _interactionObserver: (obs) => {
+        console.log(`_interactionsObserver:`, obs);
+      },
+
+      _documentObserver: (obs) => {
+        console.log(`_documentObserver:`, obs);
+      },
+
+      _saveAsMetadata() {
+        console.log('_saveAsMetadata');
+        this.$.addFacetOp.execute()
+          .then((response) => {
+            console.log('Facet added successfully:', response);
+            this._updateDocument();
+          })
+          .catch((error) => {
+            console.error('Error adding facet:', error);
+          });
+      },
+
+      _saveAsRelated() {
+        this._createDocument().then((res) => {
+          if (res) {
+            this.fire('notify', { message: 'Document Created' });
+            this._addRelation();
+            this._fetchRelatedDocuments();
+          }
+        }).catch((error) => {
+          this.notify(error);
+        });
+      },
+
+      _updateDocument(e) {
+        this.$.updateDocument.params = {
+          'properties': {
+            "interactionresults:interactions": [{
+              "id": "random-id",
+              "interactionId": this.interaction.id,
+              "documentId": this.document.uid,
+              "jsonResponse": this.interactionResponse,
+              "name": "name",
+              "status": "status",
+              "createdAt": Date.now(),
+              "createdBy": "user",
+              "parameters": this.interaction.parameters
+            }],
+          },
+        };
+        this.$.updateDocument.execute().then((response) => {
+          console.log("document updated");
+          this.fire('notify', { message: 'Document Updated' });
+        }).catch((error) => {
+          console.log(error);
+          this.notify(error);
+        })
+      },
+
+      _createDocument() {
+        this.$.createDocument.input = this.document.uid;
+        this.$.createDocument.params = {
+          'type': "InteractionResults",
+          "properties": {
+            "dc:title": 'AI Interaction Result',
+            "dc:description": 'AI Interaction Result',
+            "interactionresults:interactions": [{
+              "id": "random-id",
+              "interactionId": this.interaction.id,
+              "documentId": this.document.uid,
+              "jsonResponse": this.interactionResponse,
+              "name": "name",
+              "status": "status",
+              "createdAt": Date.now(),
+              "createdBy": "user",
+              "parameters": this.interaction.parameters
+            }],
+          }
+        };
+        return this.$.createDocument.execute();
+      },
+
+      _addFacet() {
+        this.$.addFacetOp.execute()
+          .then((response) => {
+            console.log('Facet added successfully:', response);
+          })
+          .catch((error) => {
+            console.error('Error adding facet:', error);
+          });
+      },
+
+      _addRelation() {
+        this.$.addRelationOp.execute()
+          .then((response) => {
+            console.log('Relation added successfully:', response);
+          })
+          .catch((error) => {
+            console.error('Error adding relation:', error);
+          });
+      },
+
+      _fetchRelatedDocuments() {
+        if (this.document) {
+          this.$.getRelationsOp.execute()
+            .then((response) => {
+              this.relatedDocuments = response.entries || [];
+            })
+            .catch((error) => {
+              console.error('Error fetching related documents:', error);
+            });
+        }
+      }
+
+    });
+  </script>
+</dom-module>

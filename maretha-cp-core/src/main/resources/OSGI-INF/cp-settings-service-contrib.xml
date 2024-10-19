@@ -2,12 +2,12 @@
 <component name="io.maretha.cp.core.services.CPSettingsService">
 
   <documentation>
-    Composable Prompts Settings Service.
+    AI Interaction Settings Service.
   </documentation>
 
-  <implementation class="io.maretha.cp.core.services.LocalSettingsService" />
+  <implementation class="io.maretha.cp.core.services.SavedSettingsService" />
 
   <service>
-    <provide interface="io.maretha.cp.core.services.LocalSettingsServiceInterface" />
+    <provide interface="io.maretha.cp.core.services.SavedSettingsServiceInterface" />
   </service>
 </component>
