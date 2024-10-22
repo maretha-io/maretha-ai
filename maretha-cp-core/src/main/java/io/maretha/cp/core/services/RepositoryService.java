@@ -7,6 +7,7 @@ import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.InteractionResponse;
 import io.maretha.cp.core.models.Settings;
+import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.automation.AutomationService;
 import org.nuxeo.ecm.automation.OperationContext;
@@ -22,12 +23,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RepositoryService implements RepositoryServiceInterface {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public List<Interaction> getLocalInteractionSettings(CoreSession session) {
@@ -119,19 +121,30 @@ public class RepositoryService implements RepositoryServiceInterface {
         }
     }
 
+    @SneakyThrows
     private HashMap<String, Object> convertToInteractionResponseComplexType(InteractionResponse interactionResponse) {
         HashMap<String, Object> interactionMap = new HashMap<>();
-        interactionMap.put(SCHEMA_ID, interactionResponse.getId());
-        interactionMap.put(SCHEMA_RESPONSE, interactionResponse.getResponse());
-        interactionMap.put(SCHEMA_STATUS, interactionResponse.getStatus());
-        interactionMap.put(SCHEMA_CREATED_BY, interactionResponse.getCreatedBy());
-        interactionMap.put(SCHEMA_PARAMETERS, convertParameters(interactionResponse.getParameters()));
+        addNonNullValue(interactionMap, SCHEMA_ID, interactionResponse.getId());
+        addNonNullValue(interactionMap, SCHEMA_NAME, interactionResponse.getName());
+        addNonNullValue(interactionMap, SCHEMA_DOCUMENT_ID, interactionResponse.getDocumentId());
+        addNonNullValue(interactionMap, SCHEMA_INTERACTION_ID, interactionResponse.getInteractionId());
+        addNonNullValue(interactionMap, SCHEMA_RESPONSE, objectMapper.writeValueAsString(interactionResponse.getResponse()));
+        addNonNullValue(interactionMap, SCHEMA_STATUS, interactionResponse.getStatus());
+        addNonNullValue(interactionMap, SCHEMA_CREATED_BY, interactionResponse.getCreatedBy());
+        addNonNullValue(interactionMap, SCHEMA_CREATED_AT, interactionResponse.getCreatedAt());
+        addNonNullValue(interactionMap, SCHEMA_PARAMETERS, convertParameters(interactionResponse.getParameters()));
         return interactionMap;
+    }
+
+    private void addNonNullValue(HashMap<String, Object> map, String field, Object value) {
+        if (!Objects.isNull(value)) {
+            map.put(field, value);
+        }
     }
 
     private <T> T convertToType(ObjectNode obj, Class<T> type) {
         try {
-            return mapper.treeToValue(obj, type);
+            return objectMapper.treeToValue(obj, type);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error converting ObjectNode to " + type.getSimpleName(), e);
         }

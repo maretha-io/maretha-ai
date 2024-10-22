@@ -52,7 +52,7 @@
 
     <div class="button-container">
       <paper-button raised class="save-metadata" on-click="_saveAsMetadata">Save as Metadata</paper-button>
-      <paper-button raised class="save-related" on-click="_saveAsRelatedDocument">Save as Related Document</paper-button>
+      <paper-button raised class="save-related" on-click="_saveAsRelatedDocument">Save as Document</paper-button>
     </div>
 
   </template>
@@ -83,7 +83,7 @@
       observers: [],
 
       _interactionObserver: (obs) => {
-        console.log(`_interactionsObserver:`, obs);
+        console.log(`_interactionObserver:`, obs);
       },
 
       _documentObserver: (obs) => {
@@ -103,28 +103,36 @@
       },
 
       _saveInteractionResponse(e) {
+        console.log(this.interactionResponse);
         if(!this.interactionResponse) {
-          this.fire('notify', 'Cannot save without a response.', {close: true});
+          this.fire('notify', {message: 'Cannot save without a response.'});
+          console.error('Cannot save without a response.');
           return;
         }
         this.$.saveResponse.params.interactions =  [{
-          "id": "random-id",
+          "id": this.document.uid+'-'+this.interaction.id+'-'+ new Date().toISOString(),
           "interactionId": this.interaction.id,
           "documentId": this.document.uid,
           "response": this.interactionResponse,
-          "name": "name",
-          "status": "status",
-          "createdAt": Date.now(),
-          "createdBy": "user",
+          "name": this.interaction.name,
+          "status": this.interaction.status,
+          "createdAt": new Date().toISOString(),
+          "createdBy": this._getUser(),
           "parameters": this.interaction.parameters
         }];
         this.$.saveResponse.execute().then((response) => {
-          console.log("document saved");
-          this.fire('notify', { message: 'Document Updated' });
+          console.log("interaction saved");
+          this.fire('notify', { message: 'Interaction Saved' });
+          this.fire('document-updated');
         }).catch((error) => {
           console.log(error);
           this.notify(error);
         })
+      },
+
+      _getUser: function () {
+        const app = document.querySelector('nuxeo-app');
+        return app.currentUser.id;
       },
 
     });

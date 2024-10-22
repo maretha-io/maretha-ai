@@ -17,9 +17,10 @@ public class InteractionResponse {
     private String documentId;
     private String interactionId;
     private String status;
+    private String name;
     private String updatedAt;
     private String createdAt;
     private String createdBy;
-    private String response;
+    private Object response;
     private List<InteractionParameter> parameters = new ArrayList<>();
 }

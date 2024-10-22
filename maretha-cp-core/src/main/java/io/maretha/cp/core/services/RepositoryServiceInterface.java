@@ -16,6 +16,9 @@ public interface RepositoryServiceInterface {
     String RESULTS_SCHEMA = "interactionResults";
     String SCHEMA_RESPONSE = "response";
     String SCHEMA_CREATED_BY = "createdBy";
+    String SCHEMA_CREATED_AT = "createdAt";
+    String SCHEMA_DOCUMENT_ID = "documentId";
+    String SCHEMA_INTERACTION_ID = "interactionId";
 
     String SETTINGS_DOCUMENT_TYPE = "InteractionSettings";
     String SETTINGS_SCHEMA_NAME = "interactionSettings";
