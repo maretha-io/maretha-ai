@@ -19,6 +19,7 @@ import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -80,11 +81,16 @@ public class RepositoryService implements RepositoryServiceInterface {
         if (!doc.hasFacet(RESULTS_FACET)) {
             doc.addFacet(RESULTS_FACET);
         }
+        List<HashMap<String, Object>> existingInteractions = (List<HashMap<String, Object>>) doc.getPropertyValue(RESULTS_SCHEMA_PATH);
+        if (CollectionUtils.isEmpty(existingInteractions)) {
+            existingInteractions = new ArrayList<>();
+        }
         List<HashMap<String, Object>> interactionsMap = interactions.stream()
                 .map(objNode -> convertToType(objNode, InteractionResponse.class))
                 .map(this::convertToInteractionResponseComplexType)
                 .collect(Collectors.toList());
-        doc.setPropertyValue(RESULTS_SCHEMA_PATH, (Serializable) interactionsMap);
+        existingInteractions.addAll(interactionsMap);
+        doc.setPropertyValue(RESULTS_SCHEMA_PATH, (Serializable) existingInteractions);
         return session.saveDocument(doc);
     }
 
