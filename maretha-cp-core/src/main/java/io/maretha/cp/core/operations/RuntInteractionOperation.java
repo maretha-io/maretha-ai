@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.services.CPServiceInterface;
+import io.maretha.cp.core.services.CloudStorageFileShare;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
@@ -19,6 +20,7 @@ import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
+import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.IOException;
@@ -51,11 +53,13 @@ public class RuntInteractionOperation {
         parameters.forEach(param -> {
             String name = param.getName();
             String value = param.getValue();
-            //TODO check if parameter type and format (media for s3 signed url)
+            //TODO check if parameter type and format (document for s3 signed url)
             if ("[[file:content]]".equalsIgnoreCase(value)) {
                 Property blobProperty = doc.getProperty(FILE_CONTENT);
-                Blob blob = (Blob) blobProperty.getValue();
-                value = getText(blob);
+                ManagedBlob blob = (ManagedBlob) blobProperty.getValue();
+                CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
+                //value = getText(blob); //for sending text
+                value = cloudStorageFileShare.getPublicRemoteUri(blob).toString();
             }
             paramsMap.put(name, value);
         });

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.services.CloudStorageFileShare">
+
+  <documentation>
+    Sign S3 document url.
+  </documentation>
+
+  <implementation class="io.maretha.cp.core.services.SignS3Media" />
+
+  <service>
+    <provide interface="io.maretha.cp.core.services.CloudStorageFileShare" />
+  </service>
+</component>
