@@ -47,6 +47,12 @@
         min-height: 50%;
         margin: auto;
       }
+
+      .buttons {
+        margin: auto;
+        display: block;
+        text-align: right;
+      }
     </style>
 
     <nuxeo-page>
@@ -92,12 +98,18 @@
                 </template>
               </nuxeo-data-table-column>
             </nuxeo-data-table>
-            <paper-icon-button icon="icons:delete-forever" on-tap="_reset"
-                               aria-label="Delete and Reset">
-            </paper-icon-button>
-            <paper-icon-button id="chat" icon="icons:save" on-tap="_saveInteractions"
-                               aria-label="Save Configuration">
-            </paper-icon-button>
+
+            <div class="buttons">
+              <paper-button id="reset" on-tap="_reset" aria-label="Delete and Reset" raised style="background-color: #f87070;">
+                Delete and Reset
+                <iron-icon icon="icons:delete-forever"></iron-icon>
+              </paper-button>
+
+              <paper-button id="save" on-tap="_saveInteractions" aria-label="Save Configuration" raised style="background-color: lightgreen;">
+                Save Configuration
+                <iron-icon icon="icons:save"></iron-icon>
+              </paper-button>
+            </div>
           </div>
         </nuxeo-card>
       </div>
@@ -122,10 +134,10 @@
           </div>
         </div>
         <div class="buttons">
-          <paper-button noink dialog-dismiss on-tap="_close">Close</paper-button>
-          <paper-icon-button id="chat" icon="icons:save" on-tap="_saveInteractions"
-                             aria-label="Save Configuration">
-          </paper-icon-button>
+          <paper-button id="save" on-tap="_saveInteractions" aria-label="Save Configuration" raised style="background-color: lightgreen;">
+            Save Configuration
+            <iron-icon icon="icons:save"></iron-icon>
+          </paper-button>
         </div>
       </nuxeo-dialog>
 
