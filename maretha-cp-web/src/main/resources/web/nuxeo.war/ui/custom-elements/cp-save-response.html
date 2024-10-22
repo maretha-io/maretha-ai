@@ -126,7 +126,7 @@
           this.fire('document-updated');
         }).catch((error) => {
           console.log(error);
-          this.notify(error);
+          this.notify('notify', { message:'error'});
         })
       },
 
