@@ -27,6 +27,7 @@
 
       .table {
         width: 100%;
+        text-align: left;
       }
 
       .response-table-row {
@@ -73,7 +74,7 @@
           <div class="related-documents">
             <template is="dom-if" if="[[savedInteractions]]">
               <h3>Previous interactions</h3>
-              <nuxeo-data-table items="[[savedInteractions]]">
+              <nuxeo-data-table class="table" items="[[savedInteractions]]">
                 <nuxeo-data-table-column name="Name">
                   <template>
                     <a href="https://cloud.becomposable.com/studio/interactions/[[item.interactionId]]"
