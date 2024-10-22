@@ -1,58 +1,57 @@
 package io.maretha.cp.core.services;
 
 import com.amazonaws.HttpMethod;
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.nuxeo.ecm.blob.s3.S3BlobProvider;
+import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.blob.BlobManager;
 import org.nuxeo.ecm.core.blob.BlobProvider;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
-import org.nuxeo.ecm.core.storage.sql.S3BinaryManager;
 import org.nuxeo.runtime.api.Framework;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import static org.nuxeo.ecm.core.io.download.DownloadHelper.getContentTypeHeader;
+import static org.nuxeo.ecm.core.blob.KeyStrategy.VER_SEP;
 
 public class SignS3Media implements CloudStorageFileShare {
-    private final AmazonS3 publicS3Client = Framework.getService(S3BinaryManager.class).getAmazonS3();
+    private static final Log log = LogFactory.getLog(SignS3Media.class);
+    private static final int EXPIRATION_DAYS = 7;
 
-    // TODO how to test, run MINI.IO locally?
-    public URI getPublicRemoteUri(ManagedBlob blob) throws IOException {
-        String bucketNamePrefix = "";
-        String digest = "";
-        // 3. Retrieve the BlobProvider
-        BlobManager blobManager = Framework.getService(BlobManager.class);
-        BlobProvider blobProvider = blobManager.getBlobProvider(blob.getProviderId());
-
-        Map<String, String> properties = blobProvider.getProperties();
-        String bucketName = properties.get("bucket");  // Retrieve the bucket name from the provider properties
-        String regionName = properties.get("region");  // Retrieve the region from the provider properties
-        String s3Key = blob.getFilename();  // Assume S3 key is stored in the filename property
-
-        if (bucketName == null || s3Key == null) {
-            throw new NuxeoException("Could not retrieve bucket name or S3 key from blob.");
+    public URI getPublicRemoteUri(ManagedBlob blob) {
+        BlobProvider s3BlobProvider = Framework.getService(BlobManager.class).getBlobProvider("default");
+        if (!(s3BlobProvider instanceof S3BlobProvider)) {
+            log.error("Server not configured with s3; skipping upload");
         }
-
-        int directDownloadExpire = 60;
-        String key = bucketNamePrefix + digest;
-        Date expiration = new Date();
-        expiration.setTime(expiration.getTime() + directDownloadExpire * 1000);
-        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, key, HttpMethod.GET);
-        request.addRequestParameter("response-content-type", getContentTypeHeader(blob));
-//        request.addRequestParameter("response-content-disposition", getContentDispositionHeader(blob, null));
-        request.setExpiration(expiration);
-        URL url = publicS3Client.generatePresignedUrl(request);
         try {
-            return url.toURI();
+            return getURIS3((S3BlobProvider) s3BlobProvider, blob.getDigest(), blob);
         } catch (URISyntaxException e) {
-            throw new IOException(e);
+            throw new NuxeoException(e);
         }
+    }
+
+    private URI getURIS3(S3BlobProvider s3BlobProvider, String bucketKey, Blob blob) throws URISyntaxException {
+        // split version id if part of file key
+        String[] parts = bucketKey.split(String.valueOf(VER_SEP));
+        bucketKey = s3BlobProvider.config.bucketPrefix + parts[0];
+        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(s3BlobProvider.config.bucketName,
+                bucketKey, HttpMethod.GET);
+        if (parts.length > 1) {
+            request.setVersionId(parts[1]);
+        }
+        Date expiration = new Date();
+        expiration.setTime(expiration.getTime() + TimeUnit.MILLISECONDS.convert(EXPIRATION_DAYS, TimeUnit.DAYS));
+        request.addRequestParameter("response-content-type", blob.getMimeType());
+        request.addRequestParameter("response-content-disposition", String.format("attachment; filename=\"%s\"", blob.getFilename()));
+        request.setExpiration(expiration);
+        URL url = s3BlobProvider.config.amazonS3.generatePresignedUrl(request);
+        return url.toURI();
     }
 
 }
