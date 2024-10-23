@@ -80,7 +80,7 @@
 
               <nuxeo-data-table-column name="Active">
                 <template>
-                  <paper-toggle-button checked="{{item.active}}">Active</paper-toggle-button>
+                  <paper-toggle-button checked="{{item.active}}" on-change="_saveInteractions">Active</paper-toggle-button>
                 </template>
               </nuxeo-data-table-column>
 
@@ -100,15 +100,11 @@
             </nuxeo-data-table>
 
             <div class="buttons">
-              <paper-button id="reset" on-tap="_reset" aria-label="Delete and Reset" raised style="background-color: #f87070;">
-                Delete and Reset
-                <iron-icon icon="icons:delete-forever"></iron-icon>
-              </paper-button>
-
-              <paper-button id="save" on-tap="_saveInteractions" aria-label="Save Configuration" raised style="background-color: lightgreen;">
-                Save Configuration
-                <iron-icon icon="icons:save"></iron-icon>
-              </paper-button>
+<!--              TODO Reset individual interactionSetting (Q. What about getting new interactions?)-->
+<!--              <paper-button id="reset" on-tap="_reset" aria-label="Delete and Reset" raised style="background-color: #f87070;">-->
+<!--                Delete and Reset-->
+<!--                <iron-icon icon="icons:delete-forever"></iron-icon>-->
+<!--              </paper-button>-->
             </div>
           </div>
         </nuxeo-card>
