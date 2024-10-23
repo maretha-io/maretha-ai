@@ -1,11 +1,30 @@
 <?xml version="1.0"?>
 <fragment version="1">
 
-    <require>all</require>
+    <require>org.nuxeo.web.ui</require>
     <install>
+<!--        <unzip from="${bundle.fileName}" to="/" prefix="web">-->
+<!--            <include>web/**</include>-->
+<!--        </unzip>-->
+
+        <!-- unzip the war template -->
         <unzip from="${bundle.fileName}" to="/" prefix="web">
-            <include>web/**</include>
+            <include>web/nuxeo.war/**</include>
+            <exclude>web/nuxeo.war/ui/i18n/**</exclude>
         </unzip>
+
+        <!-- create a temporary folder -->
+        <delete path="${bundle.fileName}.tmp"/>
+        <mkdir path="${bundle.fileName}.tmp"/>
+        <unzip from="${bundle.fileName}" to="${bundle.fileName}.tmp">
+            <include>web/nuxeo.war/ui/i18n/**</include>
+        </unzip>
+
+        <!-- append the translations -->
+        <append from="${bundle.fileName}.tmp/web/nuxeo.war/ui/i18n/messages.json"
+                to="nuxeo.war/ui/i18n/messages.json"/>
+
+        <delete path="${bundle.fileName}.tmp"/>
     </install>
 
 </fragment>
