@@ -79,7 +79,7 @@ public class CPService implements CPServiceInterface {
     }
 
     @Override
-    public JsonNode getInteractionResult(String interaction, Map<String, String> data) {
+    public JsonNode getInteractionResult(String interaction, Map<String, Object> data) {
         boolean stream = false;
         String dataParameters = "";
         try {
