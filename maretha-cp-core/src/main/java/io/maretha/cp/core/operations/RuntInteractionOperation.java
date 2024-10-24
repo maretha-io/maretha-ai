@@ -6,24 +6,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.services.CPServiceInterface;
 import io.maretha.cp.core.services.CloudStorageFileShare;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
-import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.runtime.api.Framework;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,55 +43,26 @@ public class RuntInteractionOperation {
     public JsonNode run(DocumentModel doc) {
         List<InteractionParameter> parameters = objectMapper
                 .convertValue(data, objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));
-        Map<String, String> paramsMap = new HashMap<>();
+        Map<String, Object> paramsMap = new HashMap<>();
         parameters.forEach(param -> {
             String name = param.getName();
-            String value = param.getValue();
-            //TODO check if parameter type and format (document for s3 signed url)
-            if ("[[file:content]]".equalsIgnoreCase(value)) {
+            Object value = param.getValue();
+            String type = param.getType();
+            if ("[[file:content]]".equalsIgnoreCase((String) value)) {
                 Property blobProperty = doc.getProperty(FILE_CONTENT);
                 ManagedBlob blob = (ManagedBlob) blobProperty.getValue();
                 CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
-                //value = getText(blob); //for sending text
-                value = cloudStorageFileShare.getPublicRemoteUri(blob).toString();
+                String signedS3Url = cloudStorageFileShare.getPublicRemoteUri(blob).toString();
+                if (!StringUtils.isEmpty(type) && "array".equalsIgnoreCase(type)) {
+                    value = List.of(signedS3Url);
+                } else {
+                    value = signedS3Url;
+                }
             }
             paramsMap.put(name, value);
         });
 
         return Framework.getService(CPServiceInterface.class).getInteractionResult(interactionId, paramsMap);
     }
-
-    private String getText(Blob blob) {
-        String text = "";
-        try {
-            if (blob != null) {
-                // Extract text based on the blob type (Word, PDF, etc.)
-                String mimeType = blob.getMimeType();
-                if (mimeType.equals("application/pdf")) {
-                    // Use PDFBox to extract text from PDF
-                    try (PDDocument pdfDocument = PDDocument.load(blob.getStream())) {
-                        PDFTextStripper pdfStripper = new PDFTextStripper();
-                        text = pdfStripper.getText(pdfDocument);
-                    }
-                } else if (mimeType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-                    // Use Apache POI to extract text from Word document
-                    try (XWPFDocument doc = new XWPFDocument(blob.getStream())) {
-                        XWPFWordExtractor extractor = new XWPFWordExtractor(doc);
-                        text = extractor.getText();
-                    }
-                } else {
-                    throw new NuxeoException("Cannot extract text from document");
-                }
-            }
-        } catch (IOException e) {
-            throw new NuxeoException("Cannot extract text from document", e);
-        }
-        return removeRepetitiveCharacters(text);
-    }
-
-    protected String removeRepetitiveCharacters(String text) {
-        return text.replaceAll("(\\s*(.)\\s*)\\1+", "$1");
-    }
-
 
 }
