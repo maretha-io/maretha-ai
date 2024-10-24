@@ -1,9 +1,10 @@
 <dom-module id="cp-document-interaction">
   <template>
-    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
-    <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]"></nuxeo-operation>
+    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation"></nuxeo-operation>
+    <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
+      input="[[document.uid]]"></nuxeo-operation>
     <nuxeo-operation id="getRelationsOp" op="Relations.GetRelations" input="[[document]]"
-                     params='{"outgoing": "true", "predicate": "http://www.nuxeo.org/ecm/schemas/relation#isRelatedTo"}'>
+      params='{"outgoing": "true", "predicate": "http://www.nuxeo.org/ecm/schemas/relation#isRelatedTo"}'>
     </nuxeo-operation>
 
     <style include="nuxeo-action-button-styles">
@@ -31,17 +32,18 @@
       }
 
       .response-table-row {
-        height: 50px; /* Set the desired height */
-        overflow: scroll; /* Ensure content does not overflow */
+        height: 50px;
+        /* Set the desired height */
+        overflow: scroll;
+        /* Ensure content does not overflow */
       }
-      
     </style>
 
     <paper-icon-button icon="communication:chat" label="Interact with document" on-tap="_toggleDialog">
       <nuxeo-tooltip>AI Interact with document</nuxeo-tooltip>
     </paper-icon-button>
 
-    <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
+    <nuxeo-dialog id="dialog" opened="{{dialogOpened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
       <div class="content">
         <div style="width: 90%; margin:auto; text-align: center;">
           <paper-dropdown-menu label="Select AI Interaction">
@@ -54,7 +56,8 @@
 
           <div style="width: 50%; margin:auto; text-align: center;">
             <template is="dom-repeat" items="[[selectedInteraction.parameters]]">
-              <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
+              <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]"
+                type="[[item.type]]"></nuxeo-input>
             </template>
           </div>
 
@@ -68,7 +71,8 @@
           <div id="response"></div>
 
           <template is="dom-if" if="[[interactionResponse]]">
-            <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]" interaction-response="[[interactionResponse]]"></cp-save-response>
+            <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]"
+              interaction-response="[[interactionResponse]]"></cp-save-response>
           </template>
 
           <div class="related-documents">
@@ -78,7 +82,7 @@
                 <nuxeo-data-table-column name="Name">
                   <template>
                     <a href="https://cloud.becomposable.com/studio/interactions/[[item.interactionId]]"
-                       target="_blank">[[item.name]]</a>
+                      target="_blank">[[item.name]]</a>
                   </template>
                 </nuxeo-data-table-column>
                 <nuxeo-data-table-column name="Response" style="height: 50px; overflow: scroll;" flex="50">
@@ -151,30 +155,61 @@
           type: Number,
           value: -1,
         },
+
+        dialogOpened: {
+          type: Boolean,
+          observer: '_dialogOpenObserver'
+        },
+
+        debugging: {
+          type: Boolean,
+          value: false
+        },
       },
 
-      observers: [],
+      _dialogOpenObserver: function (open) {
+        if (open && this.interactions.length === 0) {
+          this._loadData();
+        }
+        if (!open) {
+          this._resetData();
+        }
+      },
 
-      _documentObserver() {
-        if(this.hasFacet(this.document, 'InteractionResultsFacet')) {
+      _resetData() {
+        this.set('interactions', []);
+        this.set('selectedIndex', null);
+        this.set('selectedInteraction', null);
+        this.set('interactionResponse', null);
+        this.set('savedInteractions', []);
+      },
+
+      _documentObserver(doc) {
+        this._debug('_documentObserver', doc);
+        this._resetData();
+        this._loadData();
+      },
+
+      _loadData() {
+        this._getInteractions();
+        if (this.hasFacet(this.document, 'InteractionResultsFacet')) {
           this._fetchRelatedDocuments();
           this._addMetadataInteractions();
         }
       },
 
       ready: function () {
-        this._getInteractions();
+
       },
 
       _addMetadataInteractions() {
         const savedInteractions = this.savedInteractions || [];
         const interactions = this.document.properties['interactionresults:interactions'];
-        if(interactions){
+        if (interactions) {
           this.savedInteractions.push(...interactions);
         }
         this.set('savedInteractions', []);
         this.set('savedInteractions', savedInteractions);
-<!--        console.log(savedInteractions, this.savedInteractions);-->
       },
 
       _getInteractions: function () {
@@ -189,10 +224,10 @@
       },
 
       _interactWithDocument: function () {
-        if(!this.selectedInteraction) return;
+        if (!this.selectedInteraction) return;
         this.$.response.innerHTML = '<p>Waiting for AI response...</p>';
         const operation = this.$.runInteractionOperation;
-        operation.params = {"interactionId": this.selectedInteraction.id, "data": this.selectedInteraction.parameters};
+        operation.params = { "interactionId": this.selectedInteraction.id, "data": this.selectedInteraction.parameters };
         operation.execute().then((response) => {
           this.set('interactionResponse', response.value);
         }).catch((error) => {
@@ -201,39 +236,36 @@
         });
       },
 
-      _interactionsObserver: (obs) => {
-        console.log(`_interactionsObserver:`, obs);
+      _interactionsObserver(obs) {
+        this._debug(`_interactionsObserver:`, obs);
       },
 
-      _savedInteractionsObserver: (obs) => {
-          console.log(`_savedInteractionsObserver:`, obs);
+      _savedInteractionsObserver(obs) {
+        this._debug(`_savedInteractionsObserver:`, obs);
       },
 
-      _selectedInteractionObserver: (obs) => {
-        console.log('_selectedInteractionObserver', obs);
+      _selectedInteractionObserver(obs) {
+        this._debug('_selectedInteractionObserver', obs);
       },
 
-      _interactionResponseObserver: function(obs) {
-          const htmlFormatted = this._jsonToHtml(obs);
-          this.$.response.innerHTML = htmlFormatted;
+      _interactionResponseObserver: function (obs) {
+        const htmlFormatted = this._jsonToHtml(obs);
+        this.$.response.innerHTML = htmlFormatted;
       },
 
       _relatedDocumentsObserver: function (obs) {
-        console.log('relatedDocuments', this.relatedDocuments);
-        if(!this.relatedDocuments) return;
+        if (!this.relatedDocuments) return;
         const savedInteractions = this.savedInteractions || [];
         this.relatedDocuments.forEach(doc => {
-            const interactions = doc.properties['interactionresults:interactions'];
-            console.log('interactions', interactions);
-            savedInteractions.push(...interactions);
+          const interactions = doc.properties['interactionresults:interactions'];
+          savedInteractions.push(...interactions);
         });
         this.set('savedInteractions', []);
         this.set('savedInteractions', savedInteractions);
-        console.log('_relatedDocumentsObserver',savedInteractions, this.savedInteractions);
       },
 
       // Compute the selected value based on the selected index
-      _computeSelectedValue: function(selectedIndex, jsonData) {
+      _computeSelectedValue: function (selectedIndex, jsonData) {
         if (selectedIndex >= 0 && jsonData && jsonData[selectedIndex]) {
           return jsonData[selectedIndex];
         }
@@ -257,7 +289,6 @@
             .then((response) => {
               const documents = response.entries || [];
               this.relatedDocuments = documents.filter(doc => (doc.type === 'InteractionResults' && doc.isTrashed === false));
-              console.log(this.relatedDocuments);
             })
             .catch((error) => {
               console.error('Error fetching related documents:', error);
@@ -265,18 +296,24 @@
         }
       },
 
-      _jsonToHtml: function(json) {
+      _jsonToHtml: function (json) {
         let htmlOutput = '';
         for (let key in json) {
-            if (json.hasOwnProperty(key)) {
-                htmlOutput += `<p><b>${this._capitalizeFirstLetter(key)}:</b> ${json[key]}</p>`;
-            }
+          if (json.hasOwnProperty(key)) {
+            htmlOutput += `<p><b>${this._capitalizeFirstLetter(key)}:</b> ${json[key]}</p>`;
+          }
         }
         return htmlOutput;
       },
 
-      _capitalizeFirstLetter: function(string) {
-          return string.charAt(0).toUpperCase() + string.slice(1);
+      _capitalizeFirstLetter: function (string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      },
+
+      _debug: function (name, info) {
+        if (this.debug) {
+          console.log(name, info);
+        }
       }
 
     });

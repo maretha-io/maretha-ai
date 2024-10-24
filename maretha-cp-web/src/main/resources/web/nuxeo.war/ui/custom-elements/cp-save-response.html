@@ -8,13 +8,16 @@
       /* Flexbox container for the buttons */
       .button-container {
         display: flex;
-        gap: 16px; /* Spacing between the buttons */
+        gap: 16px;
+        /* Spacing between the buttons */
       }
 
       /* Base button styles for both buttons */
       paper-button {
-        background-color: #e0f7fa; /* Light cyan background */
-        color: #00796b; /* Dark teal text */
+        background-color: #e0f7fa;
+        /* Light cyan background */
+        color: #00796b;
+        /* Dark teal text */
         border-radius: 4px;
         padding: 10px 16px;
         font-size: 14px;
@@ -30,23 +33,29 @@
 
       /* Make buttons slightly more distinct but still light */
       paper-button.save-metadata {
-        background-color: #f1f8e9; /* Light green background */
-        color: #558b2f; /* Olive text */
+        background-color: #f1f8e9;
+        /* Light green background */
+        color: #558b2f;
+        /* Olive text */
       }
 
       paper-button.save-related {
-        background-color: #e0f7fa; /* Light cyan background */
-        color: #00796b; /* Dark teal text */
+        background-color: #e0f7fa;
+        /* Light cyan background */
+        color: #00796b;
+        /* Dark teal text */
       }
 
       /* Hover effect for the Save as Metadata button */
       paper-button.save-metadata:hover {
-        background-color: #dcedc8; /* Slightly darker green */
+        background-color: #dcedc8;
+        /* Slightly darker green */
       }
 
       /* Hover effect for Save as Related Document */
       paper-button.save-related:hover {
-        background-color: #b2ebf2; /* Slightly darker cyan */
+        background-color: #b2ebf2;
+        /* Slightly darker cyan */
       }
     </style>
 
@@ -78,39 +87,41 @@
           observer: '_interactionObserver',
         },
 
+        debugging: {
+          type: Boolean,
+          value: false
+        },
+
       },
 
       observers: [],
 
-      _interactionObserver: (obs) => {
-        console.log(`_interactionObserver:`, obs);
+      _interactionObserver(obs) {
+        this._debug(`_interactionObserver:`, obs);
       },
 
-      _documentObserver: (obs) => {
-        console.log(`_documentObserver:`, obs);
+      _documentObserver(obs) {
+        this._debug(`_documentObserver:`, obs);
       },
 
       _saveAsMetadata() {
-        console.log('_saveAsMetadata');
         this.$.saveResponse.params.saveOnMetadata = true;
         this._saveInteractionResponse();
       },
 
       _saveAsRelatedDocument() {
-        console.log('_saveAsRelatedDocument');
         this.$.saveResponse.params.saveOnMetadata = false;
         this._saveInteractionResponse();
       },
 
       _saveInteractionResponse(e) {
-        console.log(this.interactionResponse);
-        if(!this.interactionResponse) {
-          this.fire('notify', {message: 'Cannot save without a response.'});
+        if (!this.interactionResponse) {
+          this.fire('notify', { message: 'Cannot save without a response.' });
           console.error('Cannot save without a response.');
           return;
         }
-        this.$.saveResponse.params.interactions =  [{
-          "id": this.document.uid+'-'+this.interaction.id+'-'+ new Date().toISOString(),
+        this.$.saveResponse.params.interactions = [{
+          "id": this.document.uid + '-' + this.interaction.id + '-' + new Date().toISOString(),
           "interactionId": this.interaction.id,
           "documentId": this.document.uid,
           "response": this.interactionResponse,
@@ -121,12 +132,11 @@
           "parameters": this.interaction.parameters
         }];
         this.$.saveResponse.execute().then((response) => {
-          console.log("interaction saved");
           this.fire('notify', { message: 'Interaction Saved' });
           this.fire('document-updated');
         }).catch((error) => {
-          console.log(error);
-          this.notify('notify', { message:'error'});
+          console.error(error);
+          this.notify('notify', { message: 'error' });
         })
       },
 
@@ -134,6 +144,12 @@
         const app = document.querySelector('nuxeo-app');
         return app.currentUser.id;
       },
+
+      _debug: function (name, info) {
+        if (this.debugging) {
+          console.log(name, info);
+        }
+      }
 
     });
   </script>

@@ -1,8 +1,8 @@
 <dom-module id="cp-settings">
   <template>
-    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation" ></nuxeo-operation>
-    <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation" ></nuxeo-operation>
-    <nuxeo-operation id="docTypesOp" op="GetDocumentTypesOperation" ></nuxeo-operation>
+    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation"></nuxeo-operation>
+    <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation"></nuxeo-operation>
+    <nuxeo-operation id="docTypesOp" op="GetDocumentTypesOperation"></nuxeo-operation>
 
     <style include="nuxeo-styles">
       .content {
@@ -24,17 +24,20 @@
       }
 
       .toast-error {
-        background-color: #f44336; /* Red */
+        background-color: #f44336;
+        /* Red */
         color: white;
       }
 
       .toast-success {
-        background-color: #4caf50; /* Green */
+        background-color: #4caf50;
+        /* Green */
         color: white;
       }
 
       .toast-warning {
-        background-color: #ff9800; /* Orange */
+        background-color: #ff9800;
+        /* Orange */
         color: white;
       }
 
@@ -68,7 +71,7 @@
               <nuxeo-data-table-column name="Name">
                 <template>
                   <a href="https://cloud.becomposable.com/studio/interactions/{{interaction.id}}"
-                     target="_blank">{{item.name}}</a>
+                    target="_blank">{{item.name}}</a>
                 </template>
               </nuxeo-data-table-column>
 
@@ -80,7 +83,8 @@
 
               <nuxeo-data-table-column name="Active">
                 <template>
-                  <paper-toggle-button checked="{{item.active}}" on-change="_saveInteractions">Active</paper-toggle-button>
+                  <paper-toggle-button checked="{{item.active}}"
+                    on-change="_saveInteractions">Active</paper-toggle-button>
                 </template>
               </nuxeo-data-table-column>
 
@@ -92,7 +96,8 @@
 
               <nuxeo-data-table-column name="Configuration">
                 <template>
-                  <paper-icon-button icon="editor:border-color" label="Configuration" interaction="{{item}}" on-tap="_toggleDialog">
+                  <paper-icon-button icon="editor:border-color" label="Configuration" interaction="{{item}}"
+                    on-tap="_toggleDialog">
                     <nuxeo-tooltip>Configuration</nuxeo-tooltip>
                   </paper-icon-button>
                 </template>
@@ -100,8 +105,9 @@
             </nuxeo-data-table>
 
             <div class="buttons">
-<!--              TODO Reset individual interactionSetting (Q. What about getting new interactions?)-->
-              <paper-button id="reset" on-tap="_reset" aria-label="Delete and Reset" raised style="background-color: #f87070;">
+              <!--              TODO Reset individual interactionSetting (Q. What about getting new interactions?)-->
+              <paper-button id="reset" on-tap="_reset" aria-label="Delete and Reset" raised
+                style="background-color: #f87070;">
                 Delete and Reset
                 <iron-icon icon="icons:delete-forever"></iron-icon>
               </paper-button>
@@ -113,24 +119,21 @@
       <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
         <div class="content">
           <div style="width: 30%; margin:auto;">
-            <nuxeo-selectivity
-                    class="selectivity-container"
-                    multiple
-                    min-chars="0"
-                    data="{{documentTypes}}"
-                    value="{{selectedInteraction.activeOnDocumentTypes}}"
-                    placeholder="Select Document Types"
-            ></nuxeo-selectivity>
+            <nuxeo-selectivity class="selectivity-container" multiple min-chars="0" data="{{documentTypes}}"
+              value="{{selectedInteraction.activeOnDocumentTypes}}"
+              placeholder="Select Document Types"></nuxeo-selectivity>
           </div>
           <div style="width: 30%; margin:auto;">
             <p>Parameters</p>
             <template is="dom-repeat" items="[[selectedInteraction.parameters]]" as="item">
-              <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
+              <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]"
+                type="[[item.type]]"></nuxeo-input>
             </template>
           </div>
         </div>
         <div class="buttons">
-          <paper-button id="save" on-tap="_saveInteractions" aria-label="Save Configuration" raised style="background-color: lightgreen;">
+          <paper-button id="save" on-tap="_saveInteractions" aria-label="Save Configuration" raised
+            style="background-color: lightgreen;">
             Save Configuration
             <iron-icon icon="icons:save"></iron-icon>
           </paper-button>
@@ -161,6 +164,11 @@
           type: Array,
           value: [],
           observer: '_documentTypesObserver'
+        },
+
+        debugging: {
+          type: Boolean,
+          value: false
         },
       },
 
@@ -193,9 +201,8 @@
 
       _saveInteractions: function () {
         const operation = this.$.saveInteractionsOperation;
-        operation.params = {'interactions': this.interactions};
+        operation.params = { 'interactions': this.interactions };
         operation.execute().then((response) => {
-          console.log(`_saveInteractions`, response.value);
           this._showNotification('Changes Saved!', 'success');
         }).catch((error) => {
           console.error('Error triggering operation:', error);
@@ -203,20 +210,20 @@
         });
       },
 
-      _interactionsObserver: function (obs) {
-        console.log(`_interactionsObserver:`, obs);
+      _interactionsObserver (obs) {
+        this._debug(`_interactionsObserver:`, obs);
       },
 
-      _selectedInteractionObserver: function (obs) {
-        console.log(`_selectedInteractionObserver`, obs);
+      _selectedInteractionObserver (obs) {
+        this._debug(`_selectedInteractionObserver`, obs);
       },
 
-      _interactionsChangeObserver: function (obs) {
-        console.log(`_interactionsObserver:`, obs);
+      _interactionsChangeObserver (obs) {
+        this._debug(`_interactionsObserver:`, obs);
       },
 
-      _documentTypesObserver: function (obs) {
-        console.log(`_documentTypesObserver:`, obs);
+      _documentTypesObserver (obs) {
+        this._debug(`_documentTypesObserver:`, obs);
       },
 
       _showNotification(message, type) {
@@ -242,13 +249,19 @@
 
       _reset: function () {
         const operation = this.$.getInteractionsOperation;
-        operation.params = {"refresh": true};
+        operation.params = { "refresh": true };
         operation.execute().then((response) => {
           this.set('interactions', response.value);
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });
       },
+
+      _debug: function (name, info) {
+        if (this.debug) {
+          console.log(name, info);
+        }
+      }
 
     });
   </script>
