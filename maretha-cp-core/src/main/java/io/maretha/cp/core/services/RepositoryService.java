@@ -168,9 +168,12 @@ public class RepositoryService implements RepositoryServiceInterface {
         interactionMap.put(SCHEMA_DESCRIPTION, interaction.getDescription());
         interactionMap.put(SCHEMA_NAME, interaction.getName());
         interactionMap.put(SCHEMA_STATUS, interaction.getStatus());
+        interactionMap.put(SCHEMA_VERSION, interaction.getVersion());
         interactionMap.put(SCHEMA_ACTIVE_ON_DOCUMENTS, interaction.getActiveOnDocumentTypes());
         interactionMap.put(SCHEMA_UPDATED_AT, interaction.getUpdatedAt()); //TODO update all at the same time or send isolated interactions?
         interactionMap.put(SCHEMA_ACTIVE, interaction.isActive());
+        interactionMap.put(SCHEMA_ACTIVE_ON_FOLDER, interaction.isActiveOnFolder());
+        interactionMap.put(SCHEMA_ACTIVE_ON_ACTION_MENU, interaction.isActiveOnActionMenu());
         interactionMap.put(SCHEMA_PARAMETERS, convertParameters(interaction.getParameters()));
         return interactionMap;
     }

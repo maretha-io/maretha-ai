@@ -56,6 +56,33 @@
         display: block;
         text-align: right;
       }
+
+      .nuxeo-card {
+        width: 100%;
+        height: 100%;
+        text-align: left;
+      }
+
+      .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        text-align: center;
+      }
+
+      .flex-item-left {
+        padding: 10px;
+        flex: 30%;
+      }
+
+      .flex-item-center {
+        padding: 10px;
+        flex: 30%;
+      }
+
+      .flex-item-right {
+        padding: 10px;
+        flex: 30%;
+      }
     </style>
 
     <nuxeo-page>
@@ -107,7 +134,7 @@
             <div class="buttons">
               <!--              TODO Reset individual interactionSetting (Q. What about getting new interactions?)-->
               <paper-button id="reset" on-tap="_reset" aria-label="Delete and Reset" raised
-                style="background-color: #f87070;">
+                style="background-color: #fdb2b2;">
                 Delete and Reset
                 <iron-icon icon="icons:delete-forever"></iron-icon>
               </paper-button>
@@ -117,23 +144,57 @@
       </div>
 
       <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
-        <div class="content">
-          <div style="width: 30%; margin:auto;">
-            <nuxeo-selectivity class="selectivity-container" multiple min-chars="0" data="{{documentTypes}}"
-              value="{{selectedInteraction.activeOnDocumentTypes}}"
-              placeholder="Select Document Types"></nuxeo-selectivity>
+        <div class="content" style="width: auto;max-width: 100%;">
+          <h2>Configure your Composable Interaction</h2>
+          <div>
+            <div class="flex-container">
+              <div class="flex-item-left">
+                <nuxeo-card role="widget" class="nuxeo-card" heading="Interaction: [[selectedInteraction.name]]">
+                  <p>Description: [[selectedInteraction.description]]</p>
+                  <p>Version: [[selectedInteraction.version]]</p>
+                  <p>Status: [[selectedInteraction.status]]</p>
+                </nuxeo-card>
+              </div>
+
+              <div class="flex-item-center">
+                <nuxeo-card role="widget" class="nuxeo-card" heading="Parameters">
+                  <template is="dom-repeat" items="[[selectedInteraction.parameters]]" as="item">
+                    <nuxeo-input role="widget" value="{{item.value}}"
+                      label="name: [[item.name]] type: [[item.type]] [[item.format]]" readonly="[[item.readOnly]]"
+                      type="[[item.type]]"></nuxeo-input>
+                  </template>
+                </nuxeo-card>
+              </div>
+
+              <div class="flex-item-right">
+                <nuxeo-card role="widget" class="nuxeo-card" heading="Configuration">
+                  <div style="display: inline-flex;">
+                    <span>Available in Action Menu:</span>
+                    <paper-toggle-button checked="{{selectedInteraction.activeOnActionMenu}}"
+                      on-change="_saveInteractions"></paper-toggle-button>
+                  </div>
+
+                  <div style="display: inline-flex;">
+                    <span>Executable on Folders:</span>
+                    <paper-toggle-button checked="{{selectedInteraction.activeOnFolder}}"
+                      on-change="_saveInteractions"></paper-toggle-button>
+                  </div>
+
+                  <div style="display: inline-block;width: 100%;">
+                    <span>Active for documents:</span>
+                    <nuxeo-selectivity class="selectivity-container" style="margin: auto;text-align: left;" multiple
+                      min-chars="0" data="{{documentTypes}}" value="{{selectedInteraction.activeOnDocumentTypes}}"
+                      placeholder="Select Document Types"></nuxeo-selectivity>
+                  </div>
+                </nuxeo-card>
+              </div>
+
+            </div>
           </div>
-          <div style="width: 30%; margin:auto;">
-            <p>Parameters</p>
-            <template is="dom-repeat" items="[[selectedInteraction.parameters]]" as="item">
-              <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]"
-                type="[[item.type]]"></nuxeo-input>
-            </template>
-          </div>
+
         </div>
         <div class="buttons">
-          <paper-button id="save" on-tap="_saveInteractions" aria-label="Save Configuration" raised
-            style="background-color: lightgreen;">
+          <paper-button id="save" on-tap="_saveInteractions" aria-label="Save Configuration" raised>
             Save Configuration
             <iron-icon icon="icons:save"></iron-icon>
           </paper-button>
@@ -210,19 +271,19 @@
         });
       },
 
-      _interactionsObserver (obs) {
+      _interactionsObserver(obs) {
         this._debug(`_interactionsObserver:`, obs);
       },
 
-      _selectedInteractionObserver (obs) {
+      _selectedInteractionObserver(obs) {
         this._debug(`_selectedInteractionObserver`, obs);
       },
 
-      _interactionsChangeObserver (obs) {
+      _interactionsChangeObserver(obs) {
         this._debug(`_interactionsObserver:`, obs);
       },
 
-      _documentTypesObserver (obs) {
+      _documentTypesObserver(obs) {
         this._debug(`_documentTypesObserver:`, obs);
       },
 
