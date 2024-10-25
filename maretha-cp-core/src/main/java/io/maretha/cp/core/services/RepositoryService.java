@@ -44,11 +44,16 @@ public class RepositoryService implements RepositoryServiceInterface {
     }
 
     @Override
-    public List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType) {
+    public List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
         return getLocalInteractionSettings(session)
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
+                .filter(Interaction::isActiveOnActionMenu)
+                .filter(interaction -> {
+                    if (isFolder) return interaction.isActiveOnFolder();
+                    return true;
+                })
                 .collect(Collectors.toList());
     }
 

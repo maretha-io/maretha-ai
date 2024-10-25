@@ -95,33 +95,33 @@
         <nuxeo-card>
           <div class="content">
             <nuxeo-data-table items="[[interactions]]" class="results-table">
-              <nuxeo-data-table-column name="Name">
+              <nuxeo-data-table-column name="Name" flex="30">
                 <template>
                   <a href="https://cloud.becomposable.com/studio/interactions/{{interaction.id}}"
                     target="_blank">{{item.name}}</a>
                 </template>
               </nuxeo-data-table-column>
 
-              <nuxeo-data-table-column name="Description">
+              <nuxeo-data-table-column name="Description" flex="50">
                 <template>
                   [[item.description]]
                 </template>
               </nuxeo-data-table-column>
 
-              <nuxeo-data-table-column name="Active">
+              <nuxeo-data-table-column name="Active" flex="10">
                 <template>
                   <paper-toggle-button checked="{{item.active}}"
                     on-change="_saveInteractions">Active</paper-toggle-button>
                 </template>
               </nuxeo-data-table-column>
 
-              <nuxeo-data-table-column name="Status">
+              <nuxeo-data-table-column name="Status" flex="5">
                 <template>
                   [[item.status]]
                 </template>
               </nuxeo-data-table-column>
 
-              <nuxeo-data-table-column name="Configuration">
+              <nuxeo-data-table-column name="Configuration" flex="5">
                 <template>
                   <paper-icon-button icon="editor:border-color" label="Configuration" interaction="{{item}}"
                     on-tap="_toggleDialog">
