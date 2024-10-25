@@ -28,9 +28,12 @@ public interface RepositoryServiceInterface {
     String SCHEMA_DESCRIPTION = "description";
     String SCHEMA_NAME = "name";
     String SCHEMA_STATUS = "status";
+    String SCHEMA_VERSION = "version";
     String SCHEMA_ACTIVE_ON_DOCUMENTS = "activeOnDocumentTypes";
     String SCHEMA_UPDATED_AT = "updatedAt";
     String SCHEMA_ACTIVE = "active";
+    String SCHEMA_ACTIVE_ON_FOLDER = "activeOnFolder";
+    String SCHEMA_ACTIVE_ON_ACTION_MENU = "activeOnActionMenu";
     String SCHEMA_PARAMETERS = "parameters";
 
     String PARAMETER_SCHEMA_NAME = "name";

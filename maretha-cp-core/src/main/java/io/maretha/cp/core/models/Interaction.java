@@ -17,10 +17,13 @@ public class Interaction {
     private String description;
     private String name;
     private String status;
+    private String version;
     private String updatedAt;
     private String createdAt;
     private String createdBy;
     private List<InteractionParameter> parameters = new ArrayList<>();
     private List<String> activeOnDocumentTypes = new ArrayList<>();
     private boolean isActive;
+    private boolean activeOnFolder;
+    private boolean activeOnActionMenu;
 }

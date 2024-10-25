@@ -13,9 +13,12 @@
             <xs:element name="description" type="xs:string"/>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="status" type="xs:string"/>
+            <xs:element name="version" type="xs:string"/>
             <xs:element name="updatedAt" type="xs:dateTime"/>
             <xs:element name="activeOnDocumentTypes" type="nxs:stringList"/>
             <xs:element name="active" type="xs:boolean"/>
+            <xs:element name="activeOnActionMenu" type="xs:boolean"/>
+            <xs:element name="activeOnFolder" type="xs:boolean"/>
             <xs:element name="parameters" type="nxs:interactionParameterList"/>
         </xs:sequence>
     </xs:complexType>
