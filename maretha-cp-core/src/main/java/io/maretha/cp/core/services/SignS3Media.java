@@ -22,7 +22,7 @@ import static org.nuxeo.ecm.core.blob.KeyStrategy.VER_SEP;
 
 public class SignS3Media implements CloudStorageFileShare {
     private static final Log log = LogFactory.getLog(SignS3Media.class);
-    private static final int EXPIRATION_DAYS = 7;
+    private static final int EXPIRATION_HOURS = 2;
 
     public URI getPublicRemoteUri(ManagedBlob blob) {
         BlobProvider s3BlobProvider = Framework.getService(BlobManager.class).getBlobProvider("default");
@@ -46,7 +46,7 @@ public class SignS3Media implements CloudStorageFileShare {
             request.setVersionId(parts[1]);
         }
         Date expiration = new Date();
-        expiration.setTime(expiration.getTime() + TimeUnit.MILLISECONDS.convert(EXPIRATION_DAYS, TimeUnit.DAYS));
+        expiration.setTime(expiration.getTime() + TimeUnit.MILLISECONDS.convert(EXPIRATION_HOURS, TimeUnit.HOURS));
         request.addRequestParameter("response-content-type", blob.getMimeType());
         request.addRequestParameter("response-content-disposition", String.format("attachment; filename=\"%s\"", blob.getFilename()));
         request.setExpiration(expiration);
