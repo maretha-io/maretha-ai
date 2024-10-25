@@ -1,6 +1,6 @@
 <dom-module id="cp-document-interaction">
   <template>
-    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation"></nuxeo-operation>
+    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsForDocumentOperation" input="[[document]]"></nuxeo-operation>
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
       input="[[document.uid]]"></nuxeo-operation>
     <nuxeo-operation id="getRelationsOp" op="Relations.GetRelations" input="[[document]]"
@@ -216,8 +216,7 @@
         const operation = this.$.getInteractionsOperation;
         operation.params = {};
         operation.execute().then((response) => {
-          const activeInteractions = response.value.filter(interaction => interaction.active === true);
-          this.set('interactions', activeInteractions);
+          this.set('interactions', response.value);
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });

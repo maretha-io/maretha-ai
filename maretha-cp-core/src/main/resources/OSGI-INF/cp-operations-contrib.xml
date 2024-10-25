@@ -7,7 +7,7 @@
     <operation class="io.maretha.cp.core.operations.GetDocumentTypesOperation"/>
     <operation class="io.maretha.cp.core.operations.RuntInteractionOperation"/>
     <operation class="io.maretha.cp.core.operations.SaveInteractionResponseOperation"/>
-    <operation class="io.maretha.cp.core.operations.GetSignedDocumentUrlOperation"/>
+    <operation class="io.maretha.cp.core.operations.GetInteractionsForDocumentOperation"/>
   </extension>
 
 </component>

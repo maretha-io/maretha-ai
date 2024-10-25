@@ -44,7 +44,7 @@ public interface RepositoryServiceInterface {
 
     List<Interaction> getLocalInteractionSettings(CoreSession session);
 
-    List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType);
+    List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean folder);
 
     DocumentModel saveInteractionSettings(CoreSession session, List<ObjectNode> interactions);
 
