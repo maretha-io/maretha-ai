@@ -1,6 +1,5 @@
 package io.maretha.cp.core.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +26,8 @@ import java.util.stream.Collectors;
 
 public class CPService implements CPServiceInterface {
     private final Log log = LogFactory.getLog(CPService.class);
-    private final String API_URL = Framework.getProperty("cp.api.url", "https://api.becomposable.com/api/v1");
+    private final String API_URL = Framework.getProperty("cp.api.url", "https://api.becomposable.com");
+    private final String UPLOAD_API_URL = Framework.getProperty("cp.upload.url", "https://zeno-server-production.api.becomposable.com");
     private final String AUTH_TOKEN = Framework.getProperty("cp.auth.token");
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final OkHttpClient client = new OkHttpClient.Builder()
@@ -38,7 +38,7 @@ public class CPService implements CPServiceInterface {
 
     @Override
     public List<Interaction> getInteractions() {
-        String url = API_URL + "/interactions";
+        String url = API_URL + "/api/v1/interactions";
         String interactions = getRequest(getBearerToken(), url);
         try {
             List<Interaction> cpInteractions = objectMapper.readValue(interactions, new TypeReference<>() {
@@ -47,46 +47,20 @@ public class CPService implements CPServiceInterface {
                 List<InteractionParameter> interactionParameters = getInteractionParameters(interaction.getId());
                 interaction.setParameters(interactionParameters);
             }).collect(Collectors.toList());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private List<InteractionParameter> getInteractionParameters(String interactionId) {
-        String url = API_URL + "/interactions/" + interactionId;
-        String interactionParametersResponse = getRequest(getBearerToken(), url);
-        List<InteractionParameter> paramsList = new ArrayList<>();
-        try {
-            JsonNode jsonNode = objectMapper.readTree(interactionParametersResponse);
-            JsonNode prompts = jsonNode.get("prompts");
-            if (prompts.isArray()) {
-                for (JsonNode parameterNode : prompts) {
-                    JsonNode params = parameterNode.get("template").get("inputSchema").get("properties");
-                    if (params != null) {
-                        params.fields().forEachRemaining(field -> {
-                            String name = field.getKey();
-                            JsonNode value = field.getValue();
-                            String type = value.has("type") ? value.get("type").asText() : "";
-                            String format = value.has("format") ? value.get("format").asText() : "";
-                            paramsList.add(new InteractionParameter(name, type, format, ""));
-                        });
-                    }
-                }
-            }
-            return paramsList;
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new NuxeoException(e);
         }
     }
 
     @Override
     public JsonNode getInteractionResult(String interaction, Map<String, Object> data) {
+        String url = API_URL + "/api/v1/runs";
         boolean stream = false;
         String dataParameters = "";
         try {
             dataParameters = objectMapper.writeValueAsString(data);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new NuxeoException(e);
         }
 
         String jsonBody = "{\n" +
@@ -94,18 +68,17 @@ public class CPService implements CPServiceInterface {
                 "    \"data\": " + dataParameters + ",\n" +
                 "    \"stream\": " + stream + "\n" +
                 "}";
-        String url = API_URL + "/runs";
         String response = postRequest(getBearerToken(), url, jsonBody);
         try {
             return objectMapper.readTree(response).get("result");
-        } catch (JsonProcessingException e) {
-            throw new NuxeoException(e); //TODO ADD logging
+        } catch (Exception e) {
+            throw new NuxeoException(e);
         }
     }
 
     @Override
     public String getBearerToken() {
-        String response = getRequest(AUTH_TOKEN, "https://api.becomposable.com/auth/token"); //TODO use base URL
+        String response = getRequest(AUTH_TOKEN, API_URL + "/auth/token");
         JSONObject jsonObject = new JSONObject(response);
         return jsonObject.getString("token");
     }
@@ -113,7 +86,7 @@ public class CPService implements CPServiceInterface {
     @Override
     public String uploadFileToStore(Blob file) {
         String bearerToken = getBearerToken();
-        String uploadUrlApi = "https://zeno-server-production.api.becomposable.com/api/v1/objects/upload-url";
+        String uploadUrlApi = UPLOAD_API_URL + "/api/v1/objects/upload-url";
         String filename = file.getFilename();
         String mimeType = file.getMimeType();
         String bodyJson = "{" +
@@ -141,9 +114,10 @@ public class CPService implements CPServiceInterface {
                 "    }\n" +
                 "}";
 
-        String uploadedResponse = postRequest(bearerToken, "https://zeno-server-production.api.becomposable.com/api/v1/objects", bodyJsonObject);
+        String uploadedResponse = postRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects", bodyJsonObject);
         JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
-
+//        String checkDocumentResponse = getRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects/" + storeId);
+//        JSONObject savedDocumentJson = new JSONObject(checkDocumentResponse);
         return uploadedResponseObject.getString("id");
     }
 
@@ -172,13 +146,7 @@ public class CPService implements CPServiceInterface {
                 .addHeader("Authorization", "Bearer " + apiToken)
                 .get()
                 .build();
-        try (Response response = client.newCall(request).execute()) {
-            String responseString = response.body().string();
-            log.debug(responseString);
-            return responseString;
-        } catch (Exception e) {
-            throw new NuxeoException(e);
-        }
+        return getResponseAsString(request);
     }
 
     private String postRequest(String apiToken, String url, String jsonBody) {
@@ -188,10 +156,41 @@ public class CPService implements CPServiceInterface {
                 .addHeader("Authorization", "Bearer " + apiToken)
                 .post(body)
                 .build();
+        return getResponseAsString(request);
+    }
+
+    private String getResponseAsString(Request request) {
         try (Response response = client.newCall(request).execute()) {
             String responseString = response.body().string();
             log.debug(responseString);
             return responseString;
+        } catch (Exception e) {
+            throw new NuxeoException(e);
+        }
+    }
+
+    private List<InteractionParameter> getInteractionParameters(String interactionId) {
+        String url = API_URL + "/api/v1/interactions/" + interactionId;
+        String interactionParametersResponse = getRequest(getBearerToken(), url);
+        List<InteractionParameter> paramsList = new ArrayList<>();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(interactionParametersResponse);
+            JsonNode prompts = jsonNode.get("prompts");
+            if (prompts.isArray()) {
+                for (JsonNode parameterNode : prompts) {
+                    JsonNode params = parameterNode.get("template").get("inputSchema").get("properties");
+                    if (params != null) {
+                        params.fields().forEachRemaining(field -> {
+                            String name = field.getKey();
+                            JsonNode value = field.getValue();
+                            String type = value.has("type") ? value.get("type").asText() : "";
+                            String format = value.has("format") ? value.get("format").asText() : "";
+                            paramsList.add(new InteractionParameter(name, type, format, ""));
+                        });
+                    }
+                }
+            }
+            return paramsList;
         } catch (Exception e) {
             throw new NuxeoException(e);
         }

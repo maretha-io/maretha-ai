@@ -36,7 +36,7 @@ import static io.maretha.cp.core.services.RepositoryServiceInterface.RESULTS_STO
 /**
  *
  */
-@Operation(id = RuntInteractionOperation.ID, category = Constants.CAT_DOCUMENT, label = "Run Interactions", description = "")
+@Operation(id = RuntInteractionOperation.ID, category = Constants.CAT_DOCUMENT, label = "Run Interactions", description = "Run Interaction")
 public class RuntInteractionOperation {
 
     public static final String ID = "RunInteractionOperation";
@@ -49,14 +49,13 @@ public class RuntInteractionOperation {
     @Param(name = "interactionId")
     protected String interactionId;
 
-    @OperationMethod
     //TODO Extract logic in Service Q. How to handle 1000 child documents?
+    @OperationMethod
     public JsonNode run(DocumentModel doc) {
         List<InteractionParameter> parameters = objectMapper
                 .convertValue(data, objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));
         if (doc.isFolder()) {
-            DocumentModelList childrenDocs = session.getChildren(doc.getRef());
-            List<DocumentModel> childrenDocsWithStoreId = getChildrenDocuments(childrenDocs);
+            List<DocumentModel> childrenDocsWithStoreId = getChildrenDocumentsAndUploadFiles(session.getChildren(doc.getRef()));
             Map<String, Object> paramsMap = buildParametersForFolder(childrenDocsWithStoreId, parameters);
             return cpServiceInterface.getInteractionResult(interactionId, paramsMap);
         } else {
@@ -74,25 +73,27 @@ public class RuntInteractionOperation {
         String storeId = null;
         if (doc.hasFacet(RESULTS_FACET)) {
             storeId = (String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
-        } else {
-            doc.addFacet(RESULTS_FACET);
         }
         if (StringUtils.isEmpty(storeId)) {
+            doc.addFacet(RESULTS_FACET);
             storeId = cpServiceInterface.uploadFileToStore((Blob) doc.getPropertyValue(FILE_CONTENT));
             doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
             doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
+            return session.saveDocument(doc);
         }
-        return session.saveDocument(doc);
+        return doc;
     }
 
-    private List<DocumentModel> getChildrenDocuments(DocumentModelList childrenDocs) {
-        return childrenDocs.stream().map(childrenDoc -> {
-            boolean isSupportedMimeType = blobIsSupportedMimeType(childrenDoc);
-            if (isSupportedMimeType) {
-                return uploadFileAndGetStoreId(childrenDoc);
-            }
-            return null;
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+    private List<DocumentModel> getChildrenDocumentsAndUploadFiles(DocumentModelList childrenDocs) {
+        return childrenDocs.stream()
+                .filter(doc -> !doc.isTrashed() && !doc.isProxy())
+                .map(childrenDoc -> {
+                    boolean isSupportedMimeType = blobIsSupportedMimeType(childrenDoc);
+                    if (isSupportedMimeType) {
+                        return uploadFileAndGetStoreId(childrenDoc);
+                    }
+                    return null;
+                }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     private Map<String, Object> buildParameters(DocumentModel doc, List<InteractionParameter> parameters) {
@@ -126,20 +127,12 @@ public class RuntInteractionOperation {
             boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
             if (isDocumentOrMediaFormat && "array".equalsIgnoreCase(type)) {
                 value = childrenDocsWithStoreId.stream()
-                        .map(doc -> "storeId:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
+                        .map(doc -> "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
                         .collect(Collectors.toList());
             }
             paramsMap.put(name, value);
         });
         return paramsMap;
-    }
-
-
-    private String getSignedS3Url(DocumentModel doc) {
-        Property blobProperty = doc.getProperty(FILE_CONTENT);
-        ManagedBlob blob = (ManagedBlob) blobProperty.getValue();
-        CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
-        return cloudStorageFileShare.getPublicRemoteUri(blob).toString();
     }
 
     private boolean blobIsSupportedMimeType(DocumentModel doc) {
@@ -156,6 +149,14 @@ public class RuntInteractionOperation {
 
     private String getSupportedMimeTypes() {
         return Framework.getProperty("cp.supported.mime-types", "text/plain,application/pdf");
+    }
+
+    // Not used for now as Composable does not process links, will be used in the future or for media type.
+    private String getSignedS3Url(DocumentModel doc) {
+        Property blobProperty = doc.getProperty(FILE_CONTENT);
+        ManagedBlob blob = (ManagedBlob) blobProperty.getValue();
+        CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
+        return cloudStorageFileShare.getPublicRemoteUri(blob).toString();
     }
 
 }
