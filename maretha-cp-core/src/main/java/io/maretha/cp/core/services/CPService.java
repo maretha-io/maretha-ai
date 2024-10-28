@@ -13,7 +13,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
+import org.json.JSONObject;
+import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.runtime.api.Framework;
 
@@ -28,17 +29,17 @@ public class CPService implements CPServiceInterface {
     private final Log log = LogFactory.getLog(CPService.class);
     private final String API_URL = Framework.getProperty("cp.api.url", "https://api.becomposable.com/api/v1");
     private final String AUTH_TOKEN = Framework.getProperty("cp.auth.token");
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .build();
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public List<Interaction> getInteractions() {
         String url = API_URL + "/interactions";
-        String interactions = getRequest(AUTH_TOKEN, url);
+        String interactions = getRequest(getBearerToken(), url);
         try {
             List<Interaction> cpInteractions = objectMapper.readValue(interactions, new TypeReference<>() {
             });
@@ -53,7 +54,7 @@ public class CPService implements CPServiceInterface {
 
     private List<InteractionParameter> getInteractionParameters(String interactionId) {
         String url = API_URL + "/interactions/" + interactionId;
-        String interactionParametersResponse = getRequest(AUTH_TOKEN, url);
+        String interactionParametersResponse = getRequest(getBearerToken(), url);
         List<InteractionParameter> paramsList = new ArrayList<>();
         try {
             JsonNode jsonNode = objectMapper.readTree(interactionParametersResponse);
@@ -94,11 +95,74 @@ public class CPService implements CPServiceInterface {
                 "    \"stream\": " + stream + "\n" +
                 "}";
         String url = API_URL + "/runs";
-        String response = postRequest(AUTH_TOKEN, url, jsonBody);
+        String response = postRequest(getBearerToken(), url, jsonBody);
         try {
             return objectMapper.readTree(response).get("result");
         } catch (JsonProcessingException e) {
             throw new NuxeoException(e); //TODO ADD logging
+        }
+    }
+
+    @Override
+    public String getBearerToken() {
+        String response = getRequest(AUTH_TOKEN, "https://api.becomposable.com/auth/token"); //TODO use base URL
+        JSONObject jsonObject = new JSONObject(response);
+        return jsonObject.getString("token");
+    }
+
+    @Override
+    public String uploadFileToStore(Blob file) {
+        String bearerToken = getBearerToken();
+        String uploadUrlApi = "https://zeno-server-production.api.becomposable.com/api/v1/objects/upload-url";
+        String filename = file.getFilename();
+        String mimeType = file.getMimeType();
+        String bodyJson = "{" +
+                "    \"name\": \"" + filename + "\"," +
+                "    \"mime_type\": \"" + mimeType + "\"" +
+                "}";
+        String uploadUrlResponse = postRequest(bearerToken, uploadUrlApi, bodyJson);
+        JSONObject jsonObject = new JSONObject(uploadUrlResponse);
+        String uploadUrl = jsonObject.getString("url");
+        String uploadId = jsonObject.getString("id");
+
+        String etag = null;
+        try {
+            etag = putFileRequest(uploadUrl, file);
+        } catch (Exception e) {
+            throw new NuxeoException(e);
+        }
+
+        String bodyJsonObject = "{\n" +
+                "    \"content\": {\n" +
+                "        \"source\": \"" + uploadId + "\",\n" +
+                "        \"name\": \"" + filename + "\",\n" +
+                "        \"type\": \"" + mimeType + "\",\n" +
+                "        \"etag\": " + etag + "\n" +
+                "    }\n" +
+                "}";
+
+        String uploadedResponse = postRequest(bearerToken, "https://zeno-server-production.api.becomposable.com/api/v1/objects", bodyJsonObject);
+        JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
+
+        return uploadedResponseObject.getString("id");
+    }
+
+    private String putFileRequest(String url, Blob file) throws IOException {
+        byte[] fileBytes = file.getStream().readAllBytes();
+        RequestBody requestBody = RequestBody.create(fileBytes, MediaType.parse("application/octet-stream"));
+        Request request = new Request.Builder()
+                .url(url)
+                .put(requestBody)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            log.debug(response.body().string());
+            if (response.isSuccessful()) {
+                return response.header("Etag");
+            }
+            return null;
+        } catch (Exception e) {
+            throw new NuxeoException(e);
         }
     }
 
@@ -112,7 +176,7 @@ public class CPService implements CPServiceInterface {
             String responseString = response.body().string();
             log.debug(responseString);
             return responseString;
-        } catch (IOException | JSONException e) {
+        } catch (Exception e) {
             throw new NuxeoException(e);
         }
     }
@@ -128,7 +192,7 @@ public class CPService implements CPServiceInterface {
             String responseString = response.body().string();
             log.debug(responseString);
             return responseString;
-        } catch (IOException | JSONException e) {
+        } catch (Exception e) {
             throw new NuxeoException(e);
         }
     }

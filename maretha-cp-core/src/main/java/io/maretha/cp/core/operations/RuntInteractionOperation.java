@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.services.CPServiceInterface;
 import io.maretha.cp.core.services.CloudStorageFileShare;
+import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
@@ -15,10 +16,12 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.runtime.api.Framework;
 
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.maretha.cp.core.listeners.DocumentChangeListener.FILE_CONTENT;
+import static io.maretha.cp.core.services.RepositoryServiceInterface.RESULTS_FACET;
+import static io.maretha.cp.core.services.RepositoryServiceInterface.RESULTS_STORED_DATE_SCHEMA_PATH;
+import static io.maretha.cp.core.services.RepositoryServiceInterface.RESULTS_STORE_ID_SCHEMA_PATH;
 
 /**
  *
@@ -50,19 +56,40 @@ public class RuntInteractionOperation {
                 .convertValue(data, objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));
         if (doc.isFolder()) {
             DocumentModelList childrenDocs = session.getChildren(doc.getRef());
-            List<String> childrenSignedDocuments = getChildrenSignedDocuments(childrenDocs);
-            Map<String, Object> paramsMap = buildParametersForFolder(childrenSignedDocuments, parameters);
+            List<DocumentModel> childrenDocsWithStoreId = getChildrenDocuments(childrenDocs);
+            Map<String, Object> paramsMap = buildParametersForFolder(childrenDocsWithStoreId, parameters);
+            return cpServiceInterface.getInteractionResult(interactionId, paramsMap);
+        } else {
+            doc = uploadFileAndGetStoreId(doc);
+            Map<String, Object> paramsMap = buildParameters(doc, parameters);
             return cpServiceInterface.getInteractionResult(interactionId, paramsMap);
         }
-        Map<String, Object> paramsMap = buildParameters(doc, parameters);
-        return cpServiceInterface.getInteractionResult(interactionId, paramsMap);
     }
 
-    private List<String> getChildrenSignedDocuments(DocumentModelList childrenDocs) {
+    private DocumentModel uploadFileAndGetStoreId(DocumentModel doc) {
+        boolean isSupportedMimeType = blobIsSupportedMimeType(doc);
+        if (!isSupportedMimeType) {
+            throw new NuxeoException("This file:content is not supported");
+        }
+        String storeId = null;
+        if (doc.hasFacet(RESULTS_FACET)) {
+            storeId = (String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
+        } else {
+            doc.addFacet(RESULTS_FACET);
+        }
+        if (StringUtils.isEmpty(storeId)) {
+            storeId = cpServiceInterface.uploadFileToStore((Blob) doc.getPropertyValue(FILE_CONTENT));
+            doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
+            doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
+        }
+        return session.saveDocument(doc);
+    }
+
+    private List<DocumentModel> getChildrenDocuments(DocumentModelList childrenDocs) {
         return childrenDocs.stream().map(childrenDoc -> {
             boolean isSupportedMimeType = blobIsSupportedMimeType(childrenDoc);
             if (isSupportedMimeType) {
-                return getSignedS3Url(childrenDoc);
+                return uploadFileAndGetStoreId(childrenDoc);
             }
             return null;
         }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -77,11 +104,11 @@ public class RuntInteractionOperation {
             String format = param.getFormat();
             boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
             if (isDocumentOrMediaFormat) {
-                String signedS3Url = getSignedS3Url(doc);
+                String storeId = "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
                 if ("array".equalsIgnoreCase(type)) {
-                    value = List.of(signedS3Url);
+                    value = List.of(storeId);
                 } else {
-                    value = signedS3Url;
+                    value = storeId;
                 }
             }
             paramsMap.put(name, value);
@@ -89,7 +116,7 @@ public class RuntInteractionOperation {
         return paramsMap;
     }
 
-    private Map<String, Object> buildParametersForFolder(List<String> childrenSignedDocuments, List<InteractionParameter> parameters) {
+    private Map<String, Object> buildParametersForFolder(List<DocumentModel> childrenDocsWithStoreId, List<InteractionParameter> parameters) {
         Map<String, Object> paramsMap = new HashMap<>();
         parameters.forEach(param -> {
             String name = param.getName();
@@ -98,7 +125,9 @@ public class RuntInteractionOperation {
             String format = param.getFormat();
             boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
             if (isDocumentOrMediaFormat && "array".equalsIgnoreCase(type)) {
-                value = childrenSignedDocuments;
+                value = childrenDocsWithStoreId.stream()
+                        .map(doc -> "storeId:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
+                        .collect(Collectors.toList());
             }
             paramsMap.put(name, value);
         });
