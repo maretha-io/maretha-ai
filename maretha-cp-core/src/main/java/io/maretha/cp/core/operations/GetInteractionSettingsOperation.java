@@ -1,7 +1,7 @@
 package io.maretha.cp.core.operations;
 
 import io.maretha.cp.core.models.Interaction;
-import io.maretha.cp.core.services.CPServiceInterface;
+import io.maretha.cp.core.services.APIServiceInterface;
 import io.maretha.cp.core.services.RepositoryServiceInterface;
 import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.automation.core.Constants;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class GetInteractionSettingsOperation {
 
     public static final String ID = "GetInteractionsOperation";
-    private final CPServiceInterface cpService = Framework.getService(CPServiceInterface.class);
+    private final APIServiceInterface cpService = Framework.getService(APIServiceInterface.class);
     private final RepositoryServiceInterface cpLocalSettingsService = Framework.getService(RepositoryServiceInterface.class);
 
     @Param(name = "refresh", required = false)

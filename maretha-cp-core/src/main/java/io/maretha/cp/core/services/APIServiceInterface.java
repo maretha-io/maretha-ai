@@ -7,7 +7,7 @@ import org.nuxeo.ecm.core.api.Blob;
 import java.util.List;
 import java.util.Map;
 
-public interface CPServiceInterface {
+public interface APIServiceInterface {
     List<Interaction> getInteractions();
     JsonNode getInteractionResult(String request, Map<String, Object> data);
     String getBearerToken();

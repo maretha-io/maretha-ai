@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.services.RunInteractionService">
+
+    <documentation>
+        Runs the Interaction by calling relevant APIs and saves data.
+    </documentation>
+
+    <implementation class="io.maretha.cp.core.services.RunInteractionServiceImpl"/>
+
+    <service>
+        <provide interface="io.maretha.cp.core.services.RunInteractionService"/>
+    </service>
+</component>

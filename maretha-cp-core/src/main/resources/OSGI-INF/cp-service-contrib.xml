@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
-<component name="io.maretha.cp.core.services.CPService">
+<component name="io.maretha.cp.core.services.APIService">
 
   <documentation>
     Composable Prompts API Service.
   </documentation>
 
-  <implementation class="io.maretha.cp.core.services.CPService" />
+  <implementation class="io.maretha.cp.core.services.APIService" />
 
   <service>
-    <provide interface="io.maretha.cp.core.services.CPServiceInterface" />
+    <provide interface="io.maretha.cp.core.services.APIServiceInterface" />
   </service>
 </component>

@@ -16,12 +16,10 @@
  */
 package io.maretha.cp.core.stream;
 
-import io.maretha.cp.core.services.CPServiceInterface;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.bulk.action.computation.AbstractBulkComputation;
-import org.nuxeo.runtime.api.Framework;
 
 import java.io.Serializable;
 import java.util.List;
@@ -37,10 +35,10 @@ public class CPInteractionComputation extends AbstractBulkComputation {
 
     @Override
     protected void compute(CoreSession session, List<String> texts, Map<String, Serializable> properties) {
-        texts.forEach(text -> {
+//        texts.forEach(text -> {
 //            String interactionResult = Framework.getService(CPServiceInterface.class).getInteractionResult(text, data);
 //            log.debug("InteractionResult: " + interactionResult);
-        });
+//        });
     }
 
 }
