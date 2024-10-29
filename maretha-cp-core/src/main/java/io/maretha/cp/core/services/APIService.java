@@ -185,7 +185,6 @@ public class APIService implements APIServiceInterface {
         String responseBody = Retry.decorateSupplier(retry, () -> executeHttpRequest(request)).get();
         log.debug(responseBody);
         return responseBody;
-
     }
 
     private String executeHttpRequest(Request request) {
