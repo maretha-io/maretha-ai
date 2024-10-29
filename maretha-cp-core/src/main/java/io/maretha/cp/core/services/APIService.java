@@ -5,11 +5,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
+import io.maretha.cp.core.services.utils.FileUploadAsStream;
+import io.maretha.cp.core.services.utils.RetryInterceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
@@ -24,8 +27,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class CPService implements CPServiceInterface {
-    private final Log log = LogFactory.getLog(CPService.class);
+public class APIService implements APIServiceInterface {
+    private final Log log = LogFactory.getLog(APIService.class);
     private final String API_URL = Framework.getProperty("cp.api.url", "https://api.becomposable.com");
     private final String UPLOAD_API_URL = Framework.getProperty("cp.upload.url", "https://zeno-server-production.api.becomposable.com");
     private final String AUTH_TOKEN = Framework.getProperty("cp.auth.token");
@@ -34,6 +37,7 @@ public class CPService implements CPServiceInterface {
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
+            .addInterceptor(new RetryInterceptor(3, 1000))
             .build();
 
     @Override
@@ -69,10 +73,12 @@ public class CPService implements CPServiceInterface {
                 "    \"stream\": " + stream + "\n" +
                 "}";
         String response = postRequest(getBearerToken(), url, jsonBody);
+        JsonNode responseAsJson = null;
         try {
-            return objectMapper.readTree(response).get("result");
+            responseAsJson = objectMapper.readTree(response);
+            return responseAsJson.get("result");
         } catch (Exception e) {
-            throw new NuxeoException(e);
+            return responseAsJson;
         }
     }
 
@@ -85,6 +91,8 @@ public class CPService implements CPServiceInterface {
 
     @Override
     public String uploadFileToStore(Blob file) {
+        log.debug(String.format("uploadFileToStore: fileName:[%s], digest:[%s]", file.getFilename(), file.getDigest()));
+
         String bearerToken = getBearerToken();
         String uploadUrlApi = UPLOAD_API_URL + "/api/v1/objects/upload-url";
         String filename = file.getFilename();
@@ -105,6 +113,10 @@ public class CPService implements CPServiceInterface {
             throw new NuxeoException(e);
         }
 
+        if (StringUtils.isEmpty(etag)) {
+            throw new NuxeoException("Failed to upload the file");
+        }
+
         String bodyJsonObject = "{\n" +
                 "    \"content\": {\n" +
                 "        \"source\": \"" + uploadId + "\",\n" +
@@ -122,8 +134,8 @@ public class CPService implements CPServiceInterface {
     }
 
     private String putFileRequest(String url, Blob file) throws IOException {
-        byte[] fileBytes = file.getStream().readAllBytes();
-        RequestBody requestBody = RequestBody.create(fileBytes, MediaType.parse("application/octet-stream"));
+        RequestBody requestBody = new FileUploadAsStream().createStreamRequestBody(MediaType.parse("application/octet-stream"), file.getStream());
+
         Request request = new Request.Builder()
                 .url(url)
                 .put(requestBody)
@@ -195,4 +207,5 @@ public class CPService implements CPServiceInterface {
             throw new NuxeoException(e);
         }
     }
+
 }
