@@ -66,7 +66,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private List<DocumentModel> getChildrenDocumentsAndUploadFiles(CoreSession session, DocumentModel parentDoc) {
         String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:ancestorId = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0" +
-                " AND ecm:mixinType = 'file' AND file:content IS NOT NULL", parentDoc.getId());
+                " AND file:content IS NOT NULL", parentDoc.getId());
         DocumentModelList childDocuments = session.query(nxqlQuery);
         return childDocuments.stream()
                 .map(childrenDoc -> {
