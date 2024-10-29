@@ -5,21 +5,22 @@
 
 <nuxeo-slot-content name="maretha-cp-interactions" slot="PAGES" order="100">
     <template>
-        <cp-settings name="maretha-cp-interactions" user="user"></cp-settings>
+        <nuxeo-filter user="[[user]]" expression="user && user?.isAdministrator">
+            <template>
+                <cp-settings name="maretha-cp-interactions" user="[[user]]"></cp-settings>
+            </template>
+        </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 
-<nuxeo-slot-content name="maretha-cp" slot="DRAWER_ITEMS" order="100">
+<nuxeo-slot-content name="maretha-cp" slot="ADMINISTRATION_MENU">
     <template>
-        <nuxeo-menu-icon name="maretha-cp" label="AI Interactions Management"
-                         icon="icons:extension"></nuxeo-menu-icon>
-    </template>
-</nuxeo-slot-content>
-
-<nuxeo-slot-content name="maretha-cp" slot="DRAWER_PAGES">
-    <template>
-        <nuxeo-menu-item name="maretha-cp" label="AI Interactions Settings"
-                         route="page:maretha-cp-interactions"></nuxeo-menu-item>
+        <nuxeo-filter user="[[user]]" expression="user && user?.isAdministrator">
+            <template>
+                <nuxeo-menu-item name="maretha-cp" label="AI Interactions Settings"
+                                 route="page:maretha-cp-interactions"></nuxeo-menu-item>
+            </template>
+        </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 

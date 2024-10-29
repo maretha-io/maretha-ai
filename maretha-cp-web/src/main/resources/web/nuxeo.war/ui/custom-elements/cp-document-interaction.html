@@ -56,7 +56,7 @@
 
           <div style="width: 50%; margin:auto; text-align: center;">
             <template is="dom-repeat" items="[[selectedInteraction.parameters]]">
-              <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]"
+              <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]" hidden="[[_hideParameter(item)]]"
                 type="[[item.type]]"></nuxeo-input>
             </template>
           </div>
@@ -309,11 +309,16 @@
         return string.charAt(0).toUpperCase() + string.slice(1);
       },
 
+      _hideParameter: function(parameter) {
+        const hiddenTypes = ["document", "media"];
+        return hiddenTypes.includes(parameter.type) || hiddenTypes.includes(parameter.format);
+      },
+
       _debug: function (name, info) {
         if (this.debug) {
           console.log(name, info);
         }
-      }
+      },
 
     });
   </script>

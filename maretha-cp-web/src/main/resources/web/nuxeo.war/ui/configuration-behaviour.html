@@ -3,14 +3,9 @@
   var Nuxeo = Nuxeo || {};
 
   Nuxeo.ConfigurationBehaviour = {
-
-    _isassistantAutoGenerationEnabled: function () {
-      return Nuxeo.UI.config && Nuxeo.UI.config.assistant && Nuxeo.UI.config.assistant.auto && Nuxeo.UI.config.assistant.auto.generation && Nuxeo.UI.config.assistant.auto.generation.enabled === "true";
-    },
-
     _getSupportedMimeTypes: function () {
-      if (Nuxeo.UI.config && Nuxeo.UI.config.assistant && Nuxeo.UI.config.assistant.supported.mimeTypes) {
-        return Nuxeo.UI.config.assistant.supported.mimeTypes.split(',');
+      if (Nuxeo.UI.config && Nuxeo.UI.config.cp && Nuxeo.UI.config.cp.supported.mimeTypes) {
+        return Nuxeo.UI.config.cp.supported.mime-types.split(',');
       }
       return [];
     }
