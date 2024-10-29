@@ -3,10 +3,12 @@ package io.maretha.cp.core.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryRegistry;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.services.utils.FileUploadAsStream;
-import io.maretha.cp.core.services.utils.RetryInterceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -21,6 +23,7 @@ import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +40,15 @@ public class APIService implements APIServiceInterface {
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
-            .addInterceptor(new RetryInterceptor(3, 1000))
             .build();
+    private final RetryConfig config = RetryConfig.custom()
+            .maxAttempts(3) // Maximum number of attempts
+            .waitDuration(Duration.ofSeconds(1)) // Wait 1 second between attempts
+            .retryExceptions(Exception.class) // Retry on all exceptions
+            .build();
+
+    private final RetryRegistry registry = RetryRegistry.of(config);
+    private final Retry retry = registry.retry("httpRetry");
 
     @Override
     public List<Interaction> getInteractions() {
@@ -158,7 +168,7 @@ public class APIService implements APIServiceInterface {
                 .addHeader("Authorization", "Bearer " + apiToken)
                 .get()
                 .build();
-        return getResponseAsString(request);
+        return getResponseWithRetry(request);
     }
 
     private String postRequest(String apiToken, String url, String jsonBody) {
@@ -168,16 +178,26 @@ public class APIService implements APIServiceInterface {
                 .addHeader("Authorization", "Bearer " + apiToken)
                 .post(body)
                 .build();
-        return getResponseAsString(request);
+        return getResponseWithRetry(request);
     }
 
-    private String getResponseAsString(Request request) {
+    private String getResponseWithRetry(Request request) {
+        String responseBody = Retry.decorateSupplier(retry, () -> executeHttpRequest(request)).get();
+        log.debug(responseBody);
+        return responseBody;
+
+    }
+
+    private String executeHttpRequest(Request request) {
         try (Response response = client.newCall(request).execute()) {
-            String responseString = response.body().string();
-            log.debug(responseString);
-            return responseString;
+            if (!response.isSuccessful()) {
+                throw new RuntimeException("Failed to get a successful response, code: " + response.code());
+            }
+            return response.body().string();
         } catch (Exception e) {
-            throw new NuxeoException(e);
+            // Handle exception (optional)
+            log.error("Request failed: " + e.getMessage());
+            throw new RuntimeException(e); // Rethrow to trigger retry
         }
     }
 
