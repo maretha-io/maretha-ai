@@ -61,6 +61,7 @@
         width: 100%;
         height: 100%;
         text-align: left;
+        box-shadow: 0 3px 20px rgb(0 0 0 / 10%);
       }
 
       .flex-container {
@@ -132,11 +133,9 @@
             </nuxeo-data-table>
 
             <div class="buttons">
-              <!--              TODO Reset individual interactionSetting (Q. What about getting new interactions?)-->
-              <paper-button id="reset" on-tap="_reset" aria-label="Delete and Reset" raised
-                style="background-color: #fdb2b2;">
-                Delete and Reset
-                <iron-icon icon="icons:delete-forever"></iron-icon>
+              <paper-button id="reset" on-tap="_reset" aria-label="Refresh" raised style="">
+                Refresh
+                <iron-icon icon="icons:refresh"></iron-icon>
               </paper-button>
             </div>
           </div>
@@ -159,10 +158,11 @@
               <div class="flex-item-center">
                 <nuxeo-card role="widget" class="nuxeo-card" heading="Parameters">
                   <template is="dom-repeat" items="[[selectedInteraction.parameters]]" as="item">
-                    <div class="parameter" style="border: 2px solid #efefef;margin: auto;padding: 10px; margin-bottom: 5px;">
+                    <div class="parameter"
+                      style="box-shadow:0 3px 5px rgb(0 0 0 / 30%);margin: auto;padding: 10px; margin-bottom: 5px;">
                       <nuxeo-input role="widget" value="{{item.value}}"
-                        label="name: [[item.name]] type: [[item.type]] [[item.format]]"
-                        type="[[item.type]]" placeholder="default value" style="margin: auto;"></nuxeo-input>
+                        label="name: [[item.name]] type: [[item.type]] [[item.format]]" type="[[item.type]]"
+                        placeholder="default value" style="margin: auto;"></nuxeo-input>
                       <paper-toggle-button checked="{{item.readOnly}}" aria-label$="ReadOnly"
                         on-change="_saveInteractions">ReadOnly</paper-toggle-button>
                     </div>
@@ -198,6 +198,12 @@
 
         </div>
         <div class="buttons">
+          <paper-button id="deleteInteraction" on-tap="_deleteInteraction" aria-label="Refresh" raised
+            style="background-color: #f44336;color: white;">
+            Delete
+            <iron-icon icon="icons:delete-forever"></iron-icon>
+          </paper-button>
+
           <paper-button id="save" on-tap="_saveInteractions" aria-label="Save Configuration" raised>
             Save Configuration
             <iron-icon icon="icons:save"></iron-icon>
@@ -320,6 +326,15 @@
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });
+      },
+
+      _deleteInteraction: function (e) {
+        if (confirm('Are you sure you want to remove this interaction: ' + this.selectedInteraction.name + ' ?')) {
+          const newInteractionsArray = this.interactions.filter(obj => obj.id !== this.selectedInteraction.id);
+          this.set('interactions', newInteractionsArray);
+          this._saveInteractions();
+          this.$.dialog.toggle();
+        }
       },
 
       _debug: function (name, info) {
