@@ -35,14 +35,13 @@ public class GetInteractionSettingsOperation {
     @OperationMethod
     public Collection<Interaction> run() {
         Map<String, Interaction> interactionsById = new HashMap<>();
-        if (refresh) {
-            return cpService.getInteractions(); //reset and return all from remote (hard update)
-        }
         //Get local interactions
         List<Interaction> interactionSettings = cpLocalSettingsService.getLocalInteractionSettings(session);
         if (!CollectionUtils.isEmpty(interactionSettings)) {
             interactionSettings.forEach(interaction -> interactionsById.put(interaction.getId(), interaction));
-        } else { //Get remote interactions
+        }
+        //Get remote interactions
+        if (refresh || CollectionUtils.isEmpty(interactionSettings)) {
             List<Interaction> remoteInteractions = cpService.getInteractions();
             remoteInteractions.forEach(interaction -> {
                 if (!interactionsById.containsKey(interaction.getId())) {

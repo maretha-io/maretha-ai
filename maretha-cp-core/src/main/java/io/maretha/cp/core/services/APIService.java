@@ -138,8 +138,6 @@ public class APIService implements APIServiceInterface {
 
         String uploadedResponse = postRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects", bodyJsonObject);
         JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
-//        String checkDocumentResponse = getRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects/" + storeId);
-//        JSONObject savedDocumentJson = new JSONObject(checkDocumentResponse);
         return uploadedResponseObject.getString("id");
     }
 
@@ -225,6 +223,12 @@ public class APIService implements APIServiceInterface {
         } catch (Exception e) {
             throw new NuxeoException(e);
         }
+    }
+
+    public JSONObject getStoredDocumentText(String storeId) {
+        String bearerToken = getBearerToken();
+        String documentResponse = getRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects/" + storeId + "/text");
+        return new JSONObject(documentResponse);
     }
 
 }

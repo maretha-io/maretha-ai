@@ -26,22 +26,21 @@ import static io.maretha.cp.core.services.RepositoryServiceInterface.RESULTS_FAC
 import static io.maretha.cp.core.services.RepositoryServiceInterface.RESULTS_STORED_DATE_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryServiceInterface.RESULTS_STORE_ID_SCHEMA_PATH;
 
-//TODO How to handle 1000+ child documents? Execute in Worker?
 public class RunInteractionServiceImpl implements RunInteractionService {
 
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
-    private final APIServiceInterface APIServiceInterface = Framework.getService(APIServiceInterface.class);
+    private final APIServiceInterface apiServiceInterface = Framework.getService(APIServiceInterface.class);
 
     @Override
     public JsonNode triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters) {
         if (doc.isFolder()) {
             List<DocumentModel> childrenDocsWithStoreId = getChildrenDocumentsAndUploadFiles(session, doc);
             Map<String, Object> paramsMap = buildParametersForFolder(childrenDocsWithStoreId, parameters);
-            return APIServiceInterface.getInteractionResult(interactionId, paramsMap);
+            return apiServiceInterface.getInteractionResult(interactionId, paramsMap);
         } else {
             doc = uploadFileAndGetStoreId(doc, session);
             Map<String, Object> paramsMap = buildParameters(doc, parameters);
-            return APIServiceInterface.getInteractionResult(interactionId, paramsMap);
+            return apiServiceInterface.getInteractionResult(interactionId, paramsMap);
         }
     }
 
@@ -56,7 +55,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         if (StringUtils.isEmpty(storeId)) {
             doc.addFacet(RESULTS_FACET);
-            storeId = APIServiceInterface.uploadFileToStore((Blob) doc.getPropertyValue(FILE_CONTENT));
+            storeId = apiServiceInterface.uploadFileToStore((Blob) doc.getPropertyValue(FILE_CONTENT));
             doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
             doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
             return session.saveDocument(doc);
