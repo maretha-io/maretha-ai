@@ -159,9 +159,13 @@
               <div class="flex-item-center">
                 <nuxeo-card role="widget" class="nuxeo-card" heading="Parameters">
                   <template is="dom-repeat" items="[[selectedInteraction.parameters]]" as="item">
-                    <nuxeo-input role="widget" value="{{item.value}}"
-                      label="name: [[item.name]] type: [[item.type]] [[item.format]]" readonly="[[item.readOnly]]" hidden="[[_hideParameter(item)]]"
-                      type="[[item.type]]"></nuxeo-input>
+                    <div class="parameter" style="border: 2px solid #efefef;margin: auto;padding: 10px; margin-bottom: 5px;">
+                      <nuxeo-input role="widget" value="{{item.value}}"
+                        label="name: [[item.name]] type: [[item.type]] [[item.format]]"
+                        type="[[item.type]]" placeholder="default value" style="margin: auto;"></nuxeo-input>
+                      <paper-toggle-button checked="{{item.readOnly}}" aria-label$="ReadOnly"
+                        on-change="_saveInteractions">ReadOnly</paper-toggle-button>
+                    </div>
                   </template>
                 </nuxeo-card>
               </div>
@@ -306,11 +310,6 @@
       },
 
       _dialogClosed: function () {
-      },
-
-      _hideParameter: function(parameter) {
-        const hiddenTypes = ["document", "media"];
-        return hiddenTypes.includes(parameter.type) || hiddenTypes.includes(parameter.format);
       },
 
       _reset: function () {

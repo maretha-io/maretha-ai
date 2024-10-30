@@ -190,6 +190,7 @@ public class RepositoryService implements RepositoryServiceInterface {
             paramMap.put(PARAMETER_SCHEMA_TYPE, param.getType());
             paramMap.put(PARAMETER_SCHEMA_FORMAT, param.getFormat());
             paramMap.put(PARAMETER_SCHEMA_VALUE, param.getValue());
+            paramMap.put(PARAMETER_SCHEMA_READ_ONLY, param.isReadOnly());
             return paramMap;
         }).collect(Collectors.toList());
     }
