@@ -50,6 +50,7 @@
             <xs:element name="type" type="xs:string"/>
             <xs:element name="format" type="xs:string"/>
             <xs:element name="value" type="xs:string"/>
+            <xs:element name="readOnly" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 

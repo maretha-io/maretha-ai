@@ -42,6 +42,8 @@ public interface RepositoryServiceInterface {
     String PARAMETER_SCHEMA_TYPE = "type";
     String PARAMETER_SCHEMA_FORMAT = "format";
     String PARAMETER_SCHEMA_VALUE = "value";
+    String PARAMETER_SCHEMA_READ_ONLY = "readOnly";
+
     String SETTINGS_DOCUMENT_NAME = "InteractionSettings";
 
     List<Interaction> getLocalInteractionSettings(CoreSession session);

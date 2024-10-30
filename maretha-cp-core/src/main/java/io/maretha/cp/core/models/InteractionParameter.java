@@ -14,4 +14,5 @@ public class InteractionParameter {
     private String type;
     private String format;
     private String value;
+    private boolean readOnly;
 }

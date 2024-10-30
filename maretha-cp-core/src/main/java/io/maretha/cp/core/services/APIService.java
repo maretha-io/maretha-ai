@@ -216,7 +216,7 @@ public class APIService implements APIServiceInterface {
                             JsonNode value = field.getValue();
                             String type = value.has("type") ? value.get("type").asText() : "";
                             String format = value.has("format") ? value.get("format").asText() : "";
-                            paramsList.add(new InteractionParameter(name, type, format, ""));
+                            paramsList.add(new InteractionParameter(name, type, format, "", false));
                         });
                     }
                 }
