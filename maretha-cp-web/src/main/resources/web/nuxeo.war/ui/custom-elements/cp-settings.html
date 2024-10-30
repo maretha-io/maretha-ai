@@ -84,6 +84,16 @@
         padding: 10px;
         flex: 30%;
       }
+
+      .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+      }
     </style>
 
     <nuxeo-page>
@@ -133,7 +143,7 @@
             </nuxeo-data-table>
 
             <div class="buttons">
-              <paper-button id="reset" on-tap="_reset" aria-label="Refresh" raised style="">
+              <paper-button id="refresh" on-tap="_refresh" aria-label="Refresh" raised style="">
                 Refresh
                 <iron-icon icon="icons:refresh"></iron-icon>
               </paper-button>
@@ -143,6 +153,7 @@
       </div>
 
       <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
+        <button class="close-button" on-click="_close">X</button>
         <div class="content" style="width: auto;max-width: 100%;">
           <h2>Configure your Composable Interaction</h2>
           <div>
@@ -197,9 +208,9 @@
           </div>
 
         </div>
-        <div class="buttons">
-          <paper-button id="deleteInteraction" on-tap="_deleteInteraction" aria-label="Refresh" raised
-            style="background-color: #f44336;color: white;">
+        <div class="buttons" style="padding: 40px;">
+          <paper-button id="deleteInteraction" on-tap="_deleteInteraction" aria-label="Delete" raised
+            style="background-color: #f44336;color: white; ">
             Delete
             <iron-icon icon="icons:delete-forever"></iron-icon>
           </paper-button>
@@ -313,16 +324,18 @@
       },
 
       _close: function () {
+        this.$.dialog.toggle();
       },
 
       _dialogClosed: function () {
       },
 
-      _reset: function () {
+      _refresh: function () {
         const operation = this.$.getInteractionsOperation;
         operation.params = { "refresh": true };
         operation.execute().then((response) => {
           this.set('interactions', response.value);
+          this._saveInteractions();
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });
