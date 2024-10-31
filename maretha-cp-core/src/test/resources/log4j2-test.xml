@@ -2,7 +2,7 @@
 <Configuration>
   <Appenders>
     <Console name="CONSOLE" target="SYSTEM_OUT">
-      <ThresholdFilter level="INFO" onMatch="ACCEPT" />
+      <ThresholdFilter level="DEBUG" onMatch="ACCEPT" />
       <PatternLayout pattern="%d{HH:mm:ss,SSS} %-5p [%C{1}] %m%n" />
     </Console>
     <File name="FILE" fileName="target/trace.log" append="false">
@@ -12,6 +12,7 @@
   </Appenders>
   <Loggers>
     <Logger name="org.nuxeo" level="info" />
+    <Logger name="io.maretha" level="debug" />
     <Root level="info">
       <AppenderRef ref="CONSOLE" />
       <AppenderRef ref="FILE" />

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<component name="test.core.relation.graph">
+
+  <!-- default memory graph -->
+  <extension target="org.nuxeo.ecm.platform.relations.services.RelationService"
+    point="graphs">
+    <graph name="default" type="core">
+      <option name="doctype">DefaultRelation</option>
+      <namespaces>
+        <namespace name="dc">http://purl.org/dc/elements/1.1/</namespace>
+      </namespaces>
+    </graph>
+  </extension>
+
+</component>

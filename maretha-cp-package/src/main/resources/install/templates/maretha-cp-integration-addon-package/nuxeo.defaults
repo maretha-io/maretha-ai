@@ -4,4 +4,3 @@ cp.api.url=https://api.becomposable.com
 cp.auth.token=
 cp.upload.url=https://zeno-server-production.api.becomposable.com
 cp.supported.mime-types=text/plain,application/pdf,image/jpeg,image/png,image/webp
-=text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document

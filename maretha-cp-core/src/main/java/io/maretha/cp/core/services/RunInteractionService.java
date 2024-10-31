@@ -10,5 +10,7 @@ import java.util.List;
 public interface RunInteractionService {
     String FILE_CONTENT = "file:content";
 
+    DocumentModel uploadFileAndGetStoreId(DocumentModel doc, CoreSession session);
+
     JsonNode triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters);
 }

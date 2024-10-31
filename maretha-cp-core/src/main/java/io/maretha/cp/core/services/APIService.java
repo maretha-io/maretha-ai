@@ -11,7 +11,7 @@ import java.util.Map;
 public interface APIService {
     List<Interaction> getInteractions();
 
-    JsonNode getInteractionResult(String request, Map<String, Object> data);
+    JsonNode getInteractionResult(String interactionId, Map<String, Object> data);
 
     String getBearerToken();
 
