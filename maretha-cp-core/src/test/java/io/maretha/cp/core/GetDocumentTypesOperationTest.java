@@ -39,7 +39,7 @@ public class GetDocumentTypesOperationTest {
     AutomationService automationService;
 
     @Test
-    public void shouldSaveInteractionSettings() throws OperationException {
+    public void shouldGetAllDocumentTypes() throws OperationException {
         OperationContext ctx = new OperationContext(session);
         List<String> documentTypes = (List<String>) automationService.run(ctx, GetDocumentTypesOperation.ID);
         assertNotNull(documentTypes);

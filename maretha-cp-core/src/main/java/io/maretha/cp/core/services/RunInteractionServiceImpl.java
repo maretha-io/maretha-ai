@@ -43,7 +43,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    private DocumentModel uploadFileAndGetStoreId(DocumentModel doc, CoreSession session) {
+    public DocumentModel uploadFileAndGetStoreId(DocumentModel doc, CoreSession session) {
         boolean isSupportedMimeType = blobIsSupportedMimeType(doc);
         if (!isSupportedMimeType) {
             throw new NuxeoException("This file:content is not supported");

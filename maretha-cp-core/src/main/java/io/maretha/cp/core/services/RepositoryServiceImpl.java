@@ -9,13 +9,12 @@ import io.maretha.cp.core.models.InteractionResponse;
 import io.maretha.cp.core.models.Settings;
 import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
-import org.nuxeo.ecm.automation.AutomationService;
-import org.nuxeo.ecm.automation.OperationContext;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.platform.relations.api.DocumentRelationManager;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.Serializable;
@@ -119,17 +118,10 @@ public class RepositoryServiceImpl implements RepositoryService {
     }
 
     private void addDocumentRelation(DocumentModel sourceDoc, CoreSession session, DocumentModel targetDoc) throws OperationException {
-        AutomationService automationService = Framework.getService(AutomationService.class);
-        try (OperationContext context = new OperationContext(session)) {
-            context.setInput(sourceDoc);
-            String predicate = "http://www.nuxeo.org/ecm/schemas/relation#isRelatedTo"; // Relation predicate
-            Map<String, Object> params = new HashMap<>();
-            params.put("object", targetDoc.getId()); // The target document's ID or reference
-            params.put("predicate", predicate);      // The relation predicate (relation type)
-            params.put("outgoing", true);            // Optional: Define whether the relation is outgoing (true) or incoming (default is false)
-            automationService.run(context, "Document.AddRelation", params);
-            context.getCoreSession().save();
-        }
+        DocumentRelationManager documentRelationManager = Framework.getService(DocumentRelationManager.class);
+        String predicate = "http://www.nuxeo.org/ecm/schemas/relation#isRelatedTo";
+        boolean outgoing = true;
+        documentRelationManager.addRelation(session, sourceDoc, targetDoc, predicate, !outgoing);
     }
 
     @SneakyThrows

@@ -186,6 +186,7 @@ public class APIServiceImpl implements APIService {
     }
 
     private String executeHttpRequest(Request request) {
+        log.debug("Executing HttpRequest for URL: " + request.url());
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new RuntimeException("Failed to get a successful response, code: " + response.code());
