@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.nuxeo.ecm.core.blob.KeyStrategy.VER_SEP;
 
-public class SignS3Media implements CloudStorageFileShare {
-    private static final Log log = LogFactory.getLog(SignS3Media.class);
+public class CloudStorageFileShareS3Impl implements CloudStorageFileShare {
+    private static final Log log = LogFactory.getLog(CloudStorageFileShareS3Impl.class);
     private static final int EXPIRATION_HOURS = 2;
 
     public URI getPublicRemoteUri(ManagedBlob blob) {

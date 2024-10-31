@@ -1,7 +1,7 @@
 package io.maretha.cp.core.operations;
 
 import io.maretha.cp.core.models.Interaction;
-import io.maretha.cp.core.services.RepositoryServiceInterface;
+import io.maretha.cp.core.services.RepositoryService;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
@@ -20,7 +20,7 @@ import java.util.Collections;
 public class GetInteractionsForDocumentOperation {
 
     public static final String ID = "GetInteractionsForDocumentOperation";
-    private final RepositoryServiceInterface cpLocalSettingsService = Framework.getService(RepositoryServiceInterface.class);
+    private final RepositoryService cpLocalSettingsService = Framework.getService(RepositoryService.class);
 
     @Context
     protected CoreSession session;

@@ -5,7 +5,7 @@
     Sign S3 document url.
   </documentation>
 
-  <implementation class="io.maretha.cp.core.services.SignS3Media" />
+  <implementation class="io.maretha.cp.core.services.CloudStorageFileShareS3Impl" />
 
   <service>
     <provide interface="io.maretha.cp.core.services.CloudStorageFileShare" />
