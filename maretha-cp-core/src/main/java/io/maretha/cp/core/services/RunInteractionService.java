@@ -8,5 +8,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import java.util.List;
 
 public interface RunInteractionService {
+    String FILE_CONTENT = "file:content";
+
     JsonNode triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters);
 }

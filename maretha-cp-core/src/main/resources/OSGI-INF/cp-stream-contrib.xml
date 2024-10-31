@@ -5,26 +5,4 @@
     <require>org.nuxeo.ecm.core.bulk.config</require>
 
 
-    <extension target="org.nuxeo.ecm.core.bulk" point="actions">
-        <action name="cpStream" bucketSize="${cpStreams.bucketSize:=10}"
-                batchSize="${cpStreams.batchSize:=1}" httpEnabled="true"
-                inputStream="bulk/cpStream"/>
-    </extension>
-
-
-    <extension target="org.nuxeo.runtime.stream.service" point="streamProcessor">
-        <streamProcessor name="cpStream"
-                         defaultConcurrency="${cpStreams.concurrency:=3}"
-                         defaultPartitions="${cpStreams.partition:=6}"
-                         class="io.maretha.cp.stream.StreamDocumentProcessor">
-
-            <policy name="default" batchCapacity="1"
-                    batchThreshold="${nuxeo.stream.cp.batch.threshold.s:=1}s"
-                    maxRetries="${maretha.cp.maxRetries:=10}" delay="10s" maxDelay="60s" continueOnFailure="true"/>
-            <computation name="cpStream" concurrency="${cpStreams.concurrency:=3}"/>
-
-        </streamProcessor>
-
-    </extension>
-
 </component>

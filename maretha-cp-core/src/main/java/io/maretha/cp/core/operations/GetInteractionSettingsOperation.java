@@ -1,8 +1,8 @@
 package io.maretha.cp.core.operations;
 
 import io.maretha.cp.core.models.Interaction;
-import io.maretha.cp.core.services.APIServiceInterface;
-import io.maretha.cp.core.services.RepositoryServiceInterface;
+import io.maretha.cp.core.services.APIService;
+import io.maretha.cp.core.services.RepositoryService;
 import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
@@ -24,8 +24,8 @@ import java.util.Map;
 public class GetInteractionSettingsOperation {
 
     public static final String ID = "GetInteractionsOperation";
-    private final APIServiceInterface cpService = Framework.getService(APIServiceInterface.class);
-    private final RepositoryServiceInterface cpLocalSettingsService = Framework.getService(RepositoryServiceInterface.class);
+    private final APIService apiService = Framework.getService(APIService.class);
+    private final RepositoryService cpLocalSettingsService = Framework.getService(RepositoryService.class);
 
     @Param(name = "refresh", required = false)
     protected boolean refresh;
@@ -42,7 +42,7 @@ public class GetInteractionSettingsOperation {
         }
         //Get remote interactions
         if (refresh || CollectionUtils.isEmpty(interactionSettings)) {
-            List<Interaction> remoteInteractions = cpService.getInteractions();
+            List<Interaction> remoteInteractions = apiService.getInteractions();
             remoteInteractions.forEach(interaction -> {
                 if (!interactionsById.containsKey(interaction.getId())) {
                     interactionsById.put(interaction.getId(), interaction);
