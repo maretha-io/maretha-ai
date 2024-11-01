@@ -13,7 +13,6 @@
             <schema name="uid"/>
             <schema name="file"/>
             <schema name="interactionSettings"/>
-            <facet name="Versionable"/>
             <facet name="HiddenInNavigation"/>
         </doctype>
 
@@ -23,6 +22,7 @@
             <schema name="uid"/>
             <schema name="file"/>
             <schema name="interactionResults"/>
+            <facet name="HiddenInNavigation"/>
         </doctype>
 
         <facet name="InteractionResultsFacet">
