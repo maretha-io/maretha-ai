@@ -22,7 +22,6 @@
             <schema name="uid"/>
             <schema name="file"/>
             <schema name="interactionResults"/>
-            <facet name="HiddenInNavigation"/>
         </doctype>
 
         <facet name="InteractionResultsFacet">
