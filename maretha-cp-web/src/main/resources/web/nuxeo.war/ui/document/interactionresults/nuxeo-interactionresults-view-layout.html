@@ -2,16 +2,16 @@
     <template>
         <style include="nuxeo-styles">
             :host {
-              @apply --paper-card;
+                @apply --paper-card;
             }
         </style>
         <template is="dom-repeat" items="[[document.properties.interactionresults:interactions]]">
-                    <a href="https://cloud.becomposable.com/studio/interactions/[[item.interactionId]]"
-                       target="_blank">[[item.name]]</a>
+            <a href="https://cloud.becomposable.com/studio/interactions/[[item.interactionId]]"
+                target="_blank">[[item.name]]</a>
 
-                    <cp-format-json-response string-json="[[item.response]]"></cp-format-json-response>
+            <cp-format-json-response string-json="[[item.response]]"></cp-format-json-response>
 
-                    [[item.createdAt]]
+            [[item.createdAt]]
 
         </template>
 
@@ -20,11 +20,15 @@
 
     <script>
         Polymer({
-          is: 'nuxeo-interactionresults-view-layout',
-          behaviors: [Nuxeo.LayoutBehavior],
-          properties: {
-            document: Object,
-          },
+            is: 'nuxeo-interactionresults-view-layout',
+            behaviors: [Nuxeo.LayoutBehavior],
+            properties: {
+                document: {
+                    type: Object,
+                    observer: '_docObserver'
+                },
+            }
+
         });
     </script>
 </dom-module>
