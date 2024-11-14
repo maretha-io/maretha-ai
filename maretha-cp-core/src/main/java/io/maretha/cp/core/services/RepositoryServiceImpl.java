@@ -101,6 +101,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         DocumentModel interactionResponseDoc;
         String docTitle = RESULTS_DOCUMENT_NAME + '-' + doc.getTitle();
         interactionResponseDoc = session.createDocumentModel(folderPath, docTitle, RESULTS_DOCUMENT_TYPE);
+        interactionResponseDoc.setPropertyValue("dc:title", docTitle);
         interactionResponseDoc = session.createDocument(interactionResponseDoc);
         List<HashMap<String, Object>> interactionsMap = interactions.stream()
                 .map(objNode -> convertToType(objNode, InteractionResponse.class))
