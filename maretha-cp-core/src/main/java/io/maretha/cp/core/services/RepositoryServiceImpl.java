@@ -10,21 +10,12 @@ import io.maretha.cp.core.models.Settings;
 import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.automation.OperationException;
-import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.*;
 import org.nuxeo.ecm.platform.relations.api.DocumentRelationManager;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RepositoryServiceImpl implements RepositoryService {
@@ -100,9 +91,16 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Override
     public DocumentModel saveInteractionResponseAsDocument(DocumentModel doc, CoreSession session, List<ObjectNode> interactions) throws OperationException {
+        String folderPath = "/" + RESULTS_DOCUMENT_NAME;
+        boolean folderExists = session.exists(new PathRef(folderPath));
+        if (!folderExists) {
+            DocumentModel folderDocument = session.createDocumentModel("/", RESULTS_DOCUMENT_NAME, "Folder");
+            folderDocument = session.createDocument(folderDocument);
+            session.saveDocument(folderDocument);
+        }
         DocumentModel interactionResponseDoc;
-        //TODO Create a folder and add permissions?
-        interactionResponseDoc = session.createDocumentModel("/", RESULTS_DOCUMENT_NAME, RESULTS_DOCUMENT_TYPE);
+        String docTitle = RESULTS_DOCUMENT_NAME + '-' + doc.getTitle();
+        interactionResponseDoc = session.createDocumentModel(folderPath, docTitle, RESULTS_DOCUMENT_TYPE);
         interactionResponseDoc = session.createDocument(interactionResponseDoc);
         List<HashMap<String, Object>> interactionsMap = interactions.stream()
                 .map(objNode -> convertToType(objNode, InteractionResponse.class))

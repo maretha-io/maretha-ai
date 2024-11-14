@@ -1,7 +1,8 @@
 <dom-module id="cp-format-json-response">
   <template>
 
-    <div id="response"></div>
+      <div id="response"></div>
+      <div class="markdown-body" inner-h-t-m-l="[[htmlMarkdown]]"></div>
 
   </template>
 
@@ -19,34 +20,32 @@
           type: Object,
         },
 
+        htmlMarkdown: {
+            type: String,
+        }
+
       },
 
       observers: ['_stringJsonToHtmlObserver(stringJson)', '_jsonToHtmlObserver(json)'],
 
+      ready: function() {
+        marked.use({
+          breaks: true,
+          gfm: true,
+          headerIds: false
+        });
+      },
+
       _stringJsonToHtmlObserver: function (stringJson) {
         const json = JSON.parse(stringJson);
-        const htmlFormatted = this._jsonToHtml(json);
-        this.$.response.innerHTML = htmlFormatted;
+        this.set('htmlMarkdown', marked.parse(json.response));
       },
 
       _jsonToHtmlObserver: function (json) {
-        const htmlFormatted = this._jsonToHtml(json);
-        this.$.response.innerHTML = htmlFormatted;
+        this.set('htmlMarkdown', marked.parse(this?.json.response));
       },
 
-      _jsonToHtml: function (json) {
-        let htmlOutput = '';
-        for (let key in json) {
-          if (json.hasOwnProperty(key)) {
-            htmlOutput += `<p><b>${this._capitalizeFirstLetter(key)}:</b> ${json[key]}</p>`;
-          }
-        }
-        return htmlOutput;
-      },
-
-      _capitalizeFirstLetter: function (string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-      },
     });
   </script>
+    <script async type="text/javascript" src="./js/marked.min.js"></script>
 </dom-module>
