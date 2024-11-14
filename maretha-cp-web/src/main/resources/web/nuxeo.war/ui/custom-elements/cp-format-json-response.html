@@ -1,0 +1,52 @@
+<dom-module id="cp-format-json-response">
+  <template>
+
+    <div id="response"></div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cp-format-json-response',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+
+        stringJson: {
+          type: Object,
+        },
+
+        json: {
+          type: Object,
+        },
+
+      },
+
+      observers: ['_stringJsonToHtmlObserver(stringJson)', '_jsonToHtmlObserver(json)'],
+
+      _stringJsonToHtmlObserver: function (stringJson) {
+        const json = JSON.parse(stringJson);
+        const htmlFormatted = this._jsonToHtml(json);
+        this.$.response.innerHTML = htmlFormatted;
+      },
+
+      _jsonToHtmlObserver: function (json) {
+        const htmlFormatted = this._jsonToHtml(json);
+        this.$.response.innerHTML = htmlFormatted;
+      },
+
+      _jsonToHtml: function (json) {
+        let htmlOutput = '';
+        for (let key in json) {
+          if (json.hasOwnProperty(key)) {
+            htmlOutput += `<p><b>${this._capitalizeFirstLetter(key)}:</b> ${json[key]}</p>`;
+          }
+        }
+        return htmlOutput;
+      },
+
+      _capitalizeFirstLetter: function (string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      },
+    });
+  </script>
+</dom-module>
