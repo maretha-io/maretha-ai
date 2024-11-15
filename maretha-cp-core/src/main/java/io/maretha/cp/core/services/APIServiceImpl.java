@@ -188,10 +188,11 @@ public class APIServiceImpl implements APIService {
     private String executeHttpRequest(Request request) {
         log.debug("Executing HttpRequest for URL: " + request.url());
         try (Response response = client.newCall(request).execute()) {
+            String responseString = response.body().string();
             if (!response.isSuccessful()) {
                 throw new RuntimeException("Failed to get a successful response, code: " + response.code());
             }
-            return response.body().string();
+            return responseString;
         } catch (Exception e) {
             // Handle exception (optional)
             log.error("Request failed: " + e.getMessage());
@@ -215,7 +216,12 @@ public class APIServiceImpl implements APIService {
                             JsonNode value = field.getValue();
                             String type = value.has("type") ? value.get("type").asText() : "";
                             String format = value.has("format") ? value.get("format").asText() : "";
-                            paramsList.add(new InteractionParameter(name, type, format, "", false));
+                            InteractionParameter parameter = InteractionParameter.builder()
+                                    .name(name)
+                                    .type(type)
+                                    .format(format)
+                                    .build();
+                            paramsList.add(parameter);
                         });
                     }
                 }
