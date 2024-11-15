@@ -9,10 +9,6 @@
     </nuxeo-operation>
 
     <style include="nuxeo-action-button-styles">
-      .reset-styles {
-        all: unset;
-      }
-
       .interaction-content {
         width: 95%;
         margin: auto;
@@ -23,7 +19,7 @@
         height: 90%;
         width: 90%;
         margin: auto;
-        overflow: scroll;
+        overflow: auto;
       }
 
       .textarea {
@@ -44,14 +40,10 @@
         /* Ensure content does not overflow */
       }
 
-      paper-dropdown-menu .underline {
-        display: none;
-      }
-
       #selectInteraction {
         max-width: 100%;
         margin: auto;
-        text-align: center;
+        text-align: left;
       }
 
       #auditButton {
@@ -63,7 +55,7 @@
       #parameters {
         max-width: 100%;
         margin: auto;
-        text-align: center;
+        text-align: left;
         border: 3px solid #ececec;
         border-radius: 15px;
         padding: 10px;
@@ -93,6 +85,7 @@
         border: 3px solid #ececec;
         border-radius: 15px;
       }
+
     </style>
 
     <paper-icon-button icon="communication:chat" label="Interact with document" on-tap="_toggleDialog">
@@ -100,96 +93,95 @@
     </paper-icon-button>
 
     <nuxeo-dialog id="dialog" opened="{{dialogOpened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
-      <div class="reset-styles">
-        <div class="interaction-content">
+      <div class="interaction-content">
+        <div class="flex-container">
 
-          <div class="flex-container">
+          <div class="flex-item-left">
+            <div id="selectInteraction">
+              <paper-dropdown-menu label="Select AI Interaction"
+                                   style="width: 100%;">
+                <paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
+                  <template is="dom-repeat" items="[[interactions]]">
+                    <paper-item>[[item.name]]</paper-item>
+                  </template>
+                </paper-listbox>
+              </paper-dropdown-menu>
+            </div>
 
-            <div class="flex-item-left">
-              <div id="selectInteraction">
-                <paper-dropdown-menu label="Select AI Interaction"
-                                     style="width: 100%; margin:auto; text-align: center;">
-                  <paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
-                    <template is="dom-repeat" items="[[interactions]]">
-                      <paper-item>[[item.name]]</paper-item>
-                    </template>
-                  </paper-listbox>
-                </paper-dropdown-menu>
-              </div>
-
-              <div id="parameters">
-                <h3>Parameters</h3>
-                <template is="dom-repeat" items="[[selectedInteraction.parameters]]">
-                  <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]"
-                               type="[[item.type]]"></nuxeo-input>
-                  <template is="dom-if" if="[[item.enableDocSelection]]">
+            <div id="parameters">
+              <h3>Parameters</h3>
+              <template is="dom-repeat" items="[[selectedInteraction.parameters]]">
+                <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]"
+                             type="[[item.type]]"></nuxeo-input>
+                <template is="dom-if" if="[[item.enableDocSelection]]">
+                  <div>
                     <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
                                                multiple="true" min-chars="0" name="selectedDocs" role="widget"
                                                on-change="_saveInteractions"></nuxeo-document-suggestion>
-                  </template>
-                </template>
-              </div>
-
-              <div class="buttons" style="margin:10px;">
-                <paper-button id="chat" style="margin: 20px;" on-tap="_interactWithDocument"
-                              aria-label="Interact with document" raised>
-                  Run Interaction
-                  <iron-icon icon="communication:chat"></iron-icon>
-                </paper-button>
-                <template is="dom-if" if="[[interactionResponse]]">
-                  <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]"
-                                    interaction-response="[[interactionResponse]]"></cp-save-response>
-                </template>
-              </div>
-            </div>
-
-            <div class="flex-item-right">
-              <div id="response">
-                [[interactionStatus]]
-
-                <template is="dom-if" if="[[showPreviousInteractions]]">
-                  <div class="related-documents">
-                    <h3>Previous interactions</h3>
-                    <nuxeo-data-table class="table" items="[[savedInteractions]]">
-                      <nuxeo-data-table-column name="Name">
-                        <template>
-                          <a href="https://cloud.becomposable.com/studio/interactions/[[item.interactionId]]"
-                             target="_blank">[[item.name]]</a>
-                        </template>
-                      </nuxeo-data-table-column>
-                      <nuxeo-data-table-column name="Response" style="height: 50px; overflow: scroll;" flex="50">
-                        <template>
-                          <cp-format-json-response string-json="[[item.response]]"></cp-format-json-response>
-                        </template>
-                      </nuxeo-data-table-column>
-                      <nuxeo-data-table-column name="Date">
-                        <template>
-                          [[item.createdAt]]
-                        </template>
-                      </nuxeo-data-table-column>
-                    </nuxeo-data-table>
-                    <template is="dom-repeat" items="[[relatedDocuments]]">
-                      <div class="related-doc">
-                        <a class="ellipsis" href$="[[urlFor(item)]]" on-click="_navigate"
-                           target="_blank">[[item.title]]</a>
-                      </div>
-                    </template>
                   </div>
                 </template>
+              </template>
+            </div>
 
-                <template is="dom-if" if="[[interactionResponse]]">
-                  <cp-format-json-response json="[[interactionResponse]]"></cp-format-json-response>
-                </template>
-              </div>
+            <div class="buttons" style="margin:10px;">
+              <paper-button id="chat" style="margin: 20px;" on-tap="_interactWithDocument"
+                            aria-label="Interact with document" raised>
+                Run Interaction
+                <iron-icon icon="communication:chat"></iron-icon>
+              </paper-button>
+              <template is="dom-if" if="[[interactionResponse]]">
+                <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]"
+                                  interaction-response="[[interactionResponse]]"></cp-save-response>
+              </template>
             </div>
           </div>
 
-          <div id="auditButton">
-            <paper-toggle-button checked="{{debugging}}"
-                                 on-change="_showPreviousInteractions">Audit</paper-toggle-button>
-          </div>
+          <div class="flex-item-right">
+            <div id="response">
+              [[interactionStatus]]
 
+              <template is="dom-if" if="[[showPreviousInteractions]]">
+                <div class="related-documents">
+                  <h3>Previous interactions</h3>
+                  <nuxeo-data-table class="table" items="[[savedInteractions]]">
+                    <nuxeo-data-table-column name="Name">
+                      <template>
+                        <a href="https://cloud.becomposable.com/studio/interactions/[[item.interactionId]]"
+                           target="_blank">[[item.name]]</a>
+                      </template>
+                    </nuxeo-data-table-column>
+                    <nuxeo-data-table-column name="Response" style="height: 50px; overflow: scroll;" flex="50">
+                      <template>
+                        <cp-format-json-response string-json="[[item.response]]"></cp-format-json-response>
+                      </template>
+                    </nuxeo-data-table-column>
+                    <nuxeo-data-table-column name="Date">
+                      <template>
+                        [[item.createdAt]]
+                      </template>
+                    </nuxeo-data-table-column>
+                  </nuxeo-data-table>
+                  <template is="dom-repeat" items="[[relatedDocuments]]">
+                    <div class="related-doc">
+                      <a class="ellipsis" href$="[[urlFor(item)]]" on-click="_navigate"
+                         target="_blank">[[item.title]]</a>
+                    </div>
+                  </template>
+                </div>
+              </template>
+
+              <template is="dom-if" if="[[interactionResponse]]">
+                <cp-format-json-response json="[[interactionResponse]]"></cp-format-json-response>
+              </template>
+            </div>
+          </div>
         </div>
+
+        <div id="auditButton">
+          <paper-toggle-button checked="{{debugging}}"
+                               on-change="_showPreviousInteractions">Audit</paper-toggle-button>
+        </div>
+
       </div>
     </nuxeo-dialog>
 
