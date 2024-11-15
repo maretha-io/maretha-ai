@@ -36,6 +36,12 @@
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="stringList">
+        <xs:sequence>
+            <xs:element name="item" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:complexType name="interactionResultParameter">
         <xs:sequence>
             <xs:element name="name" type="xs:string"/>
@@ -43,6 +49,8 @@
             <xs:element name="format" type="xs:string"/>
             <xs:element name="value" type="xs:string"/>
             <xs:element name="readOnly" type="xs:boolean"/>
+            <xs:element name="enableDocSelection" type="xs:boolean"/>
+            <xs:element name="selectedDocumentIds" type="nxs:stringList"/>
         </xs:sequence>
     </xs:complexType>
 

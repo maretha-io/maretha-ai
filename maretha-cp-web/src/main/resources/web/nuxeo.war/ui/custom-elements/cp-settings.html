@@ -176,6 +176,13 @@
                         placeholder="default value" style="margin: auto;"></nuxeo-input>
                       <paper-toggle-button checked="{{item.readOnly}}" aria-label$="ReadOnly"
                         on-change="_saveInteractions">ReadOnly</paper-toggle-button>
+                      <paper-toggle-button checked="{{item.enableDocSelection}}" aria-label$="EnableDocSelection"
+                                           on-change="_saveInteractions">EnableDocSelection</paper-toggle-button>
+                      <template is="dom-if" if="[[item.enableDocSelection]]">
+                        <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
+                                                   multiple="true"
+                                                   min-chars="0" name="selectedDocs" role="widget" on-change="_saveInteractions"></nuxeo-document-suggestion >
+                      </template>
                     </div>
                   </template>
                 </nuxeo-card>
