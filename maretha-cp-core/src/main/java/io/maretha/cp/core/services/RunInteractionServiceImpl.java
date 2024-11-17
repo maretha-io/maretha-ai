@@ -6,15 +6,26 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.ecm.core.api.*;
+import org.nuxeo.ecm.core.api.Blob;
+import org.nuxeo.ecm.core.api.CoreSession;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.IdRef;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.runtime.api.Framework;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static io.maretha.cp.core.services.RepositoryService.*;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORED_DATE_SCHEMA_PATH;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
 
@@ -83,7 +94,10 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             if (isDocumentOrMediaFormat) {
 //                paramValue = getSignedS3Url(doc); //Signed s3 URl
                 if ("array".equalsIgnoreCase(type)) {
-                    value = getSelectedDocumentsStoreIds(doc.getCoreSession(), selectedDocumentIds);
+                    List<String> selectedDocumentsStoreIds = getSelectedDocumentsStoreIds(doc.getCoreSession(), selectedDocumentIds);
+                    if (CollectionUtils.isEmpty(selectedDocumentsStoreIds))
+                        selectedDocumentsStoreIds.add("store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
+                    value = selectedDocumentsStoreIds;
                 } else {
                     value = "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
                 }

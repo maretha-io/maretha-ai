@@ -25,9 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_ENABLE_DOC_SELECTION;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_FORMAT;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_NAME;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_READ_ONLY;
+import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_SELECTED_DOC_IDS;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_TYPE;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_VALUE;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_DOCUMENT_NAME;
@@ -158,6 +160,8 @@ public class DocumentSchemasTest {
         param1.put(PARAMETER_SCHEMA_VALUE, "What is your name?");
         param1.put(PARAMETER_SCHEMA_FORMAT, "");
         param1.put(PARAMETER_SCHEMA_READ_ONLY, true);
+        param1.put(PARAMETER_SCHEMA_ENABLE_DOC_SELECTION, true);
+        param1.put(PARAMETER_SCHEMA_SELECTED_DOC_IDS, List.of("test"));
         parameters.add(param1);
 
         // Create the second parameter map
@@ -167,6 +171,8 @@ public class DocumentSchemasTest {
         param2.put(PARAMETER_SCHEMA_VALUE, "My name is John.");
         param2.put(PARAMETER_SCHEMA_FORMAT, "");
         param2.put(PARAMETER_SCHEMA_READ_ONLY, false);
+        param2.put(PARAMETER_SCHEMA_ENABLE_DOC_SELECTION, false);
+        param2.put(PARAMETER_SCHEMA_SELECTED_DOC_IDS, List.of());
         parameters.add(param2);
 
         // First interaction
