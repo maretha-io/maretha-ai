@@ -15,7 +15,6 @@ import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.runtime.api.Framework;
 
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -95,9 +94,9 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 //                paramValue = getSignedS3Url(doc); //Signed s3 URl
                 if ("array".equalsIgnoreCase(type)) {
                     List<String> selectedDocumentsStoreIds = getSelectedDocumentsStoreIds(doc.getCoreSession(), selectedDocumentIds);
-                    if (CollectionUtils.isEmpty(selectedDocumentsStoreIds))
-                        selectedDocumentsStoreIds.add("store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
                     value = selectedDocumentsStoreIds;
+                    if (CollectionUtils.isEmpty(selectedDocumentsStoreIds))
+                        value = List.of("store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
                 } else {
                     value = "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
                 }
@@ -118,7 +117,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                     .stream().map(docWithStoreId -> "store:" + docWithStoreId.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
                     .collect(Collectors.toList());
         }
-        return Collections.emptyList();
+        return null;
     }
 
     private Map<String, Object> buildParametersForFolder(List<DocumentModel> childrenDocsWithStoreId, List<InteractionParameter> parameters) {
