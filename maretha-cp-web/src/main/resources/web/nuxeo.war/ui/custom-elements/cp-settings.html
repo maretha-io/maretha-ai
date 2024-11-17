@@ -109,7 +109,7 @@
               <nuxeo-data-table-column name="Name" flex="30">
                 <template>
                   <a href="https://cloud.becomposable.com/studio/interactions/{{interaction.id}}"
-                    target="_blank">{{item.name}}</a>
+                     target="_blank">{{item.name}}</a>
                 </template>
               </nuxeo-data-table-column>
 
@@ -122,7 +122,7 @@
               <nuxeo-data-table-column name="Active" flex="10">
                 <template>
                   <paper-toggle-button checked="{{item.active}}"
-                    on-change="_saveInteractions">Active</paper-toggle-button>
+                                       on-change="_saveInteractions">Active</paper-toggle-button>
                 </template>
               </nuxeo-data-table-column>
 
@@ -135,7 +135,7 @@
               <nuxeo-data-table-column name="Configuration" flex="5">
                 <template>
                   <paper-icon-button icon="editor:border-color" label="Configuration" interaction="{{item}}"
-                    on-tap="_toggleDialog">
+                                     on-tap="_toggleDialog">
                     <nuxeo-tooltip>Configuration</nuxeo-tooltip>
                   </paper-icon-button>
                 </template>
@@ -170,14 +170,16 @@
                 <nuxeo-card role="widget" class="nuxeo-card" heading="Parameters">
                   <template is="dom-repeat" items="[[selectedInteraction.parameters]]" as="item">
                     <div class="parameter"
-                      style="box-shadow:0 3px 5px rgb(0 0 0 / 30%);margin: auto;padding: 10px; margin-bottom: 5px;">
+                         style="box-shadow:0 3px 5px rgb(0 0 0 / 30%);margin: auto;padding: 10px; margin-bottom: 5px;">
                       <nuxeo-input role="widget" value="{{item.value}}"
-                        label="name: [[item.name]] type: [[item.type]] [[item.format]]" type="[[item.type]]"
-                        placeholder="default value" style="margin: auto;"></nuxeo-input>
+                                   label="name: [[item.name]] type: [[item.type]] [[item.format]]" type="[[item.type]]"
+                                   placeholder="default value" style="margin: auto;"></nuxeo-input>
                       <paper-toggle-button checked="{{item.readOnly}}" aria-label$="ReadOnly"
-                        on-change="_saveInteractions">ReadOnly</paper-toggle-button>
-                      <paper-toggle-button checked="{{item.enableDocSelection}}" aria-label$="EnableDocSelection"
-                                           on-change="_saveInteractions">EnableDocSelection</paper-toggle-button>
+                                           on-change="_saveInteractions">ReadOnly</paper-toggle-button>
+                      <template is="dom-if" if="[[_isDocArrayType(item)]]">
+                        <paper-toggle-button checked="{{item.enableDocSelection}}" aria-label$="EnableDocSelection"
+                                             on-change="_saveInteractions">EnableDocSelection</paper-toggle-button>
+                      </template>
                       <template is="dom-if" if="[[item.enableDocSelection]]">
                         <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
                                                    multiple="true"
@@ -193,20 +195,20 @@
                   <div style="display: inline-flex;">
                     <span>Available in Action Menu:</span>
                     <paper-toggle-button checked="{{selectedInteraction.activeOnActionMenu}}"
-                      on-change="_saveInteractions"></paper-toggle-button>
+                                         on-change="_saveInteractions"></paper-toggle-button>
                   </div>
 
                   <div style="display: inline-flex;">
                     <span>Executable on Folders:</span>
                     <paper-toggle-button checked="{{selectedInteraction.activeOnFolder}}"
-                      on-change="_saveInteractions"></paper-toggle-button>
+                                         on-change="_saveInteractions"></paper-toggle-button>
                   </div>
 
                   <div style="display: inline-block;width: 100%;">
                     <span>Active for documents:</span>
                     <nuxeo-selectivity class="selectivity-container" style="margin: auto;text-align: left;" multiple
-                      min-chars="0" data="{{documentTypes}}" value="{{selectedInteraction.activeOnDocumentTypes}}"
-                      placeholder="Select Document Types"></nuxeo-selectivity>
+                                       min-chars="0" data="{{documentTypes}}" value="{{selectedInteraction.activeOnDocumentTypes}}"
+                                       placeholder="Select Document Types"></nuxeo-selectivity>
                   </div>
                 </nuxeo-card>
               </div>
@@ -217,7 +219,7 @@
         </div>
         <div class="buttons" style="padding: 40px;">
           <paper-button id="deleteInteraction" on-tap="_deleteInteraction" aria-label="Delete" raised
-            style="background-color: #f44336;color: white; ">
+                        style="background-color: #f44336;color: white; ">
             Delete
             <iron-icon icon="icons:delete-forever"></iron-icon>
           </paper-button>
@@ -355,6 +357,10 @@
           this._saveInteractions();
           this.$.dialog.toggle();
         }
+      },
+
+      _isDocArrayType: function (param) {
+        return param.type === 'array' && param.format === 'document';
       },
 
       _debug: function (name, info) {
