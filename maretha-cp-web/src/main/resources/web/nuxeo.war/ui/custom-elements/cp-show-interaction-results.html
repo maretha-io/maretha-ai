@@ -10,7 +10,8 @@
             }
 
             nuxeo-data-table-cell {
-              align-items: flex-start !important; /* Align content to the top */
+              align-items: flex-start !important;
+              /* Align content to the top */
             }
         </style>
 
@@ -67,11 +68,24 @@
             },
           },
 
+          listeners: {
+            'document-updated': '_onDocumentUpdated',
+          },
+
           ready() {
             if (this.hasFacet(this.document, 'InteractionResultsFacet')) {
-              this._fetchRelatedDocuments();
-              this._addMetadataInteractions();
+              this._getData();
             }
+          },
+
+          _getData() {
+            this._fetchRelatedDocuments();
+            this._addMetadataInteractions();
+          },
+
+          _onDocumentUpdated: function (event) {
+            console.log('Document updated!', event.detail);
+            this._getData();
           },
 
           _docObserver(doc) {
@@ -79,7 +93,11 @@
             this.classList.add('iron-selected');
           },
 
-          _savedInteractionsObserver(obs) {
+          _savedInteractionsObserver(newVal) {
+            if (!newVal || !Array.isArray(newVal)) {
+              return;
+            }
+            this.savedInteractions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
           },
 
           _fetchRelatedDocuments() {
@@ -109,7 +127,7 @@
             });
 
             this.set('savedInteractions', []);
-            this.set('savedInteractions', savedInteractions.reverse());
+            this.set('savedInteractions', savedInteractions);
           },
 
           _addMetadataInteractions() {
@@ -119,7 +137,7 @@
               this.savedInteractions.push(...interactions);
             }
             this.set('savedInteractions', []);
-            this.set('savedInteractions', savedInteractions.reverse());
+            this.set('savedInteractions', savedInteractions);
           },
 
         });
