@@ -4,9 +4,6 @@
                      input="[[document]]"></nuxeo-operation>
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
                      input="[[document.uid]]"></nuxeo-operation>
-    <nuxeo-operation id="getRelationsOp" op="Relations.GetRelations" input="[[document]]"
-                     params='{"outgoing": "true", "predicate": "http://www.nuxeo.org/ecm/schemas/relation#isRelatedTo"}'>
-    </nuxeo-operation>
 
     <style include="nuxeo-action-button-styles">
       .interaction-content {
@@ -87,7 +84,6 @@
         text-align: left;
         padding: 15px;
       }
-
     </style>
 
     <paper-icon-button icon="communication:chat" label="Interact with document" on-tap="_toggleDialog">
@@ -100,8 +96,7 @@
 
           <div class="flex-item-left">
             <div id="selectInteraction">
-              <paper-dropdown-menu label="Select AI Interaction"
-                                   style="width: 100%;">
+              <paper-dropdown-menu label="Select AI Interaction" style="width: 100%;">
                 <paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
                   <template is="dom-repeat" items="[[interactions]]">
                     <paper-item>[[item.name]]</paper-item>
@@ -143,33 +138,7 @@
               [[interactionStatus]]
 
               <template is="dom-if" if="[[showPreviousInteractions]]">
-                <div class="related-documents">
-                  <h3>Previous interactions</h3>
-                  <nuxeo-data-table class="table" items="[[savedInteractions]]">
-                    <nuxeo-data-table-column name="Name">
-                      <template>
-                        <a href="https://cloud.becomposable.com/studio/interactions/[[item.interactionId]]"
-                           target="_blank">[[item.name]]</a>
-                      </template>
-                    </nuxeo-data-table-column>
-                    <nuxeo-data-table-column name="Response" style="height: 50px; overflow: scroll;" flex="50">
-                      <template>
-                        <cp-format-json-response string-json="[[item.response]]"></cp-format-json-response>
-                      </template>
-                    </nuxeo-data-table-column>
-                    <nuxeo-data-table-column name="Date">
-                      <template>
-                        [[item.createdAt]]
-                      </template>
-                    </nuxeo-data-table-column>
-                  </nuxeo-data-table>
-                  <template is="dom-repeat" items="[[relatedDocuments]]">
-                    <div class="related-doc">
-                      <a class="ellipsis" href$="[[urlFor(item)]]" on-click="_navigate"
-                         target="_blank">[[item.title]]</a>
-                    </div>
-                  </template>
-                </div>
+                <cp-show-interaction-results document="[[document]]"></cp-show-interaction-results>
               </template>
 
               <template is="dom-if" if="[[interactionResponse]]">
@@ -180,8 +149,7 @@
         </div>
 
         <div id="auditButton">
-          <paper-toggle-button checked="{{debugging}}"
-                               on-change="_showPreviousInteractions">Audit</paper-toggle-button>
+          <paper-toggle-button checked="{{debugging}}" on-change="_showPreviousInteractions">Audit</paper-toggle-button>
         </div>
 
       </div>
@@ -203,13 +171,6 @@
           type: Array,
           value: [],
           observer: '_interactionsObserver',
-          notify: true
-        },
-
-        savedInteractions: {
-          type: Array,
-          value: [],
-          observer: '_savedInteractionsObserver',
           notify: true
         },
 
@@ -267,7 +228,6 @@
         this.set('selectedIndex', null);
         this.set('selectedInteraction', null);
         this.set('interactionResponse', null);
-        this.set('savedInteractions', []);
       },
 
       _documentObserver(doc) {
@@ -278,24 +238,10 @@
 
       _loadData() {
         this._getInteractions();
-        if (this.hasFacet(this.document, 'InteractionResultsFacet')) {
-          this._fetchRelatedDocuments();
-          this._addMetadataInteractions();
-        }
       },
 
       ready: function () {
 
-      },
-
-      _addMetadataInteractions() {
-        const savedInteractions = this.savedInteractions || [];
-        const interactions = this.document.properties['interactionresults:interactions'];
-        if (interactions) {
-          this.savedInteractions.push(...interactions);
-        }
-        this.set('savedInteractions', []);
-        this.set('savedInteractions', savedInteractions);
       },
 
       _getInteractions: function () {
@@ -329,27 +275,12 @@
         this._debug(`_interactionsObserver:`, obs);
       },
 
-      _savedInteractionsObserver(obs) {
-        this._debug(`_savedInteractionsObserver:`, obs);
-      },
-
       _selectedInteractionObserver(obs) {
         this._debug('_selectedInteractionObserver', obs);
       },
 
       _interactionResponseObserver: function (obs) {
         this._debug('_interactionResponseObserver', obs);
-      },
-
-      _relatedDocumentsObserver: function (obs) {
-        if (!this.relatedDocuments) return;
-        const savedInteractions = this.savedInteractions || [];
-        this.relatedDocuments.forEach(doc => {
-          const interactions = doc.properties['interactionresults:interactions'];
-          savedInteractions.push(...interactions);
-        });
-        this.set('savedInteractions', []);
-        this.set('savedInteractions', savedInteractions);
       },
 
       // Compute the selected value based on the selected index
@@ -371,21 +302,8 @@
 
       },
 
-      _fetchRelatedDocuments() {
-        if (this.document) {
-          this.$.getRelationsOp.execute()
-            .then((response) => {
-              const documents = response.entries || [];
-              this.relatedDocuments = documents.filter(doc => (doc.type === 'InteractionResults' && doc.isTrashed === false));
-            })
-            .catch((error) => {
-              console.error('Error fetching related documents:', error);
-            });
-        }
-      },
-
       _showPreviousInteractions: function () {
-        this.set('showPreviousInteractions', this.savedInteractions && this.debugging);
+        this.set('showPreviousInteractions', this.debugging);
       },
 
       _debug: function (name, info) {
