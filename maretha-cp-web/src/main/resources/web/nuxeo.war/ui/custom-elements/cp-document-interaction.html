@@ -136,13 +136,12 @@
           <div class="flex-item-right">
             <div id="response">
               [[interactionStatus]]
+              <template is="dom-if" if="[[interactionResponse]]">
+                <cp-format-json-response json="[[interactionResponse]]"></cp-format-json-response>
+              </template>
 
               <template is="dom-if" if="[[showPreviousInteractions]]">
                 <cp-show-interaction-results document="{{document}}"></cp-show-interaction-results>
-              </template>
-
-              <template is="dom-if" if="[[interactionResponse]]">
-                <cp-format-json-response json="[[interactionResponse]]"></cp-format-json-response>
               </template>
             </div>
           </div>
