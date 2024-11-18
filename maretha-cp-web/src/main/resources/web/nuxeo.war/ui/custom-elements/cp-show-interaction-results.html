@@ -9,38 +9,26 @@
               @apply --paper-card;
             }
 
-            nuxeo-data-table-cell {
-              align-items: flex-start !important;
-              /* Align content to the top */
+            .related-documents {
+              width: 95%;
+              margin: auto;
             }
         </style>
 
         <div class="related-documents">
             <h3>Saved interactions</h3>
-            <nuxeo-data-table class="table" items="{{savedInteractions}}">
-                <nuxeo-data-table-column name="Name">
-                    <template>
-                        <a href="https://cloud.becomposable.com/studio/interactions/[[item.interactionId]]"
-                           target="_blank">[[item.name]]</a>
+            <template is="dom-repeat" items="[[savedInteractions]]">
+                <nuxeo-card role="widget" class="nuxeo-card" heading="[[item.name]]">
+                    <cp-format-json-response string-json="[[item.response]]"></cp-format-json-response>
+                    <nuxeo-date role="widget" datetime="[[item.createdAt]]" format="YYYY-MM-DD HH:mm:ss"
+                                name="createdAt"></nuxeo-date>
+                    <template is="dom-if" if="[[item.doc]]">
+                        <p>Saved Interaction:
+                            <a class="ellipsis" href$="[[urlFor(item.doc)]]" on-click="_navigate" target="_blank">[[item.doc.title]]</a>
+                        </p>
                     </template>
-                </nuxeo-data-table-column>
-                <nuxeo-data-table-column name="Response" style="height: 50px; overflow: scroll;" flex="50">
-                    <template>
-                        <cp-format-json-response string-json="[[item.response]]"></cp-format-json-response>
-                    </template>
-                </nuxeo-data-table-column>
-                <nuxeo-data-table-column name="Date" field="createdAt">
-                    <template>
-                        <nuxeo-date role="widget" datetime="[[item.createdAt]]" format="YYYY-MM-DD HH:mm:ss"
-                                    name="createdAt"></nuxeo-date>
-                    </template>
-                </nuxeo-data-table-column>
-                <nuxeo-data-table-column name="Document">
-                    <template>
-                        <a class="ellipsis" href$="[[urlFor(item.doc)]]" on-click="_navigate" target="_blank">[[item.doc.title]]</a>
-                    </template>
-                </nuxeo-data-table-column>
-            </nuxeo-data-table>
+                </nuxeo-card>
+            </template>
         </div>
 
     </template>
@@ -68,28 +56,20 @@
             },
           },
 
-          listeners: {
-            'document-updated': '_onDocumentUpdated',
-          },
-
           ready() {
-            if (this.hasFacet(this.document, 'InteractionResultsFacet')) {
-              this._getData();
-            }
           },
 
           _getData() {
-            this._fetchRelatedDocuments();
-            this._addMetadataInteractions();
-          },
-
-          _onDocumentUpdated: function (event) {
-            console.log('Document updated!', event.detail);
-            this._getData();
+            if (this.hasFacet(this.document, 'InteractionResultsFacet')) {
+              this.set('savedInteractions', []);
+              this._fetchRelatedDocuments();
+              this._addMetadataInteractions();
+            }
           },
 
           _docObserver(doc) {
             if (!doc) return;
+            this._getData();
             this.classList.add('iron-selected');
           },
 
