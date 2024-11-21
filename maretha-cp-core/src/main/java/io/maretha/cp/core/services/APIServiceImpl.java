@@ -83,12 +83,10 @@ public class APIServiceImpl implements APIService {
                 "    \"stream\": " + stream + "\n" +
                 "}";
         String response = postRequest(getBearerToken(), url, jsonBody);
-        JsonNode responseAsJson = null;
         try {
-            responseAsJson = objectMapper.readTree(response);
-            return responseAsJson.get("result");
+            return objectMapper.readTree(response);
         } catch (Exception e) {
-            return responseAsJson;
+            return null;
         }
     }
 
