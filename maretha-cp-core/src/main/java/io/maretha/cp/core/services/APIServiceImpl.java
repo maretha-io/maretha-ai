@@ -226,10 +226,10 @@ public class APIServiceImpl implements APIService {
                     }
                 }
             }
-            return paramsList;
         } catch (Exception e) {
-            throw new NuxeoException(e);
+            log.error("Failed to get parameter for interactionId: " + interactionId);
         }
+        return paramsList;
     }
 
     public JSONObject getStoredDocumentText(String storeId) {
