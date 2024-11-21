@@ -1,0 +1,9 @@
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Manifest-Version: 1.0
+Bundle-Vendor: io.maretha.cp.api
+Bundle-Version: 1.0.0
+Bundle-Name: bma-api
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: io.maretha.cp.api.maretha-cp-api;singleton=true
+Fragment-Host: org.nuxeo.ecm.platform.restapi.server

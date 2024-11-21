@@ -25,6 +25,7 @@
     <module>maretha-cp-core</module>
     <module>maretha-cp-package</module>
     <module>maretha-cp-web</module>
+    <module>maretha-cp-api</module>
   </modules>
 
   <scm />
@@ -50,6 +51,11 @@
       <dependency>
         <groupId>io.maretha.cp</groupId>
         <artifactId>maretha-cp-package</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.maretha.cp</groupId>
+        <artifactId>maretha-cp-api</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
