@@ -108,13 +108,13 @@
             <div id="parameters">
               <h3>Parameters</h3>
               <template is="dom-repeat" items="[[selectedInteraction.parameters]]">
-                <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" readonly="[[item.readOnly]]"
+                <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" hidden="[[item.readOnly]]" readonly="[[item.readOnly]]"
                              type="[[item.type]]"></nuxeo-input>
                 <template is="dom-if" if="[[item.enableDocSelection]]">
                   <div>
                     <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
                                                multiple="true" min-chars="0" name="selectedDocs" role="widget"
-                                               on-change="_saveInteractions"></nuxeo-document-suggestion>
+                    ></nuxeo-document-suggestion>
                   </div>
                 </template>
               </template>
