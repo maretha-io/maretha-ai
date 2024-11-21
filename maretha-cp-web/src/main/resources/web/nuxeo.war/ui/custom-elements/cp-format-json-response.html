@@ -1,6 +1,11 @@
 <dom-module id="cp-format-json-response">
   <template>
-
+    <style>
+      .markdown-body {
+          font-family: Arial, sans-serif;
+          white-space: pre-wrap;
+      }
+    </style>
     <div id="response"></div>
     <div class="markdown-body" inner-h-t-m-l="[[htmlMarkdown]]"></div>
 
@@ -21,14 +26,14 @@
         },
 
         htmlMarkdown: {
-          type: String,
+            type: String,
         }
 
       },
 
       observers: ['_stringJsonToHtmlObserver(stringJson)', '_jsonToHtmlObserver(json)'],
 
-      ready: function () {
+      ready: function() {
       },
 
       _stringJsonToHtmlObserver: function (stringJson) {
@@ -40,22 +45,28 @@
         this.set('htmlMarkdown', this._formatJson(this?.json));
       },
 
-      _formatJson: function (jsonObj, indent = 0) {
-        let result = '';
-        const indentation = ' '.repeat(indent);
-
-        for (const [key, value] of Object.entries(jsonObj)) {
-          if (typeof value === 'object' && !Array.isArray(value)) {
-            result += `${indentation}${key}:\n`;
-            result += this._formatJson(value, indent + 4);
-          } else if (Array.isArray(value)) {
-            result += `${indentation}${key}: ${value.join(', ')}\n`;
-          } else {
-            result += `${indentation}${key}: ${value}\n`;
-          }
+       _formatJson: function(jsonObj, indent = 0) {
+            let result = '';
+            const indentation = '&nbsp;'.repeat(indent); // Add spaces for indentation
+            for (const key in jsonObj) {
+                if (jsonObj.hasOwnProperty(key)) {
+                    const value = jsonObj[key];
+                    const formattedKey = `<strong>${key.toUpperCase()}</strong>`;
+                    if (typeof value === 'object' && !Array.isArray(value)) {
+                        // If the value is an object, recurse and add <br>
+                        result += `${indentation}${formattedKey}:<br>`;
+                        result += formatJsonToHtml(value, indent + 4);
+                    } else if (Array.isArray(value)) {
+                        // If the value is an array, join values with commas
+                        result += `${indentation}${formattedKey}: ${value.join(', ')}<br>`;
+                    } else {
+                        // Key-value pair with a <br>
+                        result += `${indentation}${formattedKey}: ${value}<br>`;
+                    }
+                }
+            }
+            return result;
         }
-        return result;
-      }
 
     });
   </script>
