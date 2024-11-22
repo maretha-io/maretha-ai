@@ -5,6 +5,11 @@
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
                      input="[[document.uid]]"></nuxeo-operation>
 
+    <nuxeo-operation id="nxqlQueryOp" op="Document.Query" headers='{"Content-Type": "application/json"}'>
+    </nuxeo-operation>
+    <nuxeo-operation id="totalDocumentsQueryOp" op="Document.Query" headers='{"Content-Type": "application/json"}'>
+    </nuxeo-operation>
+
     <style include="nuxeo-action-button-styles">
       .interaction-content {
         width: 95%;
@@ -108,17 +113,17 @@
             <div id="parameters">
               <h3>Parameters</h3>
               <template is="dom-repeat" items="[[selectedInteraction.parameters]]">
-                <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" hidden="[[item.readOnly]]" readonly="[[item.readOnly]]"
-                             type="[[item.type]]"></nuxeo-input>
+                <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" hidden="[[item.readOnly]]"
+                             readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
                 <template is="dom-if" if="[[item.enableDocSelection]]">
                   <div>
                     <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
-                                               multiple="true" min-chars="0" name="selectedDocs" role="widget"
-                    ></nuxeo-document-suggestion>
+                                               multiple="true" min-chars="0" name="selectedDocs" role="widget"></nuxeo-document-suggestion>
                   </div>
                 </template>
               </template>
             </div>
+            Documents ready: [[documentsReady]] / [[totalDocuments]]
 
             <div class="buttons" style="margin:10px;">
               <paper-button id="chat" style="margin: 20px;" on-tap="_interactWithDocument"
@@ -210,6 +215,16 @@
           value: false
         },
 
+        documentsReady: {
+          type: Number,
+          value: 0
+        },
+
+        totalDocuments: {
+          type: Number,
+          value: 0
+        },
+
         interactionStatus: String
       },
 
@@ -237,6 +252,8 @@
 
       _loadData() {
         this._getInteractions();
+        this._executeDocumentsReadyQuery();
+        this._executeTotalDocumentsQuery();
       },
 
       ready: function () {
@@ -303,6 +320,30 @@
 
       _showPreviousInteractions: function () {
         this.set('showPreviousInteractions', this.debugging);
+      },
+
+      _executeDocumentsReadyQuery: function () {
+        const op = this.$.nxqlQueryOp;
+        op.params = {
+          query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND ecm:mixinType = 'InteractionResultsFacet' AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
+        };
+        op.execute().then((response) => {
+          this.set('documentsReady', response.entries.length);
+        }).catch((error) => {
+          console.error('Error executing NXQL query:', error);
+        });
+      },
+
+      _executeTotalDocumentsQuery: function () {
+        const op = this.$.totalDocumentsQueryOp;
+        op.params = {
+          query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
+        };
+        op.execute().then((response) => {
+          this.set('totalDocuments', response.entries.length);
+        }).catch((error) => {
+          console.error('Error executing NXQL query:', error);
+        });
       },
 
       _debug: function (name, info) {
