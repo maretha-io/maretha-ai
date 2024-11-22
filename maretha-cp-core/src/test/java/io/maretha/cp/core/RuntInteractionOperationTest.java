@@ -60,7 +60,7 @@ public class RuntInteractionOperationTest {
         String interactionId = "test-id";
         JsonNode mockResponse = mapper.convertValue("{\"response\": \"test\"}", JsonNode.class);
         //WHEN the service is mocked
-        when(runInteractionService.uploadFileAndGetStoreId(any(), any())).thenReturn(document);
+        when(runInteractionService.uploadFileAndSetStoreId(any(), any())).thenReturn(document);
         when(runInteractionService.triggerInteraction(any(), any(), any(), any())).thenReturn(mockResponse);
 
         //AND the operation is called
