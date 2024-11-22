@@ -84,7 +84,7 @@ public class APIServiceImpl implements APIService {
                 "}";
         String response = postRequest(getBearerToken(), url, jsonBody);
         try {
-            return objectMapper.readTree(response);
+            return objectMapper.readTree(response).get("result");
         } catch (Exception e) {
             return null;
         }
