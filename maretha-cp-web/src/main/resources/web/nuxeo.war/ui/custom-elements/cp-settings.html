@@ -175,12 +175,16 @@
                                    label="name: [[item.name]] type: [[item.type]] [[item.format]]" type="[[item.type]]"
                                    placeholder="default value" style="margin: auto;"></nuxeo-input>
                       <paper-toggle-button checked="{{item.readOnly}}" aria-label$="ReadOnly"
-                                           on-change="_saveInteractions">ReadOnly</paper-toggle-button>
+                                           on-change="_saveInteractions">Disable Edit</paper-toggle-button>
+                      <paper-toggle-button checked="{{item.isMainDocument}}" aria-label$="isMainDocument"
+                                           on-change="_saveInteractions">Main Document</paper-toggle-button>
                       <template is="dom-if" if="[[_isDocArrayType(item)]]">
                         <paper-toggle-button checked="{{item.enableDocSelection}}" aria-label$="EnableDocSelection"
-                                             on-change="_saveInteractions">EnableDocSelection</paper-toggle-button>
+                                             on-change="_saveInteractions">Enable Selection</paper-toggle-button>
                       </template>
                       <template is="dom-if" if="[[item.enableDocSelection]]">
+                        <paper-toggle-button checked="{{item.selectionReadOnly}}" aria-label$="EnableDocSelection"
+                                             on-change="_saveInteractions">Disable Selection Edit</paper-toggle-button>
                         <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
                                                    multiple="true"
                                                    min-chars="0" name="selectedDocs" role="widget" on-change="_saveInteractions"></nuxeo-document-suggestion >

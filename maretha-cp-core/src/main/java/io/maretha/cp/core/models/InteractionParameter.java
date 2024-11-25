@@ -20,5 +20,7 @@ public class InteractionParameter {
     private String value;
     private boolean readOnly;
     private boolean enableDocSelection;
+    private boolean isMainDocument;
+    private boolean selectionReadOnly;
     private List<String> selectedDocumentIds;
 }
