@@ -44,6 +44,8 @@ public interface RepositoryService {
     String PARAMETER_SCHEMA_FORMAT = "format";
     String PARAMETER_SCHEMA_VALUE = "value";
     String PARAMETER_SCHEMA_READ_ONLY = "readOnly";
+    String PARAMETER_SCHEMA_SELECTION_READ_ONLY = "selectionReadOnly";
+    String PARAMETER_SCHEMA_IS_MAIN_DOCUMENT = "isMainDocument";
     String PARAMETER_SCHEMA_ENABLE_DOC_SELECTION = "enableDocSelection";
     String PARAMETER_SCHEMA_SELECTED_DOC_IDS = "selectedDocumentIds";
 
