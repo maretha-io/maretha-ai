@@ -116,7 +116,7 @@
                 <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" hidden="[[item.readOnly]]"
                              readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
                 <template is="dom-if" if="[[item.isMainDocument]]">
-                  Main Document: [[item.name]] [[item.value]]
+                  Main Document: [[document.properties.file:content.name]]
                 </template>
                 <template is="dom-if" if="[[item.isContextMemoryParameter]]">
                   <nuxeo-input role="widget" value="{{_computeValue(item, interactionResponse)}}" label="[[item.name]]" hidden
