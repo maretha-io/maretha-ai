@@ -52,6 +52,7 @@
             <xs:element name="enableDocSelection" type="xs:boolean"/>
             <xs:element name="isMainDocument" type="xs:boolean"/>
             <xs:element name="selectionReadOnly" type="xs:boolean"/>
+            <xs:element name="isContextMemoryParameter" type="xs:boolean"/>
             <xs:element name="selectedDocumentIds" type="nxs:stringList"/>
         </xs:sequence>
     </xs:complexType>

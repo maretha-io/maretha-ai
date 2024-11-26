@@ -178,6 +178,8 @@
                                            on-change="_saveInteractions">Disable Edit</paper-toggle-button>
                       <paper-toggle-button checked="{{item.isMainDocument}}" aria-label$="isMainDocument"
                                            on-change="_saveInteractions">Main Document</paper-toggle-button>
+                      <paper-toggle-button checked="{{item.isContextMemoryParameter}}" aria-label$="isContextMemory"
+                                           on-change="_saveInteractions">Context Memory</paper-toggle-button>
                       <template is="dom-if" if="[[_isDocArrayType(item)]]">
                         <paper-toggle-button checked="{{item.enableDocSelection}}" aria-label$="EnableDocSelection"
                                              on-change="_saveInteractions">Enable Selection</paper-toggle-button>
