@@ -38,7 +38,7 @@ public class RuntInteractionOperation {
     protected String interactionId;
 
     @OperationMethod
-    public JsonNode run(DocumentModel doc) {
+    public String run(DocumentModel doc) {
         log.debug(String.format("RunInteraction interactionId: [%s], docId: [%s]", interactionId, doc.getId()));
         List<InteractionParameter> parameters = objectMapper
                 .convertValue(data, objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));

@@ -58,7 +58,7 @@ public class RuntInteractionOperationTest {
         DocumentModel document = createDocument();
         List<ObjectNode> data = new ArrayList<>();
         String interactionId = "test-id";
-        JsonNode mockResponse = mapper.convertValue("{\"response\": \"test\"}", JsonNode.class);
+        String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
         when(runInteractionService.uploadFileAndSetStoreId(any(), any())).thenReturn(document);
         when(runInteractionService.triggerInteraction(any(), any(), any(), any())).thenReturn(mockResponse);
@@ -68,10 +68,10 @@ public class RuntInteractionOperationTest {
         ctx.put("interactionId", interactionId);
         ctx.put("data", data);
         ctx.setInput(document);
-        JsonNode response = (JsonNode) automationService.run(ctx, RuntInteractionOperation.ID);
+        String response = (String) automationService.run(ctx, RuntInteractionOperation.ID);
         //THEN
         assertNotNull(response);
-        assertEquals("{\"response\": \"test\"}", response.asText());
+        assertEquals("{\"response\": \"test\"}", response);
     }
 
     private DocumentModel createDocument() {

@@ -55,7 +55,7 @@
                     if (typeof value === 'object' && !Array.isArray(value)) {
                         // If the value is an object, recurse and add <br>
                         result += `${indentation}${formattedKey}:<br>`;
-                        result += formatJsonToHtml(value, indent + 4);
+                        result += this._formatJson(value, indent + 4);
                     } else if (Array.isArray(value)) {
                         // If the value is an array, join values with commas
                         result += `${indentation}${formattedKey}: ${value.join(', ')}<br>`;
