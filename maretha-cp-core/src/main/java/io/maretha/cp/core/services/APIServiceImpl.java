@@ -1,5 +1,6 @@
 package io.maretha.cp.core.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -87,6 +88,33 @@ public class APIServiceImpl implements APIService {
             return objectMapper.readTree(response).get("result");
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    @Override
+    public String getInteractionResultAsStream(String interaction, Map<String, Object> data) {
+        String url = API_URL + "/api/v1/runs";
+        boolean stream = true;
+        String dataParameters = "";
+        try {
+            dataParameters = objectMapper.writeValueAsString(data);
+        } catch (Exception e) {
+            throw new NuxeoException(e);
+        }
+
+        String jsonBody = "{\n" +
+                "    \"interaction\": \"" + interaction + "\",\n" +
+                "    \"data\": " + dataParameters + ",\n" +
+                "    \"stream\": " + stream + "\n" +
+                "}";
+        String bearerToken = getBearerToken();
+        String interactionResponse = postRequest(bearerToken, url, jsonBody);
+
+        try {
+            String id = objectMapper.readTree(interactionResponse).get("id").asText();
+            return url + "/" + id + "/stream?access_token=" + bearerToken;
+        } catch (JsonProcessingException e) {
+            throw new NuxeoException(e);
         }
     }
 

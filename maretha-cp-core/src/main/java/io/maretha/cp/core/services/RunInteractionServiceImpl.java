@@ -1,6 +1,5 @@
 package io.maretha.cp.core.services;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.maretha.cp.core.bulk.actions.UploadDocumentAction;
 import io.maretha.cp.core.models.InteractionParameter;
 import org.apache.commons.collections.CollectionUtils;
@@ -49,16 +48,16 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     @Override
-    public JsonNode triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters) {
+    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters) {
         if (doc.isFolder()) {
             List<DocumentModel> childrenDocs = getChildrenDocuments(session, doc);
             List<DocumentModel> childrenDocsWithStoreId = uploadFilesAndSetStoreId(session, childrenDocs);
             Map<String, Object> paramsMap = buildParametersForFolder(childrenDocsWithStoreId, parameters);
-            return apiService.getInteractionResult(interactionId, paramsMap);
+            return apiService.getInteractionResultAsStream(interactionId, paramsMap);
         } else {
             doc = uploadFileAndSetStoreId(doc, session);
             Map<String, Object> paramsMap = buildParameters(doc, parameters);
-            return apiService.getInteractionResult(interactionId, paramsMap);
+            return apiService.getInteractionResultAsStream(interactionId, paramsMap);
         }
     }
 

@@ -13,6 +13,8 @@ public interface APIService {
 
     JsonNode getInteractionResult(String interactionId, Map<String, Object> data);
 
+    String getInteractionResultAsStream(String interactionId, Map<String, Object> data);
+
     String getBearerToken();
 
     String uploadFileToStore(Blob file);
