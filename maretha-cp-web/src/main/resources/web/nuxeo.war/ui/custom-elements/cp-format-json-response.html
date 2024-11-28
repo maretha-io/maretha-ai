@@ -2,12 +2,12 @@
   <template>
     <style>
       .markdown-body {
-          font-family: Arial, sans-serif;
-          white-space: pre-wrap;
+        font-family: Arial, sans-serif;
+        white-space: pre-wrap;
       }
     </style>
     <div id="response"></div>
-    <div class="markdown-body" inner-h-t-m-l="[[htmlMarkdown]]"></div>
+    <div class="markdown-body" inner-h-t-m-l="[[htmlValue]]"></div>
 
   </template>
 
@@ -25,48 +25,63 @@
           type: Object,
         },
 
-        htmlMarkdown: {
-            type: String,
+        htmlValue: {
+          type: String,
         }
 
       },
 
-      observers: ['_stringJsonToHtmlObserver(stringJson)', '_jsonToHtmlObserver(json)'],
+      observers: ['_stringJsonToHtmlObserver(stringJson)', '_stringJsonToHtmlObserver(json)'],
 
-      ready: function() {
+      ready: function () {
       },
 
       _stringJsonToHtmlObserver: function (stringJson) {
-        const json = JSON.parse(stringJson);
-        this.set('htmlMarkdown', this._formatJson(json));
-      },
+        this.set('htmlValue', stringJson);
 
-      _jsonToHtmlObserver: function (json) {
-        this.set('htmlMarkdown', this._formatJson(this?.json));
-      },
-
-       _formatJson: function(jsonObj, indent = 0) {
-            let result = '';
-            const indentation = '&nbsp;'.repeat(indent); // Add spaces for indentation
-            for (const key in jsonObj) {
-                if (jsonObj.hasOwnProperty(key)) {
-                    const value = jsonObj[key];
-                    const formattedKey = `<strong>${key.toUpperCase()}</strong>`;
-                    if (typeof value === 'object' && !Array.isArray(value)) {
-                        // If the value is an object, recurse and add <br>
-                        result += `${indentation}${formattedKey}:<br>`;
-                        result += this._formatJson(value, indent + 4);
-                    } else if (Array.isArray(value)) {
-                        // If the value is an array, join values with commas
-                        result += `${indentation}${formattedKey}: ${value.join(', ')}<br>`;
-                    } else {
-                        // Key-value pair with a <br>
-                        result += `${indentation}${formattedKey}: ${value}<br>`;
-                    }
-                }
-            }
-            return result;
+        try {
+          //Check if the json is valid
+          const jsonObj = JSON.parse(stringJson);
+          if (typeof jsonObj === 'object')
+            this.set('htmlValue', this._formatJson(jsonObj));
+        } catch (e) {
         }
+
+        try {
+          //Try to fix the json object
+          const cleanJson = stringJson
+            .replace(/\\\\n|\\n/g, "")
+            .trim();
+          const unescapedJson = JSON.parse(`"${cleanJson}"`);
+          const jsonObj = JSON.parse(unescapedJson);
+          if (typeof jsonObj === 'object')
+            this.set('htmlValue', this._formatJson(jsonObj));
+        } catch (e) {
+        }
+      },
+
+      _formatJson: function (jsonObj, indent = 0) {
+        let result = '';
+        const indentation = '&nbsp;'.repeat(indent); // Add spaces for indentation
+        for (const key in jsonObj) {
+          if (jsonObj.hasOwnProperty(key)) {
+            const value = jsonObj[key];
+            const formattedKey = `<strong>${key.toUpperCase()}</strong>`;
+            if (typeof value === 'object' && !Array.isArray(value)) {
+              // If the value is an object, recurse and add <br>
+              result += `${indentation}${formattedKey}:<br>`;
+              result += this._formatJson(value, indent + 4);
+            } else if (Array.isArray(value)) {
+              // If the value is an array, join values with commas
+              result += `${indentation}${formattedKey}: ${value.join(', ')}<br>`;
+            } else {
+              // Key-value pair with a <br>
+              result += `${indentation}${formattedKey}: ${value}<br>`;
+            }
+          }
+        }
+        return result;
+      }
 
     });
   </script>

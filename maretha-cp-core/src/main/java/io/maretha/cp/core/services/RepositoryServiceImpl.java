@@ -7,15 +7,24 @@ import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.InteractionResponse;
 import io.maretha.cp.core.models.Settings;
-import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.automation.OperationException;
-import org.nuxeo.ecm.core.api.*;
+import org.nuxeo.ecm.core.api.CoreSession;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.platform.relations.api.DocumentRelationManager;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RepositoryServiceImpl implements RepositoryService {
@@ -123,14 +132,13 @@ public class RepositoryServiceImpl implements RepositoryService {
         documentRelationManager.addRelation(session, sourceDoc, targetDoc, predicate, !outgoing);
     }
 
-    @SneakyThrows
     private HashMap<String, Object> convertToInteractionResponseComplexType(InteractionResponse interactionResponse) {
         HashMap<String, Object> interactionMap = new HashMap<>();
         addNonNullValue(interactionMap, SCHEMA_ID, interactionResponse.getId());
         addNonNullValue(interactionMap, SCHEMA_NAME, interactionResponse.getName());
         addNonNullValue(interactionMap, SCHEMA_DOCUMENT_ID, interactionResponse.getDocumentId());
         addNonNullValue(interactionMap, SCHEMA_INTERACTION_ID, interactionResponse.getInteractionId());
-        addNonNullValue(interactionMap, SCHEMA_RESPONSE, objectMapper.writeValueAsString(interactionResponse.getResponse()));
+        addNonNullValue(interactionMap, SCHEMA_RESPONSE, interactionResponse.getResponse());
         addNonNullValue(interactionMap, SCHEMA_STATUS, interactionResponse.getStatus());
         addNonNullValue(interactionMap, SCHEMA_CREATED_BY, interactionResponse.getCreatedBy());
         addNonNullValue(interactionMap, SCHEMA_CREATED_AT, interactionResponse.getCreatedAt());
