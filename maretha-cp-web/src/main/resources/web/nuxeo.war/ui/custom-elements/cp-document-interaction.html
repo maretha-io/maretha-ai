@@ -296,7 +296,6 @@
         const operation = this.$.runInteractionOperation;
         operation.params = { "interactionId": this.selectedInteraction.id, "data": this.selectedInteraction.parameters };
         operation.execute().then((response) => {
-          this.set('interactionStatus', '');
           this._stream(response.value);
         }).catch((error) => {
           console.error('Error triggering operation:', error);
@@ -305,6 +304,8 @@
       },
 
       _stream: function (url) {
+        this.set('interactionStatus', '');
+        this.set('interactionResponseStream', '');
         this._eventSource = new EventSource(url);
         this._eventSource.onmessage = (event) => {
           //remove string quotes
@@ -312,12 +313,20 @@
         };
 
         this._eventSource.onerror = (e) => {
-          const streamResponse = this.interactionResponseStream;
-          const cleanJson = streamResponse.replace(/\\n/g,"");
-          const unescapedJson = JSON.parse(`"${cleanJson}"`);
-          const jsonObj = JSON.parse(unescapedJson);
-          this.set('interactionResponse', jsonObj);
-          this.set('interactionResponseStream', '');
+          try {
+            const streamResponse = this.interactionResponseStream;
+            const cleanJson = streamResponse
+              .replace(/\\\\n|\\n/g, "")
+              .trim();
+            console.log(cleanJson)
+            const unescapedJson = JSON.parse(`"${cleanJson}"`);
+            console.log(unescapedJson)
+            const jsonObj = JSON.parse(unescapedJson);
+            this.set('interactionResponse', jsonObj);
+            this.set('interactionResponseStream', '');
+          } catch (e) {
+            console.error(e);
+          }
           this._eventSource.close();
         };
       },
