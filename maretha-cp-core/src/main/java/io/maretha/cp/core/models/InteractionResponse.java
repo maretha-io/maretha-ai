@@ -23,6 +23,6 @@ public class InteractionResponse {
     private String updatedAt;
     private String createdAt;
     private String createdBy;
-    private Object response;
+    private String response;
     private List<InteractionParameter> parameters = new ArrayList<>();
 }

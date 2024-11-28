@@ -315,14 +315,7 @@
         this._eventSource.onerror = (e) => {
           try {
             const streamResponse = this.interactionResponseStream;
-            const cleanJson = streamResponse
-              .replace(/\\\\n|\\n/g, "")
-              .trim();
-            console.log(cleanJson)
-            const unescapedJson = JSON.parse(`"${cleanJson}"`);
-            console.log(unescapedJson)
-            const jsonObj = JSON.parse(unescapedJson);
-            this.set('interactionResponse', jsonObj);
+            this.set('interactionResponse', streamResponse);
             this.set('interactionResponseStream', '');
           } catch (e) {
             console.error(e);
