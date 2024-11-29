@@ -6,6 +6,7 @@
     <!-- Root element definition for interactions -->
     <xs:element name="interactions" type="nxs:interactionResultList"/>
     <xs:element name="storeId" type="xs:string"/>
+    <xs:element name="storeDigest" type="xs:string"/>
     <xs:element name="storedDate" type="xs:dateTime"/>
 
     <!-- Definition for a list of interactions -->

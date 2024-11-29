@@ -16,6 +16,7 @@ public interface RepositoryService {
     String RESULTS_FACET = "InteractionResultsFacet";
     String RESULTS_SCHEMA = "interactionResults";
     String RESULTS_STORE_ID_SCHEMA_PATH = "interactionresults:storeId";
+    String RESULTS_STORE_DIGEST_SCHEMA_PATH = "interactionresults:storeDigest";
     String RESULTS_STORED_DATE_SCHEMA_PATH = "interactionresults:storedDate";
     String SCHEMA_RESPONSE = "response";
     String SCHEMA_CREATED_BY = "createdBy";

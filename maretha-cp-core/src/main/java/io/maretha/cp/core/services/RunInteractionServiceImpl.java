@@ -22,9 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
-import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORED_DATE_SCHEMA_PATH;
-import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
+import static io.maretha.cp.core.services.RepositoryService.*;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
 
@@ -74,13 +72,19 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session) {
         String storeId = null;
+        Blob blob = (Blob) doc.getPropertyValue(FILE_CONTENT);
         if (doc.hasFacet(RESULTS_FACET)) {
             storeId = (String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
+            String storeDigest = (String) doc.getPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH);
+            if (!blob.getDigest().equalsIgnoreCase(storeDigest)) {
+                storeId = ""; //re-upload file
+            }
         }
         if (StringUtils.isEmpty(storeId)) {
             doc.addFacet(RESULTS_FACET);
-            storeId = apiService.uploadFileToStore((Blob) doc.getPropertyValue(FILE_CONTENT));
+            storeId = apiService.uploadFileToStore(blob);
             doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
+            doc.setPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH, blob.getDigest());
             doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
             return session.saveDocument(doc);
         }
