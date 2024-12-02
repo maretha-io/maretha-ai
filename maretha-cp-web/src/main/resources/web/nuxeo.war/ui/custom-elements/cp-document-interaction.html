@@ -367,7 +367,7 @@
         if (!this.document) return;
         const op = this.$.nxqlQueryOp;
         op.params = {
-          query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND ecm:mixinType = 'InteractionResultsFacet' AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
+          query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND file:content/digest = '"+this.document.properties['interactionresults:storeDigest']+"' AND ecm:mixinType = 'InteractionResultsFacet' AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
         };
         op.execute().then((response) => {
           this.set('documentsReady', response.entries.length);
