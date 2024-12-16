@@ -180,17 +180,24 @@
                                            on-change="_saveInteractions">Main Document</paper-toggle-button>
                       <paper-toggle-button checked="{{item.isContextMemoryParameter}}" aria-label$="isContextMemory"
                                            on-change="_saveInteractions">Context Memory</paper-toggle-button>
-                      <template is="dom-if" if="[[_isDocArrayType(item)]]">
+                      <template is="dom-if" if="[[_isDocType(item)]]">
                         <paper-toggle-button checked="{{item.enableDocSelection}}" aria-label$="EnableDocSelection"
                                              on-change="_saveInteractions">Enable Selection</paper-toggle-button>
                       </template>
                       <template is="dom-if" if="[[item.enableDocSelection]]">
                         <paper-toggle-button checked="{{item.selectionReadOnly}}" aria-label$="EnableDocSelection"
                                              on-change="_saveInteractions">Disable Selection Edit</paper-toggle-button>
-                        <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
-                                                   multiple="true"
-                                                   min-chars="0" name="selectedDocs" role="widget" on-change="_saveInteractions"></nuxeo-document-suggestion >
-                      </template>
+                          <template is="dom-if" if="[[_isDocArrayType(item)]]">
+                          <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
+                                                     multiple="[[_isDocArrayType(item)]]"
+                                                     min-chars="0" name="selectedDocs" role="widget" on-change="_saveInteractions"></nuxeo-document-suggestion >
+                          </template>
+                          <template is="dom-if" if="[[!_isDocArrayType(item)]]">
+                            <nuxeo-document-suggestion value="{{item.selectedDocumentId}}" label="Selected Document"
+                                                       min-chars="0" name="selectedDoc" role="widget" on-change="_saveInteractions"></nuxeo-document-suggestion >
+                          </template>
+
+                        </template>
                     </div>
                   </template>
                 </nuxeo-card>
@@ -367,6 +374,10 @@
 
       _isDocArrayType: function (param) {
         return param.type === 'array' && param.format === 'document';
+      },
+
+      _isDocType: function (param) {
+        return param.format === 'document';
       },
 
       _debug: function (name, info) {

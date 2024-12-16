@@ -27,4 +27,5 @@ public class InteractionParameter {
     @JsonProperty("isContextMemoryParameter")
     private boolean isContextMemoryParameter;
     private List<String> selectedDocumentIds;
+    private String selectedDocumentId;
 }

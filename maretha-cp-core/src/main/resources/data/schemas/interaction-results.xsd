@@ -55,6 +55,7 @@
             <xs:element name="selectionReadOnly" type="xs:boolean"/>
             <xs:element name="isContextMemoryParameter" type="xs:boolean"/>
             <xs:element name="selectedDocumentIds" type="nxs:stringList"/>
+            <xs:element name="selectedDocumentId" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
