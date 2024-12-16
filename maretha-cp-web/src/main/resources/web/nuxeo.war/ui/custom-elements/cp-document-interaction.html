@@ -124,9 +124,16 @@
                 </template>
                 <template is="dom-if" if="[[item.enableDocSelection]]">
                   <div>
+                    <template is="dom-if" if="[[_isDocArrayType(item)]]">
                     <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
-                                               readonly="[[item.selectionReadOnly]]" multiple="true" min-chars="0" name="selectedDocs"
+                                               readonly="[[item.selectionReadOnly]]" multiple min-chars="0" name="selectedDocs"
                                                role="widget"></nuxeo-document-suggestion>
+                    </template>
+                    <template is="dom-if" if="[[!_isDocArrayType(item)]]">
+                      <nuxeo-document-suggestion value="{{item.selectedDocumentId}}" label="Selected Document"
+                                                 readonly="[[item.selectionReadOnly]]" min-chars="0" name="selectedDoc"
+                                                 role="widget"></nuxeo-document-suggestion>
+                    </template>
                   </div>
                 </template>
               </template>
@@ -367,7 +374,7 @@
         if (!this.document) return;
         const op = this.$.nxqlQueryOp;
         op.params = {
-          query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND file:content/digest = '"+this.document.properties['interactionresults:storeDigest']+"' AND ecm:mixinType = 'InteractionResultsFacet' AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
+          query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND interactionresults:storeDigest IS NOT NULL AND ecm:mixinType = 'InteractionResultsFacet' AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
         };
         op.execute().then((response) => {
           this.set('documentsReady', response.entries.length);
@@ -393,6 +400,10 @@
           item.value += " Previous response: " + JSON.stringify(interactionResponse);
         }
         return item.value;
+      },
+
+      _isDocArrayType: function (param) {
+        return param.type === 'array' && param.format === 'document';
       },
 
       _debug: function (name, info) {

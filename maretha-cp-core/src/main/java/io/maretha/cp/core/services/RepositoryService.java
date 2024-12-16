@@ -49,6 +49,7 @@ public interface RepositoryService {
     String PARAMETER_SCHEMA_IS_MAIN_DOCUMENT = "isMainDocument";
     String PARAMETER_SCHEMA_ENABLE_DOC_SELECTION = "enableDocSelection";
     String PARAMETER_SCHEMA_SELECTED_DOC_IDS = "selectedDocumentIds";
+    String PARAMETER_SCHEMA_SELECTED_DOC_ID = "selectedDocumentId";
     String PARAMETER_SCHEMA_IS_CONTEXT_MEMORY = "isContextMemoryParameter";
 
     String SETTINGS_DOCUMENT_NAME = "InteractionSettings";

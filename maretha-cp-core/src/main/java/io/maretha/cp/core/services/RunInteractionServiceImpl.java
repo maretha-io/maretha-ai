@@ -22,7 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.maretha.cp.core.services.RepositoryService.*;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORED_DATE_SCHEMA_PATH;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_DIGEST_SCHEMA_PATH;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
 
@@ -49,17 +52,17 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters) {
         if (doc.isFolder()) {
             List<DocumentModel> childrenDocs = getChildrenDocuments(session, doc);
-            List<DocumentModel> childrenDocsWithStoreId = uploadFilesAndSetStoreId(session, childrenDocs);
+            List<DocumentModel> childrenDocsWithStoreId = uploadFilesAndSetStoreId(childrenDocs);
             Map<String, Object> paramsMap = buildParametersForFolder(childrenDocsWithStoreId, parameters);
             return apiService.getInteractionResultAsStream(interactionId, paramsMap);
         } else {
             doc = uploadFileAndSetStoreId(doc, session);
-            Map<String, Object> paramsMap = buildParameters(doc, parameters);
+            Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
             return apiService.getInteractionResultAsStream(interactionId, paramsMap);
         }
     }
 
-    private List<DocumentModel> uploadFilesAndSetStoreId(CoreSession session, List<DocumentModel> docs) {
+    private List<DocumentModel> uploadFilesAndSetStoreId(List<DocumentModel> docs) {
         String ids = docs.stream().map(doc -> "'" + doc.getId() + "'").collect(Collectors.joining(", "));
         String query = "SELECT * FROM Document WHERE ecm:uuid IN (" + ids + ") AND ecm:mixinType != 'HiddenInNavigation' AND ecm:isProxy = 0 AND ecm:isVersion = 0 AND ecm:isTrashed = 0 ";
         BulkCommand.Builder builder = new BulkCommand.Builder(UploadDocumentAction.ACTION_NAME, query, "system");
@@ -97,7 +100,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return session.query(nxqlQuery);
     }
 
-    private Map<String, Object> buildParameters(DocumentModel doc, List<InteractionParameter> parameters) {
+    private Map<String, Object> buildParameters(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
         Map<String, Object> paramsMap = new HashMap<>();
         parameters.forEach(param -> {
             String name = param.getName();
@@ -105,6 +108,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             String type = param.getType();
             String format = param.getFormat();
             List<String> selectedDocumentIds = param.getSelectedDocumentIds();
+            String selectedDocumentId = param.getSelectedDocumentId();
+
             boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
             if (isDocumentOrMediaFormat) {
 //                paramValue = getSignedS3Url(doc); //Signed s3 URl
@@ -113,6 +118,10 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                     value = selectedDocumentsStoreIds;
                     if (CollectionUtils.isEmpty(selectedDocumentsStoreIds))
                         value = List.of("store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
+                } else if (StringUtils.isNotEmpty(selectedDocumentId)) {
+                    DocumentModel selectedDocument = doc.getCoreSession().getDocument(new IdRef(selectedDocumentId));
+                    selectedDocument = uploadFileAndSetStoreId(selectedDocument, session);
+                    value = "store:" + selectedDocument.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
                 } else {
                     value = "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
                 }
