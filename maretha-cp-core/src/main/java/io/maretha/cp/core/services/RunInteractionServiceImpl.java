@@ -170,4 +170,12 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
         return cloudStorageFileShare.getPublicRemoteUri(blob).toString();
     }
+
+    //source: "s3://composable-bs-test/my-photo.jpg#eu-north-1",
+    private String getS3Path(DocumentModel doc){
+        Property blobProperty = doc.getProperty(FILE_CONTENT);
+        ManagedBlob blob = (ManagedBlob) blobProperty.getValue();
+        CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
+        return cloudStorageFileShare.getS3FilePath(blob);
+    }
 }
