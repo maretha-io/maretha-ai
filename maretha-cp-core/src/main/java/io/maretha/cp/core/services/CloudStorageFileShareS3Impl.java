@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.blob.s3.S3BlobProvider;
+import org.nuxeo.ecm.blob.s3.S3BlobStoreConfiguration;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.blob.BlobManager;
@@ -24,6 +25,7 @@ public class CloudStorageFileShareS3Impl implements CloudStorageFileShare {
     private static final Log log = LogFactory.getLog(CloudStorageFileShareS3Impl.class);
     private static final int EXPIRATION_HOURS = 2;
 
+    @Override
     public URI getPublicRemoteUri(ManagedBlob blob) {
         BlobProvider s3BlobProvider = Framework.getService(BlobManager.class).getBlobProvider("default");
         if (!(s3BlobProvider instanceof S3BlobProvider)) {
@@ -34,6 +36,22 @@ public class CloudStorageFileShareS3Impl implements CloudStorageFileShare {
         } catch (URISyntaxException e) {
             throw new NuxeoException(e);
         }
+    }
+
+    @Override
+    public String getS3FilePath(ManagedBlob blob) {
+        BlobProvider s3BlobProvider = Framework.getService(BlobManager.class).getBlobProvider("default");
+        if (!(s3BlobProvider instanceof S3BlobProvider)) {
+            log.error("Server not configured with s3; skipping upload");
+        }
+        String bucketKey = blob.getDigest();
+        String[] parts = bucketKey.split(String.valueOf(VER_SEP));
+        S3BlobStoreConfiguration config = ((S3BlobProvider) s3BlobProvider).config;
+        String bucketName = config.bucketName;
+        String regionName = config.amazonS3.getRegionName();
+        String filename = blob.getFilename();
+        //s3://composable-bs-test/my-photo.jpg#eu-north-1
+        return "s3://" + bucketName + "/" + filename + "#" + regionName;
     }
 
     private URI getURIS3(S3BlobProvider s3BlobProvider, String bucketKey, Blob blob) throws URISyntaxException {
