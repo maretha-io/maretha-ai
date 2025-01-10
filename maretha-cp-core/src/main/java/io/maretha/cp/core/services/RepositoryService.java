@@ -43,6 +43,7 @@ public interface RepositoryService {
     String PARAMETER_SCHEMA_NAME = "name";
     String PARAMETER_SCHEMA_TYPE = "type";
     String PARAMETER_SCHEMA_FORMAT = "format";
+    String PARAMETER_SCHEMA_DESCRIPTION = "description";
     String PARAMETER_SCHEMA_VALUE = "value";
     String PARAMETER_SCHEMA_READ_ONLY = "readOnly";
     String PARAMETER_SCHEMA_SELECTION_READ_ONLY = "selectionReadOnly";

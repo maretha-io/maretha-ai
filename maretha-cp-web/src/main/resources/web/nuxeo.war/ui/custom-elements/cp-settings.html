@@ -171,6 +171,9 @@
                   <template is="dom-repeat" items="[[selectedInteraction.parameters]]" as="item">
                     <div class="parameter"
                          style="box-shadow:0 3px 5px rgb(0 0 0 / 30%);margin: auto;padding: 10px; margin-bottom: 5px;">
+                      <template is="dom-if" if="[[item.description]]">
+                        Description: [[item.description]]
+                      </template>
                       <nuxeo-input role="widget" value="{{item.value}}"
                                    label="name: [[item.name]] type: [[item.type]] [[item.format]]" type="[[item.type]]"
                                    placeholder="default value" style="margin: auto;"></nuxeo-input>

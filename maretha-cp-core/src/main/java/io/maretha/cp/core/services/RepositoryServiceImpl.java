@@ -189,6 +189,7 @@ public class RepositoryServiceImpl implements RepositoryService {
             paramMap.put(PARAMETER_SCHEMA_NAME, param.getName());
             paramMap.put(PARAMETER_SCHEMA_TYPE, param.getType());
             paramMap.put(PARAMETER_SCHEMA_FORMAT, param.getFormat());
+            paramMap.put(PARAMETER_SCHEMA_DESCRIPTION, param.getDescription());
             paramMap.put(PARAMETER_SCHEMA_VALUE, param.getValue());
             paramMap.put(PARAMETER_SCHEMA_READ_ONLY, param.isReadOnly());
             paramMap.put(PARAMETER_SCHEMA_SELECTION_READ_ONLY, param.isSelectionReadOnly());

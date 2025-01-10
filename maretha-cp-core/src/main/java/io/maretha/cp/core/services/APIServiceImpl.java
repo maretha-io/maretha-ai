@@ -242,10 +242,12 @@ public class APIServiceImpl implements APIService {
                             JsonNode value = field.getValue();
                             String type = value.has("type") ? value.get("type").asText() : "";
                             String format = value.has("format") ? value.get("format").asText() : "";
+                            String description = value.has("description") ? value.get("description").asText() : "";
                             InteractionParameter parameter = InteractionParameter.builder()
                                     .name(name)
                                     .type(type)
                                     .format(format)
+                                    .description(description)
                                     .build();
                             paramsList.add(parameter);
                         });

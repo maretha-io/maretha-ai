@@ -18,6 +18,8 @@ public class InteractionParameter {
     private String name;
     private String type;
     private String format;
+    private String description;
+
     private String value;
     private boolean readOnly;
     private boolean enableDocSelection;
