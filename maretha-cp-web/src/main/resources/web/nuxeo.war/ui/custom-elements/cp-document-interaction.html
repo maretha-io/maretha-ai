@@ -115,6 +115,9 @@
               <template is="dom-repeat" items="[[selectedInteraction.parameters]]">
                 <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" hidden="[[item.readOnly]]"
                              readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
+                <template is="dom-if" if="[[item.description]]">
+                  Description: [[item.description]]
+                </template>
                 <template is="dom-if" if="[[item.isMainDocument]]">
                   Main Document: [[document.properties.file:content.name]]
                 </template>

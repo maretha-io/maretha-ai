@@ -16,14 +16,14 @@
         </style>
 
         <div class="related-documents">
-            <h3>Saved interactions</h3>
+            <h3>Saved AI Metadata</h3>
             <template is="dom-repeat" items="[[savedInteractions]]">
                 <nuxeo-card role="widget" class="nuxeo-card" heading="[[item.name]]">
                     <cp-format-json-response string-json="[[item.response]]"></cp-format-json-response>
                     <nuxeo-date role="widget" datetime="[[item.createdAt]]" format="YYYY-MM-DD HH:mm:ss"
                                 name="createdAt"></nuxeo-date>
                     <template is="dom-if" if="[[item.doc]]">
-                        <p>Saved Interaction:
+                        <p>Saved AI document:
                             <a class="ellipsis" href$="[[urlFor(item.doc)]]" on-click="_navigate" target="_blank">[[item.doc.title]]</a>
                         </p>
                     </template>
