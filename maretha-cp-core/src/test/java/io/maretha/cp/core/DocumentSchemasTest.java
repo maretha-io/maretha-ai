@@ -31,6 +31,7 @@ import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_IS_
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_IS_MAIN_DOCUMENT;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_NAME;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_READ_ONLY;
+import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_SELECTED_DOC_ID;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_SELECTED_DOC_IDS;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_SELECTION_READ_ONLY;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_TYPE;
@@ -168,6 +169,7 @@ public class DocumentSchemasTest {
         param1.put(PARAMETER_SCHEMA_SELECTION_READ_ONLY, true);
         param1.put(PARAMETER_SCHEMA_SELECTED_DOC_IDS, List.of("test"));
         param1.put(PARAMETER_SCHEMA_IS_CONTEXT_MEMORY, true);
+        param1.put(PARAMETER_SCHEMA_SELECTED_DOC_ID, null);
         parameters.add(param1);
 
         // Create the second parameter map
@@ -182,6 +184,7 @@ public class DocumentSchemasTest {
         param2.put(PARAMETER_SCHEMA_SELECTION_READ_ONLY, false);
         param2.put(PARAMETER_SCHEMA_SELECTED_DOC_IDS, List.of());
         param2.put(PARAMETER_SCHEMA_IS_CONTEXT_MEMORY, false);
+        param2.put(PARAMETER_SCHEMA_SELECTED_DOC_ID, null);
         parameters.add(param2);
 
         // First interaction
