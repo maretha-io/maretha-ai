@@ -49,8 +49,7 @@
       }
 
       #auditButton {
-        bottom: 50px;
-        position: fixed;
+        margin: auto;
         padding: 10px;
       }
 
@@ -91,7 +90,7 @@
       }
     </style>
 
-    <paper-icon-button icon="communication:chat" label="Interact with document" on-tap="_toggleDialog">
+    <paper-icon-button icon="icons:menu" label="Interact with document" on-tap="_toggleDialog">
       <nuxeo-tooltip>AI Interact with document</nuxeo-tooltip>
     </paper-icon-button>
 
@@ -104,7 +103,7 @@
               <paper-dropdown-menu label="Select AI Interaction" style="width: 100%;">
                 <paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
                   <template is="dom-repeat" items="[[interactions]]">
-                    <paper-item>[[item.name]]</paper-item>
+                    <paper-item>[[item.name]] - [[item.description]]</paper-item>
                   </template>
                 </paper-listbox>
               </paper-dropdown-menu>
@@ -116,10 +115,10 @@
                 <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" hidden="[[item.readOnly]]"
                              readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
                 <template is="dom-if" if="[[item.description]]">
-                  Description: [[item.description]]
+                  <p>Description: [[item.description]]</p>
                 </template>
                 <template is="dom-if" if="[[item.isMainDocument]]">
-                  Main Document: [[document.properties.file:content.name]]
+                  <p>Main Document: [[document.properties.file:content.name]]</p>
                 </template>
                 <template is="dom-if" if="[[item.isContextMemoryParameter]]">
                   <nuxeo-input role="widget" value="{{_computeValue(item, interactionResponse)}}" label="[[item.name]]"
@@ -141,13 +140,12 @@
                 </template>
               </template>
             </div>
-            Documents ready: [[documentsReady]] / [[totalDocuments]]
+            <p>Documents ready: [[documentsReady]] / [[totalDocuments]]</p>
 
-            <div class="buttons" style="margin:10px;">
+            <div class="buttons" style="margin:10px; text-align:center;">
               <paper-button id="chat" style="margin: 20px;" on-tap="_interactWithDocument"
                             aria-label="Interact with document" raised>
                 Run Interaction
-                <iron-icon icon="communication:chat"></iron-icon>
               </paper-button>
               <template is="dom-if" if="[[interactionResponse]]">
                 <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]"
@@ -171,10 +169,9 @@
               </template>
             </div>
           </div>
-        </div>
-
-        <div id="auditButton">
-          <paper-toggle-button checked="{{debugging}}" on-change="_showPreviousInteractions">Audit</paper-toggle-button>
+          <div id="auditButton">
+            <paper-toggle-button checked="{{debugging}}" on-change="_showPreviousInteractions">Audit</paper-toggle-button>
+          </div>
         </div>
 
       </div>
