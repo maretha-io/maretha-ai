@@ -24,9 +24,12 @@ import org.nuxeo.runtime.test.runner.RuntimeFeature;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(FeaturesRunner.class)
 @Features({AutomationFeature.class, RuntimeFeature.class, MockitoFeature.class})
@@ -50,12 +53,14 @@ public class SaveInteractionSettingsOperationTest {
         ObjectNode interaction_1_json = mapper.convertValue(interaction_1, ObjectNode.class);
         ObjectNode interaction_2_json = mapper.convertValue(interaction_2, ObjectNode.class);
         ctx.put("interactions", List.of(interaction_1_json, interaction_2_json));
+        ctx.put("awsS3AccessEnabled", true);
         DocumentModel savedDocument = (DocumentModel) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
         assertNotNull(savedDocument);
-        Settings interactionSettings = savedDocument.getAdapter(Settings.class);
+        Settings settings = savedDocument.getAdapter(Settings.class);
         int expectedSize = 2;
-        assertEquals(expectedSize, interactionSettings.getInteractions().size());
-        assertEquals(interaction_1.getId(), interactionSettings.getInteractions().get(0).getId());
+        assertEquals(expectedSize, settings.getInteractions().size());
+        assertEquals(interaction_1.getId(), settings.getInteractions().get(0).getId());
+        assertTrue(settings.isAwsS3AccessEnabled());
     }
 
 

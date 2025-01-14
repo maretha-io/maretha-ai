@@ -19,5 +19,7 @@ public interface APIService {
 
     String uploadFileToStore(Blob file);
 
+    String uploadS3FileToStore(Blob file, String s3Path);
+
     JSONObject getStoredDocumentText(String storeId);
 }
