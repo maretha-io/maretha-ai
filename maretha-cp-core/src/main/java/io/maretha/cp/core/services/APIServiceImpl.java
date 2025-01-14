@@ -167,6 +167,25 @@ public class APIServiceImpl implements APIService {
         return uploadedResponseObject.getString("id");
     }
 
+    @Override
+    public String uploadS3FileToStore(Blob file, String s3Path) {
+        String bearerToken = getBearerToken();
+
+        String bodyJsonObject = "{\n" +
+                "  \"name\": \"" + file.getFilename() + "\",\n" +
+                "  \"content\": {\n" +
+                "    \"source\": \"" + s3Path + "\",\n" +
+                "    \"name\": \"" + file.getFilename() + "\",\n" +
+                "    \"type\": \"" + file.getMimeType() + "\"\n" +
+                "  }\n" +
+                "}";
+
+        log.debug(String.format("uploadS3FileToStore: fileName:[%s], digest:[%s], body:%s", file.getFilename(), file.getDigest(), bodyJsonObject));
+        String uploadedResponse = postRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects", bodyJsonObject);
+        JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
+        return uploadedResponseObject.getString("id");
+    }
+
     private String putFileRequest(String url, Blob file) throws IOException {
         RequestBody requestBody = new FileUploadAsStream().createStreamRequestBody(MediaType.parse("application/octet-stream"), file.getStream());
 

@@ -5,6 +5,8 @@
 
     <!-- Root element definition for interactions -->
     <xs:element name="interactions" type="nxs:interactionList"/>
+    <!--S3 Path access enabled-->
+    <xs:element name="awsS3AccessEnabled" type="xs:boolean"/>
 
     <!-- Definition for the interactions complex type -->
     <xs:complexType name="interactionType">

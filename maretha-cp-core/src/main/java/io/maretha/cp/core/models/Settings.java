@@ -13,4 +13,5 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Settings {
     private List<Interaction> interactions;
+    private boolean awsS3AccessEnabled;
 }

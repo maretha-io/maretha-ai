@@ -12,6 +12,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.runtime.api.Framework;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -26,10 +27,13 @@ public class SaveInteractionSettingsOperation {
     protected CoreSession session;
     @Param(name = "interactions")
     protected List<ObjectNode> interactions;
+    @Param(name = "awsS3AccessEnabled")
+    protected boolean awsS3AccessEnabled;
 
     @OperationMethod
     public DocumentModel run() {
-        return cpLocalSettingsService.saveInteractionSettings(session, interactions);
+        Map<String, Object> configuration = Map.of("awsS3AccessEnabled", awsS3AccessEnabled);
+        return cpLocalSettingsService.saveInteractionSettings(session, interactions, configuration);
     }
 
 }
