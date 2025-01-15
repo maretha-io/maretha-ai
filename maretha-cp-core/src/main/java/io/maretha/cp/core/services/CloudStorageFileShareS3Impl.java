@@ -44,8 +44,6 @@ public class CloudStorageFileShareS3Impl implements CloudStorageFileShare {
         if (!(s3BlobProvider instanceof S3BlobProvider)) {
             log.error("Server not configured with s3; skipping upload");
         }
-        String bucketKey = blob.getDigest();
-        String[] parts = bucketKey.split(String.valueOf(VER_SEP));
         S3BlobStoreConfiguration config = ((S3BlobProvider) s3BlobProvider).config;
         String bucketName = config.bucketName;
         String regionName = config.amazonS3.getRegionName();
