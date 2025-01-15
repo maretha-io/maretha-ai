@@ -2,11 +2,13 @@ package io.maretha.cp.core.services;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.Interaction;
+import io.maretha.cp.core.models.Settings;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 import java.util.List;
+import java.util.Map;
 
 public interface RepositoryService {
 
@@ -27,6 +29,7 @@ public interface RepositoryService {
     String SETTINGS_DOCUMENT_TYPE = "InteractionSettings";
     String SETTINGS_SCHEMA_NAME = "interactionSettings";
     String SETTINGS_SCHEMA_PATH = "interactionsettings:interactions";
+    String SETTINGS_SCHEMA_AWS_S3_ACCESS = "interactionsettings:awsS3AccessEnabled";
 
     String SCHEMA_ID = "id";
     String SCHEMA_DESCRIPTION = "description";
@@ -43,6 +46,7 @@ public interface RepositoryService {
     String PARAMETER_SCHEMA_NAME = "name";
     String PARAMETER_SCHEMA_TYPE = "type";
     String PARAMETER_SCHEMA_FORMAT = "format";
+    String PARAMETER_SCHEMA_DESCRIPTION = "description";
     String PARAMETER_SCHEMA_VALUE = "value";
     String PARAMETER_SCHEMA_READ_ONLY = "readOnly";
     String PARAMETER_SCHEMA_SELECTION_READ_ONLY = "selectionReadOnly";
@@ -54,11 +58,11 @@ public interface RepositoryService {
 
     String SETTINGS_DOCUMENT_NAME = "InteractionSettings";
 
-    List<Interaction> getLocalInteractionSettings(CoreSession session);
+    Settings getLocalInteractionSettings(CoreSession session);
 
     List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean folder);
 
-    DocumentModel saveInteractionSettings(CoreSession session, List<ObjectNode> interactions);
+    DocumentModel saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration);
 
     DocumentModel saveInteractionResponseAsMetadata(DocumentModel doc, CoreSession session, List<ObjectNode> interactions);
 

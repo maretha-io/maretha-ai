@@ -48,6 +48,7 @@
             <xs:element name="name" type="xs:string"/>
             <xs:element name="type" type="xs:string"/>
             <xs:element name="format" type="xs:string"/>
+            <xs:element name="description" type="xs:string"/>
             <xs:element name="value" type="xs:string"/>
             <xs:element name="readOnly" type="xs:boolean"/>
             <xs:element name="enableDocSelection" type="xs:boolean"/>

@@ -31,9 +31,11 @@ import org.nuxeo.runtime.test.runner.TransactionalFeature;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 @RunWith(FeaturesRunner.class)
@@ -65,21 +67,23 @@ public class GetInteractionSettingsOperationTest {
         Interaction interaction = Interaction.builder().id("test").build();
         when(apiService.getInteractions()).thenReturn(List.of(interaction));
         OperationContext ctx = new OperationContext(session);
-        Collection<Interaction> interactions = (Collection<Interaction>) automationService.run(ctx, GetInteractionSettingsOperation.ID);
-        assertNotNull(interactions);
-        assertEquals(interaction.getId(), interactions.stream().findFirst().get().getId());
+        Settings settings = (Settings) automationService.run(ctx, GetInteractionSettingsOperation.ID);
+        assertNotNull(settings);
+        assertEquals(interaction.getId(), settings.getInteractions().stream().findFirst().get().getId());
     }
 
     @Test
     public void shouldReturnInteractionSettingsFromDocument() throws OperationException {
         Interaction interaction = Interaction.builder().id("test").build();
         ObjectNode objectNode = mapper.convertValue(interaction, ObjectNode.class);
-        repositoryService.saveInteractionSettings(session, List.of(objectNode));
+        Map<String, Object> configuration = Map.of("awsS3AccessEnabled", true);
+        repositoryService.saveInteractionSettings(session, List.of(objectNode), configuration);
         txFeature.nextTransaction();
         OperationContext ctx = new OperationContext(session);
-        Collection<Interaction> interactions = (Collection<Interaction>) automationService.run(ctx, GetInteractionSettingsOperation.ID);
-        assertNotNull(interactions);
-        assertEquals(interaction.getId(), interactions.stream().findFirst().get().getId());
+        Settings interactionsSettings = (Settings) automationService.run(ctx, GetInteractionSettingsOperation.ID);
+        assertNotNull(interactionsSettings);
+        assertEquals(interaction.getId(), interactionsSettings.getInteractions().stream().findFirst().get().getId());
+        assertTrue(interactionsSettings.isAwsS3AccessEnabled());
     }
 
     @Test
@@ -90,6 +94,7 @@ public class GetInteractionSettingsOperationTest {
         ObjectNode interaction_1_json = mapper.convertValue(interaction, ObjectNode.class);
         ObjectNode interaction_2_json = mapper.convertValue(interaction_2, ObjectNode.class);
         ctx.put("interactions", List.of(interaction_1_json, interaction_2_json));
+        ctx.put("awsS3AccessEnabled", false);
         DocumentModel savedDocument = (DocumentModel) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
         assertNotNull(savedDocument);
         Settings interactionSettings = savedDocument.getAdapter(Settings.class);

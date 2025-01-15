@@ -64,6 +64,8 @@
       <paper-button raised class="save-related" on-click="_saveAsRelatedDocument">Save as Document</paper-button>
     </div>
 
+    <p id="toast"></p>
+
   </template>
 
   <script>
@@ -98,10 +100,12 @@
 
       _interactionObserver(obs) {
         this._debug(`_interactionObserver:`, obs);
+        this.$.toast.innerText = '';
       },
 
       _documentObserver(obs) {
         this._debug(`_documentObserver:`, obs);
+        this.$.toast.innerText = '';
       },
 
       _saveAsMetadata() {
@@ -118,6 +122,7 @@
         if (!this.interactionResponse) {
           this.fire('notify', { message: 'Cannot save without a response.' });
           console.error('Cannot save without a response.');
+          this._toast("Cannot save without a response.");
           return;
         }
         this.$.saveResponse.params.interactions = [{
@@ -132,12 +137,17 @@
           "parameters": this.interaction.parameters
         }];
         this.$.saveResponse.execute().then((response) => {
-          this.fire('notify', { message: 'Interaction Saved' });
-          this.fire('document-updated');
+          this.fire('notify', { message: 'Response Saved!' });
+          this._toast("Response Saved!");
         }).catch((error) => {
           console.error(error);
-          this.notify('notify', { message: 'error' });
+          this.fire('notify', { message: 'error' });
+          this._toast("Failed to save response.");
         })
+      },
+
+      _toast: function (text) {
+          this.$.toast.innerText = text;
       },
 
       _getUser: function () {

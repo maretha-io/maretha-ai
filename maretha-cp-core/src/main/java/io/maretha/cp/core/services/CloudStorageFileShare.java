@@ -6,4 +6,6 @@ import java.net.URI;
 
 public interface CloudStorageFileShare {
     URI getPublicRemoteUri(ManagedBlob blob);
+
+    String getS3FilePath(ManagedBlob blob);
 }
