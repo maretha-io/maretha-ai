@@ -32,19 +32,18 @@ public class RepositoryServiceImpl implements RepositoryService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public List<Interaction> getLocalInteractionSettings(CoreSession session) {
+    public Settings getLocalInteractionSettings(CoreSession session) {
         Optional<DocumentModel> existingSettingsDocument = getExistingSettingsDocument(session);
         if (existingSettingsDocument.isPresent()) {
             DocumentModel documentModel = existingSettingsDocument.get();
-            Settings settings = documentModel.getAdapter(Settings.class);
-            return settings.getInteractions();
+            return documentModel.getAdapter(Settings.class);
         }
-        return Collections.emptyList();
+        return new Settings();
     }
 
     @Override
     public List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
-        return getLocalInteractionSettings(session)
+        return getLocalInteractionSettings(session).getInteractions()
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
@@ -57,7 +56,7 @@ public class RepositoryServiceImpl implements RepositoryService {
     }
 
     @Override
-    public DocumentModel saveInteractionSettings(CoreSession session, List<ObjectNode> interactions) {
+    public DocumentModel saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration) {
         DocumentModel cpSettingsDoc;
         Optional<DocumentModel> existingSettingsDocument = getExistingSettingsDocument(session);
         if (existingSettingsDocument.isPresent()) {
@@ -76,7 +75,10 @@ public class RepositoryServiceImpl implements RepositoryService {
             throw new NuxeoException("Empty list of settings");
         }
 
+        Boolean awsS3AccessEnabled = (Boolean) configuration.get("awsS3AccessEnabled");
+
         cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_PATH, (Serializable) interactionsMap);
+        cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_AWS_S3_ACCESS, awsS3AccessEnabled);
         return session.saveDocument(cpSettingsDoc);
     }
 
@@ -189,6 +191,7 @@ public class RepositoryServiceImpl implements RepositoryService {
             paramMap.put(PARAMETER_SCHEMA_NAME, param.getName());
             paramMap.put(PARAMETER_SCHEMA_TYPE, param.getType());
             paramMap.put(PARAMETER_SCHEMA_FORMAT, param.getFormat());
+            paramMap.put(PARAMETER_SCHEMA_DESCRIPTION, param.getDescription());
             paramMap.put(PARAMETER_SCHEMA_VALUE, param.getValue());
             paramMap.put(PARAMETER_SCHEMA_READ_ONLY, param.isReadOnly());
             paramMap.put(PARAMETER_SCHEMA_SELECTION_READ_ONLY, param.isSelectionReadOnly());

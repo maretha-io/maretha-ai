@@ -5,6 +5,8 @@
 
     <!-- Root element definition for interactions -->
     <xs:element name="interactions" type="nxs:interactionList"/>
+    <!--S3 Path access enabled-->
+    <xs:element name="awsS3AccessEnabled" type="xs:boolean"/>
 
     <!-- Definition for the interactions complex type -->
     <xs:complexType name="interactionType">
@@ -49,6 +51,7 @@
             <xs:element name="name" type="xs:string"/>
             <xs:element name="type" type="xs:string"/>
             <xs:element name="format" type="xs:string"/>
+            <xs:element name="description" type="xs:string"/>
             <xs:element name="value" type="xs:string"/>
             <xs:element name="readOnly" type="xs:boolean"/>
             <xs:element name="enableDocSelection" type="xs:boolean"/>

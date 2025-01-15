@@ -2,6 +2,7 @@ package io.maretha.cp.core.services;
 
 import io.maretha.cp.core.bulk.actions.UploadDocumentAction;
 import io.maretha.cp.core.models.InteractionParameter;
+import io.maretha.cp.core.models.Settings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -85,7 +86,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         if (StringUtils.isEmpty(storeId)) {
             doc.addFacet(RESULTS_FACET);
-            storeId = apiService.uploadFileToStore(blob);
+            Settings settings = Framework.getService(RepositoryService.class).getLocalInteractionSettings(session);
+            if (settings.isAwsS3AccessEnabled()) {
+                String s3Path = getS3Path(doc);
+                storeId = apiService.uploadS3FileToStore(blob, s3Path);
+            } else {
+                storeId = apiService.uploadFileToStore(blob);
+            }
             doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
             doc.setPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH, blob.getDigest());
             doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
@@ -169,5 +176,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         ManagedBlob blob = (ManagedBlob) blobProperty.getValue();
         CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
         return cloudStorageFileShare.getPublicRemoteUri(blob).toString();
+    }
+
+    //source: "s3://composable-bs-test/my-photo.jpg#eu-north-1",
+    private String getS3Path(DocumentModel doc) {
+        Property blobProperty = doc.getProperty(FILE_CONTENT);
+        ManagedBlob blob = (ManagedBlob) blobProperty.getValue();
+        CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
+        return cloudStorageFileShare.getS3FilePath(blob);
     }
 }

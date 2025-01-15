@@ -26,6 +26,7 @@ import org.nuxeo.runtime.test.runner.TransactionalFeature;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -92,7 +93,8 @@ public class GetInteractionsForDocumentOperationTest {
         List<ObjectNode> interactionsAsObjectNodes = interactions.stream()
                 .map(interaction -> mapper.convertValue(interaction, ObjectNode.class))
                 .collect(Collectors.toList());
-        repositoryService.saveInteractionSettings(session, interactionsAsObjectNodes);
+        Map<String, Object> configuration = Map.of("awsS3AccessEnabled", true);
+        repositoryService.saveInteractionSettings(session, interactionsAsObjectNodes, configuration);
         txFeature.nextTransaction();
         return interactionsAsObjectNodes;
     }

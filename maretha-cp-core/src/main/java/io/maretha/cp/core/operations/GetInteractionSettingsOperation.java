@@ -1,6 +1,7 @@
 package io.maretha.cp.core.operations;
 
 import io.maretha.cp.core.models.Interaction;
+import io.maretha.cp.core.models.Settings;
 import io.maretha.cp.core.services.APIService;
 import io.maretha.cp.core.services.RepositoryService;
 import org.apache.commons.collections.CollectionUtils;
@@ -12,10 +13,12 @@ import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.runtime.api.Framework;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -33,10 +36,11 @@ public class GetInteractionSettingsOperation {
     protected CoreSession session;
 
     @OperationMethod
-    public Collection<Interaction> run() {
+    public Settings run() {
         Map<String, Interaction> interactionsById = new HashMap<>();
         //Get local interactions
-        List<Interaction> interactionSettings = cpLocalSettingsService.getLocalInteractionSettings(session);
+        Settings settings = cpLocalSettingsService.getLocalInteractionSettings(session);
+        List<Interaction> interactionSettings = settings.getInteractions();
         if (!CollectionUtils.isEmpty(interactionSettings)) {
             interactionSettings.forEach(interaction -> interactionsById.put(interaction.getId(), interaction));
         }
@@ -49,7 +53,9 @@ public class GetInteractionSettingsOperation {
                 }
             });
         }
-        return interactionsById.values();
+        List<Interaction> interactions = new ArrayList<>(interactionsById.values());
+        settings.setInteractions(interactions);
+        return settings;
     }
 
 
