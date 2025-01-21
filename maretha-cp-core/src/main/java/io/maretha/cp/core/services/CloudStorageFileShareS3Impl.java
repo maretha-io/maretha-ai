@@ -50,7 +50,7 @@ public class CloudStorageFileShareS3Impl implements CloudStorageFileShare {
         String bucketPrefix = config.bucketPrefix;
         String filename = blob.getDigest();
         //s3://aspera-dev-bucket/binaries/9f5c558a5c3860573bdafa3ddf312af4
-        return "s3://" + bucketName + "/" + bucketPrefix + "/" + filename + "#" + regionName;
+        return "s3://" + bucketName + "/" + bucketPrefix + filename + "#" + regionName;
     }
 
     private URI getURIS3(S3BlobProvider s3BlobProvider, String bucketKey, Blob blob) throws URISyntaxException {
