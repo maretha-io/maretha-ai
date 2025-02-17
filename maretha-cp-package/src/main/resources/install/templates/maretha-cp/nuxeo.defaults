@@ -1,11 +1,14 @@
-nuxeo.template.includes=common
+maretha-cp.target=.
+nuxeo.template.includes=common,mongodb,maretha-cp,maretha-cp-embeddings
 
 cp.api.url=https://api.becomposable.com
 cp.auth.token=
 cp.upload.url=https://zeno-server-production.api.becomposable.com
 cp.supported.mime-types=text/plain,application/pdf,image/jpeg,image/png,image/webp
+cp.project.id=65d4e34be4cca5a7e2d55585
+cp.environment.id=65f57d909500a8d6eb003522
+cp.embedding.model=text-embedding-3-small
 
-nuxeo.template.includes=common,mongodb
 nuxeo.dbs.cache.enabled=false
 nuxeo.dbs.cache.maxSize=1000
 

@@ -1,0 +1,59 @@
+<!--
+`nuxeo-embedding-search-search-form`
+@group Nuxeo UI
+@element nuxeo-embedding-search-search-form
+-->
+<dom-module id="nuxeo-embedding-search-search-form">
+  <template>
+    <style include="nuxeo-styles">
+    </style>
+
+    <nuxeo-input
+                 role="widget"
+                 id="searchInput"
+                 type="search"
+                 label="What are you looking for?"
+                 value="{{params.vectorQuery}}"
+                 autofocus>
+    </nuxeo-input>
+    
+  </template>
+
+  <script>
+    Polymer({
+      is: 'nuxeo-embedding-search-search-form',
+      behaviors: [Nuxeo.LayoutBehavior],
+      properties: {
+
+        params: {
+          type: Object,
+          notify: true,
+        },
+        
+        searchTerm: {
+          type: String,
+          notify: true,
+        },
+
+        aggregations: {
+          type: Object,
+          value: {},
+          notify: true,
+        }
+
+      },
+
+      ready: function() {
+        this.set('params.vectorField', "interactionresults:embeddingsText");
+      },
+      
+      validate() {
+        this.set('params.vectorField', "interactionresults:embeddingsText");
+        this.set('params.k',"10");
+        this.set('params.min_score',"0.4");
+        return true
+      }
+      
+    });
+  </script>
+</dom-module>
