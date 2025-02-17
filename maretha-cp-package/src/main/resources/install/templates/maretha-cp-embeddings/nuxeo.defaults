@@ -1,0 +1,2 @@
+maretha-cp-embeddings.target=.
+nuxeo.template.includes=common,maretha-cp-embeddings

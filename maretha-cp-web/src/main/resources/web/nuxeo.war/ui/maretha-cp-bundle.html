@@ -3,11 +3,13 @@
 <link rel="import" href="custom-elements/cp-document-interaction.html">
 <link rel="import" href="custom-elements/cp-save-response.html">
 <link rel="import" href="custom-elements/cp-format-json-response.html">
+<link rel="import" href="custom-elements/cp-format-chat-json-response.html">
 <link rel="import" href="custom-elements/cp-show-interaction-results.html">
+<link rel="import" href="custom-elements/tab/nuxeo-similar-images-tab.html">
 
 <nuxeo-slot-content name="maretha-cp-interactions" slot="PAGES" order="100">
     <template>
-        <nuxeo-filter user="[[user]]" expression="user && user?.isAdministrator">
+        <nuxeo-filter user="[[user]]" expression="user && user.isAdministrator">
             <template>
                 <cp-settings name="maretha-cp-interactions" user="[[user]]"></cp-settings>
             </template>
@@ -17,7 +19,7 @@
 
 <nuxeo-slot-content name="maretha-cp" slot="ADMINISTRATION_MENU">
     <template>
-        <nuxeo-filter user="[[user]]" expression="user && user?.isAdministrator">
+        <nuxeo-filter user="[[user]]" expression="user && user.isAdministrator">
             <template>
                 <nuxeo-menu-item name="maretha-cp" label="AI Interactions Settings"
                                  route="page:maretha-cp-interactions"></nuxeo-menu-item>
@@ -37,6 +39,42 @@
         <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
             <template>
                 <cp-show-interaction-results document="[[document]]"></cp-show-interaction-results>
+            </template>
+        </nuxeo-filter>
+    </template>
+</nuxeo-slot-content>
+
+
+<!-- Contribution of element 'nuxeo-menu-icon' for slot 'DRAWER_ITEMS' -->
+<nuxeo-slot-content name="Find" slot="DRAWER_ITEMS" order="1">
+    <template>
+        <nuxeo-menu-icon name="find" label="Find" icon="icons:info-outline"></nuxeo-menu-icon>
+    </template>
+</nuxeo-slot-content>
+<!-- Contribution of element 'nuxeo-search-form' for slot 'DRAWER_PAGES' -->
+<nuxeo-slot-content name="Find" slot="DRAWER_PAGES">
+    <template>
+        <nuxeo-search-form provider="searchByEmbeddings" schemas="dublincore" search-name="embedding-search" name="find"></nuxeo-search-form>
+    </template>
+</nuxeo-slot-content>
+
+
+<!-- Contribution of element 'nuxeo-page-item' for slot 'DOCUMENT_VIEWS_ITEMS' -->
+<nuxeo-slot-content name="similarImageTab" slot="DOCUMENT_VIEWS_ITEMS" order="10">
+    <template>
+        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet" expression="document.properties['interactionresults:embeddingsImage'] != null">
+            <template>
+                <nuxeo-page-item name="SimilarImageTab" label="More Like This"></nuxeo-page-item>
+            </template>
+        </nuxeo-filter>
+    </template>
+</nuxeo-slot-content>
+<!-- Contribution of element 'nuxeo-similar-images-tab' for slot 'DOCUMENT_VIEWS_PAGES' -->
+<nuxeo-slot-content name="SimilarImageTab" slot="DOCUMENT_VIEWS_PAGES">
+    <template>
+        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet" expression="document.properties['interactionresults:embeddingsImage'] != null">
+            <template>
+                <nuxeo-similar-images-tab document="[[document]]" name="SimilarImageTab"></nuxeo-similar-images-tab>
             </template>
         </nuxeo-filter>
     </template>

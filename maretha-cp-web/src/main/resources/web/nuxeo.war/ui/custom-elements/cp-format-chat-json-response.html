@@ -1,0 +1,115 @@
+<dom-module id="cp-format-chat-json-response">
+  <template>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f5f5f5;
+      }
+
+      :host {
+        display: block;
+        width: 95%;
+        margin: auto;
+        background: white;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .chat-container {
+        max-height: 500px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .message {
+        padding: 10px;
+        border-radius: 8px;
+        max-width: 75%;
+        word-wrap: break-word;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .assistant {
+        background: #DCF8C6;
+        align-self: flex-end;
+        text-align: right;
+      }
+
+      .user {
+        background: #E5E5EA;
+        align-self: flex-start;
+        text-align: left;
+      }
+
+      .timestamp {
+        font-size: 10px;
+        color: gray;
+        margin-top: 5px;
+        display: block;
+      }
+    </style>
+
+    <div class="chat-container">
+      <template is="dom-repeat" items="[[messages]]">
+        <div class$="message [[_computeClass(item.role)]]">
+          [[item.content]]
+          <span class="timestamp">[[_formatDate(item.date)]]</span>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[status]]">
+        <div>[[status]]</div>
+      </template>
+
+      <template is="dom-if" if="[[stream]]">
+        <div class="message assistant">
+          [[stream]]
+        </div>
+      </template>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cp-format-chat-json-response',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+        messages: {
+          type: Array,
+        },
+
+        status: {
+          type: String
+        },
+
+        stream: {
+          type: String
+        },
+
+      },
+
+      ready: function () {
+      },
+
+      _computeClass(role) {
+        return role === "user" ? "user" : "assistant";
+      },
+
+      _formatDate(dateString) {
+        let date = new Date(dateString);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      },
+
+    });
+  </script>
+</dom-module>

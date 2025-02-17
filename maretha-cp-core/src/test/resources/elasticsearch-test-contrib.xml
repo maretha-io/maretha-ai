@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.elasticsearch.test.contrib">
+
+    <extension point="elasticSearchEmbeddedServer" target="org.nuxeo.elasticsearch.ElasticSearchComponent">
+        <!--    <elasticSearchEmbeddedServer clusterName="nuxeoTestCluster" httpEnabled="true" httpPort="9333" nodeName="nuxeoTestNode">-->
+        <!--    </elasticSearchEmbeddedServer>-->
+    </extension>
+
+    <extension point="elasticSearchClient" target="org.nuxeo.elasticsearch.ElasticSearchComponent">
+
+        <elasticSearchClient class="org.nuxeo.elasticsearch.client.ESRestClientFactory">
+            <option name="addressList">localhost:9200</option>
+        </elasticSearchClient>
+
+    </extension>
+
+    <extension point="elasticSearchIndex" target="org.nuxeo.elasticsearch.ElasticSearchComponent">
+        <elasticSearchIndex name="nxutest" type="doc" repository="test">
+            <settings>
+                {
+                "index.knn": true
+                }
+            </settings>
+
+            <mapping>
+                {
+                    "properties": {
+                        "interactionresults:embeddingsText": {
+                            "type": "knn_vector",
+                            "dimension": 1536,
+                            "method": {
+                                "name": "hnsw",
+                                "space_type": "l2",
+                                "engine": "nmslib",
+                                "parameters": {
+                                    "ef_construction": 128,
+                                    "m": 24
+                                }
+                            }
+                        },
+                        "interactionresults:embeddingsImage": {
+                            "type": "knn_vector",
+                            "dimension": 1536,
+                            "method": {
+                                "name": "hnsw",
+                                "space_type": "l2",
+                                "engine": "nmslib",
+                                "parameters": {
+                                    "ef_construction": 128,
+                                    "m": 24
+                                }
+                            }
+                        }
+                    }
+                }
+            </mapping>
+        </elasticSearchIndex>
+    </extension>
+
+</component>

@@ -78,7 +78,18 @@
         flex: 70%;
       }
 
-      #response {
+      .response {
+        min-height: 400px;
+        max-height: 600px;
+        width: 100%;
+        overflow-y: scroll;
+        border: 3px solid #ececec;
+        border-radius: 15px;
+        text-align: left;
+        padding: 15px;
+      }
+
+      .chat-response {
         min-height: 400px;
         max-height: 600px;
         width: 100%;
@@ -121,15 +132,15 @@
                   <p>Main Document: [[document.properties.file:content.name]]</p>
                 </template>
                 <template is="dom-if" if="[[item.isContextMemoryParameter]]">
-                  <nuxeo-input role="widget" value="{{_computeValue(item, interactionResponse)}}" label="[[item.name]]"
-                               hidden type="[[item.type]]"></nuxeo-input>
+                  <nuxeo-input role="widget" value="{{_computeChatValue(item, interactionResponse)}}"
+                               label="[[item.name]]" hidden type="[[item.type]]"></nuxeo-input>
                 </template>
                 <template is="dom-if" if="[[item.enableDocSelection]]">
                   <div>
                     <template is="dom-if" if="[[_isDocArrayType(item)]]">
-                    <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
-                                               readonly="[[item.selectionReadOnly]]" multiple min-chars="0" name="selectedDocs"
-                                               role="widget"></nuxeo-document-suggestion>
+                      <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
+                                                 readonly="[[item.selectionReadOnly]]" multiple min-chars="0" name="selectedDocs"
+                                                 role="widget"></nuxeo-document-suggestion>
                     </template>
                     <template is="dom-if" if="[[!_isDocArrayType(item)]]">
                       <nuxeo-document-suggestion value="{{item.selectedDocumentId}}" label="Selected Document"
@@ -155,25 +166,36 @@
           </div>
 
           <div class="flex-item-right">
-            <div id="response">
-              [[interactionStatus]]
-              <template is="dom-if" if="[[interactionResponseStream]]">
-                [[interactionResponseStream]]
-              </template>
-              <template is="dom-if" if="[[interactionResponse]]">
-                <cp-format-json-response json="[[interactionResponse]]"></cp-format-json-response>
-              </template>
+            <template is="dom-if" if="[[!isChat]]">
+              <div id="response" class="response">
+                [[interactionStatus]]
+                <template is="dom-if" if="[[interactionResponseStream]]">
+                  [[interactionResponseStream]]
+                </template>
+                <template is="dom-if" if="[[interactionResponse]]">
+                  <cp-format-json-response json="[[interactionResponse]]"></cp-format-json-response>
+                </template>
 
-              <template is="dom-if" if="[[showPreviousInteractions]]">
-                <cp-show-interaction-results document="{{document}}"></cp-show-interaction-results>
-              </template>
-            </div>
+                <template is="dom-if" if="[[showPreviousInteractions]]">
+                  <cp-show-interaction-results document="{{document}}"></cp-show-interaction-results>
+                </template>
+              </div>
+              <div id="auditButton">
+                <paper-toggle-button checked="{{debugging}}"
+                                     on-change="_showPreviousInteractions">Audit</paper-toggle-button>
+              </div>
+            </template>
+
+            <template is="dom-if" if="[[isChat]]">
+              <div id="chatResponse" class="chat-response">
+                <cp-format-chat-json-response messages="[[chatContext]]" stream="[[interactionResponseStream]]"
+                                              status="[[interactionStatus]]"></cp-format-chat-json-response>
+              </div>
+            </template>
+
           </div>
-          <div id="auditButton">
-            <paper-toggle-button checked="{{debugging}}" on-change="_showPreviousInteractions">Audit</paper-toggle-button>
-          </div>
+
         </div>
-
       </div>
     </nuxeo-dialog>
 
@@ -252,6 +274,16 @@
           type: String,
         },
 
+        isChat: {
+          type: Boolean,
+          value: false
+        },
+
+        chatContext: {
+          type: Array,
+          value: []
+        }
+
       },
 
       _dialogOpenObserver: function (open) {
@@ -319,16 +351,21 @@
           this.interactionResponseStream = this.interactionResponseStream + event.data.slice(1, -1);
         };
 
-        this._eventSource.onerror = (e) => {
-          try {
-            const streamResponse = this.interactionResponseStream;
-            this.set('interactionResponse', streamResponse);
-            this.set('interactionResponseStream', '');
-          } catch (e) {
-            console.error(e);
+        this._eventSource.onerror = (event) => {
+          this.set('interactionResponseStream', "Failed to get response. Please try again...");
+        }
+
+        this._eventSource.addEventListener("close", (event) => {
+          const streamResponse = this.interactionResponseStream;
+          this.set('interactionResponse', streamResponse);
+          this.set('interactionResponseStream', '');
+          const closeObject = JSON.parse(event.data);
+          if (closeObject.error) {
+            this.set('interactionResponseStream', closeObject.error.message);
           }
           this._eventSource.close();
-        };
+        });
+
       },
 
       _interactionsObserver(obs) {
@@ -340,6 +377,7 @@
 
       _selectedInteractionObserver(obs) {
         this._debug('_selectedInteractionObserver', obs);
+        this.set('isChat', this.selectedInteraction?.parameters?.some(param => param.isContextMemoryParameter === true))
       },
 
       _interactionResponseObserver: function (obs) {
@@ -394,12 +432,24 @@
         });
       },
 
-      _computeValue(item, interactionResponse) {
-        if (!item.value) item.value = '';
-        if (interactionResponse) {
-          item.value += " Previous response: " + JSON.stringify(interactionResponse);
+      _computeChatValue(contextParam, interactionResponse) {
+        let chatContext;
+        try {
+          chatContext = JSON.parse(contextParam.value);
+          if (!Array.isArray(chatContext)) {
+            chatContext = [];
+          }
+        } catch (error) {
+          chatContext = [];
         }
-        return item.value;
+        if (interactionResponse) {
+          const userQuestion = this.selectedInteraction.parameters.find(param => param.name === "question").value;
+          chatContext.push({ "role": "user", "content": userQuestion, "date": new Date().toISOString() });
+          chatContext.push({ "role": "assistant", "content": interactionResponse, "date": new Date().toISOString() });
+        }
+        this.set('chatContext', chatContext);
+        contextParam.value = JSON.stringify(chatContext);
+        return contextParam.value;
       },
 
       _isDocArrayType: function (param) {

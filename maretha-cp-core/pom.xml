@@ -41,6 +41,16 @@
       <artifactId>nuxeo-automation-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.nuxeo.elasticsearch</groupId>
+      <artifactId>nuxeo-elasticsearch-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.elasticsearch</groupId>
+      <artifactId>nuxeo-elasticsearch-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.nuxeo.ecm.automation</groupId>
       <artifactId>nuxeo-automation-test</artifactId>
       <scope>test</scope>
@@ -51,5 +61,6 @@
       <artifactId>nuxeo-platform-test</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 </project>

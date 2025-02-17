@@ -10,6 +10,9 @@ cp.auth.token=sk-
 cp.api.url=https://api.becomposable.com
 cp.upload.url=https://zeno-server-production.api.becomposable.com
 cp.supported.mime-types=text/plain,application/pdf,image/jpeg,image/png,image/webp
+cp.project.id=
+cp.environment.id=
+cp.embedding.model=text-embedding-3-small
 
 # dev -> cp.api.url=https://studio-server-preview.api.becomposable.com
 ```

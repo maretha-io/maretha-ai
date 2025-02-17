@@ -36,6 +36,9 @@ public class APIServiceImpl implements APIService {
     private final String API_URL = Framework.getProperty("cp.api.url", "https://api.becomposable.com");
     private final String UPLOAD_API_URL = Framework.getProperty("cp.upload.url", "https://zeno-server-production.api.becomposable.com");
     private final String AUTH_TOKEN = Framework.getProperty("cp.auth.token");
+    private final String PROJECT_ID = Framework.getProperty("cp.project.id");
+    private final String ENVIRONMENT_ID = Framework.getProperty("cp.environment.id");
+    private final String EMBEDDING_MODEL = Framework.getProperty("cp.embedding.model", "text-embedding-3-small");
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
@@ -67,29 +70,6 @@ public class APIServiceImpl implements APIService {
         }
     }
 
-    @Override
-    public JsonNode getInteractionResult(String interaction, Map<String, Object> data) {
-        String url = API_URL + "/api/v1/runs";
-        boolean stream = false;
-        String dataParameters = "";
-        try {
-            dataParameters = objectMapper.writeValueAsString(data);
-        } catch (Exception e) {
-            throw new NuxeoException(e);
-        }
-
-        String jsonBody = "{\n" +
-                "    \"interaction\": \"" + interaction + "\",\n" +
-                "    \"data\": " + dataParameters + ",\n" +
-                "    \"stream\": " + stream + "\n" +
-                "}";
-        String response = postRequest(getBearerToken(), url, jsonBody);
-        try {
-            return objectMapper.readTree(response).get("result");
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
     @Override
     public String getInteractionResultAsStream(String interaction, Map<String, Object> data) {
@@ -184,6 +164,36 @@ public class APIServiceImpl implements APIService {
         String uploadedResponse = postRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects", bodyJsonObject);
         JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
         return uploadedResponseObject.getString("id");
+    }
+
+    @Override
+    public double[] textToEmbeddings( String queryText) {
+        String bearerToken = getBearerToken();
+        String requestBody = "{" +
+                "    \"model\": \"" + EMBEDDING_MODEL + "\"," +
+                "    \"text\": \"" + queryText + "\"" +
+                "}";
+        String response = postRequest(bearerToken, API_URL + "/api/v1/environments/" + ENVIRONMENT_ID + "/embeddings", requestBody);
+        try {
+            JsonNode rootNode = objectMapper.readTree(response);
+            JsonNode embeddings = rootNode.path("values");
+            return objectMapper.convertValue(embeddings, double[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public double[] getDocumentEmbeddings(String docId, String type) {
+        String bearerToken = getBearerToken();
+        String response = getRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects/" + docId + "?select=embeddings");
+        try {
+            JsonNode rootNode = objectMapper.readTree(response);
+            JsonNode embeddings = rootNode.path("embeddings").path(type).path("values");
+            return objectMapper.convertValue(embeddings, double[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String putFileRequest(String url, Blob file) throws IOException {

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.page.providers">
+
+    <extension target="org.nuxeo.ecm.platform.query.api.PageProviderService" point="providers">
+        <genericPageProvider name="searchByEmbeddings" class="io.maretha.cp.core.search.CustomKnnSearch">
+            <property name="pattern">SELECT * FROM Document</property>
+            <property name="pageSize">10</property>
+            <property name="coreSession">#{documentManager}</property>
+            <queryParameters>
+                <parameter name="vectorQuery"/>
+            </queryParameters>
+            <whereClause>
+                <fixedPart>ecm:mixinType != 'HiddenInNavigation' AND ecm:isVersion = 0 AND ecm:isTrashed = 0</fixedPart>
+            </whereClause>
+        </genericPageProvider>
+    </extension>
+</component>

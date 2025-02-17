@@ -1,0 +1,8 @@
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Manifest-Version: 1.0
+Bundle-Vendor: io.maretha.cp.core
+Bundle-Version: 1.0.0
+Bundle-Name: maretha-cp-core
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: io.maretha.cp.core.maretha-cp-core-test;singleton=true

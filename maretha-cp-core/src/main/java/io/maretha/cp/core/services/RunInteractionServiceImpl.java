@@ -17,6 +17,7 @@ import org.nuxeo.ecm.core.bulk.BulkService;
 import org.nuxeo.ecm.core.bulk.message.BulkCommand;
 import org.nuxeo.runtime.api.Framework;
 
+import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,8 @@ import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORED_DATE_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_DIGEST_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
+import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_IMAGE;
+import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TEXT;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
 
@@ -61,6 +64,18 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
             return apiService.getInteractionResultAsStream(interactionId, paramsMap);
         }
+    }
+
+    private void addTextEmbeddings(DocumentModel doc) {
+        String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
+        double[] documentEmbeddings = apiService.getDocumentEmbeddings(storeId, "text");
+        doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
+    }
+
+    private void addImageEmbeddings(DocumentModel doc) {
+        String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
+        double[] documentEmbeddings = apiService.getDocumentEmbeddings(storeId, "image");
+        doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
     }
 
     private List<DocumentModel> uploadFilesAndSetStoreId(List<DocumentModel> docs) {
@@ -98,6 +113,16 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
             return session.saveDocument(doc);
         }
+        if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
+            addImageEmbeddings(doc);
+            return session.saveDocument(doc);
+        }
+
+        if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
+            addTextEmbeddings(doc);
+            return session.saveDocument(doc);
+        }
+
         return doc;
     }
 
@@ -184,5 +209,10 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         ManagedBlob blob = (ManagedBlob) blobProperty.getValue();
         CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
         return cloudStorageFileShare.getS3FilePath(blob);
+    }
+
+    private boolean isImage(Blob blob) {
+        String mimeType = blob.getMimeType();
+        return mimeType != null && mimeType.startsWith("image/");
     }
 }
