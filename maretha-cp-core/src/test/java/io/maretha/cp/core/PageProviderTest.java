@@ -47,6 +47,7 @@ import static org.mockito.Mockito.when;
 @Deploy("org.nuxeo.elasticsearch.core")
 @Deploy("io.maretha.cp.core.maretha-cp-core-test:elasticsearch-test-contrib.xml")
 @Deploy({"org.nuxeo.ecm.platform.query.api"})
+@Deploy("org.nuxeo.ecm.platform.search.core")
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 public class PageProviderTest {
 
@@ -71,7 +72,7 @@ public class PageProviderTest {
     }
 
     @Test
-    @Ignore("Requires OpenSearch instance")
+//    @Ignore("Requires OpenSearch instance")
     public void testEmbeddingsPageProvider() throws Exception {
         DocumentModel doc = session.createDocumentModel("/", "TestDoc", "File");
         doc.setPropertyValue("dc:title", "Test Document");

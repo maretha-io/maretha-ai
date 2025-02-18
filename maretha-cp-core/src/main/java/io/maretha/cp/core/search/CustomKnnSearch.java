@@ -3,6 +3,7 @@ package io.maretha.cp.core.search;
 import io.maretha.cp.core.services.APIService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -60,46 +61,50 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         }
 
         String vectorQuery = namedParameters.get("vectorQuery");
-        if (StringUtils.isEmpty(vectorQuery) && "[]".equals(vectorQuery)) {
-            throw new IllegalArgumentException("Missing property vectorQuery for kNN query");
-        }
-
         String vectorField = namedParameters.get("vectorField");
-        if (StringUtils.isEmpty(vectorQuery)) {
-            throw new IllegalArgumentException("Missing property vectorField for kNN query");
-        }
-
-        String vectorJson;
-        String selectedVectorField;
-        if (TEXT_VECTOR_FIELD.equals(vectorField)) {
-            APIService apiService = Framework.getService(APIService.class);
-            selectedVectorField = TEXT_VECTOR_FIELD;
-            double[] vectors = apiService.textToEmbeddings(vectorQuery);
-            vectorJson = Arrays.toString(vectors);
-        } else {
-            selectedVectorField = IMAGE_VECTOR_FIELD;
-            vectorJson = vectorQuery;
-        }
-
-        //requires Opensearch in Nuxeo 2023
-        double minScore = Double.parseDouble(namedParameters.getOrDefault("min_score", "0.4"));
-
-        String knnJsonQuery = "{\n" +
-                "  \"knn\": {\n" +
-                "    \"" + selectedVectorField + "\": {\n" +
-                "      \"vector\": " + vectorJson + ",\n" +
-                "      \"k\": " + SEMANTIC_SEARCH_K + "\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-
-        log.debug("ES KNN query: " + knnJsonQuery);
 
         ElasticSearchService esService = Framework.getService(ElasticSearchService.class);
-        QueryBuilder queryBuilder = QueryBuilders.wrapperQuery(knnJsonQuery);
         NxQueryBuilder nxQuery = new NxQueryBuilder(session)
-                .nxql(query)
-                .esQuery(queryBuilder);
+                .nxql(query);
+
+        if (StringUtils.isNotEmpty(vectorQuery) && StringUtils.isNotEmpty(vectorQuery) && !"[]".equals(vectorQuery)) {
+            String vectorJson;
+            String selectedVectorField;
+            if (TEXT_VECTOR_FIELD.equals(vectorField)) {
+                APIService apiService = Framework.getService(APIService.class);
+                selectedVectorField = TEXT_VECTOR_FIELD;
+                double[] vectors = apiService.textToEmbeddings(vectorQuery);
+                vectorJson = Arrays.toString(vectors);
+            } else {
+                selectedVectorField = IMAGE_VECTOR_FIELD;
+                vectorJson = vectorQuery;
+            }
+
+            //requires Opensearch in Nuxeo 2023
+            double minScore = Double.parseDouble(namedParameters.getOrDefault("min_score", "0.4"));
+
+            String knnJsonQuery = "{\n" +
+                    "  \"knn\": {\n" +
+                    "    \"" + selectedVectorField + "\": {\n" +
+                    "      \"vector\": " + vectorJson + ",\n" +
+                    "      \"k\": " + SEMANTIC_SEARCH_K + "\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
+
+            QueryBuilder knnQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
+            // Combine NXQL and KNN using "must" (AND logic)
+            BoolQueryBuilder combinedQuery = QueryBuilders
+                    .boolQuery()
+                    .must(getCurrentQueryAsEsBuilder())
+                    .must(knnQuery);
+
+            nxQuery = nxQuery.esQuery(combinedQuery)
+                    .fetchFromElasticsearch() // Force ES query
+                    .limit(getLimit());
+
+            log.debug("ES KNN query: " + nxQuery.makeQuery());
+        }
 
         DocumentModelList resultList = esService.query(nxQuery);
         setResultsCount(resultList.totalSize());
