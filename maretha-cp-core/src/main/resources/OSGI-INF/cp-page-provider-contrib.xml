@@ -3,6 +3,8 @@
 
     <extension target="org.nuxeo.ecm.platform.query.api.PageProviderService" point="providers">
         <genericPageProvider name="searchByEmbeddings" class="io.maretha.cp.core.search.CustomKnnSearch">
+            <searchDocumentType>DefaultSearch</searchDocumentType>
+
             <property name="pattern">SELECT * FROM Document</property>
             <property name="pageSize">10</property>
             <property name="coreSession">#{documentManager}</property>
@@ -11,6 +13,9 @@
             </queryParameters>
             <whereClause>
                 <fixedPart>ecm:mixinType != 'HiddenInNavigation' AND ecm:isVersion = 0 AND ecm:isTrashed = 0</fixedPart>
+                <predicate parameter="ecm:fulltext" operator="FULLTEXT">
+                    <field schema="default_search" name="ecm_fulltext" />
+                </predicate>
             </whereClause>
         </genericPageProvider>
     </extension>

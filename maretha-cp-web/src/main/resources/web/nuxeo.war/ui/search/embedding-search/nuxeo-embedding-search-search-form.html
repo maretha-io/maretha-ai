@@ -8,6 +8,20 @@
     <style include="nuxeo-styles">
     </style>
 
+    <!-- Full Text -->
+    <nuxeo-input
+            role="widget"
+            id="searchInput"
+            label="[[i18n('assetsSearch.fullText')]]"
+            value="{{searchTerm}}"
+            type="search"
+            placeholder="[[i18n('assetsSearch.fullText.placeholder')]]"
+            autofocus
+            on-change="_search"
+            aria-label$="[[i18n('defaultSearch.fullText')]]"
+    >
+    </nuxeo-input>
+
     <nuxeo-input
                  role="widget"
                  id="searchInput"
@@ -41,6 +55,22 @@
           notify: true,
         }
 
+      },
+
+      clear() {
+        this.searchTerm = '';
+        this._search();
+      },
+
+      _search() {
+        if (this.searchTerm) {
+          this.set('params.ecm_fulltext', this.formatFulltext(this.searchTerm));
+        } else if (this.params && this.params.ecm_fulltext) {
+          this.set('params.ecm_fulltext', '');
+          // dirty but needed, the above line for
+          // ecm_fulltext removal being observed
+          delete this.params.ecm_fulltext;
+        }
       },
 
       ready: function() {
