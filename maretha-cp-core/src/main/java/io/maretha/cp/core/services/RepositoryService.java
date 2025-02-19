@@ -44,6 +44,7 @@ public interface RepositoryService {
     String SCHEMA_ACTIVE = "active";
     String SCHEMA_ACTIVE_ON_FOLDER = "activeOnFolder";
     String SCHEMA_ACTIVE_ON_ACTION_MENU = "activeOnActionMenu";
+    String SCHEMA_IS_CHAT = "chat";
     String SCHEMA_PARAMETERS = "parameters";
 
     String PARAMETER_SCHEMA_NAME = "name";
@@ -64,6 +65,8 @@ public interface RepositoryService {
     Settings getLocalInteractionSettings(CoreSession session);
 
     List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean folder);
+
+    List<Interaction> getActiveChatInteractionsForDocumentType(CoreSession session, String documentType, boolean folder);
 
     DocumentModel saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration);
 

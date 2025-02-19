@@ -16,44 +16,7 @@
 
     <extension point="elasticSearchIndex" target="org.nuxeo.elasticsearch.ElasticSearchComponent">
         <elasticSearchIndex name="nxutest" type="doc" repository="test">
-            <settings>
-                {
-                "index.knn": true
-                }
-            </settings>
 
-            <mapping>
-                {
-                    "properties": {
-                        "interactionresults:embeddingsText": {
-                            "type": "knn_vector",
-                            "dimension": 1536,
-                            "method": {
-                                "name": "hnsw",
-                                "space_type": "l2",
-                                "engine": "nmslib",
-                                "parameters": {
-                                    "ef_construction": 128,
-                                    "m": 24
-                                }
-                            }
-                        },
-                        "interactionresults:embeddingsImage": {
-                            "type": "knn_vector",
-                            "dimension": 1536,
-                            "method": {
-                                "name": "hnsw",
-                                "space_type": "l2",
-                                "engine": "nmslib",
-                                "parameters": {
-                                    "ef_construction": 128,
-                                    "m": 24
-                                }
-                            }
-                        }
-                    }
-                }
-            </mapping>
         </elasticSearchIndex>
     </extension>
 

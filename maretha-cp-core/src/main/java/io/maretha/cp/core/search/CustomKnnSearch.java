@@ -60,44 +60,51 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
             throw new NuxeoException(String.format("Cannot perform null query: check provider '%s'", getName()));
         }
 
+        ElasticSearchService esService = Framework.getService(ElasticSearchService.class);
+        NxQueryBuilder nxQuery = new NxQueryBuilder(session).nxql(query);
+
+        // Combine NXQL and KNN using "must" (AND logic)
+        BoolQueryBuilder combinedQuery = QueryBuilders
+                .boolQuery()
+                .must(getCurrentQueryAsEsBuilder());
+
         String vectorQuery = namedParameters.get("vectorQuery");
         String vectorField = namedParameters.get("vectorField");
-
-        ElasticSearchService esService = Framework.getService(ElasticSearchService.class);
-        NxQueryBuilder nxQuery = new NxQueryBuilder(session)
-                .nxql(query);
-
-        if (StringUtils.isNotEmpty(vectorQuery) && StringUtils.isNotEmpty(vectorQuery) && !"[]".equals(vectorQuery)) {
-            String vectorJson;
-            String selectedVectorField;
-            if (TEXT_VECTOR_FIELD.equals(vectorField)) {
-                APIService apiService = Framework.getService(APIService.class);
-                selectedVectorField = TEXT_VECTOR_FIELD;
-                double[] vectors = apiService.textToEmbeddings(vectorQuery);
-                vectorJson = Arrays.toString(vectors);
-            } else {
-                selectedVectorField = IMAGE_VECTOR_FIELD;
-                vectorJson = vectorQuery;
-            }
-
+        if (StringUtils.isNotEmpty(vectorQuery) && StringUtils.isNotEmpty(vectorField) && !"[]".equals(vectorQuery)) {
+            int numCandidates = 100;
             //requires Opensearch in Nuxeo 2023
             double minScore = Double.parseDouble(namedParameters.getOrDefault("min_score", "0.4"));
 
-            String knnJsonQuery = "{\n" +
-                    "  \"knn\": {\n" +
-                    "    \"" + selectedVectorField + "\": {\n" +
-                    "      \"vector\": " + vectorJson + ",\n" +
-                    "      \"k\": " + SEMANTIC_SEARCH_K + "\n" +
-                    "    }\n" +
-                    "  }\n" +
-                    "}";
+            if (TEXT_VECTOR_FIELD.equals(vectorField)) {
+                APIService apiService = Framework.getService(APIService.class);
+                double[] textVectors = apiService.textToEmbeddings(vectorQuery);
+                String vectorJson = Arrays.toString(textVectors);
+                String knnJsonQuery = "{\n" +
+                        "  \"knn\": {\n" +
+                        "    \"field\": \"" + TEXT_VECTOR_FIELD + "\",\n" +
+                        "    \"query_vector\": " + vectorJson + ",\n" +
+                        "    \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
+                        "    \"num_candidates\": " + numCandidates + "\n" +
+                        "  }\n" +
+                        "}";
 
-            QueryBuilder knnQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
-            // Combine NXQL and KNN using "must" (AND logic)
-            BoolQueryBuilder combinedQuery = QueryBuilders
-                    .boolQuery()
-                    .must(getCurrentQueryAsEsBuilder())
-                    .must(knnQuery);
+                QueryBuilder knnTextQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
+                combinedQuery = combinedQuery.must(knnTextQuery);
+            }
+
+            if (IMAGE_VECTOR_FIELD.equals(vectorField)) {
+                String knnJsonQuery = "{\n" +
+                        "  \"knn\": {\n" +
+                        "    \"field\": \"" + IMAGE_VECTOR_FIELD + "\",\n" +
+                        "    \"query_vector\": " + vectorQuery + ",\n" +
+                        "    \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
+                        "    \"num_candidates\": " + numCandidates + "\n" +
+                        "  }\n" +
+                        "}";
+
+                QueryBuilder knnTextQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
+                combinedQuery = combinedQuery.must(knnTextQuery);
+            }
 
             nxQuery = nxQuery.esQuery(combinedQuery)
                     .fetchFromElasticsearch() // Force ES query

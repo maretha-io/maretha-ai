@@ -55,6 +55,7 @@
         margin: auto;
         display: block;
         text-align: right;
+        padding: 15px;
       }
 
       .nuxeo-card {
@@ -143,12 +144,15 @@
             </nuxeo-data-table>
 
             <div class="buttons">
-              <paper-toggle-button checked="{{awsS3AccessEnabled}}"
-                                   on-change="_saveInteractions">AWS S3 Path Enabled</paper-toggle-button>
               <paper-button id="refresh" on-tap="_refresh" aria-label="Refresh" raised style="">
                 Refresh
                 <iron-icon icon="icons:refresh"></iron-icon>
               </paper-button>
+            </div>
+
+            <div class="buttons">
+              <paper-toggle-button checked="{{awsS3AccessEnabled}}"
+                                   on-change="_saveInteractions">AWS S3 Path Enabled</paper-toggle-button>
             </div>
           </div>
         </nuxeo-card>
@@ -227,6 +231,12 @@
                     <nuxeo-selectivity class="selectivity-container" style="margin: auto;text-align: left;" multiple
                                        min-chars="0" data="{{documentTypes}}" value="{{selectedInteraction.activeOnDocumentTypes}}"
                                        placeholder="Select Document Types"></nuxeo-selectivity>
+                  </div>
+
+                  <div style="display: inline-flex;">
+                    <span>Is Chat:</span>
+                    <paper-toggle-button checked="{{selectedInteraction.chat}}"
+                                         on-change="_saveInteractions"></paper-toggle-button>
                   </div>
                 </nuxeo-card>
               </div>

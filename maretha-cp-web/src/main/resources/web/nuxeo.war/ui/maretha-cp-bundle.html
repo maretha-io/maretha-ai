@@ -5,6 +5,7 @@
 <link rel="import" href="custom-elements/cp-format-json-response.html">
 <link rel="import" href="custom-elements/cp-format-chat-json-response.html">
 <link rel="import" href="custom-elements/cp-show-interaction-results.html">
+<link rel="import" href="custom-elements/cp-document-chat.html">
 <link rel="import" href="custom-elements/tab/nuxeo-similar-images-tab.html">
 
 <nuxeo-slot-content name="maretha-cp-interactions" slot="PAGES" order="100">
@@ -34,6 +35,12 @@
     </template>
 </nuxeo-slot-content>
 
+<nuxeo-slot-content name="documentChat" slot="DOCUMENT_ACTIONS" order="3">
+    <template>
+        <cp-document-chat document="[[document]]"></cp-document-chat>
+    </template>
+</nuxeo-slot-content>
+
 <nuxeo-slot-content name="interactionResults" slot="DOCUMENT_VIEWS_PAGES" order="999">
     <template>
         <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
@@ -48,7 +55,7 @@
 <!-- Contribution of element 'nuxeo-menu-icon' for slot 'DRAWER_ITEMS' -->
 <nuxeo-slot-content name="Find" slot="DRAWER_ITEMS" order="1">
     <template>
-        <nuxeo-menu-icon name="find" label="Find" icon="icons:info-outline"></nuxeo-menu-icon>
+        <nuxeo-menu-icon name="find" label="AI search" icon="icons:info-outline"></nuxeo-menu-icon>
     </template>
 </nuxeo-slot-content>
 <!-- Contribution of element 'nuxeo-search-form' for slot 'DRAWER_PAGES' -->

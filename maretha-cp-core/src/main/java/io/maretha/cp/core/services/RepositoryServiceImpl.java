@@ -48,6 +48,22 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
                 .filter(Interaction::isActiveOnActionMenu)
+                .filter(interaction -> !interaction.isChat())
+                .filter(interaction -> {
+                    if (isFolder) return interaction.isActiveOnFolder();
+                    return true;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Interaction> getActiveChatInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
+        return getLocalInteractionSettings(session).getInteractions()
+                .stream()
+                .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
+                .filter(Interaction::isActive)
+                .filter(Interaction::isActiveOnActionMenu)
+                .filter(Interaction::isChat)
                 .filter(interaction -> {
                     if (isFolder) return interaction.isActiveOnFolder();
                     return true;
@@ -180,6 +196,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         interactionMap.put(SCHEMA_ACTIVE, interaction.isActive());
         interactionMap.put(SCHEMA_ACTIVE_ON_FOLDER, interaction.isActiveOnFolder());
         interactionMap.put(SCHEMA_ACTIVE_ON_ACTION_MENU, interaction.isActiveOnActionMenu());
+        interactionMap.put(SCHEMA_IS_CHAT, interaction.isChat());
         interactionMap.put(SCHEMA_PARAMETERS, convertParameters(interaction.getParameters()));
         return interactionMap;
     }

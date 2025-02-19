@@ -72,7 +72,7 @@ public class PageProviderTest {
     }
 
     @Test
-//    @Ignore("Requires OpenSearch instance")
+    @Ignore("Requires non embedded es instance")
     public void testEmbeddingsPageProvider() throws Exception {
         DocumentModel doc = session.createDocumentModel("/", "TestDoc", "File");
         doc.setPropertyValue("dc:title", "Test Document");

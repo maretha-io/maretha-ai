@@ -22,6 +22,7 @@
             <xs:element name="active" type="xs:boolean"/>
             <xs:element name="activeOnActionMenu" type="xs:boolean"/>
             <xs:element name="activeOnFolder" type="xs:boolean"/>
+            <xs:element name="chat" type="xs:boolean"/>
             <xs:element name="parameters" type="nxs:interactionParameterList"/>
         </xs:sequence>
     </xs:complexType>

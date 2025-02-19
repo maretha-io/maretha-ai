@@ -26,6 +26,7 @@ public class Interaction {
     private List<InteractionParameter> parameters = new ArrayList<>();
     private List<String> activeOnDocumentTypes = new ArrayList<>();
     private boolean isActive;
+    private boolean isChat;
     private boolean activeOnFolder;
     private boolean activeOnActionMenu;
 }
