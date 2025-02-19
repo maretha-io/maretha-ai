@@ -6,6 +6,7 @@ import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
+import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.runtime.api.Framework;
@@ -25,9 +26,15 @@ public class GetInteractionsForDocumentOperation {
     @Context
     protected CoreSession session;
 
+    @Param(name = "isChat", required = false)
+    protected boolean isChat;
+
     @OperationMethod
     public Collection<Interaction> run(DocumentModel doc) {
         if (doc == null) return Collections.emptyList();
+        if (isChat) {
+            return cpLocalSettingsService.getActiveChatInteractionsForDocumentType(session, doc.getType(), doc.hasFacet("Folder"));
+        }
         return cpLocalSettingsService.getActiveInteractionsForDocumentType(session, doc.getType(), doc.hasFacet("Folder"));
     }
 

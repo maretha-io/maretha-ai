@@ -131,10 +131,6 @@
                 <template is="dom-if" if="[[item.isMainDocument]]">
                   <p>Main Document: [[document.properties.file:content.name]]</p>
                 </template>
-                <template is="dom-if" if="[[item.isContextMemoryParameter]]">
-                  <nuxeo-input role="widget" value="{{_computeChatValue(item, interactionResponse)}}"
-                               label="[[item.name]]" hidden type="[[item.type]]"></nuxeo-input>
-                </template>
                 <template is="dom-if" if="[[item.enableDocSelection]]">
                   <div>
                     <template is="dom-if" if="[[_isDocArrayType(item)]]">
@@ -166,7 +162,6 @@
           </div>
 
           <div class="flex-item-right">
-            <template is="dom-if" if="[[!isChat]]">
               <div id="response" class="response">
                 [[interactionStatus]]
                 <template is="dom-if" if="[[interactionResponseStream]]">
@@ -184,15 +179,6 @@
                 <paper-toggle-button checked="{{debugging}}"
                                      on-change="_showPreviousInteractions">Audit</paper-toggle-button>
               </div>
-            </template>
-
-            <template is="dom-if" if="[[isChat]]">
-              <div id="chatResponse" class="chat-response">
-                <cp-format-chat-json-response messages="[[chatContext]]" stream="[[interactionResponseStream]]"
-                                              status="[[interactionStatus]]"></cp-format-chat-json-response>
-              </div>
-            </template>
-
           </div>
 
         </div>
@@ -273,16 +259,6 @@
         interactionStatus: {
           type: String,
         },
-
-        isChat: {
-          type: Boolean,
-          value: false
-        },
-
-        chatContext: {
-          type: Array,
-          value: []
-        }
 
       },
 
@@ -377,7 +353,6 @@
 
       _selectedInteractionObserver(obs) {
         this._debug('_selectedInteractionObserver', obs);
-        this.set('isChat', this.selectedInteraction?.parameters?.some(param => param.isContextMemoryParameter === true))
       },
 
       _interactionResponseObserver: function (obs) {
@@ -430,26 +405,6 @@
           this.set('totalDocuments', response.entries.length);
         }).catch((error) => {
         });
-      },
-
-      _computeChatValue(contextParam, interactionResponse) {
-        let chatContext;
-        try {
-          chatContext = JSON.parse(contextParam.value);
-          if (!Array.isArray(chatContext)) {
-            chatContext = [];
-          }
-        } catch (error) {
-          chatContext = [];
-        }
-        if (interactionResponse) {
-          const userQuestion = this.selectedInteraction.parameters.find(param => param.name === "question").value;
-          chatContext.push({ "role": "user", "content": userQuestion, "date": new Date().toISOString() });
-          chatContext.push({ "role": "assistant", "content": interactionResponse, "date": new Date().toISOString() });
-        }
-        this.set('chatContext', chatContext);
-        contextParam.value = JSON.stringify(chatContext);
-        return contextParam.value;
       },
 
       _isDocArrayType: function (param) {

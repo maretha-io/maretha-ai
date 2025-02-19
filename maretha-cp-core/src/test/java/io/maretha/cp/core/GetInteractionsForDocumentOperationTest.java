@@ -74,12 +74,52 @@ public class GetInteractionsForDocumentOperationTest {
                 .activeOnFolder(true)
                 .activeOnDocumentTypes(List.of("Folder"))
                 .parameters(List.of())
-                .isActive(true)
+                .isActive(false)
                 .build();
+        createInteractionSettings(List.of(interaction_1, interaction_2));
+
         //WHEN
-        List<ObjectNode> interactionSettings = createInteractionSettings(List.of(interaction_1, interaction_2));
-        ctx.put("interactions", interactionSettings);
         ctx.setInput(doc);
+
+        Collection<Interaction> interactions = (Collection<Interaction>) automationService.run(ctx, GetInteractionsForDocumentOperation.ID);
+        //THEN
+        assertNotNull(interactions);
+        int expectedSize = 1;
+        assertEquals(expectedSize, interactions.size());
+        assertEquals(interaction_1, interactions.stream().findFirst().get());
+    }
+
+    @Test
+    public void shouldGetChatInteractionsForDocument() throws OperationException {
+        //Given a File document
+        DocumentModel doc = createDocument();
+        OperationContext ctx = new OperationContext(session);
+
+        //AND one Interaction that matches doc requirements
+        Interaction interaction_1 = Interaction.builder()
+                .id("test")
+                .activeOnActionMenu(true)
+                .activeOnFolder(false)
+                .activeOnDocumentTypes(List.of("Document", "File"))
+                .parameters(List.of())
+                .isActive(true)
+                .isChat(true)
+                .build();
+        //AND one Interaction that does not match doc requirements
+        Interaction interaction_2 = Interaction.builder()
+                .id("test_2")
+                .activeOnActionMenu(true)
+                .activeOnFolder(true)
+                .activeOnDocumentTypes(List.of("Folder"))
+                .parameters(List.of())
+                .isActive(true)
+                .isChat(true)
+                .build();
+        createInteractionSettings(List.of(interaction_1, interaction_2));
+
+        //WHEN
+        ctx.setInput(doc);
+        ctx.put("isChat", true);
 
         Collection<Interaction> interactions = (Collection<Interaction>) automationService.run(ctx, GetInteractionsForDocumentOperation.ID);
         //THEN

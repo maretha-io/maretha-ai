@@ -7,8 +7,6 @@
   "number_of_shards": "1",
   "number_of_replicas": "0",
 </#if>
-  "knn": true,
-  "knn.algo_param.ef_search": 100,
   "analysis": {
     "filter": {
       "truncate_filter": {
