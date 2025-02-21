@@ -231,7 +231,6 @@
       _addParametersToChatContext: function(){
         this.chatInteraction.parameters.forEach((param) => {
           if(param.isContextMemoryParameter) return;
-          console.log(param);
           if(param.type === 'string'){
             this.push('chatContext',{ "role": "user", "param": param.name, "content": param.value, "date": new Date().toISOString() });
           }
