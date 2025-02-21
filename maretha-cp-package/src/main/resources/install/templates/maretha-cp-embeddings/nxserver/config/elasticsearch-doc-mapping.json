@@ -176,30 +176,16 @@
       }
     },
     "interactionresults:embeddingsText": {
-      "type": "knn_vector",
-      "dimension": 1536,
-      "method": {
-        "name": "hnsw",
-        "space_type": "l2",
-        "engine": "nmslib",
-        "parameters": {
-          "ef_construction": 128,
-          "m": 24
-        }
-      }
+      "type": "dense_vector",
+      "dims": 1536,
+      "index": true,
+      "similarity": "l2_norm"
     },
     "interactionresults:embeddingsImage": {
-      "type": "knn_vector",
-      "dimension": 1024,
-      "method": {
-        "name": "hnsw",
-        "space_type": "l2",
-        "engine": "nmslib",
-        "parameters": {
-          "ef_construction": 128,
-          "m": 24
-        }
-      }
+      "type": "dense_vector",
+      "dims": 1024,
+      "index": true,
+      "similarity": "l2_norm"
     }
   }
 }

@@ -53,3 +53,59 @@ cp.embedding.model=text-embedding-3-small
     <schema name="interactionResults" />
 </facet>
 ```
+
+## Embeddings search
+
+``` 
+<extension target="org.nuxeo.ecm.platform.query.api.PageProviderService" point="providers">
+<genericPageProvider name="searchByEmbeddings" class="io.maretha.cp.core.search.CustomKnnSearch">
+
+<queryParameters>
+    <parameter name="vectorQuery"/>
+    <parameter name="vectorField"/>
+</queryParameters>
+
+....            
+```
+
+```java
+public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
+    //...
+    final String TEXT_VECTOR_FIELD = "interactionresults:embeddingsText";
+    final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
+
+    String vectorQuery = namedParameters.get("vectorQuery");
+    String vectorField = namedParameters.get("vectorField");
+    
+    NxQueryBuilder nxQuery = this.getQueryBuilder(session).nxql(query);
+
+    // Combine NXQL and KNN using "must" (AND logic)
+    BoolQueryBuilder combinedQuery = QueryBuilders
+            .boolQuery()
+            .must(getCurrentQueryAsEsBuilder());
+
+    APIService apiService = Framework.getService(APIService.class);
+    double[] textVectors = apiService.textToEmbeddings(vectorQuery);
+    String vectorJson = Arrays.toString(textVectors);
+    String knnJsonQuery = "{\n" +
+            "  \"knn\": {\n" +
+            "    \"field\": \"" + TEXT_VECTOR_FIELD + "\",\n" +
+            "    \"query_vector\": " + vectorJson + ",\n" +
+            "    \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
+            "    \"num_candidates\": " + numCandidates + "\n" +
+            "  }\n" +
+            "}";
+
+    QueryBuilder knnTextQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
+    combinedQuery = combinedQuery.must(knnTextQuery);
+
+    nxQuery = nxQuery.esQuery(combinedQuery)
+            .fetchFromElasticsearch() // Force ES query
+            .offset((int) this.getCurrentPageOffset())
+            .limit(this.getLimit())
+            .addAggregates(this.buildAggregates());
+
+    EsResult ret = esService.queryAndAggregate(nxQuery);
+    
+}
+```

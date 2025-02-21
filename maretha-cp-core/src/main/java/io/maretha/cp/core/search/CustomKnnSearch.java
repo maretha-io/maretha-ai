@@ -11,12 +11,16 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
+import org.nuxeo.ecm.platform.query.api.Aggregate;
+import org.nuxeo.ecm.platform.query.api.Bucket;
 import org.nuxeo.elasticsearch.api.ElasticSearchService;
+import org.nuxeo.elasticsearch.api.EsResult;
 import org.nuxeo.elasticsearch.provider.ElasticSearchNxqlPageProvider;
 import org.nuxeo.elasticsearch.query.NxQueryBuilder;
 import org.nuxeo.runtime.api.Framework;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +57,11 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
             return getEmptyResult();
         }
 
+        String vectorField = namedParameters.get("vectorField");
+        if (StringUtils.isEmpty(vectorField)) {
+            return getEmptyResult();
+        }
+
         if (query == null) {
             buildQuery(session);
         }
@@ -61,15 +70,13 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         }
 
         ElasticSearchService esService = Framework.getService(ElasticSearchService.class);
-        NxQueryBuilder nxQuery = new NxQueryBuilder(session).nxql(query);
+        NxQueryBuilder nxQuery = this.getQueryBuilder(session).nxql(query);
 
         // Combine NXQL and KNN using "must" (AND logic)
         BoolQueryBuilder combinedQuery = QueryBuilders
-                .boolQuery()
-                .must(getCurrentQueryAsEsBuilder());
+                .boolQuery();
 
         String vectorQuery = namedParameters.get("vectorQuery");
-        String vectorField = namedParameters.get("vectorField");
         if (StringUtils.isNotEmpty(vectorQuery) && StringUtils.isNotEmpty(vectorField) && !"[]".equals(vectorQuery)) {
             int numCandidates = 100;
             //requires Opensearch in Nuxeo 2023
@@ -106,16 +113,36 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
                 combinedQuery = combinedQuery.must(knnTextQuery);
             }
 
+
+            combinedQuery = combinedQuery.must(getCurrentQueryAsEsBuilder());
             nxQuery = nxQuery.esQuery(combinedQuery)
                     .fetchFromElasticsearch() // Force ES query
-                    .limit(getLimit());
+                    .offset((int) this.getCurrentPageOffset())
+                    .limit(this.getLimit())
+                    .addAggregates(this.buildAggregates());
 
             log.debug("ES KNN query: " + nxQuery.makeQuery());
         }
 
-        DocumentModelList resultList = esService.query(nxQuery);
-        setResultsCount(resultList.totalSize());
-        return resultList;
+        if (searchOnAllRepositories()) {
+            nxQuery.searchOnAllRepositories();
+        }
+        nxQuery.useUnrestrictedSession(useUnrestrictedSession());
+
+        List<String> highlightFields = getHighlights();
+        if (highlightFields != null && !highlightFields.isEmpty()) {
+            nxQuery.highlight(highlightFields);
+        }
+
+        EsResult ret = esService.queryAndAggregate(nxQuery);
+        DocumentModelList dmList = ret.getDocuments();
+        currentAggregates = new HashMap<>(ret.getAggregates().size());
+        for (Aggregate<Bucket> agg : ret.getAggregates()) {
+            currentAggregates.put(agg.getId(), agg);
+        }
+        setResultsCount(dmList.totalSize());
+        currentPageDocuments = dmList;
+        return currentPageDocuments;
     }
 
     public DocumentModelList getEmptyResult() {

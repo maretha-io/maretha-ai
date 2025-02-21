@@ -115,11 +115,12 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
             addImageEmbeddings(doc);
+            doc = session.saveDocument(doc);
         }
 
         if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
             addTextEmbeddings(doc);
-            return session.saveDocument(doc);
+            doc = session.saveDocument(doc);
         }
 
         return doc;
