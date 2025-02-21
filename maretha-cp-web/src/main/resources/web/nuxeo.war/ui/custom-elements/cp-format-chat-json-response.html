@@ -23,11 +23,13 @@
       }
 
       .chat-container {
+        height: 500px;
         max-height: 500px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
         gap: 10px;
+        scroll-behavior: smooth;
       }
 
       .message {
@@ -42,7 +44,7 @@
       .assistant {
         background: #DCF8C6;
         align-self: flex-end;
-        text-align: right;
+        text-align: left;
       }
 
       .user {
@@ -57,9 +59,20 @@
         margin-top: 5px;
         display: block;
       }
+
+      /* Loading text style */
+      .loading-text {
+        font-size: 1em;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+        color: #3498db;
+      }
+
+
     </style>
 
-    <div class="chat-container">
+    <div id="chatContainer" class="chat-container">
       <template is="dom-repeat" items="[[messages]]">
         <div class$="message [[_computeClass(item.role)]]">
           [[item.content]]
@@ -67,8 +80,12 @@
         </div>
       </template>
 
+      <template is="dom-if" if="[[loading]]">
+        <div class="loading-text">Processing...</div>
+      </template>
+
       <template is="dom-if" if="[[status]]">
-        <div>[[status]]</div>
+        <div class="loading-text">[[status]]</div>
       </template>
 
       <template is="dom-if" if="[[stream]]">
@@ -86,6 +103,7 @@
       properties: {
         messages: {
           type: Array,
+          observer: '_messagesObserver'
         },
 
         status: {
@@ -93,12 +111,30 @@
         },
 
         stream: {
-          type: String
+          type: String,
+          observer: '_streamObserver'
+        },
+
+        loading: {
+          type: Boolean,
+          value: false
         },
 
       },
 
       ready: function () {
+      },
+
+      _messagesObserver: function(messages){
+        console.log(messages);
+      },
+
+      _streamObserver: function(stream){
+      // Auto-scroll to bottom after DOM update
+        this.async(() => {
+          const container = this.$.chatContainer;
+          container.scrollTop = container.scrollHeight;
+        }, 100);
       },
 
       _computeClass(role) {
