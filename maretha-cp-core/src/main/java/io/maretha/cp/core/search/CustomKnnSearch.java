@@ -70,14 +70,15 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         }
 
         ElasticSearchService esService = Framework.getService(ElasticSearchService.class);
-        NxQueryBuilder nxQuery = this.getQueryBuilder(session).nxql(query);
+        NxQueryBuilder nxQuery = this.getQueryBuilder(session);
 
         // Combine NXQL and KNN using "must" (AND logic)
         BoolQueryBuilder combinedQuery = QueryBuilders
                 .boolQuery();
 
         String vectorQuery = namedParameters.get("vectorQuery");
-        if (StringUtils.isNotEmpty(vectorQuery) && StringUtils.isNotEmpty(vectorField) && !"[]".equals(vectorQuery)) {
+        if (StringUtils.isNotEmpty(vectorQuery) &&
+                StringUtils.isNotEmpty(vectorField) && !"[]".equals(vectorQuery)) {
             int numCandidates = 100;
             //requires Opensearch in Nuxeo 2023
             double minScore = Double.parseDouble(namedParameters.getOrDefault("min_score", "0.4"));
@@ -86,42 +87,37 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
                 APIService apiService = Framework.getService(APIService.class);
                 double[] textVectors = apiService.textToEmbeddings(vectorQuery);
                 String vectorJson = Arrays.toString(textVectors);
+                double boost = 1.0;
                 String knnJsonQuery = "{\n" +
                         "  \"knn\": {\n" +
                         "    \"field\": \"" + TEXT_VECTOR_FIELD + "\",\n" +
                         "    \"query_vector\": " + vectorJson + ",\n" +
                         "    \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
-                        "    \"num_candidates\": " + numCandidates + "\n" +
+                        "    \"num_candidates\": " + numCandidates + ",\n" +
+                        "    \"boost\": " + boost + "\n" +
                         "  }\n" +
                         "}";
 
                 QueryBuilder knnTextQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
-                combinedQuery = combinedQuery.must(knnTextQuery);
+                combinedQuery = combinedQuery.must(knnTextQuery).boost(1.0f);
             }
 
             if (IMAGE_VECTOR_FIELD.equals(vectorField)) {
+                int similarity = 50;
                 String knnJsonQuery = "{\n" +
                         "  \"knn\": {\n" +
                         "    \"field\": \"" + IMAGE_VECTOR_FIELD + "\",\n" +
                         "    \"query_vector\": " + vectorQuery + ",\n" +
                         "    \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
-                        "    \"num_candidates\": " + numCandidates + "\n" +
+                        "    \"num_candidates\": " + numCandidates + ",\n" +
+                        "    \"similarity\": " + similarity + "\n" +
                         "  }\n" +
                         "}";
 
-                QueryBuilder knnTextQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
-                combinedQuery = combinedQuery.must(knnTextQuery);
+                QueryBuilder knnImageQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
+                combinedQuery = combinedQuery.must(knnImageQuery).boost(1.0f);
             }
 
-
-            combinedQuery = combinedQuery.must(getCurrentQueryAsEsBuilder());
-            nxQuery = nxQuery.esQuery(combinedQuery)
-                    .fetchFromElasticsearch() // Force ES query
-                    .offset((int) this.getCurrentPageOffset())
-                    .limit(this.getLimit())
-                    .addAggregates(this.buildAggregates());
-
-            log.debug("ES KNN query: " + nxQuery.makeQuery());
         }
 
         if (searchOnAllRepositories()) {
@@ -134,8 +130,17 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
             nxQuery.highlight(highlightFields);
         }
 
+        combinedQuery = combinedQuery.filter(getCurrentQueryAsEsBuilder());
+        nxQuery = nxQuery.esQuery(combinedQuery)
+                .fetchFromElasticsearch() // Force ES query
+                .offset((int) this.getCurrentPageOffset())
+                .limit(this.getLimit())
+                .addAggregates(this.buildAggregates());
+        log.debug("ES KNN query: " + nxQuery.makeQuery());
+
         EsResult ret = esService.queryAndAggregate(nxQuery);
         DocumentModelList dmList = ret.getDocuments();
+
         currentAggregates = new HashMap<>(ret.getAggregates().size());
         for (Aggregate<Bucket> agg : ret.getAggregates()) {
             currentAggregates.put(agg.getId(), agg);
