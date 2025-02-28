@@ -7,11 +7,6 @@
             <searchDocumentType>DefaultSearch</searchDocumentType>
             <property name="pageSize">10</property>
             <property name="coreSession">#{documentManager}</property>
-            <queryParameters>
-                <parameter name="vectorQuery"/>
-                <parameter name="vectorField"/>
-            </queryParameters>
-
             <whereClause>
                 <fixedPart>
                     ecm:isVersion = 0 AND
@@ -101,18 +96,6 @@
                     </dateRanges>
                 </aggregate>
             </aggregates>
-            <quickFilters>
-                <quickFilter name="noFolder">
-                    <clause>ecm:mixinType != 'Folderish'</clause>
-                </quickFilter>
-                <quickFilter name="mostRecent">
-                    <sort column="dc:modified" ascending="false"/>
-                </quickFilter>
-                <quickFilter name="onlyValidated">
-                    <clause>ecm:currentLifeCycleState = 'approved'</clause>
-                    <sort column="dc:modified" ascending="false"/>
-                </quickFilter>
-            </quickFilters>
         </genericPageProvider>
     </extension>
 </component>
