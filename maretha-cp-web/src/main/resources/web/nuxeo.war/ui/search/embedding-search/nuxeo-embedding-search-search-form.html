@@ -30,7 +30,6 @@
             snaps
             value="{{params.min_score}}"
             placeholder="0.8"
-            on-change="_triggerSearch"
             pin>
     </paper-slider>
 
@@ -187,10 +186,6 @@
         if(!this.params.min_score)
           this.params.min_score = 0.8;
       },
-
-      _triggerSearch() {
-        console.log("trigger search");
-      }
       
     });
   </script>
