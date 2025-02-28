@@ -12,8 +12,8 @@
       }
 
       #dialog {
-        height: 90%;
-        width: 90%;
+        height: 80%;
+        width: 70%;
         margin: auto;
         overflow: auto;
       }
@@ -83,11 +83,10 @@
         padding: 15px;
       }
       .chat-response {
-        min-height: 400px;
-        max-height: 600px;
+        min-height: 10%;
+        max-height: 60%;
         width: 80%;
         margin: auto;
-        margin-top: 5%;
         display: block;
         overflow-y: auto;
         border: 3px solid #ececec;
@@ -110,7 +109,7 @@
       </div>
 
       <div id="chatResponse" class="chat-response">
-        <cp-format-chat-json-response messages="[[chatContext]]" stream="[[interactionResponseStream]]"
+        <cp-format-chat-json-response messages="[[chatContext]]" stream="[[interactionResponseStream]]" document="[[document]]" chat-interaction="[[chatInteraction]]"
                                       status="[[interactionStatus]]" loading="[[loading]]"></cp-format-chat-json-response>
       </div>
 
@@ -188,8 +187,8 @@
       },
 
       _resetData() {
-        this.set('chatInteraction', null);
         this.set('interactionResponse', null);
+        this.set('chatContext', []);
       },
 
       _documentObserver(doc) {
@@ -277,6 +276,10 @@
       _toggleDialog: function () {
         this.$.dialog.toggle();
       },
+
+      _dialogClosed: function () {
+
+      }
 
     });
   </script>

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -12,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Settings {
-    private List<Interaction> interactions;
+    private List<Interaction> interactions = new ArrayList<>();
     private boolean awsS3AccessEnabled;
 }
