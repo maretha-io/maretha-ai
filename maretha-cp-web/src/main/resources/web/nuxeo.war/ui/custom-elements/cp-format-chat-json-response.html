@@ -23,8 +23,8 @@
       }
 
       .chat-container {
-        height: 500px;
-        max-height: 500px;
+        min-height: 10%;
+        max-height: 50%;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
@@ -77,6 +77,9 @@
         <div class$="message [[_computeClass(item.role)]]">
           [[item.content]]
           <span class="timestamp">[[_formatDate(item.date)]]</span>
+          <template is="dom-if" if="[[_isAssistantRole(item.role)]]">
+            <cp-save-response document="[[document]]" interaction="[[chatInteraction]]" interaction-response="[[item.content]]"></cp-save-response>
+          </template>
         </div>
       </template>
 
@@ -101,6 +104,11 @@
       is: 'cp-format-chat-json-response',
       behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
       properties: {
+
+        document: {
+          type: Object,
+        },
+
         messages: {
           type: Array,
           observer: '_messagesObserver'
@@ -108,6 +116,10 @@
 
         status: {
           type: String
+        },
+
+        chatInteraction: {
+          type: Object
         },
 
         stream: {
@@ -138,6 +150,10 @@
 
       _computeClass(role) {
         return role === "user" ? "user" : "assistant";
+      },
+
+      _isAssistantRole(role) {
+        return role === "assistant";
       },
 
       _formatDate(dateString) {

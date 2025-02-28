@@ -30,7 +30,9 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     public static final String TEXT_VECTOR_FIELD = "interactionresults:embeddingsText";
     public static final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
     private static final long serialVersionUID = 1L;
-    private static final String SEMANTIC_SEARCH_K = "10";
+    private static final int numCandidates = 1000;
+    private static final float boost = 2.0F;
+    private static final String SEMANTIC_SEARCH_K = "30";
     private List<DocumentModel> results;
 
     @Override
@@ -79,43 +81,51 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         String vectorQuery = namedParameters.get("vectorQuery");
         if (StringUtils.isNotEmpty(vectorQuery) &&
                 StringUtils.isNotEmpty(vectorField) && !"[]".equals(vectorQuery)) {
-            int numCandidates = 100;
-            //requires Opensearch in Nuxeo 2023
-            double minScore = Double.parseDouble(namedParameters.getOrDefault("min_score", "0.4"));
+
+            double minScore = Double.parseDouble(namedParameters.getOrDefault("min_score", "0.8"));
 
             if (TEXT_VECTOR_FIELD.equals(vectorField)) {
                 APIService apiService = Framework.getService(APIService.class);
                 double[] textVectors = apiService.textToEmbeddings(vectorQuery);
                 String vectorJson = Arrays.toString(textVectors);
-                double boost = 1.0;
+
                 String knnJsonQuery = "{\n" +
-                        "  \"knn\": {\n" +
-                        "    \"field\": \"" + TEXT_VECTOR_FIELD + "\",\n" +
-                        "    \"query_vector\": " + vectorJson + ",\n" +
-                        "    \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
-                        "    \"num_candidates\": " + numCandidates + ",\n" +
-                        "    \"boost\": " + boost + "\n" +
+                        "  \"function_score\": {\n" +  // Wrap knn inside function_score
+                        "    \"query\": {\n" +
+                        "      \"knn\": {\n" +
+                        "        \"field\": \"" + TEXT_VECTOR_FIELD + "\",\n" +
+                        "        \"query_vector\": " + vectorJson + ",\n" +
+                        "        \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
+                        "        \"num_candidates\": " + numCandidates + "\n" +
+                        "      }\n" +
+                        "    },\n" +
+                        "    \"min_score\": " + minScore + ",\n" +  // Apply min_score inside function_score
+                        "    \"boost_mode\": \"multiply\" \n" +
                         "  }\n" +
                         "}";
 
                 QueryBuilder knnTextQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
-                combinedQuery = combinedQuery.must(knnTextQuery).boost(1.0f);
+                combinedQuery = combinedQuery.must(knnTextQuery).boost(boost);
             }
 
             if (IMAGE_VECTOR_FIELD.equals(vectorField)) {
-                int similarity = 50;
                 String knnJsonQuery = "{\n" +
-                        "  \"knn\": {\n" +
-                        "    \"field\": \"" + IMAGE_VECTOR_FIELD + "\",\n" +
-                        "    \"query_vector\": " + vectorQuery + ",\n" +
-                        "    \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
-                        "    \"num_candidates\": " + numCandidates + ",\n" +
-                        "    \"similarity\": " + similarity + "\n" +
+                        "  \"function_score\": {\n" +  // Wrap knn inside function_score
+                        "    \"query\": {\n" +
+                        "      \"knn\": {\n" +
+                        "        \"field\": \"" + IMAGE_VECTOR_FIELD + "\",\n" +
+                        "        \"query_vector\": " + vectorQuery + ",\n" +
+                        "        \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
+                        "        \"num_candidates\": " + numCandidates + "\n" +
+                        "      }\n" +
+                        "    },\n" +
+                        "    \"min_score\": " + minScore + ",\n" +  // Apply min_score inside function_score
+                        "    \"boost_mode\": \"multiply\" \n" +
                         "  }\n" +
                         "}";
 
                 QueryBuilder knnImageQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
-                combinedQuery = combinedQuery.must(knnImageQuery).boost(1.0f);
+                combinedQuery = combinedQuery.must(knnImageQuery).boost(boost);
             }
 
         }

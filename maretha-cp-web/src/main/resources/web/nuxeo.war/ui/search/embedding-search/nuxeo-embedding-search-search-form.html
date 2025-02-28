@@ -20,6 +20,18 @@
 
     <nuxeo-input
             role="widget"
+            id="minScore"
+            type="number"
+            min="0"
+            max="1"
+            step="0.1"
+            label="Min Score"
+            value="{{params.min_score}}"
+            placeholder="0.8">
+    </nuxeo-input>
+
+    <nuxeo-input
+            role="widget"
             id="searchInput"
             type="search"
             label="[[i18n('defaultSearch.fullText')]]"
@@ -176,7 +188,7 @@
       validate() {
         this.set('params.vectorField', "interactionresults:embeddingsText");
         this.set('params.k',"10");
-        this.set('params.min_score',"0.4");
+        if(!this.params.min_score) this.params.min_score = 0.8;
         return true
       },
 
