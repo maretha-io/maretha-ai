@@ -18,17 +18,21 @@
             autofocus>
     </nuxeo-input>
 
-    <nuxeo-input
+    <label>Min Score</label>
+    <paper-slider
             role="widget"
-            id="minScore"
+            id="minScoreSlider"
+            label="Minimum Score"
             type="number"
             min="0"
             max="1"
             step="0.1"
-            label="Min Score"
+            snaps
             value="{{params.min_score}}"
-            placeholder="0.8">
-    </nuxeo-input>
+            placeholder="0.8"
+            on-change="_triggerSearch"
+            pin>
+    </paper-slider>
 
     <nuxeo-input
             role="widget"
@@ -64,22 +68,6 @@
               aria-label$="[[i18n('defaultSearch.authors')]]"
       >
       </nuxeo-dropdown-aggregation>
-    </div>
-
-    <div role="widget">
-      <label>[[i18n('defaultSearch.collections')]]</label>
-      <template is="dom-if" if="[[_checkForCollectionTitle(params)]]">
-        <nuxeo-selectivity
-                operation="User.GetCollections"
-                min-chars="0"
-                placeholder="[[i18n('defaultSearch.collections.placeholder')]]"
-                value="{{params.ecm_collections}}"
-                multiple="true"
-                name="collections"
-                aria-label$="[[i18n('defaultSearch.collections')]]"
-        >
-        </nuxeo-selectivity>
-      </template>
     </div>
 
     <div role="widget">
@@ -138,20 +126,21 @@
       >
       </nuxeo-checkbox-aggregation>
     </div>
-    
+
   </template>
 
   <script>
     Polymer({
       is: 'nuxeo-embedding-search-search-form',
-      behaviors: [Nuxeo.LayoutBehavior],
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.SearchParamsInterceptorBehavior],
       properties: {
 
         params: {
           type: Object,
           notify: true,
+          observer: '_paramsObserver'
         },
-        
+
         searchTerm: {
           type: String,
           notify: true,
@@ -161,7 +150,12 @@
           type: Object,
           value: {},
           notify: true,
-        }
+        },
+
+        auto: {
+          type: Boolean,
+          value: true
+        },
 
       },
 
@@ -172,7 +166,7 @@
 
       _search() {
         if (this.searchTerm) {
-          this.set('params.ecm_fulltext', this.formatFulltext(this.searchTerm));
+          this.set('params.ecm_fulltext_', this.formatFulltext(this.searchTerm));
         } else if (this.params && this.params.ecm_fulltext) {
           this.set('params.ecm_fulltext', '');
           // dirty but needed, the above line for
@@ -181,30 +175,22 @@
         }
       },
 
-      ready: function() {
-        this.set('params.vectorField', "interactionresults:embeddingsText");
-      },
-      
-      validate() {
-        this.set('params.vectorField', "interactionresults:embeddingsText");
-        this.set('params.k',"10");
-        if(!this.params.min_score) this.params.min_score = 0.8;
-        return true
-      },
-
      _checkForEnter(e) {
         if (e.keyCode === 13) {
           this._search();
         }
       },
 
-      _checkForCollectionTitle(params) {
-        return (
-          params == null ||
-          Object.keys(params).length === 0 ||
-          (params && params.ecm_collections.some((item) => item.displayLabel || item.title || item.text))
-        );
+      _paramsObserver(params) {
+        if(!this.params.vectorField)
+          this.set('params.vectorField', "interactionresults:embeddingsText");
+        if(!this.params.min_score)
+          this.params.min_score = 0.8;
       },
+
+      _triggerSearch() {
+        console.log("trigger search");
+      }
       
     });
   </script>

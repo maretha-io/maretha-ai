@@ -11,7 +11,7 @@ COPY --chown=900:0 maretha-cp-package/target/maretha-cp-package-1.0-SNAPSHOT.zip
 RUN echo ${CLID} $NUXEO_HOME/nxserver/data/instance.clid
 
 # Install nuxeo-web-ui
-RUN /install-packages.sh --clid ${NUXEO_CLID}  nuxeo-web-ui amazon-s3-online-storage
+RUN /install-packages.sh --clid ${NUXEO_CLID}  nuxeo-web-ui-3.0.40 amazon-s3-online-storage
 # Install a local package without its dependencies (`mp-install --nodeps`)
 RUN /install-packages.sh --offline $NUXEO_HOME/local-packages/maretha-cp-package-1.0-SNAPSHOT.zip
 RUN rm -rf $NUXEO_HOME/local-packages
