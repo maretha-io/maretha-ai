@@ -6,13 +6,12 @@
             <trackUsage>true</trackUsage>
             <searchDocumentType>DefaultSearch</searchDocumentType>
             <property name="pageSize">10</property>
+            <sort column="dc:modified" ascending="false" />
+            <pageSize>10</pageSize>
             <property name="coreSession">#{documentManager}</property>
+            <property name="useUnrestrictedSession">false</property>
             <whereClause>
-                <fixedPart>
-                    ecm:isVersion = 0 AND
-                    ecm:mixinType != 'HiddenInNavigation' AND
-                    ecm:isTrashed = 0
-                </fixedPart>
+                <fixedPart>ecm:mixinType != 'HiddenInNavigation' AND ecm:isVersion = 0 AND ecm:isTrashed = 0</fixedPart>
                 <predicate parameter="ecm:fulltext" operator="FULLTEXT">
                     <field schema="default_search" name="ecm_fulltext"/>
                 </predicate>
