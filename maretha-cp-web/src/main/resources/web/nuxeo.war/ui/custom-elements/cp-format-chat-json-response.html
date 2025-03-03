@@ -75,7 +75,7 @@
     <div id="chatContainer" class="chat-container">
       <template is="dom-repeat" items="[[messages]]">
         <div class$="message [[_computeClass(item.role)]]">
-          [[item.content]]
+          <div style="white-space: pre-wrap;">[[_formatContent(item.content)]]</div>
           <span class="timestamp">[[_formatDate(item.date)]]</span>
           <template is="dom-if" if="[[_isAssistantRole(item.role)]]">
             <cp-save-response document="[[document]]" interaction="[[chatInteraction]]" interaction-response="[[item.content]]"></cp-save-response>
@@ -160,6 +160,12 @@
         let date = new Date(dateString);
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       },
+
+      _formatContent(content) {
+        if (!content) return '';
+        let formatted = content.replace(/\\n/g, "");
+        return formatted;
+      }
 
     });
   </script>
