@@ -108,10 +108,12 @@
         <p>[[chatInteraction.description]]</p>
       </div>
 
-      <div id="chatResponse" class="chat-response">
-        <cp-format-chat-json-response messages="[[chatContext]]" stream="[[interactionResponseStream]]" document="[[document]]" chat-interaction="[[chatInteraction]]"
-                                      status="[[interactionStatus]]" loading="[[loading]]"></cp-format-chat-json-response>
-      </div>
+      <template is="dom-if" if="[[chatContext.length]]">
+        <div id="chatResponse" class="chat-response">
+          <cp-format-chat-json-response messages="[[chatContext]]" stream="[[interactionResponseStream]]" document="[[document]]" chat-interaction="[[chatInteraction]]"
+                                        status="[[interactionStatus]]" loading="[[loading]]"></cp-format-chat-json-response>
+        </div>
+      </template>
 
       <template is="dom-repeat" items="[[chatInteraction.parameters]]">
         <template is="dom-if" if="[[item.isContextMemoryParameter]]">
@@ -278,7 +280,7 @@
       },
 
       _dialogClosed: function () {
-
+        this.fire('document-updated');
       }
 
     });

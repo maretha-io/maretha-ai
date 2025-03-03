@@ -165,7 +165,7 @@
 
       _search() {
         if (this.searchTerm) {
-          this.set('params.ecm_fulltext_', this.formatFulltext(this.searchTerm));
+          this.set('params.ecm_fulltext', this.formatFulltext(this.searchTerm));
         } else if (this.params && this.params.ecm_fulltext) {
           this.set('params.ecm_fulltext', '');
           // dirty but needed, the above line for

@@ -75,12 +75,13 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         NxQueryBuilder nxQuery = this.getQueryBuilder(session);
 
         // Combine NXQL and KNN using "must" (AND logic)
-        BoolQueryBuilder combinedQuery = QueryBuilders
-                .boolQuery();
+        BoolQueryBuilder combinedQuery = QueryBuilders.boolQuery();
 
         String vectorQuery = namedParameters.get("vectorQuery");
         if (StringUtils.isNotEmpty(vectorQuery) &&
                 StringUtils.isNotEmpty(vectorField) && !"[]".equals(vectorQuery)) {
+
+
 
             double minScore = Double.parseDouble(namedParameters.getOrDefault("min_score", "0.8"));
 
@@ -127,7 +128,6 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
                 QueryBuilder knnImageQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
                 combinedQuery = combinedQuery.must(knnImageQuery).boost(boost);
             }
-
         }
 
         if (searchOnAllRepositories()) {
@@ -146,6 +146,7 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
                 .offset((int) this.getCurrentPageOffset())
                 .limit(this.getLimit())
                 .addAggregates(this.buildAggregates());
+
         log.debug("ES KNN query: " + nxQuery.makeQuery());
 
         EsResult ret = esService.queryAndAggregate(nxQuery);
