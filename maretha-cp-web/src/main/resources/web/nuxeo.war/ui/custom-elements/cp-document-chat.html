@@ -185,6 +185,7 @@
         }
         if (!open) {
           this._resetData();
+          this.fire('document-updated');
         }
       },
 
@@ -280,7 +281,7 @@
       },
 
       _dialogClosed: function () {
-        this.fire('document-updated');
+
       }
 
     });
