@@ -5,11 +5,14 @@
       sync-indexing="true"></nuxeo-operation>
 
     <style include="nuxeo-action-button-styles">
-      /* Flexbox container for the buttons */
       .button-container {
-        display: flex;
-        gap: 16px;
-        /* Spacing between the buttons */
+        display: block;
+        margin: auto;
+      }
+
+      :host {
+        display: block;
+        margin: auto;
       }
 
       /* Base button styles for both buttons */
@@ -20,8 +23,7 @@
         /* Dark teal text */
         border-radius: 4px;
         padding: 10px 16px;
-        font-size: 14px;
-        font-weight: bold;
+        font-size: 9px;
         text-transform: uppercase;
         transition: background-color 0.3s ease;
       }
@@ -32,36 +34,38 @@
       }
 
       /* Make buttons slightly more distinct but still light */
-      paper-button.save-metadata {
+      .save-metadata {
         background-color: #f1f8e9;
-        /* Light green background */
         color: #558b2f;
-        /* Olive text */
+        border: 1px solid;
       }
 
-      paper-button.save-related {
+      .save-related {
         background-color: #e0f7fa;
-        /* Light cyan background */
         color: #00796b;
-        /* Dark teal text */
+        border: 1px solid;
       }
 
       /* Hover effect for the Save as Metadata button */
-      paper-button.save-metadata:hover {
+      .save-metadata:hover {
         background-color: #dcedc8;
         /* Slightly darker green */
       }
 
       /* Hover effect for Save as Related Document */
-      paper-button.save-related:hover {
+      .save-related:hover {
         background-color: #b2ebf2;
         /* Slightly darker cyan */
       }
     </style>
 
     <div class="button-container">
-      <paper-button raised class="save-metadata" on-click="_saveAsMetadata">Save as Metadata</paper-button>
-      <paper-button raised class="save-related" on-click="_saveAsRelatedDocument">Save as Document</paper-button>
+      <paper-icon-button icon="icons:save" class="save-metadata" label="Save as Metadata" on-tap="_saveAsMetadata">
+        <nuxeo-tooltip>Save as Metadata</nuxeo-tooltip>
+      </paper-icon-button>
+      <paper-icon-button icon="icons:save" class="save-related" label="Save as Document" on-tap="_saveAsRelatedDocument">
+        <nuxeo-tooltip>Save as Document</nuxeo-tooltip>
+      </paper-icon-button>
     </div>
 
     <p id="toast"></p>
