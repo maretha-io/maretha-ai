@@ -109,3 +109,13 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     
 }
 ```
+
+### Settings document
+http://localhost:8080/nuxeo/ui/#!/browse/InteractionSettings
+
+### AI models:
+```
+amazon.titan-embed-image-v1
+anthropic.claude-3-5-sonnet
+amazon.titan-embed-text-v2
+```
