@@ -2,6 +2,7 @@ package io.maretha.cp.core.operations;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.automation.core.Constants;
@@ -10,6 +11,7 @@ import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
+import org.nuxeo.ecm.core.schema.DocumentType;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.Type;
@@ -37,19 +39,28 @@ public class GetDocumentTypesOperation {
     private final Log log = LogFactory.getLog(GetDocumentTypesOperation.class);
     @Param(name = "withSchemas", required = false)
     protected boolean withSchemas;
+    @Param(name = "documentType", required = false)
+    protected String documentType;
 
     @OperationMethod
     public List<? extends Object> run() {
         SchemaManager schemaManager = Framework.getService(SchemaManager.class);
         if (withSchemas) {
-            return getDocTypesWithSchemaDetails(schemaManager);
+            return getDocTypesWithSchemaDetails(schemaManager, documentType);
         }
         return Arrays.stream(schemaManager.getDocumentTypes()).map(Type::getName).collect(Collectors.toList());
     }
 
-    private List<DocTypeWithSchema> getDocTypesWithSchemaDetails(SchemaManager schemaManager) {
+    private List<DocTypeWithSchema> getDocTypesWithSchemaDetails(SchemaManager schemaManager, String documentType) {
         List<DocTypeWithSchema> docTypes = new ArrayList<>();
-        Arrays.stream(schemaManager.getDocumentTypes()).forEach(docType -> {
+        List<DocumentType> documentTypes;
+        if (StringUtils.isNotEmpty(documentType)) {
+            DocumentType docType = schemaManager.getDocumentType(documentType);
+            documentTypes = List.of(docType);
+        } else {
+            documentTypes = List.of(schemaManager.getDocumentTypes());
+        }
+        documentTypes.forEach(docType -> {
             DocTypeWithSchema docTypeWithSchema = new DocTypeWithSchema();
             docTypeWithSchema.setName(docType.getName());
             docTypes.add(docTypeWithSchema);
