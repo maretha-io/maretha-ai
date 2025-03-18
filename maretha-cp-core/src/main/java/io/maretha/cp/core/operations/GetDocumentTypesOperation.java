@@ -75,11 +75,13 @@ public class GetDocumentTypesOperation {
                     Type type = field.getType();
                     DocTypeWithSchema.Schema.Field customField = new DocTypeWithSchema.Schema.Field();
                     customField.setXpath(field.getName().getPrefixedName());
+                    customField.setType(field.getType().getName());
                     customField.setDescription("");
                     docTypeSchema.getFields().add(customField);
                     ObjectResolver objectResolver = type.getObjectResolver();
                     if (objectResolver instanceof DirectoryEntryResolver) {
                         Directory directory = ((DirectoryEntryResolver) objectResolver).getDirectory();
+                        customField.setDirectoryName(directory.getName());
 
                         try (Session session = Framework.getService(DirectoryService.class).open(directory.getName())) {
                             DocumentModelList entries = session.query(Map.of());
@@ -115,6 +117,8 @@ public class GetDocumentTypesOperation {
             public static class Field {
                 private String xpath;
                 private String description;
+                private String type;
+                private String directoryName;
                 private List<DirectoryEntry> directoryEntries = new ArrayList<>();
 
                 @Data
