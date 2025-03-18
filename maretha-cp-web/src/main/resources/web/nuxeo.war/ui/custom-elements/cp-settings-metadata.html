@@ -1,0 +1,321 @@
+<dom-module id="cp-settings-metadata">
+  <template>
+    <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation"></nuxeo-operation>
+    <nuxeo-operation id="docTypesOp" op="GetDocumentTypesOperation"></nuxeo-operation>
+
+    <style include="nuxeo-styles">
+      .content {
+        width: 100%;
+      }
+
+      paper-checkbox {
+        padding: 10px;
+        width: 50%;
+      }
+
+      paper-toggle-button {
+        --paper-toggle-button-checked-bar-color: var(--paper-green-500);
+        --paper-toggle-button-checked-button-color: var(--paper-green-500);
+        --paper-toggle-button-checked-ink-color: var(--paper-green-500);
+        --paper-toggle-button-unchecked-bar-color: var(--paper-red-500);
+        --paper-toggle-button-unchecked-button-color: var(--paper-red-500);
+        --paper-toggle-button-unchecked-ink-color: var(--paper-red-500);
+      }
+
+      .toast-error {
+        background-color: #f44336;
+        /* Red */
+        color: white;
+      }
+
+      .toast-success {
+        background-color: #4caf50;
+        /* Green */
+        color: white;
+      }
+
+      .toast-warning {
+        background-color: #ff9800;
+        /* Orange */
+        color: white;
+      }
+
+      .table {
+        width: 100%;
+      }
+
+      #dialog {
+        width: 80%;
+        min-height: 50%;
+        margin: auto;
+      }
+
+      .buttons {
+        margin: auto;
+        display: block;
+        text-align: right;
+        padding: 15px;
+      }
+
+      .nuxeo-card {
+        width: 100%;
+        height: 100%;
+        text-align: left;
+        box-shadow: 0 3px 20px rgb(0 0 0 / 10%);
+      }
+
+      .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        text-align: center;
+      }
+
+      .flex-item-left {
+        padding: 10px;
+        flex: 30%;
+      }
+
+      .flex-item-center {
+        padding: 10px;
+        flex: 30%;
+      }
+
+      .flex-item-right {
+        padding: 10px;
+        flex: 30%;
+      }
+
+      .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      paper-textarea {
+        width: 100%;
+        --paper-input-container-input: {
+          white-space: normal;
+          overflow: visible;
+          text-overflow: clip;
+        };
+      }
+    </style>
+
+
+    <div id="main slot">
+
+      <nuxeo-card>
+        <h3>AI Metadata Settings</h3>
+        <paper-toast id="toast"></paper-toast>
+
+        <div class="content">
+
+          <paper-dropdown-menu class="dropdown" label="Select DocumentType">
+            <paper-listbox
+                    class="dropdown-content"
+                    id="dropdownListbox"
+                    selected="{{selectedDocTypeIndex}}"
+                    slot="dropdown-content">
+              <template is="dom-repeat" items="[[documentTypes]]">
+                <paper-item>[[item]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+
+          <paper-dropdown-menu class="dropdown" label="Select Schema">
+            <paper-listbox
+                    class="dropdown-content"
+                    id="dropdownListbox"
+                    selected="{{selectedSchemaIndex}}"
+                    slot="dropdown-content">
+              <template is="dom-repeat" items="[[documentTypeWithSchema.schemas]]">
+                <paper-item>[[item.name]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+
+          <nuxeo-data-table items="[[selectedSchema.fields]]" class="results-table">
+            <nuxeo-data-table-column name="Xpath" flex="10">
+              <template>
+                [[item.xpath]]
+              </template>
+            </nuxeo-data-table-column>
+
+            <nuxeo-data-table-column name="Type" flex="20">
+              <template>
+                [[item.type]]
+              </template>
+            </nuxeo-data-table-column>
+
+            <nuxeo-data-table-column name="Description" flex="60">
+              <template>
+                <paper-input value="{{item.description}}" style="width: 100%;"></paper-input>
+              </template>
+            </nuxeo-data-table-column>
+
+            <nuxeo-data-table-column name="Directory" flex="10">
+              <template>
+                [[item.directoryName]]
+              </template>
+            </nuxeo-data-table-column>
+
+            <nuxeo-data-table-column name="Active" flex="10">
+              <template>
+                <paper-toggle-button checked="{{item.active}}"
+                                     on-change="_saveMetadataSettings"></paper-toggle-button>
+              </template>
+            </nuxeo-data-table-column>
+
+          </nuxeo-data-table>
+        </div>
+      </nuxeo-card>
+    </div>
+
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cp-settings-metadata',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+        interactions: {
+          type: Array,
+          value: [],
+          observer: '_interactionsObserver',
+          notify: true
+        },
+
+        selectedInteraction: {
+          type: Object,
+          observer: '_selectedInteractionObserver',
+        },
+
+        documentTypes: {
+          type: Array,
+          value: [],
+          observer: '_documentTypesObserver'
+        },
+
+        documentTypeWithSchema: {
+          type: Object
+        },
+
+        selectedDocTypeIndex: {
+          type: Number,
+          observer: '_selectedDocTypeIndexObserver'
+        },
+
+        selectedSchemaIndex: {
+          type: Number,
+          observer: '_selectedSchemaIndexObserver',
+        },
+
+        selectedSchema: {
+          type: Object,
+        },
+
+        debugging: {
+          type: Boolean,
+          value: false
+        },
+      },
+
+      ready: function () {
+        this._getDocumentTypes();
+      },
+
+      _getDocumentTypes: function () {
+        const operation = this.$.docTypesOp;
+        operation.params = {};
+        operation.execute().then((response) => {
+          this.set('documentTypes', response.value);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _getDocumentTypeWithSchema: function () {
+        const operation = this.$.docTypesOp;
+        operation.params = {"withSchemas": true, "documentType": this.documentTypes[this.selectedDocTypeIndex]};
+        operation.execute().then((response) => {
+          this.set('documentTypeWithSchema', response.value[0]);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _selectedDocTypeIndexObserver(selectedDocTypeIndex) {
+        if(selectedDocTypeIndex > -1) {
+          this._getDocumentTypeWithSchema();
+        }
+      },
+
+      _selectedSchemaIndexObserver(selectedSchemaIndex) {
+        if(selectedSchemaIndex > -1) {
+          this.set('selectedSchema', this.documentTypeWithSchema.schemas[selectedSchemaIndex]);
+        }
+      },
+
+      _saveMetadataSettings: function () {
+        const operation = this.$.saveInteractionsOperation;
+        operation.params = { 'interactions': this.interactions, 'awsS3AccessEnabled': this.awsS3AccessEnabled };
+        operation.execute().then((response) => {
+          this._showNotification('Changes Saved!', 'success');
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+          this._showNotification('Changes NOT Saved!', 'error');
+        });
+      },
+
+      _interactionsObserver(obs) {
+        this._debug(`_interactionsObserver:`, obs);
+      },
+
+      _selectedInteractionObserver(obs) {
+        this._debug(`_selectedInteractionObserver`, obs);
+      },
+
+      _interactionsChangeObserver(obs) {
+        this._debug(`_interactionsObserver:`, obs);
+      },
+
+      _documentTypesObserver(obs) {
+        this._debug(`_documentTypesObserver:`, obs);
+      },
+
+      _showNotification(message, type) {
+        const toast = this.$.toast;
+        toast.text = message;
+        toast.classList.remove('toast-error', 'toast-success', 'toast-warning'); // Remove existing classes
+        if (type) {
+          toast.classList.add(`toast-${type}`);
+        }
+        toast.open();
+      },
+
+      _toggleDialog: function (e) {
+        this.set('selectedInteraction', e.currentTarget.interaction);
+        this.$.dialog.toggle();
+      },
+
+      _close: function () {
+        this.$.dialog.toggle();
+      },
+
+      _dialogClosed: function () {
+      },
+
+      _debug: function (name, info) {
+        if (this.debug) {
+          console.log(name, info);
+        }
+      }
+
+    });
+  </script>
+</dom-module>

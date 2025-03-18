@@ -197,6 +197,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         interactionMap.put(SCHEMA_ACTIVE_ON_FOLDER, interaction.isActiveOnFolder());
         interactionMap.put(SCHEMA_ACTIVE_ON_ACTION_MENU, interaction.isActiveOnActionMenu());
         interactionMap.put(SCHEMA_IS_CHAT, interaction.isChat());
+        interactionMap.put(SCHEMA_IS_SAVE_METADATA, interaction.isSaveMetadata());
         interactionMap.put(SCHEMA_PARAMETERS, convertParameters(interaction.getParameters()));
         return interactionMap;
     }

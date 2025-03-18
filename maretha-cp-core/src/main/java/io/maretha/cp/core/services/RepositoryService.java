@@ -45,6 +45,7 @@ public interface RepositoryService {
     String SCHEMA_ACTIVE_ON_FOLDER = "activeOnFolder";
     String SCHEMA_ACTIVE_ON_ACTION_MENU = "activeOnActionMenu";
     String SCHEMA_IS_CHAT = "chat";
+    String SCHEMA_IS_SAVE_METADATA = "saveMetadata";
     String SCHEMA_PARAMETERS = "parameters";
 
     String PARAMETER_SCHEMA_NAME = "name";

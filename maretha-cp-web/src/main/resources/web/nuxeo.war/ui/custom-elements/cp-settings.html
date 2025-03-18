@@ -105,11 +105,12 @@
         <paper-toast id="toast"></paper-toast>
 
         <nuxeo-card>
+          <h3>AI Interaction Settings</h3>
           <div class="content">
             <nuxeo-data-table items="[[interactions]]" class="results-table">
               <nuxeo-data-table-column name="Name" flex="30">
                 <template>
-                  <a href="https://cloud.becomposable.com/studio/interactions/{{interaction.id}}"
+                  <a href="https://cloud.vertesia.com/studio/interactions/{{interaction.id}}"
                      target="_blank">{{item.name}}</a>
                 </template>
               </nuxeo-data-table-column>
@@ -156,6 +157,9 @@
             </div>
           </div>
         </nuxeo-card>
+
+        <cp-settings-metadata></cp-settings-metadata>
+
       </div>
 
       <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
@@ -236,6 +240,12 @@
                   <div style="display: inline-flex;">
                     <span>Is Chat:</span>
                     <paper-toggle-button checked="{{selectedInteraction.chat}}"
+                                         on-change="_saveInteractions"></paper-toggle-button>
+                  </div>
+
+                  <div style="display: inline-flex;">
+                    <span>Save Metadata:</span>
+                    <paper-toggle-button checked="{{selectedInteraction.saveMetadata}}"
                                          on-change="_saveInteractions"></paper-toggle-button>
                   </div>
                 </nuxeo-card>
