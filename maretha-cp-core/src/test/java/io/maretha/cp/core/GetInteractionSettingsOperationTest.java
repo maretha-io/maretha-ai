@@ -95,9 +95,8 @@ public class GetInteractionSettingsOperationTest {
         ObjectNode interaction_2_json = mapper.convertValue(interaction_2, ObjectNode.class);
         ctx.put("interactions", List.of(interaction_1_json, interaction_2_json));
         ctx.put("awsS3AccessEnabled", false);
-        DocumentModel savedDocument = (DocumentModel) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
-        assertNotNull(savedDocument);
-        Settings interactionSettings = savedDocument.getAdapter(Settings.class);
+        Settings interactionSettings = (Settings) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
+        assertNotNull(interactionSettings);
         int expectedSize = 2;
         assertEquals(expectedSize, interactionSettings.getInteractions().size());
         assertEquals(interaction.getId(), interactionSettings.getInteractions().get(0).getId());

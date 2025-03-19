@@ -153,7 +153,7 @@
 
             <nuxeo-data-table-column name="Description" flex="60">
               <template>
-                <paper-input value="{{item.description}}" style="width: 100%;"></paper-input>
+                <paper-input value="{{item.description}}" on-change="_saveMetadataSettings" style="width: 100%;"></paper-input>
               </template>
             </nuxeo-data-table-column>
 
@@ -183,16 +183,9 @@
       is: 'cp-settings-metadata',
       behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
       properties: {
-        interactions: {
-          type: Array,
-          value: [],
-          observer: '_interactionsObserver',
-          notify: true
-        },
-
-        selectedInteraction: {
+        schemaSettings: {
           type: Object,
-          observer: '_selectedInteractionObserver',
+          observer: '_schemaSettingsObserver'
         },
 
         documentTypes: {
@@ -252,6 +245,7 @@
       _selectedDocTypeIndexObserver(selectedDocTypeIndex) {
         if(selectedDocTypeIndex > -1) {
           this._getDocumentTypeWithSchema();
+          this.set('selectedSchema', this.documentTypeWithSchema.schemas[0]);
         }
       },
 
@@ -263,29 +257,24 @@
 
       _saveMetadataSettings: function () {
         const operation = this.$.saveInteractionsOperation;
-        operation.params = { 'interactions': this.interactions, 'awsS3AccessEnabled': this.awsS3AccessEnabled };
+        operation.params = {
+          'schemaSettings': this.selectedSchema
+        };
         operation.execute().then((response) => {
           this._showNotification('Changes Saved!', 'success');
+          this.set('schemaSettings', response.value.schemaSettings);
         }).catch((error) => {
           console.error('Error triggering operation:', error);
           this._showNotification('Changes NOT Saved!', 'error');
         });
       },
 
-      _interactionsObserver(obs) {
-        this._debug(`_interactionsObserver:`, obs);
-      },
-
-      _selectedInteractionObserver(obs) {
-        this._debug(`_selectedInteractionObserver`, obs);
-      },
-
-      _interactionsChangeObserver(obs) {
-        this._debug(`_interactionsObserver:`, obs);
-      },
-
       _documentTypesObserver(obs) {
         this._debug(`_documentTypesObserver:`, obs);
+      },
+
+      _schemaSettingsObserver(obs) {
+        console.log("schemaSettings", obs);
       },
 
       _showNotification(message, type) {
@@ -299,7 +288,6 @@
       },
 
       _toggleDialog: function (e) {
-        this.set('selectedInteraction', e.currentTarget.interaction);
         this.$.dialog.toggle();
       },
 
