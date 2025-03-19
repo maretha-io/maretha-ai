@@ -176,16 +176,12 @@
       }
     },
     "interactionresults:embeddingsText": {
-      "type": "dense_vector",
-      "dims": 1536,
-      "index": true,
-      "similarity": "l2_norm"
+      "type": "knn_vector",
+      "dimension": 1024
     },
     "interactionresults:embeddingsImage": {
-      "type": "dense_vector",
-      "dims": 1024,
-      "index": true,
-      "similarity": "l2_norm"
+      "type": "knn_vector",
+      "dimension": 1024
     }
   }
 }
