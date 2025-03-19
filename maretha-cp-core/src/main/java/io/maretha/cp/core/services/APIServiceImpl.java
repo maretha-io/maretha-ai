@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.cache.Cache;
+import org.nuxeo.ecm.core.cache.CacheService;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.IOException;
@@ -32,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class APIServiceImpl implements APIService {
+    public final static String EMBEDDINGS_CACHE = "embeddings_cache";
     private final Log log = LogFactory.getLog(APIServiceImpl.class);
     private final String API_URL = Framework.getProperty("cp.api.url", "https://api.becomposable.com");
     private final String UPLOAD_API_URL = Framework.getProperty("cp.upload.url", "https://zeno-server-production.api.becomposable.com");
@@ -50,7 +53,6 @@ public class APIServiceImpl implements APIService {
             .waitDuration(Duration.ofSeconds(1)) // Wait 1 second between attempts
             .retryExceptions(Exception.class) // Retry on all exceptions
             .build();
-
     private final RetryRegistry registry = RetryRegistry.of(config);
     private final Retry retry = registry.retry("httpRetry");
 
@@ -168,6 +170,11 @@ public class APIServiceImpl implements APIService {
 
     @Override
     public double[] textToEmbeddings(String queryText) {
+        Cache cache = Framework.getService(CacheService.class).getCache(EMBEDDINGS_CACHE);
+        if (cache.hasEntry(queryText)) {
+            return (double[]) cache.get(queryText);
+        }
+
         String bearerToken = getBearerToken();
         String requestBody = "{" +
                 "    \"model\": \"" + EMBEDDING_MODEL + "\"," +
@@ -177,7 +184,9 @@ public class APIServiceImpl implements APIService {
         try {
             JsonNode rootNode = objectMapper.readTree(response);
             JsonNode embeddings = rootNode.path("values");
-            return objectMapper.convertValue(embeddings, double[].class);
+            double[] embeddingsAsDoubles = objectMapper.convertValue(embeddings, double[].class);
+            cache.put(queryText, embeddingsAsDoubles);
+            return embeddingsAsDoubles;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
