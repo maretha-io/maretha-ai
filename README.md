@@ -12,7 +12,7 @@ cp.upload.url=https://zeno-server-production.api.vertesia.io
 cp.supported.mime-types=text/plain,application/pdf,image/jpeg,image/png,image/webp
 cp.project.id=
 cp.environment.id=
-cp.embedding.model=text-embedding-3-small
+cp.embedding.model=amazon.titan-embed-text-v2:0
 
 # dev -> cp.api.url=https://studio-server-preview.api.vertesia.io
 ```

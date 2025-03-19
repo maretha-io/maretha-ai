@@ -167,7 +167,7 @@ public class APIServiceImpl implements APIService {
     }
 
     @Override
-    public double[] textToEmbeddings( String queryText) {
+    public double[] textToEmbeddings(String queryText) {
         String bearerToken = getBearerToken();
         String requestBody = "{" +
                 "    \"model\": \"" + EMBEDDING_MODEL + "\"," +
@@ -245,7 +245,7 @@ public class APIServiceImpl implements APIService {
         try (Response response = client.newCall(request).execute()) {
             String responseString = response.body().string();
             if (!response.isSuccessful()) {
-                throw new RuntimeException("Failed to get a successful response, code: " + response.code());
+                throw new RuntimeException("Failed to get a successful from: " + request.url() + " response: " + response);
             }
             return responseString;
         } catch (Exception e) {

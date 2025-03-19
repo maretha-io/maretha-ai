@@ -3,9 +3,7 @@ package io.maretha.cp.core.search;
 import io.maretha.cp.core.services.APIService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.json.JSONArray;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -18,6 +16,11 @@ import org.nuxeo.elasticsearch.api.EsResult;
 import org.nuxeo.elasticsearch.provider.ElasticSearchNxqlPageProvider;
 import org.nuxeo.elasticsearch.query.NxQueryBuilder;
 import org.nuxeo.runtime.api.Framework;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.index.query.functionscore.ScriptScoreQueryBuilder;
+import org.opensearch.script.Script;
+import org.opensearch.script.ScriptType;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,10 +32,7 @@ import static org.nuxeo.ecm.platform.query.api.PageProviderService.NAMED_PARAMET
 public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     public static final String TEXT_VECTOR_FIELD = "interactionresults:embeddingsText";
     public static final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
-    private static final long serialVersionUID = 1L;
-    private static final int numCandidates = 1000;
-    private static final float boost = 2.0F;
-    private static final String SEMANTIC_SEARCH_K = "30";
+    private static final float boost = 1.0F;
     private List<DocumentModel> results;
 
     @Override
@@ -81,52 +81,26 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         if (StringUtils.isNotEmpty(vectorQuery) &&
                 StringUtils.isNotEmpty(vectorField) && !"[]".equals(vectorQuery)) {
 
-
-
-            double minScore = Double.parseDouble(namedParameters.getOrDefault("min_score", "0.8"));
+            float minScore = Float.parseFloat(namedParameters.getOrDefault("min_score", "0.8"));
 
             if (TEXT_VECTOR_FIELD.equals(vectorField)) {
                 APIService apiService = Framework.getService(APIService.class);
                 double[] textVectors = apiService.textToEmbeddings(vectorQuery);
                 String vectorJson = Arrays.toString(textVectors);
 
-                String knnJsonQuery = "{\n" +
-                        "  \"function_score\": {\n" +  // Wrap knn inside function_score
-                        "    \"query\": {\n" +
-                        "      \"knn\": {\n" +
-                        "        \"field\": \"" + TEXT_VECTOR_FIELD + "\",\n" +
-                        "        \"query_vector\": " + vectorJson + ",\n" +
-                        "        \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
-                        "        \"num_candidates\": " + numCandidates + "\n" +
-                        "      }\n" +
-                        "    },\n" +
-                        "    \"min_score\": " + minScore + ",\n" +  // Apply min_score inside function_score
-                        "    \"boost_mode\": \"multiply\" \n" +
-                        "  }\n" +
-                        "}";
-
-                QueryBuilder knnTextQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
-                combinedQuery = combinedQuery.must(knnTextQuery).boost(boost);
+                ScriptScoreQueryBuilder scoreQuery = buildScriptKnnQuery(vectorJson, TEXT_VECTOR_FIELD)
+                        .setMinScore(minScore);
+                combinedQuery = combinedQuery
+                        .must(scoreQuery)
+                        .boost(boost);
             }
 
             if (IMAGE_VECTOR_FIELD.equals(vectorField)) {
-                String knnJsonQuery = "{\n" +
-                        "  \"function_score\": {\n" +  // Wrap knn inside function_score
-                        "    \"query\": {\n" +
-                        "      \"knn\": {\n" +
-                        "        \"field\": \"" + IMAGE_VECTOR_FIELD + "\",\n" +
-                        "        \"query_vector\": " + vectorQuery + ",\n" +
-                        "        \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
-                        "        \"num_candidates\": " + numCandidates + "\n" +
-                        "      }\n" +
-                        "    },\n" +
-                        "    \"min_score\": " + minScore + ",\n" +  // Apply min_score inside function_score
-                        "    \"boost_mode\": \"multiply\" \n" +
-                        "  }\n" +
-                        "}";
-
-                QueryBuilder knnImageQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
-                combinedQuery = combinedQuery.must(knnImageQuery).boost(boost);
+                ScriptScoreQueryBuilder scoreQuery = buildScriptKnnQuery(vectorQuery, IMAGE_VECTOR_FIELD)
+                        .setMinScore(minScore);
+                combinedQuery = combinedQuery
+                        .must(scoreQuery)
+                        .boost(boost);
             }
         }
 
@@ -164,5 +138,30 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     public DocumentModelList getEmptyResult() {
         setResultsCount(0);
         return new DocumentModelListImpl();
+    }
+
+    private ScriptScoreQueryBuilder buildScriptKnnQuery(String queryVector, String type) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("query_value", parseVector(queryVector));
+        params.put("field", type);
+        params.put("space_type", "cosinesimil");
+
+        // Construct the script for cosine similarity
+        Script script = new Script(ScriptType.INLINE, "knn", "knn_score", params);
+
+        // Build the script-based query
+        return QueryBuilders.scriptScoreQuery(
+                QueryBuilders.existsQuery(type).boost(0.1f), // Filter: Only docs with vectors
+                script
+        );
+    }
+
+    private double[] parseVector(String vectorString) {
+        JSONArray jsonArray = new JSONArray(vectorString);
+        double[] result = new double[jsonArray.length()];
+        for (int i = 0; i < jsonArray.length(); i++) {
+            result[i] = jsonArray.getDouble(i);
+        }
+        return result;
     }
 }
