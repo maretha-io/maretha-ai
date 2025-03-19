@@ -1,8 +1,10 @@
 package io.maretha.cp.core.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.InteractionResponse;
@@ -72,30 +74,52 @@ public class RepositoryServiceImpl implements RepositoryService {
     }
 
     @Override
-    public DocumentModel saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration) {
+    public Settings saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration) {
         DocumentModel cpSettingsDoc;
         Optional<DocumentModel> existingSettingsDocument = getExistingSettingsDocument(session);
+
         if (existingSettingsDocument.isPresent()) {
             cpSettingsDoc = existingSettingsDocument.get();
         } else {
-            //TODO Create a folder and add permissions?
             cpSettingsDoc = session.createDocumentModel("/", SETTINGS_DOCUMENT_NAME, SETTINGS_DOCUMENT_TYPE);
             cpSettingsDoc = session.createDocument(cpSettingsDoc);
         }
-        List<HashMap<String, Object>> interactionsMap = interactions.stream()
-                .map(objNode -> convertToType(objNode, Interaction.class))
-                .map(this::convertToInteractionComplexType)
-                .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(interactions)) {
+            List<HashMap<String, Object>> interactionsMap = interactions.stream()
+                    .map(objNode -> convertToType(objNode, Interaction.class))
+                    .map(this::convertToInteractionComplexType)
+                    .collect(Collectors.toList());
 
-        if (CollectionUtils.isEmpty(interactionsMap)) {
-            throw new NuxeoException("Empty list of settings");
+            cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_PATH, (Serializable) interactionsMap);
         }
 
         Boolean awsS3AccessEnabled = (Boolean) configuration.get("awsS3AccessEnabled");
-
-        cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_PATH, (Serializable) interactionsMap);
         cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_AWS_S3_ACCESS, awsS3AccessEnabled);
-        return session.saveDocument(cpSettingsDoc);
+
+        DocTypeWithSchema.Schema schemaSettings = (DocTypeWithSchema.Schema) configuration.get("schemaSettings");
+        if (!Objects.isNull(schemaSettings)) {
+            updateSchemaSettings(schemaSettings, cpSettingsDoc);
+        }
+
+        return session.saveDocument(cpSettingsDoc).getAdapter(Settings.class);
+    }
+
+    private void updateSchemaSettings(DocTypeWithSchema.Schema schemaSettingsInput, DocumentModel cpSettingsDoc) {
+        Map<String, DocTypeWithSchema.Schema> schemaSettingsMap = new HashMap<>();
+
+        try {
+            String propertyValue = (String) cpSettingsDoc.getPropertyValue(SETTINGS_SCHEMA_METADATA);
+            if (!Objects.isNull(propertyValue)) {
+                schemaSettingsMap = objectMapper.readValue(propertyValue, new TypeReference<>() {
+                });
+            }
+            String schemaName = schemaSettingsInput.getName();
+            schemaSettingsMap.put(schemaName, schemaSettingsInput);
+            String jsonString = objectMapper.writeValueAsString(schemaSettingsMap);
+            cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_METADATA, jsonString);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

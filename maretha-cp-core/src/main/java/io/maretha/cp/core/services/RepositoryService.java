@@ -33,6 +33,7 @@ public interface RepositoryService {
     String SETTINGS_SCHEMA_NAME = "interactionSettings";
     String SETTINGS_SCHEMA_PATH = "interactionsettings:interactions";
     String SETTINGS_SCHEMA_AWS_S3_ACCESS = "interactionsettings:awsS3AccessEnabled";
+    String SETTINGS_SCHEMA_METADATA = "interactionsettings:schemaSettings";
 
     String SCHEMA_ID = "id";
     String SCHEMA_DESCRIPTION = "description";
@@ -69,7 +70,7 @@ public interface RepositoryService {
 
     List<Interaction> getActiveChatInteractionsForDocumentType(CoreSession session, String documentType, boolean folder);
 
-    DocumentModel saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration);
+    Settings saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration);
 
     DocumentModel saveInteractionResponseAsMetadata(DocumentModel doc, CoreSession session, List<ObjectNode> interactions);
 

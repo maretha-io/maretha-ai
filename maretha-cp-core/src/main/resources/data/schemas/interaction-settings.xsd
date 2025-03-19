@@ -7,6 +7,8 @@
     <xs:element name="interactions" type="nxs:interactionList"/>
     <!--S3 Path access enabled-->
     <xs:element name="awsS3AccessEnabled" type="xs:boolean"/>
+    <!--Schema Settings for saving metadata-->
+    <xs:element name="schemaSettings" type="xs:string"/>
 
     <!-- Definition for the interactions complex type -->
     <xs:complexType name="interactionType">

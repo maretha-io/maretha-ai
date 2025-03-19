@@ -2,6 +2,7 @@ package io.maretha.cp.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.Settings;
 import io.maretha.cp.core.operations.SaveInteractionSettingsOperation;
@@ -12,7 +13,6 @@ import org.nuxeo.ecm.automation.OperationContext;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.test.AutomationFeature;
 import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.test.DefaultRepositoryInit;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
@@ -23,11 +23,11 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 import org.nuxeo.runtime.test.runner.RuntimeFeature;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -54,13 +54,37 @@ public class SaveInteractionSettingsOperationTest {
         ObjectNode interaction_2_json = mapper.convertValue(interaction_2, ObjectNode.class);
         ctx.put("interactions", List.of(interaction_1_json, interaction_2_json));
         ctx.put("awsS3AccessEnabled", true);
-        DocumentModel savedDocument = (DocumentModel) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
-        assertNotNull(savedDocument);
-        Settings settings = savedDocument.getAdapter(Settings.class);
+        Settings settings = (Settings) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
+        assertNotNull(settings);
         int expectedSize = 2;
         assertEquals(expectedSize, settings.getInteractions().size());
         assertEquals(interaction_1.getId(), settings.getInteractions().get(0).getId());
         assertTrue(settings.isAwsS3AccessEnabled());
+    }
+
+    @Test
+    public void shouldSaveSchemaSettings() throws OperationException {
+        //GIVEN
+        OperationContext ctx = new OperationContext(session);
+        Interaction interaction_1 = Interaction.builder().id("test").build();
+        Interaction interaction_2 = Interaction.builder().id("test_2").build();
+        DocTypeWithSchema.Schema schemaSettings = new DocTypeWithSchema.Schema();
+        String testSchemaName = "TestSchema";
+        schemaSettings.setName(testSchemaName);
+        schemaSettings.setFields(new ArrayList<>());
+        ObjectNode schemaSettingsObj = mapper.convertValue(schemaSettings, ObjectNode.class);
+        ObjectNode interaction_1_json = mapper.convertValue(interaction_1, ObjectNode.class);
+        ObjectNode interaction_2_json = mapper.convertValue(interaction_2, ObjectNode.class);
+        //WHEN
+        ctx.put("interactions", List.of(interaction_1_json, interaction_2_json));
+        ctx.put("awsS3AccessEnabled", true);
+        ctx.put("schemaSettings", schemaSettingsObj);
+        Settings settings = (Settings) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
+        //THEN
+        assertNotNull(settings);
+        Map<String, DocTypeWithSchema.Schema> schemaSettingsSaved = settings.getSchemaSettings();
+        assertNotNull(schemaSettingsSaved);
+        assertEquals(testSchemaName, schemaSettingsSaved.get(testSchemaName).getName());
     }
 
 
