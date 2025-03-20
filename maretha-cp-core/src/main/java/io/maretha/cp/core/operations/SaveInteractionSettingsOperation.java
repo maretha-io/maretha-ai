@@ -33,12 +33,15 @@ public class SaveInteractionSettingsOperation {
     protected boolean awsS3AccessEnabled;
     @Param(name = "schemaSettings", required = false)
     protected DocTypeWithSchema.Schema schemaSettings;
+    @Param(name = "esSettings", required = false)
+    protected Map<String, String> esSettings;
 
     @OperationMethod
     public Settings run() {
         Map<String, Object> configuration = new HashMap<>();
         configuration.put("awsS3AccessEnabled", awsS3AccessEnabled);
         configuration.put("schemaSettings", schemaSettings);
+        configuration.put("esSettings", esSettings);
         return cpLocalSettingsService.saveInteractionSettings(session, interactions, configuration);
     }
 

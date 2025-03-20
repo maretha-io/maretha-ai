@@ -228,10 +228,10 @@
 
     },
 
-    observers: ['_update(searchValue, visible)'],
+    observers: ['_update(document)'],
 
-    _update: function(searchValue, visible) {
-      if (visible) {
+    _update: function(document) {
+      if (document) {
         this.params = this._computeParams(document);
         this._refresh();
       }
@@ -239,10 +239,14 @@
 
     _computeParams: function(document) {
       let params = {};
-      if (this.searchValue) {
-        params.vectorField = this.searchProperty;
-        params.vectorQuery = this.searchValue;
-        params.min_score = "0.5";
+      params.vectorField = this.searchProperty;
+      params.min_score = "0.5";
+
+      if(document.properties && document.properties['interactionresults:embeddingsImage'].length > 0){
+        params.vectorQuery = JSON.stringify(document.properties['interactionresults:embeddingsImage']);
+      }
+      if(document.properties && document.properties['interactionresults:embeddingsText'].length > 0){
+        params.vectorQuery = JSON.stringify(document.properties['interactionresults:embeddingsText']);
       }
       return params;
     }

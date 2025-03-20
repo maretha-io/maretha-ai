@@ -1,6 +1,7 @@
 <link rel="import" href="configuration-behaviour.html">
 <link rel="import" href="custom-elements/cp-settings.html">
 <link rel="import" href="custom-elements/cp-settings-metadata.html">
+<link rel="import" href="custom-elements/cp-settings-elasticsearch.html">
 <link rel="import" href="custom-elements/cp-document-interaction.html">
 <link rel="import" href="custom-elements/cp-save-response.html">
 <link rel="import" href="custom-elements/cp-format-json-response.html">
@@ -70,7 +71,7 @@
 <!-- Contribution of element 'nuxeo-page-item' for slot 'DOCUMENT_VIEWS_ITEMS' -->
 <nuxeo-slot-content name="similarImageTab" slot="DOCUMENT_VIEWS_ITEMS" order="10">
     <template>
-        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet" expression="document.properties['interactionresults:embeddingsImage'] != null">
+        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
             <template>
                 <nuxeo-page-item name="SimilarImageTab" label="More Like This"></nuxeo-page-item>
             </template>
@@ -80,7 +81,7 @@
 <!-- Contribution of element 'nuxeo-similar-images-tab' for slot 'DOCUMENT_VIEWS_PAGES' -->
 <nuxeo-slot-content name="SimilarImageTab" slot="DOCUMENT_VIEWS_PAGES">
     <template>
-        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet" expression="document.properties['interactionresults:embeddingsImage'] != null">
+        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
             <template>
                 <nuxeo-similar-images-tab document="[[document]]" name="SimilarImageTab"></nuxeo-similar-images-tab>
             </template>
