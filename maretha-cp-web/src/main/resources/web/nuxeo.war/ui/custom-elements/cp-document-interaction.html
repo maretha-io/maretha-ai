@@ -1,6 +1,6 @@
 <dom-module id="cp-document-interaction">
   <template>
-    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsForDocumentOperation"
+    <nuxeo-operation id="getSettingsOperation" op="GetInteractionsForDocumentOperation"
                      input="[[document]]"></nuxeo-operation>
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
                      input="[[document.uid]]"></nuxeo-operation>
@@ -297,7 +297,7 @@
       },
 
       _getInteractions: function () {
-        const operation = this.$.getInteractionsOperation;
+        const operation = this.$.getSettingsOperation;
         operation.params = {};
         operation.execute().then((response) => {
           this.set('interactions', response.value);

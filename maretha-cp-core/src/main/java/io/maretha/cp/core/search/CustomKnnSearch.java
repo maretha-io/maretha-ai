@@ -91,7 +91,7 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         BoolQueryBuilder combinedQuery = QueryBuilders.boolQuery();
 
         if (StringUtils.isNotEmpty(vectorQuery)) {
-            Settings settings = settingsService.getLocalInteractionSettings(CoreInstance.getCoreSessionSystem(null));
+            Settings settings = settingsService.getSavedSettings(CoreInstance.getCoreSessionSystem(null));
             Map<String, String> esSettings = settings.getEsSettings();
 
             if (TEXT_VECTOR_FIELD.equals(vectorField)) {

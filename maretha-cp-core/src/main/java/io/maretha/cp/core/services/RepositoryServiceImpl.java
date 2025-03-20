@@ -10,7 +10,9 @@ import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.InteractionResponse;
 import io.maretha.cp.core.models.Settings;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.ecm.automation.OperationException;
+import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -29,12 +31,17 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AWS_S3_ACCESS_ENABLED;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.ES_SETTINGS;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
+
 public class RepositoryServiceImpl implements RepositoryService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public Settings getLocalInteractionSettings(CoreSession session) {
+    public Settings getSavedSettings(CoreSession session) {
         Optional<DocumentModel> existingSettingsDocument = getExistingSettingsDocument(session);
         if (existingSettingsDocument.isPresent()) {
             DocumentModel documentModel = existingSettingsDocument.get();
@@ -45,7 +52,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Override
     public List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
-        return getLocalInteractionSettings(session).getInteractions()
+        return getSavedSettings(session).getInteractions()
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
@@ -60,7 +67,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Override
     public List<Interaction> getActiveChatInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
-        return getLocalInteractionSettings(session).getInteractions()
+        return getSavedSettings(session).getInteractions()
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
@@ -84,6 +91,7 @@ public class RepositoryServiceImpl implements RepositoryService {
             cpSettingsDoc = session.createDocumentModel("/", SETTINGS_DOCUMENT_NAME, SETTINGS_DOCUMENT_TYPE);
             cpSettingsDoc = session.createDocument(cpSettingsDoc);
         }
+
         if (CollectionUtils.isNotEmpty(interactions)) {
             List<HashMap<String, Object>> interactionsMap = interactions.stream()
                     .map(objNode -> convertToType(objNode, Interaction.class))
@@ -93,21 +101,36 @@ public class RepositoryServiceImpl implements RepositoryService {
             cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_PATH, (Serializable) interactionsMap);
         }
 
-        Boolean awsS3AccessEnabled = (Boolean) configuration.get("awsS3AccessEnabled");
+        Boolean awsS3AccessEnabled = (Boolean) configuration.get(AWS_S3_ACCESS_ENABLED);
         cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_AWS_S3_ACCESS, awsS3AccessEnabled);
 
-        DocTypeWithSchema.Schema schemaSettings = (DocTypeWithSchema.Schema) configuration.get("schemaSettings");
+        DocTypeWithSchema.Schema schemaSettings = (DocTypeWithSchema.Schema) configuration.get(SCHEMA_SETTINGS);
         if (!Objects.isNull(schemaSettings)) {
             updateSchemaSettings(schemaSettings, cpSettingsDoc);
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, String> esSettings = (Map<String, String>) configuration.get("esSettings");
+        Map<String, String> esSettings = (Map<String, String>) configuration.get(ES_SETTINGS);
         if (!Objects.isNull(esSettings)) {
             updateEsSettings(esSettings, cpSettingsDoc);
         }
 
+        @SuppressWarnings("unchecked")
+        Map<String, String> vertesiaSettings = (Map<String, String>) configuration.get(VERTESIA_SETTINGS);
+        if (!Objects.isNull(vertesiaSettings)) {
+            updateVertesiaSettings(vertesiaSettings, cpSettingsDoc);
+        }
+
         return session.saveDocument(cpSettingsDoc).getAdapter(Settings.class);
+    }
+
+    private void updateVertesiaSettings(Map<String, String> settings, DocumentModel cpSettingsDoc) {
+        try {
+            String jsonString = objectMapper.writeValueAsString(settings);
+            cpSettingsDoc.setPropertyValue(SETTINGS_VERTESIA, jsonString);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void updateSchemaSettings(DocTypeWithSchema.Schema schemaSettingsInput, DocumentModel cpSettingsDoc) {
@@ -182,7 +205,26 @@ public class RepositoryServiceImpl implements RepositoryService {
         return interactionResponseDoc;
     }
 
-    private void addDocumentRelation(DocumentModel sourceDoc, CoreSession session, DocumentModel targetDoc) throws OperationException {
+    @Override
+    public String getSettingsProperty(String name, String defaultValue) {
+        String property = Framework.getProperty(name);
+        if (StringUtils.isNotEmpty(property)) {
+            return property;
+        }
+        //TODO Cache?
+        Settings settings = getSavedSettings(CoreInstance.getCoreSessionSystem(null));
+        String nameWithoutPrefix = name.replace("vertesia.", "");
+        String savedProperty = settings.getVertesiaSettings().get(nameWithoutPrefix);
+        if (StringUtils.isNotEmpty(savedProperty)) {
+            return savedProperty;
+        }
+        if (StringUtils.isNotEmpty(defaultValue)) {
+            return defaultValue;
+        }
+        return "";
+    }
+
+    private void addDocumentRelation(DocumentModel sourceDoc, CoreSession session, DocumentModel targetDoc) {
         DocumentRelationManager documentRelationManager = Framework.getService(DocumentRelationManager.class);
         String predicate = "http://www.nuxeo.org/ecm/schemas/relation#isRelatedTo";
         boolean outgoing = true;

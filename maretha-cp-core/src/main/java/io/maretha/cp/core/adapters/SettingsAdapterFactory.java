@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.Settings;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.adapter.DocumentAdapterFactory;
 
@@ -15,10 +17,12 @@ import java.util.Objects;
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_ELASTICSEARCH;
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_SCHEMA_AWS_S3_ACCESS;
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_SCHEMA_METADATA;
+import static io.maretha.cp.core.services.RepositoryService.SETTINGS_VERTESIA;
 import static io.maretha.cp.core.services.RepositoryServiceImpl.SETTINGS_DOCUMENT_TYPE;
 import static io.maretha.cp.core.services.RepositoryServiceImpl.SETTINGS_SCHEMA_PATH;
 
 public class SettingsAdapterFactory implements DocumentAdapterFactory {
+    private static final Log log = LogFactory.getLog(SettingsAdapterFactory.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -28,34 +32,27 @@ public class SettingsAdapterFactory implements DocumentAdapterFactory {
             List<Interaction> cpInteractions = objectMapper
                     .convertValue(interactions, objectMapper.getTypeFactory().constructCollectionType(List.class, Interaction.class));
             Boolean awsS3AccessEnabled = (Boolean) Objects.requireNonNullElse(doc.getPropertyValue(SETTINGS_SCHEMA_AWS_S3_ACCESS), false);
-            Map<String, DocTypeWithSchema.Schema> schemaSettingsMap = getSchemaSettingsMap(doc);
-            Map<String, String> esSettingsMap = getEsSettingsMap(doc);
-            return new Settings(cpInteractions, awsS3AccessEnabled, schemaSettingsMap, esSettingsMap);
+            Map<String, DocTypeWithSchema.Schema> schemaSettingsMap = getPropertyValue(doc, SETTINGS_SCHEMA_METADATA, new TypeReference<>() {
+            });
+            Map<String, String> esSettingsMap = getPropertyValue(doc, SETTINGS_ELASTICSEARCH, new TypeReference<>() {
+            });
+            Map<String, String> settingsMap = getPropertyValue(doc, SETTINGS_VERTESIA, new TypeReference<>() {
+            });
+            return new Settings(cpInteractions, awsS3AccessEnabled, schemaSettingsMap, esSettingsMap, settingsMap);
         }
         return null;
     }
 
-    private Map<String, DocTypeWithSchema.Schema> getSchemaSettingsMap(DocumentModel doc) {
-        Map<String, DocTypeWithSchema.Schema> schemaSettingsMap = Map.of();
+    private <T> T getPropertyValue(DocumentModel doc, String xpath, TypeReference<T> typeReference) {
         try {
-            String schemaSettings = (String) doc.getPropertyValue(SETTINGS_SCHEMA_METADATA);
-            schemaSettingsMap = objectMapper.readValue(schemaSettings, new TypeReference<>() {
-            });
-        } catch (Exception e) {
+            String schemaSettings = (String) doc.getPropertyValue(xpath);
+            return objectMapper.readValue(schemaSettings, typeReference);
+        } catch (IllegalArgumentException e) {
             //ignore
+        } catch (Exception e) {
+            log.error(e);
         }
-        return schemaSettingsMap;
+        return null;
     }
 
-    private Map<String, String> getEsSettingsMap(DocumentModel doc) {
-        Map<String, String> esSettingsMap = Map.of();
-        try {
-            String schemaSettings = (String) doc.getPropertyValue(SETTINGS_ELASTICSEARCH);
-            esSettingsMap = objectMapper.readValue(schemaSettings, new TypeReference<>() {
-            });
-        } catch (Exception e) {
-            //ignore
-        }
-        return esSettingsMap;
-    }
 }

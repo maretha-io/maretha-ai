@@ -1,6 +1,6 @@
 <dom-module id="cp-settings">
   <template>
-    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation"></nuxeo-operation>
+    <nuxeo-operation id="getSettingsOperation" op="GetSettingsOperation"></nuxeo-operation>
     <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation"></nuxeo-operation>
     <nuxeo-operation id="docTypesOp" op="GetDocumentTypesOperation"></nuxeo-operation>
 
@@ -162,6 +162,8 @@
 
         <cp-settings-elasticsearch></cp-settings-elasticsearch>
 
+        <cp-settings-vertesia></cp-settings-vertesia>
+
       </div>
 
       <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
@@ -315,7 +317,7 @@
       },
 
       _getInteractions: function () {
-        const operation = this.$.getInteractionsOperation;
+        const operation = this.$.getSettingsOperation;
         operation.params = {};
         operation.execute().then((response) => {
           this.set('interactions', response.value.interactions);
@@ -385,7 +387,7 @@
       },
 
       _refresh: function () {
-        const operation = this.$.getInteractionsOperation;
+        const operation = this.$.getSettingsOperation;
         operation.params = { "refresh": true };
         operation.execute().then((response) => {
           this.set('interactions', response.value.interactions);

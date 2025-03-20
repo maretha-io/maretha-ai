@@ -1,7 +1,7 @@
 <dom-module id="cp-settings-elasticsearch">
   <template>
     <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation"></nuxeo-operation>
-    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsOperation"></nuxeo-operation>
+    <nuxeo-operation id="getSettingsOperation" op="GetSettingsOperation"></nuxeo-operation>
 
     <style include="nuxeo-styles">
       .content {
@@ -62,7 +62,7 @@
       },
 
       _getEsSettings: function () {
-        const operation = this.$.getInteractionsOperation;
+        const operation = this.$.getSettingsOperation;
         operation.params = {};
         operation.execute().then((response) => {
           this.set('esSettings', response.value.esSettings);

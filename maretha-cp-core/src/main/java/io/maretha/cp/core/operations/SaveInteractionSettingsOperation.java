@@ -23,25 +23,32 @@ import java.util.Map;
 public class SaveInteractionSettingsOperation {
 
     public static final String ID = "SaveInteractionsOperation";
+    public static final String VERTESIA_SETTINGS = "vertesiaSettings";
+    public static final String ES_SETTINGS = "esSettings";
+    public static final String SCHEMA_SETTINGS = "schemaSettings";
+    public static final String AWS_S3_ACCESS_ENABLED = "awsS3AccessEnabled";
     private final RepositoryService cpLocalSettingsService = Framework.getService(RepositoryService.class);
 
     @Context
     protected CoreSession session;
     @Param(name = "interactions", required = false)
     protected List<ObjectNode> interactions;
-    @Param(name = "awsS3AccessEnabled", required = false)
+    @Param(name = AWS_S3_ACCESS_ENABLED, required = false)
     protected boolean awsS3AccessEnabled;
-    @Param(name = "schemaSettings", required = false)
+    @Param(name = SCHEMA_SETTINGS, required = false)
     protected DocTypeWithSchema.Schema schemaSettings;
-    @Param(name = "esSettings", required = false)
+    @Param(name = ES_SETTINGS, required = false)
     protected Map<String, String> esSettings;
+    @Param(name = VERTESIA_SETTINGS, required = false)
+    protected Map<String, String> vertesiaSettings;
 
     @OperationMethod
     public Settings run() {
         Map<String, Object> configuration = new HashMap<>();
-        configuration.put("awsS3AccessEnabled", awsS3AccessEnabled);
-        configuration.put("schemaSettings", schemaSettings);
-        configuration.put("esSettings", esSettings);
+        configuration.put(AWS_S3_ACCESS_ENABLED, awsS3AccessEnabled);
+        configuration.put(SCHEMA_SETTINGS, schemaSettings);
+        configuration.put(ES_SETTINGS, esSettings);
+        configuration.put(VERTESIA_SETTINGS, vertesiaSettings);
         return cpLocalSettingsService.saveInteractionSettings(session, interactions, configuration);
     }
 

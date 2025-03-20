@@ -27,6 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AWS_S3_ACCESS_ENABLED;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.ES_SETTINGS;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -53,7 +57,7 @@ public class SaveInteractionSettingsOperationTest {
         ObjectNode interaction_1_json = mapper.convertValue(interaction_1, ObjectNode.class);
         ObjectNode interaction_2_json = mapper.convertValue(interaction_2, ObjectNode.class);
         ctx.put("interactions", List.of(interaction_1_json, interaction_2_json));
-        ctx.put("awsS3AccessEnabled", true);
+        ctx.put(AWS_S3_ACCESS_ENABLED, true);
         Settings settings = (Settings) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
         assertNotNull(settings);
         int expectedSize = 2;
@@ -77,8 +81,8 @@ public class SaveInteractionSettingsOperationTest {
         ObjectNode interaction_2_json = mapper.convertValue(interaction_2, ObjectNode.class);
         //WHEN
         ctx.put("interactions", List.of(interaction_1_json, interaction_2_json));
-        ctx.put("awsS3AccessEnabled", true);
-        ctx.put("schemaSettings", schemaSettingsObj);
+        ctx.put(AWS_S3_ACCESS_ENABLED, true);
+        ctx.put(SCHEMA_SETTINGS, schemaSettingsObj);
         Settings settings = (Settings) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
         //THEN
         assertNotNull(settings);
@@ -95,7 +99,7 @@ public class SaveInteractionSettingsOperationTest {
         ObjectNode esSettingsObj = mapper.convertValue(esSettings, ObjectNode.class);
 
         //WHEN
-        ctx.put("esSettings", esSettingsObj);
+        ctx.put(ES_SETTINGS, esSettingsObj);
         Settings settings = (Settings) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
         //THEN
         assertNotNull(settings);
@@ -103,6 +107,23 @@ public class SaveInteractionSettingsOperationTest {
         assertNotNull(savedEsSettings);
         assertEquals("1.0", savedEsSettings.get("TEXT_WEIGHT"));
         assertEquals("1.5", savedEsSettings.get("IMAGE_WEIGHT"));
+    }
+
+    @Test
+    public void shouldSaveVertesiaSettings() throws OperationException {
+        //GIVEN
+        OperationContext ctx = new OperationContext(session);
+        Map<String, String> vertesoaSettingsMap = Map.of("vertesia.apiUrl", "http://test.com");
+        ObjectNode settingsAsJson = mapper.convertValue(vertesoaSettingsMap, ObjectNode.class);
+
+        //WHEN
+        ctx.put(VERTESIA_SETTINGS, settingsAsJson);
+        Settings settings = (Settings) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
+        //THEN
+        assertNotNull(settings);
+        Map<String, String> savedSettings = settings.getVertesiaSettings();
+        assertNotNull(savedSettings);
+        assertEquals("http://test.com", savedSettings.get("vertesia.apiUrl"));
     }
 
 
