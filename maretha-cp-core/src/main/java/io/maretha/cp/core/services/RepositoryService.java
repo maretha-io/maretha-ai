@@ -34,6 +34,7 @@ public interface RepositoryService {
     String SETTINGS_SCHEMA_PATH = "interactionsettings:interactions";
     String SETTINGS_SCHEMA_AWS_S3_ACCESS = "interactionsettings:awsS3AccessEnabled";
     String SETTINGS_SCHEMA_METADATA = "interactionsettings:schemaSettings";
+    String SETTINGS_ELASTICSEARCH = "interactionsettings:esSettings";
 
     String SCHEMA_ID = "id";
     String SCHEMA_DESCRIPTION = "description";

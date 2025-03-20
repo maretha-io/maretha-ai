@@ -101,6 +101,12 @@ public class RepositoryServiceImpl implements RepositoryService {
             updateSchemaSettings(schemaSettings, cpSettingsDoc);
         }
 
+        @SuppressWarnings("unchecked")
+        Map<String, String> esSettings = (Map<String, String>) configuration.get("esSettings");
+        if (!Objects.isNull(esSettings)) {
+            updateEsSettings(esSettings, cpSettingsDoc);
+        }
+
         return session.saveDocument(cpSettingsDoc).getAdapter(Settings.class);
     }
 
@@ -117,6 +123,15 @@ public class RepositoryServiceImpl implements RepositoryService {
             schemaSettingsMap.put(schemaName, schemaSettingsInput);
             String jsonString = objectMapper.writeValueAsString(schemaSettingsMap);
             cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_METADATA, jsonString);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void updateEsSettings(Map<String, String> esSettings, DocumentModel cpSettingsDoc) {
+        try {
+            String jsonString = objectMapper.writeValueAsString(esSettings);
+            cpSettingsDoc.setPropertyValue(SETTINGS_ELASTICSEARCH, jsonString);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

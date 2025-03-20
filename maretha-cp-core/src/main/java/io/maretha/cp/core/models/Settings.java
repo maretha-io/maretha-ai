@@ -17,4 +17,5 @@ public class Settings {
     private List<Interaction> interactions = new ArrayList<>();
     private boolean awsS3AccessEnabled;
     private Map<String, DocTypeWithSchema.Schema> schemaSettings;
+    private Map<String, String> esSettings;
 }

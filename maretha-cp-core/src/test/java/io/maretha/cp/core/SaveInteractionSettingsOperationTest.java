@@ -87,5 +87,23 @@ public class SaveInteractionSettingsOperationTest {
         assertEquals(testSchemaName, schemaSettingsSaved.get(testSchemaName).getName());
     }
 
+    @Test
+    public void shouldSaveEsSettings() throws OperationException {
+        //GIVEN
+        OperationContext ctx = new OperationContext(session);
+        Map<String, String> esSettings = Map.of("TEXT_WEIGHT", "1.0", "IMAGE_WEIGHT", "1.5");
+        ObjectNode esSettingsObj = mapper.convertValue(esSettings, ObjectNode.class);
+
+        //WHEN
+        ctx.put("esSettings", esSettingsObj);
+        Settings settings = (Settings) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
+        //THEN
+        assertNotNull(settings);
+        Map<String, String> savedEsSettings = settings.getEsSettings();
+        assertNotNull(savedEsSettings);
+        assertEquals("1.0", savedEsSettings.get("TEXT_WEIGHT"));
+        assertEquals("1.5", savedEsSettings.get("IMAGE_WEIGHT"));
+    }
+
 
 }

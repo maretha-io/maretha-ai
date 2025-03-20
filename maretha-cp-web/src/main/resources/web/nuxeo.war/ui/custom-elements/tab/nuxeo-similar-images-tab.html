@@ -14,8 +14,7 @@
       }
     </style>
     
-    <nuxeo-similar-images document="[[document]]" visible="[[visible]]" provider-name="searchByEmbeddings"
-                          search-property="interactionresults:embeddingsImage" search-value="[[searchValue]]">
+    <nuxeo-similar-images document="[[document]]" visible="[[visible]]" provider-name="searchByEmbeddings">
     </nuxeo-similar-images>
     
   </template>
@@ -30,20 +29,10 @@
         
         visible: {
           type: Boolean
-        },
-        
-        searchValue: {
-          type: String,
-          computed: '_computeSearchValue(document,visible)'
-        } 
-      },
-      
-      _computeSearchValue: function(document,visible) {
-        if (!visible || !document || !document.properties['interactionresults:embeddingsImage']) {
-          return;
         }
-        return JSON.stringify(document.properties['interactionresults:embeddingsImage']);
-      }
+
+      },
+
       
     });
   </script>
