@@ -18,4 +18,5 @@ public class Settings {
     private boolean awsS3AccessEnabled;
     private Map<String, DocTypeWithSchema.Schema> schemaSettings;
     private Map<String, String> esSettings;
+    private Map<String, String> vertesiaSettings;
 }

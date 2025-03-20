@@ -35,22 +35,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
     private final APIService apiService = Framework.getService(APIService.class);
-
-    public static boolean blobIsSupportedMimeType(DocumentModel doc) {
-        if (!doc.hasSchema("file")) return false;
-        try {
-            Property blobProperty = doc.getProperty(FILE_CONTENT);
-            Blob blob = (Blob) blobProperty.getValue();
-            String mimeType = blob.getMimeType();
-            return getSupportedMimeTypes().contains(mimeType);
-        } catch (Exception ex) {
-            return false;
-        }
-    }
-
-    private static String getSupportedMimeTypes() {
-        return Framework.getProperty("cp.supported.mime-types", "text/plain,application/pdf");
-    }
+    private final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters) {
@@ -90,6 +75,11 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session) {
+        boolean isSupportedMimeType = blobIsSupportedMimeType(doc);
+        if (!isSupportedMimeType) {
+            log.debug("Document blob is not supported");
+            return doc;
+        }
         String storeId = null;
         Blob blob = (Blob) doc.getPropertyValue(FILE_CONTENT);
         if (doc.hasFacet(RESULTS_FACET)) {
@@ -101,7 +91,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         if (StringUtils.isEmpty(storeId)) {
             doc.addFacet(RESULTS_FACET);
-            Settings settings = Framework.getService(RepositoryService.class).getLocalInteractionSettings(session);
+            Settings settings = Framework.getService(RepositoryService.class).getSavedSettings(session);
             if (settings.isAwsS3AccessEnabled()) {
                 String s3Path = getS3Path(doc);
                 storeId = apiService.uploadS3FileToStore(blob, s3Path);
@@ -168,7 +158,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             return selectedDocumentIds
                     .stream()
                     .map(docId -> coreSession.getDocument(new IdRef(docId)))
-                    .filter(RunInteractionServiceImpl::blobIsSupportedMimeType)
+                    .filter(this::blobIsSupportedMimeType)
                     .map(doc -> uploadFileAndSetStoreId(doc, coreSession))
                     .map(docWithStoreId -> "store:" + docWithStoreId.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
                     .collect(Collectors.toList());
@@ -214,5 +204,21 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private boolean isImage(Blob blob) {
         String mimeType = blob.getMimeType();
         return mimeType != null && mimeType.startsWith("image/");
+    }
+
+    public boolean blobIsSupportedMimeType(DocumentModel doc) {
+        if (!doc.hasSchema("file")) return false;
+        try {
+            Property blobProperty = doc.getProperty(FILE_CONTENT);
+            Blob blob = (Blob) blobProperty.getValue();
+            String mimeType = blob.getMimeType();
+            return getSupportedMimeTypes().contains(mimeType);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    private String getSupportedMimeTypes() {
+        return repositoryService.getSettingsProperty("vertesia.mimeTypes", "text/plain,application/pdf");
     }
 }

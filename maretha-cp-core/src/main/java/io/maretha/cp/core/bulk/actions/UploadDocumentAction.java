@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static io.maretha.cp.core.services.RunInteractionServiceImpl.blobIsSupportedMimeType;
 import static org.nuxeo.ecm.core.bulk.BulkServiceImpl.STATUS_STREAM;
 import static org.nuxeo.lib.stream.computation.AbstractComputation.INPUT_1;
 import static org.nuxeo.lib.stream.computation.AbstractComputation.OUTPUT_1;
@@ -47,10 +46,7 @@ public class UploadDocumentAction implements StreamProcessorTopology {
             RunInteractionService runInteractionService = Framework.getService(RunInteractionService.class);
             ids.forEach(docId -> {
                 DocumentModel document = session.getDocument(new IdRef(docId));
-                boolean isSupportedMimeType = blobIsSupportedMimeType(document);
-                if (isSupportedMimeType) {
-                    runInteractionService.uploadFileAndSetStoreId(document, session);
-                }
+                runInteractionService.uploadFileAndSetStoreId(document, session);
             });
         }
     }

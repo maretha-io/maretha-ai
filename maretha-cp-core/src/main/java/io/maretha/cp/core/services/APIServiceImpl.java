@@ -28,6 +28,7 @@ import org.nuxeo.runtime.api.Framework;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -35,13 +36,13 @@ import java.util.stream.Collectors;
 
 public class APIServiceImpl implements APIService {
     public final static String EMBEDDINGS_CACHE = "embeddings_cache";
+    public final static String API_URL = "API_URL";
+    public final static String AUTH_TOKEN = "AUTH_TOKEN";
+    public final static String UPLOAD_API_URL = "UPLOAD_API_URL";
+    public final static String EMBEDDING_MODEL = "EMBEDDING_MODEL";
+    public final static String ENVIRONMENT_ID = "ENVIRONMENT_ID";
+    public final static String PROJECT_ID = "PROJECT_ID";
     private final Log log = LogFactory.getLog(APIServiceImpl.class);
-    private final String API_URL = Framework.getProperty("cp.api.url", "https://api.becomposable.com");
-    private final String UPLOAD_API_URL = Framework.getProperty("cp.upload.url", "https://zeno-server-production.api.becomposable.com");
-    private final String AUTH_TOKEN = Framework.getProperty("cp.auth.token");
-    private final String PROJECT_ID = Framework.getProperty("cp.project.id");
-    private final String ENVIRONMENT_ID = Framework.getProperty("cp.environment.id");
-    private final String EMBEDDING_MODEL = Framework.getProperty("cp.embedding.model", "text-embedding-3-small");
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
@@ -58,9 +59,9 @@ public class APIServiceImpl implements APIService {
 
     @Override
     public List<Interaction> getInteractions() {
-        String url = API_URL + "/api/v1/interactions";
-        String interactions = getRequest(getBearerToken(), url);
         try {
+            String url = getSetting(API_URL) + "/api/v1/interactions";
+            String interactions = getRequest(getBearerToken(), url);
             List<Interaction> cpInteractions = objectMapper.readValue(interactions, new TypeReference<>() {
             });
             return cpInteractions.stream().peek(interaction -> {
@@ -68,14 +69,15 @@ public class APIServiceImpl implements APIService {
                 interaction.setParameters(interactionParameters);
             }).collect(Collectors.toList());
         } catch (Exception e) {
-            throw new NuxeoException(e);
+            log.error("Failed request", e);
         }
+        return Collections.emptyList();
     }
 
 
     @Override
     public String getInteractionResultAsStream(String interaction, Map<String, Object> data) {
-        String url = API_URL + "/api/v1/runs";
+        String url = getSetting(API_URL) + "/api/v1/runs";
         boolean stream = true;
         String dataParameters = "";
         try {
@@ -102,7 +104,7 @@ public class APIServiceImpl implements APIService {
 
     @Override
     public String getBearerToken() {
-        String response = getRequest(AUTH_TOKEN, API_URL + "/auth/token");
+        String response = getRequest(getSetting(AUTH_TOKEN), getSetting(API_URL) + "/auth/token");
         JSONObject jsonObject = new JSONObject(response);
         return jsonObject.getString("token");
     }
@@ -112,7 +114,7 @@ public class APIServiceImpl implements APIService {
         log.debug(String.format("uploadFileToStore: fileName:[%s], digest:[%s]", file.getFilename(), file.getDigest()));
 
         String bearerToken = getBearerToken();
-        String uploadUrlApi = UPLOAD_API_URL + "/api/v1/objects/upload-url";
+        String uploadUrlApi = getSetting(UPLOAD_API_URL) + "/api/v1/objects/upload-url";
         String filename = file.getFilename();
         String mimeType = file.getMimeType();
         String bodyJson = "{" +
@@ -144,7 +146,7 @@ public class APIServiceImpl implements APIService {
                 "    }\n" +
                 "}";
 
-        String uploadedResponse = postRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects", bodyJsonObject);
+        String uploadedResponse = postRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects", bodyJsonObject);
         JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
         return uploadedResponseObject.getString("id");
     }
@@ -163,7 +165,7 @@ public class APIServiceImpl implements APIService {
                 "}";
 
         log.debug(String.format("uploadS3FileToStore: fileName:[%s], digest:[%s], body:%s", file.getFilename(), file.getDigest(), bodyJsonObject));
-        String uploadedResponse = postRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects", bodyJsonObject);
+        String uploadedResponse = postRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects", bodyJsonObject);
         JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
         return uploadedResponseObject.getString("id");
     }
@@ -177,10 +179,10 @@ public class APIServiceImpl implements APIService {
 
         String bearerToken = getBearerToken();
         String requestBody = "{" +
-                "    \"model\": \"" + EMBEDDING_MODEL + "\"," +
+                "    \"model\": \"" + getSetting(EMBEDDING_MODEL) + "\"," +
                 "    \"text\": \"" + queryText + "\"" +
                 "}";
-        String response = postRequest(bearerToken, API_URL + "/api/v1/environments/" + ENVIRONMENT_ID + "/embeddings", requestBody);
+        String response = postRequest(bearerToken, getSetting(API_URL) + "/api/v1/environments/" + getSetting(ENVIRONMENT_ID) + "/embeddings", requestBody);
         try {
             JsonNode rootNode = objectMapper.readTree(response);
             JsonNode embeddings = rootNode.path("values");
@@ -195,7 +197,7 @@ public class APIServiceImpl implements APIService {
     @Override
     public double[] getDocumentEmbeddings(String docId, String type) {
         String bearerToken = getBearerToken();
-        String response = getRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects/" + docId + "?select=embeddings");
+        String response = getRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects/" + docId + "?select=embeddings");
         try {
             JsonNode rootNode = objectMapper.readTree(response);
             JsonNode embeddings = rootNode.path("embeddings").path(type).path("values");
@@ -265,7 +267,7 @@ public class APIServiceImpl implements APIService {
     }
 
     private List<InteractionParameter> getInteractionParameters(String interactionId) {
-        String url = API_URL + "/api/v1/interactions/" + interactionId;
+        String url = getSetting(API_URL) + "/api/v1/interactions/" + interactionId;
         String interactionParametersResponse = getRequest(getBearerToken(), url);
         List<InteractionParameter> paramsList = new ArrayList<>();
         try {
@@ -300,8 +302,23 @@ public class APIServiceImpl implements APIService {
 
     public JSONObject getStoredDocumentText(String storeId) {
         String bearerToken = getBearerToken();
-        String documentResponse = getRequest(bearerToken, UPLOAD_API_URL + "/api/v1/objects/" + storeId + "/text");
+        String documentResponse = getRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects/" + storeId + "/text");
         return new JSONObject(documentResponse);
+    }
+
+    private String getSetting(String name) {
+        final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
+        return switch (name) {
+            case API_URL -> repositoryService.getSettingsProperty("vertesia.apiUrl", "https://api.vertesia.io");
+            case UPLOAD_API_URL ->
+                    repositoryService.getSettingsProperty("vertesia.uploadUrl", "https://zeno-server-production.api.vertesia.io");
+            case AUTH_TOKEN -> repositoryService.getSettingsProperty("vertesia.authToken", null);
+            case PROJECT_ID -> repositoryService.getSettingsProperty("vertesia.projectId", null);
+            case ENVIRONMENT_ID -> repositoryService.getSettingsProperty("vertesia.environmentId", null);
+            case EMBEDDING_MODEL ->
+                    repositoryService.getSettingsProperty("vertesia.embeddingModel", "amazon.titan-embed-text-v2:0");
+            default -> null;
+        };
     }
 
 }
