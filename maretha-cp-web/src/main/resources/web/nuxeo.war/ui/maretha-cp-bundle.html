@@ -8,7 +8,7 @@
 <link rel="import" href="custom-elements/cp-format-chat-json-response.html">
 <link rel="import" href="custom-elements/cp-show-interaction-results.html">
 <link rel="import" href="custom-elements/cp-document-chat.html">
-<link rel="import" href="custom-elements/tab/nuxeo-similar-images-tab.html">
+<link rel="import" href="custom-elements/tab/nuxeo-similar-documents-tab.html">
 
 <nuxeo-slot-content name="maretha-cp-interactions" slot="PAGES" order="100">
     <template>
@@ -69,21 +69,21 @@
 
 
 <!-- Contribution of element 'nuxeo-page-item' for slot 'DOCUMENT_VIEWS_ITEMS' -->
-<nuxeo-slot-content name="similarImageTab" slot="DOCUMENT_VIEWS_ITEMS" order="10">
+<nuxeo-slot-content name="SimilarDocumentsTab" slot="DOCUMENT_VIEWS_ITEMS" order="10">
     <template>
         <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
             <template>
-                <nuxeo-page-item name="SimilarImageTab" label="More Like This"></nuxeo-page-item>
+                <nuxeo-page-item name="SimilarDocumentsTab" label="More Like This"></nuxeo-page-item>
             </template>
         </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
-<!-- Contribution of element 'nuxeo-similar-images-tab' for slot 'DOCUMENT_VIEWS_PAGES' -->
-<nuxeo-slot-content name="SimilarImageTab" slot="DOCUMENT_VIEWS_PAGES">
+<!-- Contribution of element 'nuxeo-similar-documents-tab' for slot 'DOCUMENT_VIEWS_PAGES' -->
+<nuxeo-slot-content name="SimilarDocumentsTab" slot="DOCUMENT_VIEWS_PAGES">
     <template>
         <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
             <template>
-                <nuxeo-similar-images-tab document="[[document]]" name="SimilarImageTab"></nuxeo-similar-images-tab>
+                <nuxeo-similar-documents-tab document="[[document]]" name="SimilarDocumentsTab"></nuxeo-similar-documents-tab>
             </template>
         </nuxeo-filter>
     </template>

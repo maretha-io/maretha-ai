@@ -40,7 +40,7 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     public static final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
     private static final String BOOST = "1.0";
     private static final String TEXT_WEIGHT = "1.0";
-    private static final String IMAGE_WEIGHT = "1.5";
+    private static final String IMAGE_WEIGHT = "1.0";
     private static final String SCORE_MODE = "AVG";
     private static final String BOOST_MODE = "AVG";
     private final RepositoryService settingsService = Framework.getService(RepositoryService.class);
