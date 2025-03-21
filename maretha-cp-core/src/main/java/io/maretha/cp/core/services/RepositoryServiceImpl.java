@@ -211,7 +211,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         if (StringUtils.isNotEmpty(property)) {
             return property;
         }
-        //TODO Cache?
+        //TODO Cache
         Settings settings = getSavedSettings(CoreInstance.getCoreSessionSystem(null));
         String nameWithoutPrefix = name.replace("vertesia.", "");
         String savedProperty = settings.getVertesiaSettings().get(nameWithoutPrefix);

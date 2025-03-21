@@ -36,12 +36,12 @@ import java.util.stream.Collectors;
 
 public class APIServiceImpl implements APIService {
     public final static String EMBEDDINGS_CACHE = "embeddings_cache";
-    public final static String API_URL = "API_URL";
-    public final static String AUTH_TOKEN = "AUTH_TOKEN";
-    public final static String UPLOAD_API_URL = "UPLOAD_API_URL";
-    public final static String EMBEDDING_MODEL = "EMBEDDING_MODEL";
-    public final static String ENVIRONMENT_ID = "ENVIRONMENT_ID";
-    public final static String PROJECT_ID = "PROJECT_ID";
+    public final static String API_URL = "vertesia.apiUrl";
+    public final static String UPLOAD_API_URL = "vertesia.uploadUrl";
+    public final static String AUTH_TOKEN = "vertesia.authToken";
+    public final static String EMBEDDING_MODEL = "vertesia.embeddingModel";
+    public final static String ENVIRONMENT_ID = "vertesia.environmentId";
+    public final static String PROJECT_ID = "vertesia.projectId";
     private final Log log = LogFactory.getLog(APIServiceImpl.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final OkHttpClient client = new OkHttpClient.Builder()
@@ -104,6 +104,7 @@ public class APIServiceImpl implements APIService {
 
     @Override
     public String getBearerToken() {
+        //TODO cache for 1h
         String response = getRequest(getSetting(AUTH_TOKEN), getSetting(API_URL) + "/auth/token");
         JSONObject jsonObject = new JSONObject(response);
         return jsonObject.getString("token");
@@ -309,14 +310,14 @@ public class APIServiceImpl implements APIService {
     private String getSetting(String name) {
         final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
         return switch (name) {
-            case API_URL -> repositoryService.getSettingsProperty("vertesia.apiUrl", "https://api.vertesia.io");
+            case API_URL -> repositoryService.getSettingsProperty(API_URL, "https://api.vertesia.io");
             case UPLOAD_API_URL ->
-                    repositoryService.getSettingsProperty("vertesia.uploadUrl", "https://zeno-server-production.api.vertesia.io");
-            case AUTH_TOKEN -> repositoryService.getSettingsProperty("vertesia.authToken", null);
-            case PROJECT_ID -> repositoryService.getSettingsProperty("vertesia.projectId", null);
-            case ENVIRONMENT_ID -> repositoryService.getSettingsProperty("vertesia.environmentId", null);
+                    repositoryService.getSettingsProperty(UPLOAD_API_URL, "https://zeno-server-production.api.vertesia.io");
+            case AUTH_TOKEN -> repositoryService.getSettingsProperty(AUTH_TOKEN, null);
+            case PROJECT_ID -> repositoryService.getSettingsProperty(PROJECT_ID, null);
+            case ENVIRONMENT_ID -> repositoryService.getSettingsProperty(ENVIRONMENT_ID, null);
             case EMBEDDING_MODEL ->
-                    repositoryService.getSettingsProperty("vertesia.embeddingModel", "amazon.titan-embed-text-v2:0");
+                    repositoryService.getSettingsProperty(EMBEDDING_MODEL, "amazon.titan-embed-text-v2:0");
             default -> null;
         };
     }
