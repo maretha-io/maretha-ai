@@ -3,6 +3,8 @@ package io.maretha.cp.core.operations;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.Settings;
 import io.maretha.cp.core.services.RepositoryService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,7 +73,7 @@ public class GetDocumentTypesOperation {
 
             schemas.forEach(schema -> {
                 String schemaName = schema.getName();
-                if (schemaSettings.containsKey(schemaName)) {
+                if (MapUtils.isNotEmpty(schemaSettings) && schemaSettings.containsKey(schemaName)) {
                     //add existing saved schema settings
                     docTypeWithSchema.getSchemas().add(schemaSettings.get(schemaName));
                     return;
