@@ -22,6 +22,7 @@ import org.nuxeo.runtime.api.Framework;
 import org.opensearch.common.lucene.search.function.CombineFunction;
 import org.opensearch.common.lucene.search.function.FunctionScoreQuery;
 import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.QueryBuilder;
 import org.opensearch.index.query.QueryBuilders;
 import org.opensearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.opensearch.index.query.functionscore.ScoreFunctionBuilders;
@@ -39,6 +40,7 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     public static final String TEXT_VECTOR_FIELD = "interactionresults:embeddingsText";
     public static final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
     private static final String BOOST = "1.0";
+    private static final String K = "10";
     private static final String TEXT_WEIGHT = "1.0";
     private static final String IMAGE_WEIGHT = "1.0";
     private static final String SCORE_MODE = "AVG";
@@ -100,12 +102,8 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
                 vectorQuery = Arrays.toString(textVectors);
             }
 
-            FunctionScoreQueryBuilder scoreQuery = buildScriptKnnQuery(vectorQuery, esSettings)
-                    .setMinScore(minScore);
-
-            combinedQuery = combinedQuery
-                    .must(scoreQuery)
-                    .boost(Float.parseFloat(BOOST));
+            FunctionScoreQueryBuilder knnQuery = knnQuery(vectorQuery, minScore, esSettings);
+            combinedQuery = combinedQuery.must(knnQuery);
         }
 
         if (searchOnAllRepositories()) {
@@ -142,6 +140,54 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     public DocumentModelList getEmptyResult() {
         setResultsCount(0);
         return new DocumentModelListImpl();
+    }
+
+    private FunctionScoreQueryBuilder knnQuery(String vector, float minScore, Map<String, String> esSettings) {
+        float imageWeight = Float.parseFloat(esSettings.getOrDefault("IMAGE_WEIGHT", IMAGE_WEIGHT));
+        float textWeight = Float.parseFloat(esSettings.getOrDefault("TEXT_WEIGHT", TEXT_WEIGHT));
+        float boost = Float.parseFloat(esSettings.getOrDefault("BOOST", BOOST));
+        float k = Float.parseFloat(esSettings.getOrDefault("K", K));
+        FunctionScoreQuery.ScoreMode scoreMode = FunctionScoreQuery.ScoreMode.fromString(esSettings.getOrDefault("SCORE_MODE", SCORE_MODE));
+        CombineFunction boostMode = CombineFunction.fromString(esSettings.getOrDefault("BOOST_MODE", BOOST_MODE));
+
+        // Construct the KNN portion manually as a JSON string
+        String textKnnQueryJson = "{ \"knn\": { \"" + TEXT_VECTOR_FIELD + "\": { \"vector\": " + vector + ", \"k\": " + k + " } } }";
+        String imageKnnQueryJson = "{ \"knn\": { \"" + IMAGE_VECTOR_FIELD + "\": { \"vector\": " + vector + ", \"k\": " + k + " } } }";
+
+        // Wrap KNN queries in QueryBuilder
+        QueryBuilder textKnnQuery = QueryBuilders.wrapperQuery(textKnnQueryJson);
+        QueryBuilder imageKnnQuery = QueryBuilders.wrapperQuery(imageKnnQueryJson);
+
+        // Build `bool` query with `should` (OR condition for multiple KNN fields)
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+                .should(textKnnQuery)
+                .should(imageKnnQuery);
+
+
+        // Assign different weights to each KNN query
+        FunctionScoreQueryBuilder.FilterFunctionBuilder[] functionBuilders = new FunctionScoreQueryBuilder.FilterFunctionBuilder[]{
+                new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.existsQuery(TEXT_VECTOR_FIELD),
+                        ScoreFunctionBuilders.weightFactorFunction(textWeight)),
+                new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.existsQuery(IMAGE_VECTOR_FIELD),
+                        ScoreFunctionBuilders.weightFactorFunction(imageWeight))
+        };
+
+        // Apply function score to each KNN query
+        FunctionScoreQueryBuilder functionScore = new FunctionScoreQueryBuilder(boolQuery, functionBuilders)
+                .scoreMode(scoreMode)
+                .boostMode(boostMode)
+                .boost(boost)
+                .setMinScore(minScore);
+
+//        FunctionScoreQueryBuilder imageFunctionScore = new FunctionScoreQueryBuilder(imageKnnQuery,
+//                ScoreFunctionBuilders.weightFactorFunction(imageWeight))
+//                .scoreMode(scoreMode)
+//                .boostMode(boostMode)
+//                .boost(boost)
+//                .setMinScore(minScore);
+
+        // Combine queries using BoolQueryBuilder
+        return functionScore;
     }
 
     private FunctionScoreQueryBuilder buildScriptKnnQuery(String queryVector, Map<String, String> esSettings) {
