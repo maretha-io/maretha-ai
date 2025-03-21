@@ -9,7 +9,7 @@
 
   <groupId>io.maretha.cp</groupId>
   <artifactId>maretha-cp-parent</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>Maretha cp parent</name>
   <description>Maretha Nuxeo Add-On Integration with Vertesia</description>
   <packaging>pom</packaging>

@@ -179,7 +179,7 @@ public class RepositoryServiceImpl implements RepositoryService {
     }
 
     @Override
-    public DocumentModel saveInteractionResponseAsDocument(DocumentModel doc, CoreSession session, List<ObjectNode> interactions) throws OperationException {
+    public DocumentModel saveInteractionResponseAsDocument(DocumentModel doc, CoreSession session, List<ObjectNode> interactions) {
         String folderPath = "/" + RESULTS_DOCUMENT_NAME;
         boolean folderExists = session.exists(new PathRef(folderPath));
         if (!folderExists) {

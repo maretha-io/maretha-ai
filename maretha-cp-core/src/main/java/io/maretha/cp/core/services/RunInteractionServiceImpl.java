@@ -35,7 +35,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
     private final APIService apiService = Framework.getService(APIService.class);
-    private final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
+    public static final String MIME_TYPES = "vertesia.mimeTypes";
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters) {
@@ -219,6 +219,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     private String getSupportedMimeTypes() {
-        return repositoryService.getSettingsProperty("vertesia.mimeTypes", "text/plain,application/pdf");
+        return Framework.getService(RepositoryService.class).getSettingsProperty(MIME_TYPES, "text/plain,application/pdf");
     }
 }

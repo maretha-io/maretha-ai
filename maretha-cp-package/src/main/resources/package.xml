@@ -14,11 +14,11 @@
   <nuxeo-validation>none</nuxeo-validation>
   <!-- Production State: production_ready | testing | proto -->
   <production-state>testing</production-state>
-  <supported>false</supported>
-<!--  <target-platform>-->
-<!--    <name>lts</name>-->
-<!--    <version>[@NUXEO_TARGET_VERSION@,)</version>-->
-<!--  </target-platform>-->
+  <supported>true</supported>
+  <target-platform>
+    <name>lts</name>
+    <version>[@NUXEO_TARGET_VERSION@,)</version>
+  </target-platform>
   <!-- Dependencies on other packages -->
   <!-- <dependencies> -->
   <!-- <package>another-package:1.0.0:1.0.0</package> -->
