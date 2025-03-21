@@ -54,6 +54,7 @@
       properties: {
         esSettings: {
           type: Object,
+          value: {}
         },
       },
 
@@ -65,7 +66,8 @@
         const operation = this.$.getSettingsOperation;
         operation.params = {};
         operation.execute().then((response) => {
-          this.set('esSettings', response.value.esSettings);
+          if(response.value.esSettings)
+            this.set('esSettings', response.value.esSettings);
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });

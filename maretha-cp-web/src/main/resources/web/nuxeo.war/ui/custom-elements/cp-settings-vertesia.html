@@ -72,7 +72,8 @@
         const operation = this.$.getSettingsOperation;
         operation.params = {};
         operation.execute().then((response) => {
-          this.set('vertesiaSettings', response.value.vertesiaSettings);
+          if(response.value.vertesiaSettings)
+            this.set('vertesiaSettings', response.value.vertesiaSettings);
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });
