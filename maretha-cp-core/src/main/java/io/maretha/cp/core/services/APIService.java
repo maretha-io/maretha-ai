@@ -21,4 +21,5 @@ public interface APIService {
 
     double[] getDocumentEmbeddings(String docId, String type);
 
+    Map<String, Double> search(String vectorQuery, String type, int limit);
 }

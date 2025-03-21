@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -206,6 +207,34 @@ public class APIServiceImpl implements APIService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Map<String, Double> search(String vectorQuery, String type, int limit) {
+        Map<String, Double> docIdScoreMap = new HashMap<>();
+        String requestBody = String.format("""
+                {
+                  "limit": %s,
+                  "offset": 0,
+                  "query": {
+                    "vector": {
+                      "values": %s,
+                      "type": "%s"
+                    }
+                  }
+                }
+                """, limit, vectorQuery, type);
+        String response = postRequest(getBearerToken(), getSetting(UPLOAD_API_URL) + "/api/v1/objects/search", requestBody);
+        try {
+            objectMapper.readTree(response).forEach(obj -> {
+                String id = obj.get("id").asText();
+                double score = obj.get("score").asDouble();
+                docIdScoreMap.put(id, score);
+            });
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return docIdScoreMap;
     }
 
     private String putFileRequest(String url, Blob file) throws IOException {

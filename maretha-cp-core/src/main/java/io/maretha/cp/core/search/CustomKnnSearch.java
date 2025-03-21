@@ -34,18 +34,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
 import static org.nuxeo.ecm.platform.query.api.PageProviderService.NAMED_PARAMETERS;
 
 public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     public static final String TEXT_VECTOR_FIELD = "interactionresults:embeddingsText";
     public static final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
+    public static final String RELEVANCE_SCORE = "relevance_score";
     private static final String BOOST = "1.0";
     private static final String K = "10";
     private static final String TEXT_WEIGHT = "1.0";
     private static final String IMAGE_WEIGHT = "1.0";
     private static final String SCORE_MODE = "AVG";
     private static final String BOOST_MODE = "AVG";
+    private static final boolean VERTESIA_SEARCH = true; //todo make configurable
     private final RepositoryService settingsService = Framework.getService(RepositoryService.class);
+    private final APIService apiService = Framework.getService(APIService.class);
     private List<DocumentModel> results;
 
     @Override
@@ -75,9 +79,6 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         float minScore = Float.parseFloat(namedParameters.getOrDefault("min_score", "0.8"));
         String vectorField = namedParameters.get("vectorField");
         String vectorQuery = namedParameters.get("vectorQuery");
-        if (StringUtils.isEmpty(vectorQuery) || "[]".equals(vectorQuery)) {
-            return getEmptyResult();
-        }
 
         if (query == null) {
             buildQuery(session);
@@ -92,18 +93,33 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         // Combine NXQL and KNN using "must" (AND logic)
         BoolQueryBuilder combinedQuery = QueryBuilders.boolQuery();
 
-        if (StringUtils.isNotEmpty(vectorQuery)) {
-            Settings settings = settingsService.getSavedSettings(CoreInstance.getCoreSessionSystem(null));
-            Map<String, String> esSettings = settings.getEsSettings();
+        Map<String, Double> idsAndScores = new HashMap<>();
 
+        if (StringUtils.isNotEmpty(vectorQuery) && !"[]".equals(vectorQuery)) {
             if (TEXT_VECTOR_FIELD.equals(vectorField)) {
                 APIService apiService = Framework.getService(APIService.class);
                 double[] textVectors = apiService.textToEmbeddings(vectorQuery);
                 vectorQuery = Arrays.toString(textVectors);
             }
 
-            FunctionScoreQueryBuilder knnQuery = knnQuery(vectorQuery, minScore, esSettings);
-            combinedQuery = combinedQuery.must(knnQuery);
+            if (!VERTESIA_SEARCH) {
+                Settings settings = settingsService.getSavedSettings(CoreInstance.getCoreSessionSystem(null));
+                Map<String, String> esSettings = settings.getEsSettings();
+                FunctionScoreQueryBuilder knnQuery = knnQuery(vectorQuery, minScore, esSettings);
+                combinedQuery = combinedQuery.must(knnQuery);
+            } else {
+                Map<String, Double> docIdScoreMapTextSearch = apiService.search(vectorQuery, "text", 100);
+                Map<String, Double> docIdScoreMapImageSearch = apiService.search(vectorQuery, "image", 100);
+                docIdScoreMapTextSearch.forEach((id, score) -> {
+                    if (score >= minScore)
+                        idsAndScores.merge(id, score, Math::max);
+                });
+                docIdScoreMapImageSearch.forEach((id, score) -> {
+                    if (score >= minScore)
+                        idsAndScores.merge(id, score, Math::max);
+                });
+                combinedQuery.must(QueryBuilders.termsQuery(RESULTS_STORE_ID_SCHEMA_PATH, idsAndScores.keySet()));
+            }
         }
 
         if (searchOnAllRepositories()) {
@@ -127,6 +143,15 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
 
         EsResult ret = esService.queryAndAggregate(nxQuery);
         DocumentModelList dmList = ret.getDocuments();
+
+        if (VERTESIA_SEARCH && StringUtils.isNotEmpty(vectorQuery) && !"[]".equals(vectorQuery)) {
+            dmList.forEach(dcm -> {
+                String id = dcm.getId();
+                if (idsAndScores.containsKey(id)) {
+                    dcm.putContextData(RELEVANCE_SCORE, idsAndScores.get(id));
+                }
+            });
+        }
 
         currentAggregates = new HashMap<>(ret.getAggregates().size());
         for (Aggregate<Bucket> agg : ret.getAggregates()) {
