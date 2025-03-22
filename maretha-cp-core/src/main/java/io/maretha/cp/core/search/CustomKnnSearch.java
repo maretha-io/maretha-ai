@@ -111,11 +111,16 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
             } else {
                 Map<String, Double> docIdScoreMapTextSearch = apiService.search(vectorQuery, "text", 100);
                 Map<String, Double> docIdScoreMapImageSearch = apiService.search(vectorQuery, "image", 100);
+                Map<String, Double> docIdScoreMapPropertiesSearch = apiService.search(vectorQuery, "properties", 100);
                 docIdScoreMapTextSearch.forEach((id, score) -> {
                     if (score >= minScore)
                         idsAndScores.merge(id, score, Math::max);
                 });
                 docIdScoreMapImageSearch.forEach((id, score) -> {
+                    if (score >= minScore)
+                        idsAndScores.merge(id, score, Math::max);
+                });
+                docIdScoreMapPropertiesSearch.forEach((id, score) -> {
                     if (score >= minScore)
                         idsAndScores.merge(id, score, Math::max);
                 });

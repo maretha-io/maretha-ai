@@ -56,6 +56,21 @@
                          method="post">
     </nuxeo-page-provider>
 
+    <div style="height:15px;">
+      <paper-slider
+              role="widget"
+              id="minScoreSlider"
+              label="Minimum Score"
+              type="number"
+              min="0"
+              max="1"
+              step="0.1"
+              snaps
+              value="{{minScore}}"
+              pin>
+      </paper-slider>
+    </div>
+
     <nuxeo-results id="results"
                    display-mode="grid"
                    name="[[document.uid]].similar"
@@ -103,9 +118,9 @@
                                  flex="20" hidden>
           <template is="header">
             <nuxeo-dropdown-aggregation
-                                        placeholder="[[i18n('documentContentView.datatable.header.modified')]]"
-                                        data="[[aggregations.dublincore_modified_agg]]"
-                                        value="{{column.filterValue}}" multiple>
+                    placeholder="[[i18n('documentContentView.datatable.header.modified')]]"
+                    data="[[aggregations.dublincore_modified_agg]]"
+                    value="{{column.filterValue}}" multiple>
             </nuxeo-dropdown-aggregation>
           </template>
           <template>
@@ -118,9 +133,9 @@
                                  sort-by="[[_displaySort(document, 'dc:lastContributor')]]" flex="20" hidden>
           <template is="header">
             <nuxeo-dropdown-aggregation
-                                        placeholder="[[i18n('documentContentView.datatable.header.lastContributor')]]"
-                                        data="[[aggregations.dublincore_lastContributor_agg]]"
-                                        value="{{column.filterValue}}" multiple>
+                    placeholder="[[i18n('documentContentView.datatable.header.lastContributor')]]"
+                    data="[[aggregations.dublincore_lastContributor_agg]]"
+                    value="{{column.filterValue}}" multiple>
             </nuxeo-dropdown-aggregation>
           </template>
           <template>
@@ -139,9 +154,9 @@
                                  field="dc:creator" sort-by="[[_displaySort(document, 'dc:creator')]]" hidden>
           <template is="header">
             <nuxeo-dropdown-aggregation
-                                        placeholder="[[i18n('documentContentView.datatable.header.author')]]"
-                                        data="[[aggregations.dublincore_creator_agg]]"
-                                        value="{{column.filterValue}}" multiple>
+                    placeholder="[[i18n('documentContentView.datatable.header.author')]]"
+                    data="[[aggregations.dublincore_creator_agg]]"
+                    value="{{column.filterValue}}" multiple>
             </nuxeo-dropdown-aggregation>
           </template>
           <template>
@@ -169,9 +184,9 @@
                                  filter-by="system_currentLifeCycleState_agg">
           <template is="header">
             <nuxeo-dropdown-aggregation
-                                        placeholder="[[i18n('documentContentView.datatable.header.state')]]"
-                                        data="[[aggregations.system_currentLifeCycleState_agg]]"
-                                        value="{{column.filterValue}}" multiple>
+                    placeholder="[[i18n('documentContentView.datatable.header.state')]]"
+                    data="[[aggregations.system_currentLifeCycleState_agg]]"
+                    value="{{column.filterValue}}" multiple>
             </nuxeo-dropdown-aggregation>
           </template>
 
@@ -183,74 +198,83 @@
   </template>
 
   <script>
-  Polymer({
-    is: 'nuxeo-similar-documents',
-    behaviors: [Nuxeo.DocumentContentBehavior],
-    properties: {
+    Polymer({
+      is: 'nuxeo-similar-documents',
+      behaviors: [Nuxeo.DocumentContentBehavior],
+      properties: {
 
-      /**
-         * @doctype Request
-         */
-      document: {
-        type: Object,
-      },
-      
-      visible: {
-        type: Boolean
-      },
+        /**
+           * @doctype Request
+           */
+        document: {
+          type: Object,
+        },
 
-      providerName: {
-        type: String
-      },
+        visible: {
+          type: Boolean
+        },
 
-      headers: {
-        type: Object,
-        value: function () {
-          return {
-            "X-NXfetch.document": ["dc:creator", "dc:lastContributor"].join(','),
-            "X-NXtranslate.directoryEntry": "label"
+        params: {
+          type: Object
+        },
+
+        minScore: {
+          type: Number,
+          value: 0.5
+        },
+
+        providerName: {
+          type: String
+        },
+
+        headers: {
+          type: Object,
+          value: function () {
+            return {
+              "X-NXfetch.document": ["dc:creator", "dc:lastContributor"].join(','),
+              "X-NXtranslate.directoryEntry": "label"
+            }
           }
+        },
+
+        searchProperty: {
+          type: String
+        },
+
+        searchValue: {
+          type: String
+        },
+
+        withDragAndDrop: {
+          type: Boolean,
+          value: false
+        }
+
+      },
+
+      observers: ['_update(document, visible, minScore)'],
+
+      _update: function(document, visible, score) {
+        if (document && visible && score) {
+          this.set('params', this._computeParams(document));
+          this.$.results._refreshAndFetch();
         }
       },
 
-      searchProperty: {
-        type: String
-      },
+      _computeParams: function(document) {
+        let params = {};
+        params.vectorField = this.searchProperty;
+        params.min_score = this.minScore;
 
-      searchValue: {
-        type: String
-      },
-
-      withDragAndDrop: {
-        type: Boolean,
-        value: false
+        if(document.properties && document.properties['interactionresults:embeddingsImage'].length > 0){
+          params.vectorQuery = JSON.stringify(document.properties['interactionresults:embeddingsImage']);
+        }
+        if(document.properties && document.properties['interactionresults:embeddingsText'].length > 0){
+          params.vectorQuery = JSON.stringify(document.properties['interactionresults:embeddingsText']);
+        }
+        return params;
       }
 
-    },
-
-    observers: ['_update(document)'],
-
-    _update: function(document) {
-      if (document) {
-        this.params = this._computeParams(document);
-        this._refresh();
-      }
-    },
-
-    _computeParams: function(document) {
-      let params = {};
-      params.vectorField = this.searchProperty;
-      params.min_score = "0.5";
-
-      if(document.properties && document.properties['interactionresults:embeddingsImage'].length > 0){
-        params.vectorQuery = JSON.stringify(document.properties['interactionresults:embeddingsImage']);
-      }
-      if(document.properties && document.properties['interactionresults:embeddingsText'].length > 0){
-        params.vectorQuery = JSON.stringify(document.properties['interactionresults:embeddingsText']);
-      }
-      return params;
-    }
-
-  });
+    });
   </script>
 </dom-module>
