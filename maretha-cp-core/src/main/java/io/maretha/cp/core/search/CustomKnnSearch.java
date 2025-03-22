@@ -30,6 +30,7 @@ import org.opensearch.script.Script;
 import org.opensearch.script.ScriptType;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,22 +143,23 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         log.debug("ES KNN query: " + nxQuery.makeQuery());
 
         EsResult ret = esService.queryAndAggregate(nxQuery);
-        DocumentModelList dmList = ret.getDocuments();
+        List<DocumentModel> dmList = ret.getDocuments();
 
         if (VERTESIA_SEARCH && StringUtils.isNotEmpty(vectorQuery) && !"[]".equals(vectorQuery)) {
             dmList.forEach(dcm -> {
-                String id = dcm.getId();
-                if (idsAndScores.containsKey(id)) {
+                String id = (String) session.getDocument(dcm.getRef()).getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
+                if (StringUtils.isNotEmpty(id) && idsAndScores.containsKey(id)) {
                     dcm.putContextData(RELEVANCE_SCORE, idsAndScores.get(id));
                 }
             });
+            dmList.sort((doc1, doc2) -> Double.compare((double) doc2.getContextData(RELEVANCE_SCORE), (double) doc1.getContextData(RELEVANCE_SCORE)));
         }
 
         currentAggregates = new HashMap<>(ret.getAggregates().size());
         for (Aggregate<Bucket> agg : ret.getAggregates()) {
             currentAggregates.put(agg.getId(), agg);
         }
-        setResultsCount(dmList.totalSize());
+        setResultsCount(dmList.size());
         currentPageDocuments = dmList;
         return currentPageDocuments;
     }
