@@ -286,7 +286,7 @@ public class APIServiceImpl implements APIService {
         try (Response response = client.newCall(request).execute()) {
             String responseString = response.body().string();
             if (!response.isSuccessful()) {
-                throw new RuntimeException("Failed to get a successful from: " + request.url() + " response: " + response);
+                throw new RuntimeException("Failed to get a successful from: " + request.url() + " response: " + responseString);
             }
             return responseString;
         } catch (Exception e) {

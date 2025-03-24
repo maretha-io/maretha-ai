@@ -13,22 +13,22 @@
             <whereClause>
                 <fixedPart>ecm:mixinType != 'HiddenInNavigation' AND ecm:isVersion = 0 AND ecm:isTrashed = 0 AND ecm:primaryType = 'XCM_Insights'</fixedPart>
                 <predicate parameter="ecm:fulltext" operator="FULLTEXT">
-                    <field schema="default_search" name="ecm_fulltext"/>
+                    <field schema="XCM_insights_search_pp" name="ecm_fulltext"/>
                 </predicate>
                 <predicate parameter="XCM_Insights:Title" operator="FULLTEXT">
-                    <field schema="default_search" name="XCM_Insights_Title"/>
+                    <field schema="XCM_insights_search_pp" name="XCM_Insights_Title"/>
                 </predicate>
                 <predicate parameter="XCM_Insights:Creator_or_Author" operator="FULLTEXT">
-                    <field schema="default_search" name="XCM_Insights_Creator_or_Author"/>
+                    <field schema="XCM_insights_search_pp" name="XCM_Insights_Creator_or_Author"/>
                 </predicate>
                 <predicate parameter="XCM_Insights:Keywords" operator="FULLTEXT">
-                    <field schema="default_search" name="XCM_Insights_Keywords"/>
+                    <field schema="XCM_insights_search_pp" name="XCM_Insights_Keywords"/>
                 </predicate>
 
             </whereClause>
             <aggregates>
                 <aggregate id="XCM_Insights_Date_agg" type="date_range" parameter="XCM_Insights:Date">
-                    <field schema="default_search" name="XCM_Insights_Date_agg"/>
+                    <field schema="XCM_insights_search_pp" name="XCM_Insights_Date_agg"/>
                     <properties>
                         <property name="format">"dd-MM-yyyy"</property>
                     </properties>
@@ -41,35 +41,35 @@
                     </dateRanges>
                 </aggregate>
                 <aggregate id="XCM_Insights_Language_agg" type="terms" parameter="XCM_Insights:Language">
-                    <field schema="default_search" name="XCM_Insights_Language_agg"/>
+                    <field schema="XCM_insights_search_pp" name="XCM_Insights_Language_agg"/>
                     <properties>
                         <property name="size">20</property>
                         <property name="orderBucketsBy">term desc</property>
                     </properties>
                 </aggregate>
                 <aggregate id="XCM_Insights_Country_agg" type="terms" parameter="XCM_Insights:Country">
-                    <field schema="default_search" name="XCM_Insights_Country_agg"/>
+                    <field schema="XCM_insights_search_pp" name="XCM_Insights_Country_agg"/>
                     <properties>
                         <property name="size">20</property>
                         <property name="orderBucketsBy">count desc</property>
                     </properties>
                 </aggregate>
                 <aggregate id="XCM_Insights_Big_Rock_agg" type="terms" parameter="XCM_Insights:Big_Rock">
-                    <field schema="default_search" name="XCM_Insights_Big_Rock_agg"/>
+                    <field schema="XCM_insights_search_pp" name="XCM_Insights_Big_Rock_agg"/>
                     <properties>
                         <property name="size">20</property>
                         <property name="orderBucketsBy">count desc</property>
                     </properties>
                 </aggregate>
                 <aggregate id="XCM_Insights_Quarter_agg" type="terms" parameter="XCM_Insights:Quarter">
-                    <field schema="default_search" name="XCM_Insights_Quarter_agg"/>
+                    <field schema="XCM_insights_search_pp" name="XCM_Insights_Quarter_agg"/>
                     <properties>
                         <property name="size">20</property>
                         <property name="orderBucketsBy">count desc</property>
                     </properties>
                 </aggregate>
                 <aggregate id="XCM_Insights_Year_agg" type="terms" parameter="XCM_Insights:Year">
-                    <field schema="default_search" name="XCM_Insights_Year_agg"/>
+                    <field schema="XCM_insights_search_pp" name="XCM_Insights_Year_agg"/>
                     <properties>
                         <property name="size">20</property>
                         <property name="orderBucketsBy">count desc</property>
