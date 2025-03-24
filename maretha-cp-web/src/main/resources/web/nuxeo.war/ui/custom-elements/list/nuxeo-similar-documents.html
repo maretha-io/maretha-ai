@@ -255,13 +255,15 @@
       observers: ['_update(document, visible, minScore)'],
 
       _update: function(document, visible, score) {
-        if (document && visible && score) {
-          this.set('params', this._computeParams(document));
+        const params = this._computeParams(document);
+        if (document && visible && score && params.vectorQuery) {
+          this.set('params', params);
           this.$.results._refreshAndFetch();
         }
       },
 
       _computeParams: function(document) {
+        if(!document) return;
         let params = {};
         params.vectorField = this.searchProperty;
         params.min_score = this.minScore;

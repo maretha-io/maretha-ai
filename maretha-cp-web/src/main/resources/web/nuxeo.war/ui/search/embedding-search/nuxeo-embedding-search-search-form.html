@@ -46,84 +46,40 @@
     >
     </nuxeo-input>
 
+    <nuxeo-input role="widget" value="{{params.XCM_Insights_Title}}" label="Title" type="text" name="XCM_Insights_Title"></nuxeo-input>
+
+    <nuxeo-input value="{{params.XCM_Insights_Creator_or_Author}}" label="Creator Or  Author" type="text" name="XCM_Insights_Creator_or_Author" role="widget"></nuxeo-input>
+
+    <nuxeo-input value="{{params.XCM_Insights_Keywords}}" label="Keywords" type="text" name="XCM_Insights_Keywords" role="widget"></nuxeo-input>
+
     <div role="widget">
-      <nuxeo-checkbox-aggregation
-              data="[[aggregations.dc_modified_agg]]"
-              value="{{params.dc_modified_agg}}"
-              label="[[i18n('defaultSearch.modifiedDate')]]"
-              collapsible
-      >
-      </nuxeo-checkbox-aggregation>
+      <label id="XCM_Insights_Date_aggField">Date</label>
+      <nuxeo-checkbox-aggregation value="{{params.XCM_Insights_Date_agg}}" data="[[aggregations.XCM_Insights_Date_agg]]" aria-labelledby="XCM_Insights_Date_aggField" name="XCM_Insights_Date_agg"></nuxeo-checkbox-aggregation>
     </div>
 
     <div role="widget">
-      <label>[[i18n('defaultSearch.authors')]]</label>
-      <nuxeo-dropdown-aggregation
-              placeholder="[[i18n('defaultSearch.authors.placeholder')]]"
-              data="[[aggregations.dc_creator_agg]]"
-              value="{{params.dc_creator_agg}}"
-              multiple="true"
-              name="authors"
-              aria-label$="[[i18n('defaultSearch.authors')]]"
-      >
-      </nuxeo-dropdown-aggregation>
+      <label id="XCM_Insights_Language_aggField">Language</label>
+      <nuxeo-checkbox-aggregation value="{{params.XCM_Insights_Language_agg}}" data="[[aggregations.XCM_Insights_Language_agg]]" aria-labelledby="XCM_Insights_Language_aggField" name="XCM_Insights_Language_agg"></nuxeo-checkbox-aggregation>
     </div>
 
     <div role="widget">
-      <label>[[i18n('defaultSearch.tags')]]</label>
-      <nuxeo-tag-suggestion
-              min-chars="1"
-              placeholder="[[i18n('defaultSearch.tags.placeholder')]]"
-              value="{{params.ecm_tags}}"
-              multiple="true"
-              name="tags"
-              aria-label$="[[i18n('defaultSearch.tags')]]"
-      >
-      </nuxeo-tag-suggestion>
+      <label id="XCM_Insights_Year_aggField">Year</label>
+      <nuxeo-checkbox-aggregation value="{{params.XCM_Insights_Year_agg}}" data="[[aggregations.XCM_Insights_Year_agg]]" aria-labelledby="XCM_Insights_Year_aggField" name="XCM_Insights_Year_agg"></nuxeo-checkbox-aggregation>
     </div>
 
     <div role="widget">
-      <nuxeo-checkbox-aggregation
-              data="[[aggregations.dc_nature_agg]]"
-              value="{{params.dc_nature_agg}}"
-              name="nature"
-              label="[[i18n('defaultSearch.nature')]]"
-              collapsible
-      >
-      </nuxeo-checkbox-aggregation>
+      <label id="XCM_Insights_Quarter_aggField">Quarter</label>
+      <nuxeo-checkbox-aggregation value="{{params.XCM_Insights_Quarter_agg}}" data="[[aggregations.XCM_Insights_Quarter_agg]]" aria-labelledby="XCM_Insights_Quarter_aggField" name="XCM_Insights_Quarter_agg"></nuxeo-checkbox-aggregation>
     </div>
 
     <div role="widget">
-      <nuxeo-checkbox-aggregation
-              data="[[aggregations.dc_subjects_agg]]"
-              value="{{params.dc_subjects_agg}}"
-              name="subject"
-              label="[[i18n('defaultSearch.subject')]]"
-              collapsible
-      >
-      </nuxeo-checkbox-aggregation>
+      <label id="XCM_Insights_Country_aggField">Country</label>
+      <nuxeo-checkbox-aggregation value="{{params.XCM_Insights_Country_agg}}" data="[[aggregations.XCM_Insights_Country_agg]]" aria-labelledby="XCM_Insights_Country_aggField" name="XCM_Insights_Country_agg"></nuxeo-checkbox-aggregation>
     </div>
 
     <div role="widget">
-      <nuxeo-checkbox-aggregation
-              data="[[aggregations.dc_coverage_agg]]"
-              value="{{params.dc_coverage_agg}}"
-              name="coverage"
-              label="[[i18n('defaultSearch.coverage')]]"
-              collapsible
-      >
-      </nuxeo-checkbox-aggregation>
-    </div>
-
-    <div role="widget">
-      <nuxeo-checkbox-aggregation
-              data="[[aggregations.common_size_agg]]"
-              value="{{params.common_size_agg}}"
-              name="size"
-              label="[[i18n('defaultSearch.size')]]"
-              collapsible
-      >
-      </nuxeo-checkbox-aggregation>
+      <label id="XCM_Insights_Big_Rock_aggField">Big  Rock</label>
+      <nuxeo-checkbox-aggregation value="{{params.XCM_Insights_Big_Rock_agg}}" data="[[aggregations.XCM_Insights_Big_Rock_agg]]" aria-labelledby="XCM_Insights_Big_Rock_aggField" name="XCM_Insights_Big_Rock_agg"></nuxeo-checkbox-aggregation>
     </div>
 
   </template>
