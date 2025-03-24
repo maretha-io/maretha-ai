@@ -26,25 +26,30 @@
 
           <nuxeo-input role="widget" value="{{vertesiaSettings.apiUrl}}"
                        label="apiUrl" type="text"
-                       placeholder="" style="margin: auto;" on-change="_saveVertesiaSettings"></nuxeo-input>
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
           <nuxeo-input role="widget" value="{{vertesiaSettings.uploadUrl}}"
                        label="uploadUrl" type="text"
-                       placeholder="" style="margin: auto;" on-change="_saveVertesiaSettings"></nuxeo-input>
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
           <nuxeo-input role="widget" value="{{vertesiaSettings.authToken}}"
-                       label="authToken" type="password" autocomplete$="off"
-                       placeholder="" style="margin: auto;" on-change="_saveVertesiaSettings"></nuxeo-input>
+                       label="authToken" type="text"
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
           <nuxeo-input role="widget" value="{{vertesiaSettings.projectId}}"
                        label="projectId" type="text"
-                       placeholder="" style="margin: auto;" on-change="_saveVertesiaSettings"></nuxeo-input>
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
           <nuxeo-input role="widget" value="{{vertesiaSettings.environmentId}}"
                        label="environmentId" type="text"
-                       placeholder="" style="margin: auto;" on-change="_saveVertesiaSettings"></nuxeo-input>
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
           <nuxeo-input role="widget" value="{{vertesiaSettings.embeddingModel}}"
                        label="embeddingModel" type="text"
-                       placeholder="" style="margin: auto;" on-change="_saveVertesiaSettings"></nuxeo-input>
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
           <nuxeo-input role="widget" value="{{vertesiaSettings.mimeTypes}}"
                        label="mimeTypes" type="text"
-                       placeholder="" style="margin: auto;" on-change="_saveVertesiaSettings"></nuxeo-input>
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
+
+          <paper-button id="save" on-tap="_saveVertesiaSettings" aria-label="Save Settings" raised style="">
+            Save Settings
+            <iron-icon icon="icons:save"></iron-icon>
+          </paper-button>
 
         </div>
       </nuxeo-card>

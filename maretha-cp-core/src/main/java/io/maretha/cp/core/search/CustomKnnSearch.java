@@ -30,7 +30,6 @@ import org.opensearch.script.Script;
 import org.opensearch.script.ScriptType;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +74,9 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
 
         Map<String, String> namedParameters = (Map<String, String>) searchDoc.getContextData(NAMED_PARAMETERS);
         if (namedParameters == null || MapUtils.isEmpty(namedParameters)) {
+            return getEmptyResult();
+        }
+        if (!namedParameters.containsKey("vectorField") && !namedParameters.containsKey("vectorQuery")) {
             return getEmptyResult();
         }
         float minScore = Float.parseFloat(namedParameters.getOrDefault("min_score", "0.8"));
