@@ -78,9 +78,8 @@ public class APIServiceImpl implements APIService {
 
 
     @Override
-    public String getInteractionResultAsStream(String interaction, Map<String, Object> data) {
+    public String getInteractionResult(String interaction, Map<String, Object> data, boolean stream) {
         String url = getSetting(API_URL) + "/api/v1/runs";
-        boolean stream = true;
         String dataParameters = "";
         try {
             dataParameters = objectMapper.writeValueAsString(data);
@@ -96,12 +95,15 @@ public class APIServiceImpl implements APIService {
         String bearerToken = getBearerToken();
         String interactionResponse = postRequest(bearerToken, url, jsonBody);
 
-        try {
-            String id = objectMapper.readTree(interactionResponse).get("id").asText();
-            return url + "/" + id + "/stream?access_token=" + bearerToken;
-        } catch (JsonProcessingException e) {
-            throw new NuxeoException(e);
+        if (stream) {
+            try {
+                String id = objectMapper.readTree(interactionResponse).get("id").asText();
+                return url + "/" + id + "/stream?access_token=" + bearerToken;
+            } catch (JsonProcessingException e) {
+                throw new NuxeoException(e);
+            }
         }
+        return interactionResponse;
     }
 
     @Override

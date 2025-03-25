@@ -1,6 +1,5 @@
 package io.maretha.cp.core.operations;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.InteractionParameter;
@@ -36,13 +35,15 @@ public class RuntInteractionOperation {
     protected List<ObjectNode> data;
     @Param(name = "interactionId")
     protected String interactionId;
+    @Param(name = "saveMetadata", required = false)
+    protected boolean saveMetadata;
 
     @OperationMethod
     public String run(DocumentModel doc) {
         log.debug(String.format("RunInteraction interactionId: [%s], docId: [%s]", interactionId, doc.getId()));
         List<InteractionParameter> parameters = objectMapper
                 .convertValue(data, objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));
-        return runInteractionService.triggerInteraction(doc, session, interactionId, parameters);
+        return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata);
     }
 
 }
