@@ -6,5 +6,10 @@
             <option name="maxSize">1000</option>
             <option name="concurrencyLevel">500</option>
         </cache>
+        <cache name="vertesia_cache">
+            <ttl>60</ttl>
+            <option name="maxSize">1000</option>
+            <option name="concurrencyLevel">500</option>
+        </cache>
     </extension>
 </component>
