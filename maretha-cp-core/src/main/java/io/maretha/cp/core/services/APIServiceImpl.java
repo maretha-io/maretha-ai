@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 public class APIServiceImpl implements APIService {
     public final static String EMBEDDINGS_CACHE = "embeddings_cache";
+    public final static String VERTESIA_CACHE = "vertesia_cache";
     public final static String API_URL = "vertesia.apiUrl";
     public final static String UPLOAD_API_URL = "vertesia.uploadUrl";
     public final static String AUTH_TOKEN = "vertesia.authToken";
@@ -105,10 +106,17 @@ public class APIServiceImpl implements APIService {
 
     @Override
     public String getBearerToken() {
-        //TODO cache for 1h
+        Cache cache = Framework.getService(CacheService.class).getCache(VERTESIA_CACHE);
+        if (cache.hasEntry(AUTH_TOKEN)) {
+            return (String) cache.get(AUTH_TOKEN);
+        }
         String response = getRequest(getSetting(AUTH_TOKEN), getSetting(API_URL) + "/auth/token");
         JSONObject jsonObject = new JSONObject(response);
-        return jsonObject.getString("token");
+        String token = jsonObject.getString("token");
+        if (StringUtils.isNotEmpty(token)) {
+            cache.put(AUTH_TOKEN, token);
+        }
+        return token;
     }
 
     @Override
