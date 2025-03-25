@@ -1,6 +1,10 @@
 package io.maretha.cp.core.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.bulk.actions.UploadDocumentAction;
+import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
 import org.apache.commons.collections.CollectionUtils;
@@ -10,13 +14,19 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.model.Property;
+import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.ecm.core.bulk.BulkService;
 import org.nuxeo.ecm.core.bulk.message.BulkCommand;
+import org.nuxeo.ecm.directory.Session;
+import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.runtime.api.Framework;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -33,21 +43,46 @@ import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TE
 
 public class RunInteractionServiceImpl implements RunInteractionService {
 
+    public static final String MIME_TYPES = "vertesia.mimeTypes";
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
     private final APIService apiService = Framework.getService(APIService.class);
-    public static final String MIME_TYPES = "vertesia.mimeTypes";
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters) {
+    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata) {
+        Map<String, Object> paramsMap;
+        if (saveMetadata) {
+            parameters = addSchemasFieldsAndVocabs(doc, session, parameters);
+        }
         if (doc.isFolder()) {
             List<DocumentModel> childrenDocs = getChildrenDocuments(session, doc);
             List<DocumentModel> childrenDocsWithStoreId = uploadFilesAndSetStoreId(childrenDocs);
-            Map<String, Object> paramsMap = buildParametersForFolder(childrenDocsWithStoreId, parameters);
-            return apiService.getInteractionResultAsStream(interactionId, paramsMap);
+            paramsMap = buildParametersForFolder(childrenDocsWithStoreId, parameters);
         } else {
             doc = uploadFileAndSetStoreId(doc, session);
-            Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
-            return apiService.getInteractionResultAsStream(interactionId, paramsMap);
+            paramsMap = buildParameters(doc, session, parameters);
+        }
+        if (saveMetadata) {
+            String response = apiService.getInteractionResult(interactionId, paramsMap, false);
+            return validateAndSaveMetadata(response, doc, session);
+        }
+        return apiService.getInteractionResult(interactionId, paramsMap, true);
+    }
+
+    private String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(response);
+            JsonNode resultNode = jsonNode.get("result").get("result");
+            resultNode.fields().forEachRemaining(field -> {
+                String key = field.getKey();
+                String value = field.getValue().asText();
+                log.debug(String.format("Saving metadata key: %s value: %s", key, value));
+                doc.setPropertyValue(key, value);
+            });
+            session.saveDocument(doc);
+            return objectMapper.writeValueAsString(resultNode);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -220,5 +255,61 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private String getSupportedMimeTypes() {
         return Framework.getService(RepositoryService.class).getSettingsProperty(MIME_TYPES, "text/plain,application/pdf");
+    }
+
+    private Map<String, String> getDictionaryValues(String directory) {
+        Map<String, String> dictionaryMap = new HashMap<>();
+        try (Session session = Framework.getService(DirectoryService.class).open(directory)) {
+            DocumentModelList entries = session.query(Map.of());
+            entries.forEach(entry -> {
+                String id = entry.getId();
+                try {
+                    String label = (String) (entry.getProperty("label")).getValue();
+                    dictionaryMap.put(id, label);
+                } catch (PropertyNotFoundException e) {
+                    log.debug("Label not found for directory: " + id);
+                }
+            });
+        }
+        return dictionaryMap;
+    }
+
+    private List<InteractionParameter> addSchemasFieldsAndVocabs(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session);
+        Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
+        Map<String, Object> dictionariesMap = new HashMap<>();
+        List<DocTypeWithSchema.Schema.Field> schemasFields = new ArrayList<>();
+
+        Arrays.stream(doc.getSchemas()).forEach(schema -> {
+            if (schemaSettings.containsKey(schema)) {
+                DocTypeWithSchema.Schema schemaSetting = schemaSettings.get(schema);
+                schemaSetting.getFields().stream().filter(DocTypeWithSchema.Schema.Field::isActive).forEach(activeField -> {
+                    schemasFields.add(activeField);
+                    if (StringUtils.isNotEmpty(activeField.getDirectoryName())) {
+                        Map<String, String> dictionaryValues = getDictionaryValues(activeField.getDirectoryName());
+                        dictionariesMap.put(activeField.getDirectoryName(), dictionaryValues);
+                    }
+                });
+            }
+        });
+
+        parameters.forEach(param -> {
+            if (param.getName().equals("schema")) {
+                try {
+                    param.setValue(objectMapper.writeValueAsString(schemasFields));
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            if (param.getName().equals("dictionaries")) {
+                try {
+                    param.setValue(objectMapper.writeValueAsString(dictionariesMap));
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        return parameters;
     }
 }

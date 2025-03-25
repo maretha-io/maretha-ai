@@ -3,7 +3,6 @@ package io.maretha.cp.core.operations;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.Settings;
 import io.maretha.cp.core.services.RepositoryService;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -99,22 +98,6 @@ public class GetDocumentTypesOperation {
             });
         });
         return docTypes;
-    }
-
-    private void getDictionaryValues() {
-//        try (Session session = Framework.getService(DirectoryService.class).open(directory.getName())) {
-//            DocumentModelList entries = session.query(Map.of());
-//            entries.forEach(entry -> {
-//                String id = entry.getId();
-//                try {
-//                    String label = (String) (entry.getProperty("label")).getValue();
-//                    DocTypeWithSchema.Schema.Field.DirectoryEntry directoryEntry = new DocTypeWithSchema.Schema.Field.DirectoryEntry(id, label, "");
-//                    customField.getDirectoryEntries().add(directoryEntry);
-//                } catch (PropertyNotFoundException e) {
-//                    log.debug("Label not found for directory: " + id);
-//                }
-//            });
-//        }
     }
 
 }

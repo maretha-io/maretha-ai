@@ -9,7 +9,7 @@ import java.util.Map;
 public interface APIService {
     List<Interaction> getInteractions();
 
-    String getInteractionResultAsStream(String interactionId, Map<String, Object> data);
+    String getInteractionResult(String interactionId, Map<String, Object> data, boolean stream);
 
     String getBearerToken();
 

@@ -311,9 +311,18 @@
         this.set('interactionStatus', 'Waiting for AI response...');
         this.set('interactionResponse', '');
         const operation = this.$.runInteractionOperation;
-        operation.params = { "interactionId": this.selectedInteraction.id, "data": this.selectedInteraction.parameters };
+        operation.params = {
+          "interactionId": this.selectedInteraction.id,
+          "data": this.selectedInteraction.parameters,
+          "saveMetadata": this.selectedInteraction.saveMetadata
+        };
         operation.execute().then((response) => {
-          this._stream(response.value);
+          if(this.selectedInteraction.saveMetadata) {
+              this.set('interactionResponse', response.value);
+              this.set('interactionStatus', '');
+          } else {
+            this._stream(response.value);
+          }
         }).catch((error) => {
           console.error('Error triggering operation:', error);
           this.set('interactionStatus', `<p>Error: ${error}</p>`);
