@@ -1,0 +1,91 @@
+<dom-module id="cp-document-get-metadata">
+  <template>
+    <nuxeo-operation id="getInteractionsOp" op="GetInteractionsForDocumentOperation"
+                     input="[[document]]"></nuxeo-operation>
+    <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
+                     input="[[document.uid]]"></nuxeo-operation>
+
+    <paper-icon-button icon="icons:info-outline" label="Save Metadata" on-tap="_saveMetadata">
+      <nuxeo-tooltip>Save Metadata</nuxeo-tooltip>
+    </paper-icon-button>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cp-document-get-metadata',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+        document: {
+          type: Object,
+          observer: '_documentObserver'
+        },
+
+        interactions: {
+          type: Array,
+          value: [],
+          notify: true
+        },
+
+        selectedInteraction: {
+          type: Object
+        },
+
+        interactionResponse: {
+          type: String,
+        },
+
+      },
+
+      _resetData() {
+        this.set('interactions', []);
+        this.set('interactionResponse', null);
+      },
+
+      _documentObserver(doc) {
+        this._resetData();
+        this._loadData();
+      },
+
+      _loadData() {
+        this._getInteractions();
+      },
+
+      _getInteractions: function () {
+        const operation = this.$.getInteractionsOp;
+        operation.params = {};
+        operation.execute().then((response) => {
+          this.set('interactions', response.value);
+          const selectedInteraction = response.value.find(obj => obj.saveMetadata === true);
+          this.set('selectedInteraction', selectedInteraction);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _saveMetadata: function () {
+        if (!this.selectedInteraction) return;
+        this.set('interactionStatus', 'Waiting for AI response...');
+        this.set('interactionResponse', '');
+        const operation = this.$.runInteractionOperation;
+        operation.params = {
+          "interactionId": this.selectedInteraction.id,
+          "data": this.selectedInteraction.parameters,
+          "saveMetadata": this.selectedInteraction.saveMetadata
+        };
+        this.fire('notify', { message: 'Metadata request in progress...' });
+        operation.execute().then((response) => {
+          this.set('interactionResponse', response.value);
+          this.set('interactionStatus', '');
+          this.fire('document-updated');
+          this.fire('notify', { message: 'Metadata saved.' });
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+          this.fire('notify', { message: 'Cannot save metadata.' });
+          this.set('interactionStatus', `<p>Error: ${error}</p>`);
+        });
+      },
+
+    });
+  </script>
+</dom-module>
