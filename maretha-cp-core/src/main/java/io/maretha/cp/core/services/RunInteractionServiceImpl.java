@@ -62,6 +62,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             doc = uploadFileAndSetStoreId(doc, session);
             paramsMap = buildParameters(doc, session, parameters);
         }
+        //Retry for document to have status completed
+        apiService.getStoredDocumentStatus((String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
         if (saveMetadata) {
             String response = apiService.getInteractionResult(interactionId, paramsMap, false);
             return validateAndSaveMetadata(response, doc, session);

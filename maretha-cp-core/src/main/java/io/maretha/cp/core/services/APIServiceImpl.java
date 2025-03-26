@@ -52,8 +52,8 @@ public class APIServiceImpl implements APIService {
             .readTimeout(60, TimeUnit.SECONDS)
             .build();
     private final RetryConfig config = RetryConfig.custom()
-            .maxAttempts(3) // Maximum number of attempts
-            .waitDuration(Duration.ofSeconds(1)) // Wait 1 second between attempts
+            .maxAttempts(10) // Maximum number of attempts
+            .waitDuration(Duration.ofSeconds(10)) // Wait 10 seconds between attempts
             .retryExceptions(Exception.class) // Retry on all exceptions
             .build();
     private final RetryRegistry registry = RetryRegistry.of(config);
@@ -291,6 +291,19 @@ public class APIServiceImpl implements APIService {
         return responseBody;
     }
 
+    private String getResponseWithRetryAndValidation(Request request) {
+        String responseBody = Retry.decorateSupplier(retry, () -> {
+            String response = executeHttpRequest(request);
+            String status = new JSONObject(response).getString("status");
+            if (!status.equals("completed")) {
+                throw new RuntimeException("Status is not completed, but:" + status);
+            }
+            return response;
+        }).get();
+        log.debug(responseBody);
+        return responseBody;
+    }
+
     private String executeHttpRequest(Request request) {
         log.debug("Executing HttpRequest for URL: " + request.url());
         try (Response response = client.newCall(request).execute()) {
@@ -340,10 +353,15 @@ public class APIServiceImpl implements APIService {
         return paramsList;
     }
 
-    public JSONObject getStoredDocumentText(String storeId) {
+    public String getStoredDocumentStatus(String storeId) {
         String bearerToken = getBearerToken();
-        String documentResponse = getRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects/" + storeId + "/text");
-        return new JSONObject(documentResponse);
+        Request request = new Request.Builder().url(getSetting(UPLOAD_API_URL) + "/api/v1/objects/" + storeId)
+                .addHeader("Accept", "application/json")
+                .addHeader("Authorization", "Bearer " + bearerToken)
+                .get()
+                .build();
+        String documentResponse = getResponseWithRetryAndValidation(request);
+        return new JSONObject(documentResponse).getString("status");
     }
 
     private String getSetting(String name) {
