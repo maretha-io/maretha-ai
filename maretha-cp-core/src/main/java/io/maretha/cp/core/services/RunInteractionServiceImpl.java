@@ -85,7 +85,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             return objectMapper.writeValueAsString(resultNode);
         } catch (Exception e) {
             log.error("Could not save document metadata", e);
-            return "Failed to save document metadata: " + e.getMessage();
+            throw new RuntimeException("Failed to save document metadata: " + e.getMessage());
         }
     }
 
