@@ -18,6 +18,7 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
+import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.ecm.core.bulk.BulkService;
 import org.nuxeo.ecm.core.bulk.message.BulkCommand;
@@ -49,6 +50,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
     private final APIService apiService = Framework.getService(APIService.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
@@ -82,8 +84,12 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 String value = field.getValue().asText();
                 Serializable propertyValue = doc.getPropertyValue(key);
                 if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
-                    log.debug(String.format("Saving metadata key: %s value: %s", key, value));
-                    doc.setPropertyValue(key, value);
+                    if (!validationService.validate(key, value).hasError()) {
+                        log.debug(String.format("Saving metadata key: %s value: %s", key, value));
+                        doc.setPropertyValue(key, value);
+                    } else {
+                        log.error(String.format("Failed to save metadata key: %s value: %s", key, value));
+                    }
                 }
             });
             session.saveDocument(doc);
