@@ -36,6 +36,7 @@ public interface RepositoryService {
     String SETTINGS_SCHEMA_METADATA = "interactionsettings:schemaSettings";
     String SETTINGS_ELASTICSEARCH = "interactionsettings:esSettings";
     String SETTINGS_VERTESIA = "interactionsettings:vertesiaSettings";
+    String SETTINGS_EVENTS = "interactionsettings:eventsSettings";
 
     String SCHEMA_ID = "id";
     String SCHEMA_DESCRIPTION = "description";

@@ -11,5 +11,5 @@ public interface RunInteractionService {
 
     DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session);
 
-    String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata);
+    String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride);
 }

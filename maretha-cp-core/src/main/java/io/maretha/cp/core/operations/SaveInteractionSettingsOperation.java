@@ -24,6 +24,7 @@ public class SaveInteractionSettingsOperation {
 
     public static final String ID = "SaveInteractionsOperation";
     public static final String VERTESIA_SETTINGS = "vertesiaSettings";
+    public static final String EVENTS_SETTINGS = "eventsSettings";
     public static final String ES_SETTINGS = "esSettings";
     public static final String SCHEMA_SETTINGS = "schemaSettings";
     public static final String AWS_S3_ACCESS_ENABLED = "awsS3AccessEnabled";
@@ -41,6 +42,8 @@ public class SaveInteractionSettingsOperation {
     protected Map<String, String> esSettings;
     @Param(name = VERTESIA_SETTINGS, required = false)
     protected Map<String, String> vertesiaSettings;
+    @Param(name = EVENTS_SETTINGS, required = false)
+    protected Map<String, String> eventsSettings;
 
     @OperationMethod
     public Settings run() {
@@ -49,6 +52,7 @@ public class SaveInteractionSettingsOperation {
         configuration.put(SCHEMA_SETTINGS, schemaSettings);
         configuration.put(ES_SETTINGS, esSettings);
         configuration.put(VERTESIA_SETTINGS, vertesiaSettings);
+        configuration.put(EVENTS_SETTINGS, eventsSettings);
         return cpLocalSettingsService.saveInteractionSettings(session, interactions, configuration);
     }
 

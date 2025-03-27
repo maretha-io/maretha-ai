@@ -2,6 +2,7 @@ package io.maretha.cp.core.adapters;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.maretha.cp.core.models.EventWithInteraction;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.Settings;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_ELASTICSEARCH;
+import static io.maretha.cp.core.services.RepositoryService.SETTINGS_EVENTS;
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_SCHEMA_AWS_S3_ACCESS;
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_SCHEMA_METADATA;
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_VERTESIA;
@@ -36,9 +38,11 @@ public class SettingsAdapterFactory implements DocumentAdapterFactory {
             });
             Map<String, String> esSettingsMap = getPropertyValue(doc, SETTINGS_ELASTICSEARCH, new TypeReference<>() {
             });
-            Map<String, String> settingsMap = getPropertyValue(doc, SETTINGS_VERTESIA, new TypeReference<>() {
+            Map<String, String> vertesiaSettings = getPropertyValue(doc, SETTINGS_VERTESIA, new TypeReference<>() {
             });
-            return new Settings(cpInteractions, awsS3AccessEnabled, schemaSettingsMap, esSettingsMap, settingsMap);
+            Map<String, List<EventWithInteraction>> eventsSettingsMap = getPropertyValue(doc, SETTINGS_EVENTS, new TypeReference<>() {
+            });
+            return new Settings(cpInteractions, awsS3AccessEnabled, schemaSettingsMap, esSettingsMap, vertesiaSettings, eventsSettingsMap);
         }
         return null;
     }
