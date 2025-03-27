@@ -37,13 +37,15 @@ public class RuntInteractionOperation {
     protected String interactionId;
     @Param(name = "saveMetadata", required = false)
     protected boolean saveMetadata;
+    @Param(name = "saveMetadataModeOverride", required = false)
+    protected boolean saveMetadataModeOverride;
 
     @OperationMethod
     public String run(DocumentModel doc) {
         log.debug(String.format("RunInteraction interactionId: [%s], docId: [%s]", interactionId, doc.getId()));
         List<InteractionParameter> parameters = objectMapper
                 .convertValue(data, objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));
-        return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata);
+        return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
     }
 
 }

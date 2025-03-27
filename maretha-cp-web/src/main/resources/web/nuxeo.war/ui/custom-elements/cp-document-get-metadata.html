@@ -5,9 +5,25 @@
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
                      input="[[document.uid]]"></nuxeo-operation>
 
-    <paper-icon-button icon="icons:info-outline" label="Save Metadata" on-tap="_saveMetadata">
-      <nuxeo-tooltip>Save Metadata</nuxeo-tooltip>
-    </paper-icon-button>
+    <paper-menu-button id="dropdownButtonAi" close-on-activate no-overlap horizontal-align="right">
+      <paper-icon-button
+              id="aiButton"
+              icon="icons:info-outline"
+              slot="dropdown-trigger"
+              aria-labelledby="iconButtonAITooltip"
+      ></paper-icon-button>
+      <paper-listbox no-animations="" id="menu" selectable="item" slot="dropdown-content">
+        <paper-icon-item name="update" on-click="_updateMetadata">
+          <iron-icon icon="icons:info-outline" slot="item-icon">&gt;</iron-icon>
+          <div>Update metadata</div>
+        </paper-icon-item>
+        <paper-icon-item name="add" on-click="_addMissingMetadata">
+          <iron-icon icon="icons:info-outline" slot="item-icon">&gt;</iron-icon>
+          <div>Add missing metadata</div>
+        </paper-icon-item>
+      </paper-listbox>
+    </paper-menu-button>
+    <nuxeo-tooltip for="aiButton" id="iconButtonAITooltip">AI Metadata</nuxeo-tooltip>
 
   </template>
 
@@ -34,6 +50,14 @@
         interactionResponse: {
           type: String,
         },
+
+        dialogOpened: {
+          type: Boolean,
+        },
+
+        saveMetadataModeOverride: {
+          type: Boolean
+        }
 
       },
 
@@ -63,7 +87,7 @@
         });
       },
 
-      _saveMetadata: function () {
+      _updateMetadata: function () {
         if (!this.selectedInteraction) return;
         this.set('interactionStatus', 'Waiting for AI response...');
         this.set('interactionResponse', '');
@@ -71,7 +95,8 @@
         operation.params = {
           "interactionId": this.selectedInteraction.id,
           "data": this.selectedInteraction.parameters,
-          "saveMetadata": this.selectedInteraction.saveMetadata
+          "saveMetadata": this.selectedInteraction.saveMetadata,
+          "saveMetadataModeOverride": true
         };
         this.fire('notify', { message: 'Metadata request in progress...' });
         operation.execute().then((response) => {
@@ -84,6 +109,34 @@
           this.fire('notify', { message: 'Cannot save metadata.' });
           this.set('interactionStatus', `<p>Error: ${error}</p>`);
         });
+      },
+
+      _addMissingMetadata: function () {
+        if (!this.selectedInteraction) return;
+        this.set('interactionStatus', 'Waiting for AI response...');
+        this.set('interactionResponse', '');
+        const operation = this.$.runInteractionOperation;
+        operation.params = {
+          "interactionId": this.selectedInteraction.id,
+          "data": this.selectedInteraction.parameters,
+          "saveMetadata": this.selectedInteraction.saveMetadata,
+          "saveMetadataModeOverride": false
+        };
+        this.fire('notify', { message: 'Metadata request in progress...' });
+        operation.execute().then((response) => {
+          this.set('interactionResponse', response.value);
+          this.set('interactionStatus', '');
+          this.fire('document-updated');
+          this.fire('notify', { message: 'Metadata saved.' });
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+          this.fire('notify', { message: 'Cannot save metadata.' });
+          this.set('interactionStatus', `<p>Error: ${error}</p>`);
+        });
+      },
+
+      _toggleDialog: function () {
+        this.$.dialog.toggle();
       },
 
     });

@@ -25,6 +25,7 @@ import org.nuxeo.ecm.directory.Session;
 import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.runtime.api.Framework;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,6 +33,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
@@ -49,7 +51,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata) {
+    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
         Map<String, Object> paramsMap;
         if (saveMetadata) {
             parameters = addSchemasFieldsAndVocabs(doc, session, parameters);
@@ -66,20 +68,23 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         apiService.getStoredDocumentStatus((String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
         if (saveMetadata) {
             String response = apiService.getInteractionResult(interactionId, paramsMap, false);
-            return validateAndSaveMetadata(response, doc, session);
+            return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride);
         }
         return apiService.getInteractionResult(interactionId, paramsMap, true);
     }
 
-    private String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session) {
+    private String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride) {
         try {
             JsonNode jsonNode = objectMapper.readTree(response);
             JsonNode resultNode = jsonNode.get("result").get("result");
             resultNode.fields().forEachRemaining(field -> {
                 String key = field.getKey();
                 String value = field.getValue().asText();
-                log.debug(String.format("Saving metadata key: %s value: %s", key, value));
-                doc.setPropertyValue(key, value);
+                Serializable propertyValue = doc.getPropertyValue(key);
+                if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
+                    log.debug(String.format("Saving metadata key: %s value: %s", key, value));
+                    doc.setPropertyValue(key, value);
+                }
             });
             session.saveDocument(doc);
             return objectMapper.writeValueAsString(resultNode);

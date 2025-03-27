@@ -13,6 +13,8 @@
     <xs:element name="esSettings" type="xs:string"/>
     <!--Vertesia.io settings-->
     <xs:element name="vertesiaSettings" type="xs:string"/>
+    <!-- DocType events settings with interactions mapping-->
+    <xs:element name="eventsSettings" type="xs:string"/>
 
     <!-- Definition for the interactions complex type -->
     <xs:complexType name="interactionType">

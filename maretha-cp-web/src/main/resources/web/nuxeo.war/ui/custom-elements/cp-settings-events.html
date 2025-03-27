@@ -1,0 +1,102 @@
+<dom-module id="cp-settings-events">
+  <template>
+    <nuxeo-operation id="saveSettingsOp" op="SaveInteractionsOperation"></nuxeo-operation>
+    <nuxeo-operation id="getSettingsOperation" op="GetSettingsOperation"></nuxeo-operation>
+
+    <style include="nuxeo-styles">
+      .content {
+        width: 100%;
+      }
+
+      nuxeo-card {
+        width: 50%;
+        height: 100%;
+        text-align: left;
+        box-shadow: 0 3px 20px rgb(0 0 0 / 10%);
+      }
+    </style>
+
+    <div id="main slot">
+
+      <nuxeo-card>
+        <h3>Events Settings</h3>
+        <paper-toast id="toast"></paper-toast>
+
+        <div class="content">
+          
+          <paper-button id="save" on-tap="_saveEventsSettings" aria-label="Save Settings" raised style="">
+            Save Settings
+            <iron-icon icon="icons:save"></iron-icon>
+          </paper-button>
+
+        </div>
+      </nuxeo-card>
+    </div>
+
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cp-settings-events',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+        eventsSettings: {
+          type: Object,
+          value: {}
+        },
+      },
+
+      ready: function () {
+        this._getEventsSettings();
+      },
+
+      _getEventsSettings: function () {
+        const operation = this.$.getSettingsOperation;
+        operation.params = {};
+        operation.execute().then((response) => {
+          if(response.value.eventsSettings)
+            this.set('eventsSettings', response.value.eventsSettings);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _saveEventsSettings: function () {
+        const operation = this.$.saveSettingsOp;
+        operation.params = {
+          'eventsSettings': this.eventsSettings
+        };
+        operation.execute().then((response) => {
+          this._showNotification('Changes Saved!', 'success');
+          this.set('eventsSettings', response.value.eventsSettings);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+          this._showNotification('Changes NOT Saved!', 'error');
+        });
+      },
+
+      _showNotification(message, type) {
+        const toast = this.$.toast;
+        toast.text = message;
+        toast.classList.remove('toast-error', 'toast-success', 'toast-warning'); // Remove existing classes
+        if (type) {
+          toast.classList.add(`toast-${type}`);
+        }
+        toast.open();
+      },
+
+      _toggleDialog: function (e) {
+        this.$.dialog.toggle();
+      },
+
+      _close: function () {
+        this.$.dialog.toggle();
+      },
+
+      _dialogClosed: function () {
+      }
+
+    });
+  </script>
+</dom-module>
