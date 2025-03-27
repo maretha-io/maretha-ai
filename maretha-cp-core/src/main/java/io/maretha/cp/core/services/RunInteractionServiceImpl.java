@@ -50,7 +50,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
     private final APIService apiService = Framework.getService(APIService.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
@@ -77,6 +76,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride) {
         try {
+            DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
             JsonNode jsonNode = objectMapper.readTree(response);
             JsonNode resultNode = jsonNode.get("result").get("result");
             resultNode.fields().forEachRemaining(field -> {
