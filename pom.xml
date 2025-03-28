@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.nuxeo</groupId>
     <artifactId>nuxeo-parent</artifactId>
-    <version>2023.24</version>
+    <version>2021.55</version>
   </parent>
 
   <groupId>io.maretha.cp</groupId>
@@ -17,7 +17,7 @@
   <properties>
     <!-- Skip Nuxeo enforcer rules by default -->
     <nuxeo.skip.enforcer>true</nuxeo.skip.enforcer>
-    <nuxeo.target.version>2023.24</nuxeo.target.version>
+    <nuxeo.target.version>2021.66</nuxeo.target.version>
     <lombok.version>1.18.32</lombok.version>
   </properties>
 
