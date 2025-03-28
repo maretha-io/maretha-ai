@@ -222,18 +222,17 @@ public class APIServiceImpl implements APIService {
     @Override
     public Map<String, Double> search(String vectorQuery, String type, int limit) {
         Map<String, Double> docIdScoreMap = new HashMap<>();
-        String requestBody = String.format("""
-                {
-                  "limit": %s,
-                  "offset": 0,
-                  "query": {
-                    "vector": {
-                      "values": %s,
-                      "type": "%s"
-                    }
-                  }
-                }
-                """, limit, vectorQuery, type);
+        String requestBody = String.format(
+                "{\n" +
+                "  \"limit\": %s,\n" +
+                "  \"offset\": 0,\n" +
+                "  \"query\": {\n" +
+                "    \"vector\": {\n" +
+                "      \"values\": %s,\n" +
+                "      \"type\": \"%s\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}", limit, vectorQuery, type);
         String response = postRequest(getBearerToken(), getSetting(UPLOAD_API_URL) + "/api/v1/objects/search", requestBody);
         try {
             objectMapper.readTree(response).forEach(obj -> {
@@ -366,17 +365,28 @@ public class APIServiceImpl implements APIService {
 
     private String getSetting(String name) {
         final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
-        return switch (name) {
-            case API_URL -> repositoryService.getSettingsProperty(API_URL, "https://api.vertesia.io");
-            case UPLOAD_API_URL ->
-                    repositoryService.getSettingsProperty(UPLOAD_API_URL, "https://zeno-server-production.api.vertesia.io");
-            case AUTH_TOKEN -> repositoryService.getSettingsProperty(AUTH_TOKEN, null);
-            case PROJECT_ID -> repositoryService.getSettingsProperty(PROJECT_ID, null);
-            case ENVIRONMENT_ID -> repositoryService.getSettingsProperty(ENVIRONMENT_ID, null);
-            case EMBEDDING_MODEL ->
-                    repositoryService.getSettingsProperty(EMBEDDING_MODEL, "amazon.titan-embed-text-v2:0");
-            default -> null;
-        };
+        String value = null;
+        switch (name) {
+            case API_URL:
+                value = repositoryService.getSettingsProperty(API_URL, "https://api.vertesia.io");
+                break;
+            case UPLOAD_API_URL:
+                value = repositoryService.getSettingsProperty(UPLOAD_API_URL, "https://zeno-server-production.api.vertesia.io");
+                break;
+            case AUTH_TOKEN:
+                repositoryService.getSettingsProperty(AUTH_TOKEN, null);
+                break;
+            case PROJECT_ID:
+                repositoryService.getSettingsProperty(PROJECT_ID, null);
+                break;
+            case ENVIRONMENT_ID:
+                repositoryService.getSettingsProperty(ENVIRONMENT_ID, null);
+                break;
+            case EMBEDDING_MODEL:
+                repositoryService.getSettingsProperty(EMBEDDING_MODEL, "amazon.titan-embed-text-v2:0");
+                break;
+        }
+        return value;
     }
 
 }
