@@ -3,7 +3,6 @@ package io.maretha.cp.core.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.maretha.cp.core.bulk.actions.UploadDocumentAction;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
@@ -20,8 +19,6 @@ import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
-import org.nuxeo.ecm.core.bulk.BulkService;
-import org.nuxeo.ecm.core.bulk.message.BulkCommand;
 import org.nuxeo.ecm.directory.Session;
 import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.runtime.api.Framework;
@@ -53,20 +50,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
-        Map<String, Object> paramsMap;
-        if (saveMetadata) {
-            parameters = addSchemasFieldsAndVocabs(doc, session, parameters);
-        }
-        if (doc.isFolder()) {
-            List<DocumentModel> childrenDocs = getChildrenDocuments(session, doc);
-            List<DocumentModel> childrenDocsWithStoreId = uploadFilesAndSetStoreId(childrenDocs);
-            paramsMap = buildParametersForFolder(childrenDocsWithStoreId, parameters);
-        } else {
-            doc = uploadFileAndSetStoreId(doc, session);
-            paramsMap = buildParameters(doc, session, parameters);
-        }
+        doc = uploadFileAndSetStoreId(doc, session);
         //Retry for document to have status completed
         apiService.getStoredDocumentStatus((String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
+        if (saveMetadata) {
+            addSchemasFieldsAndVocabs(doc, session, parameters);
+        }
+        Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
         if (saveMetadata) {
             String response = apiService.getInteractionResult(interactionId, paramsMap, false);
             return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride);
@@ -112,17 +102,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
     }
 
-    private List<DocumentModel> uploadFilesAndSetStoreId(List<DocumentModel> docs) {
-        String ids = docs.stream().map(doc -> "'" + doc.getId() + "'").collect(Collectors.joining(", "));
-        String query = "SELECT * FROM Document WHERE ecm:uuid IN (" + ids + ") AND ecm:mixinType != 'HiddenInNavigation' AND ecm:isProxy = 0 AND ecm:isVersion = 0 AND ecm:isTrashed = 0 ";
-        BulkCommand.Builder builder = new BulkCommand.Builder(UploadDocumentAction.ACTION_NAME, query, "system");
-        BulkCommand command = builder.build();
-        BulkService bulkService = Framework.getService(BulkService.class);
-        String commandId = bulkService.submit(command);
-        //TODO wait for bulkService to finish?
-        return docs;
-    }
-
     public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session) {
         boolean isSupportedMimeType = blobIsSupportedMimeType(doc);
         if (!isSupportedMimeType) {
@@ -163,12 +142,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
 
         return doc;
-    }
-
-    private List<DocumentModel> getChildrenDocuments(CoreSession session, DocumentModel parentDoc) {
-        String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:ancestorId = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0" +
-                " AND file:content IS NOT NULL", parentDoc.getId());
-        return session.query(nxqlQuery);
     }
 
     private Map<String, Object> buildParameters(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
@@ -213,25 +186,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                     .collect(Collectors.toList());
         }
         return null;
-    }
-
-    private Map<String, Object> buildParametersForFolder(List<DocumentModel> childrenDocsWithStoreId, List<InteractionParameter> parameters) {
-        Map<String, Object> paramsMap = new HashMap<>();
-        parameters.forEach(param -> {
-            String name = param.getName();
-            Object value = param.getValue();
-            String type = param.getType();
-            String format = param.getFormat();
-            boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
-            if (isDocumentOrMediaFormat && "array".equalsIgnoreCase(type)) {
-                value = childrenDocsWithStoreId.stream()
-                        .filter(doc -> doc.hasFacet(RESULTS_FACET))
-                        .map(doc -> "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
-                        .collect(Collectors.toList());
-            }
-            paramsMap.put(name, value);
-        });
-        return paramsMap;
     }
 
     // Not used for now as Composable does not process links, will be used in the future or for media type.
