@@ -1,5 +1,6 @@
 package io.maretha.cp.core.bulk.actions;
 
+import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.services.RunInteractionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,33 +21,37 @@ import static org.nuxeo.ecm.core.bulk.BulkServiceImpl.STATUS_STREAM;
 import static org.nuxeo.lib.stream.computation.AbstractComputation.INPUT_1;
 import static org.nuxeo.lib.stream.computation.AbstractComputation.OUTPUT_1;
 
-public class UploadDocumentAction implements StreamProcessorTopology {
+public class BulkInteractionAction implements StreamProcessorTopology {
 
-    public static final String ACTION_NAME = "uploadDocumentAction";
-    public static final String ACTION_FULL_NAME = "upload/" + ACTION_NAME;
-    private static final Log log = LogFactory.getLog(UploadDocumentAction.class);
+    public static final String ACTION_NAME = "bulkInteractionAction";
+    public static final String ACTION_FULL_NAME = "document/" + ACTION_NAME;
+    private static final Log log = LogFactory.getLog(BulkInteractionAction.class);
 
     @Override
     public Topology getTopology(Map<String, String> options) {
         return Topology.builder()
-                .addComputation(UploadDocumentComputation::new,
+                .addComputation(BulkInteractionComputation::new,
                         Arrays.asList(INPUT_1 + ":" + ACTION_FULL_NAME, OUTPUT_1 + ":" + STATUS_STREAM))
                 .build();
     }
 
-    public static class UploadDocumentComputation extends AbstractBulkComputation {
+    public static class BulkInteractionComputation extends AbstractBulkComputation {
 
-        public UploadDocumentComputation() {
+        public BulkInteractionComputation() {
             super(ACTION_FULL_NAME, 1);
         }
 
         @Override
-        protected void compute(CoreSession session, List<String> ids, Map<String, Serializable> properties) {
-            log.info("Running UploadDocumentComputation for ids: " + ids);
+        protected void compute(CoreSession session, List<String> ids, Map<String, Serializable> params) {
+            log.info("Running BulkInteractionComputation for ids: " + ids);
             RunInteractionService runInteractionService = Framework.getService(RunInteractionService.class);
+            String interactionId = (String) params.get("interactionId");
+            List<InteractionParameter> parameters = (List<InteractionParameter>) params.get("parameters");
+            boolean saveMetadata = (boolean) params.get("saveMetadata");
+            boolean saveMetadataModeOverride = (boolean) params.get("saveMetadataModeOverride");
             ids.forEach(docId -> {
                 DocumentModel document = session.getDocument(new IdRef(docId));
-                runInteractionService.uploadFileAndSetStoreId(document, session);
+                runInteractionService.triggerInteraction(document, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
             });
         }
     }
