@@ -224,15 +224,15 @@ public class APIServiceImpl implements APIService {
         Map<String, Double> docIdScoreMap = new HashMap<>();
         String requestBody = String.format(
                 "{\n" +
-                "  \"limit\": %s,\n" +
-                "  \"offset\": 0,\n" +
-                "  \"query\": {\n" +
-                "    \"vector\": {\n" +
-                "      \"values\": %s,\n" +
-                "      \"type\": \"%s\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}", limit, vectorQuery, type);
+                        "  \"limit\": %s,\n" +
+                        "  \"offset\": 0,\n" +
+                        "  \"query\": {\n" +
+                        "    \"vector\": {\n" +
+                        "      \"values\": %s,\n" +
+                        "      \"type\": \"%s\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}", limit, vectorQuery, type);
         String response = postRequest(getBearerToken(), getSetting(UPLOAD_API_URL) + "/api/v1/objects/search", requestBody);
         try {
             objectMapper.readTree(response).forEach(obj -> {
@@ -374,16 +374,16 @@ public class APIServiceImpl implements APIService {
                 value = repositoryService.getSettingsProperty(UPLOAD_API_URL, "https://zeno-server-production.api.vertesia.io");
                 break;
             case AUTH_TOKEN:
-                repositoryService.getSettingsProperty(AUTH_TOKEN, null);
+                value = repositoryService.getSettingsProperty(AUTH_TOKEN, null);
                 break;
             case PROJECT_ID:
-                repositoryService.getSettingsProperty(PROJECT_ID, null);
+                value = repositoryService.getSettingsProperty(PROJECT_ID, null);
                 break;
             case ENVIRONMENT_ID:
-                repositoryService.getSettingsProperty(ENVIRONMENT_ID, null);
+                value = repositoryService.getSettingsProperty(ENVIRONMENT_ID, null);
                 break;
             case EMBEDDING_MODEL:
-                repositoryService.getSettingsProperty(EMBEDDING_MODEL, "amazon.titan-embed-text-v2:0");
+                value = repositoryService.getSettingsProperty(EMBEDDING_MODEL, "amazon.titan-embed-text-v2:0");
                 break;
         }
         return value;

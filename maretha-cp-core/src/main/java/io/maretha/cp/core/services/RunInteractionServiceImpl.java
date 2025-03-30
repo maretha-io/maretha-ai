@@ -7,6 +7,7 @@ import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,14 +73,18 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             resultNode.fields().forEachRemaining(field -> {
                 String key = field.getKey();
                 String value = field.getValue().asText();
-                Serializable propertyValue = doc.getPropertyValue(key);
-                if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
-                    if (!validationService.validate(key, value).hasError()) {
-                        log.debug(String.format("Saving metadata key: %s value: %s", key, value));
-                        doc.setPropertyValue(key, value);
-                    } else {
-                        log.error(String.format("Failed to save metadata key: %s value: %s", key, value));
+                try {
+                    Serializable propertyValue = doc.getPropertyValue(key);
+                    if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
+                        if (!validationService.validate(key, value).hasError()) {
+                            log.debug(String.format("Saving metadata key: %s value: %s", key, value));
+                            doc.setPropertyValue(key, value);
+                        } else {
+                            log.error(String.format("Failed to save metadata key: %s value: %s", key, value));
+                        }
                     }
+                } catch (Exception propertyException) {
+                    log.error("Failed to set metadata for " + key + ":" + value);
                 }
             });
             session.saveDocument(doc);
@@ -249,7 +254,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         List<DocTypeWithSchema.Schema.Field> schemasFields = new ArrayList<>();
 
         Arrays.stream(doc.getSchemas()).forEach(schema -> {
-            if (schemaSettings.containsKey(schema)) {
+            if (MapUtils.isNotEmpty(schemaSettings) && schemaSettings.containsKey(schema)) {
                 DocTypeWithSchema.Schema schemaSetting = schemaSettings.get(schema);
                 schemaSetting.getFields().stream().filter(DocTypeWithSchema.Schema.Field::isActive).forEach(activeField -> {
                     schemasFields.add(activeField);
