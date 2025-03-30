@@ -56,7 +56,7 @@
                          method="post">
     </nuxeo-page-provider>
 
-    <div style="height:15px;">
+    <div style="height:30px;">
       <paper-slider
               role="widget"
               id="minScoreSlider"
@@ -238,7 +238,8 @@
         },
 
         searchProperty: {
-          type: String
+          type: String,
+          value: "similarity"
         },
 
         searchValue: {
@@ -267,13 +268,7 @@
         let params = {};
         params.vectorField = this.searchProperty;
         params.min_score = this.minScore;
-
-        if(document.properties && document.properties['interactionresults:embeddingsImage'].length > 0){
-          params.vectorQuery = JSON.stringify(document.properties['interactionresults:embeddingsImage']);
-        }
-        if(document.properties && document.properties['interactionresults:embeddingsText'].length > 0){
-          params.vectorQuery = JSON.stringify(document.properties['interactionresults:embeddingsText']);
-        }
+        params.vectorQuery = document.properties['interactionresults:storeId'];
         return params;
       }
 

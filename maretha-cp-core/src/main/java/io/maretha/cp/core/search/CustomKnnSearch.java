@@ -27,8 +27,6 @@ import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCH
 import static org.nuxeo.ecm.platform.query.api.PageProviderService.NAMED_PARAMETERS;
 
 public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
-    public static final String TEXT_VECTOR_FIELD = "interactionresults:embeddingsText";
-    public static final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
     public static final String RELEVANCE_SCORE = "relevance_score";
     private final APIService apiService = Framework.getService(APIService.class);
     private List<DocumentModel> results;
@@ -79,16 +77,27 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
 
         Map<String, Double> idsAndScores = new HashMap<>();
 
-        if (StringUtils.isNotEmpty(vectorQuery) && !"[]".equals(vectorQuery)) {
-            if (TEXT_VECTOR_FIELD.equals(vectorField)) {
+        if (StringUtils.isNotEmpty(vectorQuery) && StringUtils.isNotEmpty(vectorField)) {
+            Map<String, Double> docIdScoreMapTextSearch = new HashMap<>();
+            Map<String, Double> docIdScoreMapImageSearch = new HashMap<>();
+            Map<String, Double> docIdScoreMapPropertiesSearch = new HashMap<>();
+
+            if ("text".equals(vectorField)) {
                 APIService apiService = Framework.getService(APIService.class);
                 double[] textVectors = apiService.textToEmbeddings(vectorQuery);
                 vectorQuery = Arrays.toString(textVectors);
+                docIdScoreMapTextSearch = apiService.search(vectorQuery, "text", 100);
+                docIdScoreMapImageSearch = apiService.search(vectorQuery, "image", 100);
+                docIdScoreMapPropertiesSearch = apiService.search(vectorQuery, "properties", 100);
             }
 
-            Map<String, Double> docIdScoreMapTextSearch = apiService.search(vectorQuery, "text", 100);
-            Map<String, Double> docIdScoreMapImageSearch = apiService.search(vectorQuery, "image", 100);
-            Map<String, Double> docIdScoreMapPropertiesSearch = apiService.search(vectorQuery, "properties", 100);
+            if ("similarity".equals(vectorField)) {
+                String objectStoreId = vectorQuery;
+                docIdScoreMapTextSearch = apiService.searchSimilarity(objectStoreId, "text", 100);
+                docIdScoreMapImageSearch = apiService.searchSimilarity(objectStoreId, "image", 100);
+                docIdScoreMapPropertiesSearch = apiService.searchSimilarity(objectStoreId, "properties", 100);
+            }
+
             docIdScoreMapTextSearch.forEach((id, score) -> {
                 if (score >= minScore)
                     idsAndScores.merge(id, score, Math::max);

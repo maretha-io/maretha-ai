@@ -23,5 +23,7 @@ public interface APIService {
 
     Map<String, Double> search(String vectorQuery, String type, int limit);
 
+    Map<String, Double> searchSimilarity(String storeId, String type, int limit);
+
     String getStoredDocumentStatus(String storeId);
 }
