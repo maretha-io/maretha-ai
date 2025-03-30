@@ -39,8 +39,6 @@ import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORED_DATE_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_DIGEST_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
-import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_IMAGE;
-import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TEXT;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
 
@@ -95,18 +93,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    private void addTextEmbeddings(DocumentModel doc) {
-        String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-        double[] documentEmbeddings = apiService.getDocumentEmbeddings(storeId, "text");
-        doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
-    }
-
-    private void addImageEmbeddings(DocumentModel doc) {
-        String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-        double[] documentEmbeddings = apiService.getDocumentEmbeddings(storeId, "image");
-        doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
-    }
-
     public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session) {
         boolean isSupportedMimeType = blobIsSupportedMimeType(doc);
         if (!isSupportedMimeType) {
@@ -136,16 +122,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
             return session.saveDocument(doc);
         }
-        if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
-            addImageEmbeddings(doc);
-            doc = session.saveDocument(doc);
-        }
-
-        if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
-            addTextEmbeddings(doc);
-            doc = session.saveDocument(doc);
-        }
-
         return doc;
     }
 

@@ -93,7 +93,7 @@ public class APIServiceImpl implements APIService {
                 "    \"stream\": " + stream + "\n" +
                 "}";
         String bearerToken = getBearerToken();
-        String interactionResponse = postRequest(bearerToken, url, jsonBody);
+        String interactionResponse = postRequest(bearerToken, url, jsonBody, true);
 
         if (stream) {
             try {
@@ -133,7 +133,7 @@ public class APIServiceImpl implements APIService {
                 "    \"name\": \"" + filename + "\"," +
                 "    \"mime_type\": \"" + mimeType + "\"" +
                 "}";
-        String uploadUrlResponse = postRequest(bearerToken, uploadUrlApi, bodyJson);
+        String uploadUrlResponse = postRequest(bearerToken, uploadUrlApi, bodyJson, true);
         JSONObject jsonObject = new JSONObject(uploadUrlResponse);
         String uploadUrl = jsonObject.getString("url");
         String uploadId = jsonObject.getString("id");
@@ -158,7 +158,7 @@ public class APIServiceImpl implements APIService {
                 "    }\n" +
                 "}";
 
-        String uploadedResponse = postRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects", bodyJsonObject);
+        String uploadedResponse = postRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects", bodyJsonObject, true);
         JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
         return uploadedResponseObject.getString("id");
     }
@@ -177,7 +177,7 @@ public class APIServiceImpl implements APIService {
                 "}";
 
         log.debug(String.format("uploadS3FileToStore: fileName:[%s], digest:[%s], body:%s", file.getFilename(), file.getDigest(), bodyJsonObject));
-        String uploadedResponse = postRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects", bodyJsonObject);
+        String uploadedResponse = postRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects", bodyJsonObject, true);
         JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
         return uploadedResponseObject.getString("id");
     }
@@ -194,7 +194,7 @@ public class APIServiceImpl implements APIService {
                 "    \"model\": \"" + getSetting(EMBEDDING_MODEL) + "\"," +
                 "    \"text\": \"" + queryText + "\"" +
                 "}";
-        String response = postRequest(bearerToken, getSetting(API_URL) + "/api/v1/environments/" + getSetting(ENVIRONMENT_ID) + "/embeddings", requestBody);
+        String response = postRequest(bearerToken, getSetting(API_URL) + "/api/v1/environments/" + getSetting(ENVIRONMENT_ID) + "/embeddings", requestBody, true);
         try {
             JsonNode rootNode = objectMapper.readTree(response);
             JsonNode embeddings = rootNode.path("values");
@@ -233,8 +233,8 @@ public class APIServiceImpl implements APIService {
                         "    }\n" +
                         "  }\n" +
                         "}", limit, vectorQuery, type);
-        String response = postRequest(getBearerToken(), getSetting(UPLOAD_API_URL) + "/api/v1/objects/search", requestBody);
         try {
+            String response = postRequest(getBearerToken(), getSetting(UPLOAD_API_URL) + "/api/v1/objects/search", requestBody, false);
             objectMapper.readTree(response).forEach(obj -> {
                 String id = obj.get("id").asText();
                 double score = obj.get("score").asDouble();
@@ -242,6 +242,34 @@ public class APIServiceImpl implements APIService {
             });
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
+        }
+        return docIdScoreMap;
+    }
+
+    @Override
+    public Map<String, Double> searchSimilarity(String storeId, String type, int limit) {
+        Map<String, Double> docIdScoreMap = new HashMap<>();
+        String requestBody = String.format(
+                "{\n" +
+                        "  \"limit\": %s,\n" +
+                        "  \"offset\": 0,\n" +
+                        "  \"query\": {\n" +
+                        "    \"similarTo\": \"%s\",\n" +
+                        "    \"vector\": {\n" +
+                        "      \"objectId\": \"%s\",\n" +
+                        "      \"type\": \"%s\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}", limit, storeId, storeId, type);
+        try {
+            String response = postRequest(getBearerToken(), getSetting(UPLOAD_API_URL) + "/api/v1/objects/search", requestBody, false);
+            objectMapper.readTree(response).forEach(obj -> {
+                String id = obj.get("id").asText();
+                double score = obj.get("score").asDouble();
+                docIdScoreMap.put(id, score);
+            });
+        } catch (Exception e) {
+            log.error(e);
         }
         return docIdScoreMap;
     }
@@ -274,14 +302,17 @@ public class APIServiceImpl implements APIService {
         return getResponseWithRetry(request);
     }
 
-    private String postRequest(String apiToken, String url, String jsonBody) {
+    private String postRequest(String apiToken, String url, String jsonBody, boolean withRetry) {
         RequestBody body = RequestBody.create(jsonBody, MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder().url(url)
                 .addHeader("Accept", "application/json")
                 .addHeader("Authorization", "Bearer " + apiToken)
                 .post(body)
                 .build();
-        return getResponseWithRetry(request);
+        if (withRetry) {
+            return getResponseWithRetry(request);
+        }
+        return executeHttpRequest(request);
     }
 
     private String getResponseWithRetry(Request request) {
