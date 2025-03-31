@@ -154,10 +154,6 @@
                             aria-label="Interact with document" raised>
                 Run Interaction
               </paper-button>
-              <template is="dom-if" if="[[interactionResponse]]">
-                <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]"
-                                  interaction-response="[[interactionResponse]]"></cp-save-response>
-              </template>
             </div>
           </div>
 
@@ -169,6 +165,8 @@
               </template>
               <template is="dom-if" if="[[interactionResponse]]">
                 <cp-format-json-response json="[[interactionResponse]]"></cp-format-json-response>
+                <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]"
+                                  interaction-response="[[interactionResponse]]"></cp-save-response>
               </template>
 
               <template is="dom-if" if="[[showPreviousInteractions]]">

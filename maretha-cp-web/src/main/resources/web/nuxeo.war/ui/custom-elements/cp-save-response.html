@@ -21,8 +21,6 @@
         /* Light cyan background */
         color: #00796b;
         /* Dark teal text */
-        border-radius: 4px;
-        padding: 10px 16px;
         font-size: 9px;
         text-transform: uppercase;
         transition: background-color 0.3s ease;
@@ -37,13 +35,11 @@
       .save-metadata {
         background-color: #f1f8e9;
         color: #558b2f;
-        border: 1px solid;
       }
 
       .save-related {
         background-color: #e0f7fa;
         color: #00796b;
-        border: 1px solid;
       }
 
       /* Hover effect for the Save as Metadata button */
@@ -60,12 +56,14 @@
     </style>
 
     <div class="button-container">
-      <paper-icon-button icon="icons:save" class="save-metadata" label="Save as Metadata" on-tap="_saveAsMetadata">
-        <nuxeo-tooltip>Save as Metadata</nuxeo-tooltip>
-      </paper-icon-button>
-      <paper-icon-button icon="icons:save" class="save-related" label="Save as Document" on-tap="_saveAsRelatedDocument">
-        <nuxeo-tooltip>Save as Document</nuxeo-tooltip>
-      </paper-icon-button>
+      <paper-button id="save" class="save-metadata" on-tap="_saveAsMetadata" aria-label="Save as Metadata" raised>
+        Save as Metadata
+        <iron-icon icon="icons:save"></iron-icon>
+      </paper-button>
+      <paper-button id="saveAsDocument" class="save-related" on-tap="_saveAsRelatedDocument" aria-label="Save as Document" raised>
+        Save as Document
+        <iron-icon icon="icons:save"></iron-icon>
+      </paper-button>
     </div>
 
     <p id="toast"></p>
