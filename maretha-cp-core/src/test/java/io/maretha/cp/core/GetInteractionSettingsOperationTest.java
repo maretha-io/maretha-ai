@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.Settings;
-import io.maretha.cp.core.operations.GetInteractionSettingsOperation;
+import io.maretha.cp.core.operations.GetSettingsOperation;
 import io.maretha.cp.core.operations.SaveInteractionSettingsOperation;
 import io.maretha.cp.core.services.APIService;
 import io.maretha.cp.core.services.RepositoryService;
@@ -16,7 +16,6 @@ import org.nuxeo.ecm.automation.OperationContext;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.test.AutomationFeature;
 import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.test.DefaultRepositoryInit;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
@@ -29,7 +28,6 @@ import org.nuxeo.runtime.test.runner.RuntimeFeature;
 import org.nuxeo.runtime.test.runner.TransactionalFeature;
 
 import javax.inject.Inject;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +65,7 @@ public class GetInteractionSettingsOperationTest {
         Interaction interaction = Interaction.builder().id("test").build();
         when(apiService.getInteractions()).thenReturn(List.of(interaction));
         OperationContext ctx = new OperationContext(session);
-        Settings settings = (Settings) automationService.run(ctx, GetInteractionSettingsOperation.ID);
+        Settings settings = (Settings) automationService.run(ctx, GetSettingsOperation.ID);
         assertNotNull(settings);
         assertEquals(interaction.getId(), settings.getInteractions().stream().findFirst().get().getId());
     }
@@ -80,7 +78,7 @@ public class GetInteractionSettingsOperationTest {
         repositoryService.saveInteractionSettings(session, List.of(objectNode), configuration);
         txFeature.nextTransaction();
         OperationContext ctx = new OperationContext(session);
-        Settings interactionsSettings = (Settings) automationService.run(ctx, GetInteractionSettingsOperation.ID);
+        Settings interactionsSettings = (Settings) automationService.run(ctx, GetSettingsOperation.ID);
         assertNotNull(interactionsSettings);
         assertEquals(interaction.getId(), interactionsSettings.getInteractions().stream().findFirst().get().getId());
         assertTrue(interactionsSettings.isAwsS3AccessEnabled());
@@ -95,9 +93,8 @@ public class GetInteractionSettingsOperationTest {
         ObjectNode interaction_2_json = mapper.convertValue(interaction_2, ObjectNode.class);
         ctx.put("interactions", List.of(interaction_1_json, interaction_2_json));
         ctx.put("awsS3AccessEnabled", false);
-        DocumentModel savedDocument = (DocumentModel) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
-        assertNotNull(savedDocument);
-        Settings interactionSettings = savedDocument.getAdapter(Settings.class);
+        Settings interactionSettings = (Settings) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
+        assertNotNull(interactionSettings);
         int expectedSize = 2;
         assertEquals(expectedSize, interactionSettings.getInteractions().size());
         assertEquals(interaction.getId(), interactionSettings.getInteractions().get(0).getId());

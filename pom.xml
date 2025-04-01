@@ -4,14 +4,14 @@
   <parent>
     <groupId>org.nuxeo</groupId>
     <artifactId>nuxeo-parent</artifactId>
-    <version>2021.66</version>
+    <version>2021.55</version>
   </parent>
 
   <groupId>io.maretha.cp</groupId>
   <artifactId>maretha-cp-parent</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.3</version>
   <name>Maretha cp parent</name>
-  <description>Maretha Nuxeo Add-On Integration with Composable Prompts</description>
+  <description>Maretha Nuxeo Add-On Integration with Vertesia</description>
   <packaging>pom</packaging>
 
   <properties>
@@ -25,7 +25,6 @@
     <module>maretha-cp-core</module>
     <module>maretha-cp-package</module>
     <module>maretha-cp-web</module>
-    <module>maretha-cp-api</module>
   </modules>
 
   <scm />
@@ -51,11 +50,6 @@
       <dependency>
         <groupId>io.maretha.cp</groupId>
         <artifactId>maretha-cp-package</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.maretha.cp</groupId>
-        <artifactId>maretha-cp-api</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>

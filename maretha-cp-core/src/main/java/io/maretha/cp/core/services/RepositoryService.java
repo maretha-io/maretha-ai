@@ -33,6 +33,10 @@ public interface RepositoryService {
     String SETTINGS_SCHEMA_NAME = "interactionSettings";
     String SETTINGS_SCHEMA_PATH = "interactionsettings:interactions";
     String SETTINGS_SCHEMA_AWS_S3_ACCESS = "interactionsettings:awsS3AccessEnabled";
+    String SETTINGS_SCHEMA_METADATA = "interactionsettings:schemaSettings";
+    String SETTINGS_ELASTICSEARCH = "interactionsettings:esSettings";
+    String SETTINGS_VERTESIA = "interactionsettings:vertesiaSettings";
+    String SETTINGS_EVENTS = "interactionsettings:eventsSettings";
 
     String SCHEMA_ID = "id";
     String SCHEMA_DESCRIPTION = "description";
@@ -45,6 +49,7 @@ public interface RepositoryService {
     String SCHEMA_ACTIVE_ON_FOLDER = "activeOnFolder";
     String SCHEMA_ACTIVE_ON_ACTION_MENU = "activeOnActionMenu";
     String SCHEMA_IS_CHAT = "chat";
+    String SCHEMA_IS_SAVE_METADATA = "saveMetadata";
     String SCHEMA_PARAMETERS = "parameters";
 
     String PARAMETER_SCHEMA_NAME = "name";
@@ -62,15 +67,17 @@ public interface RepositoryService {
 
     String SETTINGS_DOCUMENT_NAME = "InteractionSettings";
 
-    Settings getLocalInteractionSettings(CoreSession session);
+    Settings getSavedSettings(CoreSession session);
 
     List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean folder);
 
     List<Interaction> getActiveChatInteractionsForDocumentType(CoreSession session, String documentType, boolean folder);
 
-    DocumentModel saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration);
+    Settings saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration);
 
     DocumentModel saveInteractionResponseAsMetadata(DocumentModel doc, CoreSession session, List<ObjectNode> interactions);
 
     DocumentModel saveInteractionResponseAsDocument(DocumentModel doc, CoreSession session, List<ObjectNode> interactions) throws OperationException;
+
+    String getSettingsProperty(String name, String defaultValue);
 }

@@ -1,0 +1,124 @@
+<dom-module id="cp-settings-vertesia">
+  <template>
+    <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation"></nuxeo-operation>
+    <nuxeo-operation id="getSettingsOperation" op="GetSettingsOperation"></nuxeo-operation>
+
+    <style include="nuxeo-styles">
+      .content {
+        width: 100%;
+      }
+
+      nuxeo-card {
+        width: 50%;
+        height: 100%;
+        text-align: left;
+        box-shadow: 0 3px 20px rgb(0 0 0 / 10%);
+      }
+    </style>
+
+    <div id="main slot">
+
+      <nuxeo-card>
+        <h3>Vertesia Settings</h3>
+        <paper-toast id="toast"></paper-toast>
+
+        <div class="content">
+
+          <nuxeo-input role="widget" value="{{vertesiaSettings.apiUrl}}"
+                       label="apiUrl" type="text"
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
+          <nuxeo-input role="widget" value="{{vertesiaSettings.uploadUrl}}"
+                       label="uploadUrl" type="text"
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
+          <nuxeo-input role="widget" value="{{vertesiaSettings.authToken}}"
+                       label="authToken" type="text"
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
+          <nuxeo-input role="widget" value="{{vertesiaSettings.projectId}}"
+                       label="projectId" type="text"
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
+          <nuxeo-input role="widget" value="{{vertesiaSettings.environmentId}}"
+                       label="environmentId" type="text"
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
+          <nuxeo-input role="widget" value="{{vertesiaSettings.embeddingModel}}"
+                       label="embeddingModel" type="text"
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
+          <nuxeo-input role="widget" value="{{vertesiaSettings.mimeTypes}}"
+                       label="mimeTypes" type="text"
+                       placeholder="" style="margin: auto;" ></nuxeo-input>
+
+          <paper-button id="save" on-tap="_saveVertesiaSettings" aria-label="Save Settings" raised style="">
+            Save Settings
+            <iron-icon icon="icons:save"></iron-icon>
+          </paper-button>
+
+        </div>
+      </nuxeo-card>
+    </div>
+
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cp-settings-vertesia',
+      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+      properties: {
+        vertesiaSettings: {
+          type: Object,
+          value: {}
+        },
+      },
+
+      ready: function () {
+        this._getVertesiaSettings();
+      },
+
+      _getVertesiaSettings: function () {
+        const operation = this.$.getSettingsOperation;
+        operation.params = {};
+        operation.execute().then((response) => {
+          if(response.value.vertesiaSettings)
+            this.set('vertesiaSettings', response.value.vertesiaSettings);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+        });
+      },
+
+      _saveVertesiaSettings: function () {
+        const operation = this.$.saveInteractionsOperation;
+        operation.params = {
+          'vertesiaSettings': this.vertesiaSettings
+        };
+        operation.execute().then((response) => {
+          this._showNotification('Changes Saved!', 'success');
+          this.set('vertesiaSettings', response.value.vertesiaSettings);
+        }).catch((error) => {
+          console.error('Error triggering operation:', error);
+          this._showNotification('Changes NOT Saved!', 'error');
+        });
+      },
+
+      _showNotification(message, type) {
+        const toast = this.$.toast;
+        toast.text = message;
+        toast.classList.remove('toast-error', 'toast-success', 'toast-warning'); // Remove existing classes
+        if (type) {
+          toast.classList.add(`toast-${type}`);
+        }
+        toast.open();
+      },
+
+      _toggleDialog: function (e) {
+        this.$.dialog.toggle();
+      },
+
+      _close: function () {
+        this.$.dialog.toggle();
+      },
+
+      _dialogClosed: function () {
+      }
+
+    });
+  </script>
+</dom-module>

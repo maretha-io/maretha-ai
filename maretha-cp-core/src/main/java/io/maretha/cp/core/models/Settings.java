@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -15,4 +17,8 @@ import java.util.List;
 public class Settings {
     private List<Interaction> interactions = new ArrayList<>();
     private boolean awsS3AccessEnabled;
+    private Map<String, DocTypeWithSchema.Schema> schemaSettings = new HashMap<>();
+    private Map<String, String> esSettings = new HashMap<>();
+    private Map<String, String> vertesiaSettings = new HashMap<>();
+    private Map<String, List<EventWithInteraction>> eventsSettings = new HashMap<>();
 }

@@ -4,12 +4,12 @@
     <require>org.nuxeo.ecm.core.bulk</require>
 
     <extension target="org.nuxeo.ecm.core.bulk" point="actions">
-        <action name="uploadDocumentAction" inputStream="upload/uploadDocumentAction" bucketSize="1000" batchSize="200"
+        <action name="bulkInteractionAction" inputStream="document/bulkInteractionAction" bucketSize="1000" batchSize="200"
         defaultScroller="elastic" httpEnabled="false" defaultQueryLimit="${cp.upload.action.maximum.documents:=1000}" />
     </extension>
 
     <extension target="org.nuxeo.runtime.stream.service" point="streamProcessor">
-        <streamProcessor name="uploadDocumentAction" class="io.maretha.cp.core.bulk.actions.UploadDocumentAction"
+        <streamProcessor name="bulkInteractionAction" class="io.maretha.cp.core.bulk.actions.BulkInteractionAction"
         defaultConcurrency="4" defaultPartitions="${cp.upload.action.partitions:=12}">
               <policy name="default" maxRetries="2" delay="500ms" maxDelay="10s" continueOnFailure="true"/>
         </streamProcessor>

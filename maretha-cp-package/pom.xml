@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.maretha.cp</groupId>
     <artifactId>maretha-cp-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.3</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -28,10 +28,6 @@
     <dependency>
       <groupId>io.maretha.cp</groupId>
       <artifactId>maretha-cp-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.maretha.cp</groupId>
-      <artifactId>maretha-cp-api</artifactId>
     </dependency>
   </dependencies>
 

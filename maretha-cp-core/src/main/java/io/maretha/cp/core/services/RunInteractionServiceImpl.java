@@ -1,95 +1,104 @@
 package io.maretha.cp.core.services;
 
-import io.maretha.cp.core.bulk.actions.UploadDocumentAction;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.model.Property;
+import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
+import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
-import org.nuxeo.ecm.core.bulk.BulkService;
-import org.nuxeo.ecm.core.bulk.message.BulkCommand;
+import org.nuxeo.ecm.directory.Session;
+import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.runtime.api.Framework;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORED_DATE_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_DIGEST_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
-import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_IMAGE;
-import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TEXT;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
 
+    public static final String MIME_TYPES = "vertesia.mimeTypes";
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
     private final APIService apiService = Framework.getService(APIService.class);
-
-    public static boolean blobIsSupportedMimeType(DocumentModel doc) {
-        if (!doc.hasSchema("file")) return false;
-        try {
-            Property blobProperty = doc.getProperty(FILE_CONTENT);
-            Blob blob = (Blob) blobProperty.getValue();
-            String mimeType = blob.getMimeType();
-            return getSupportedMimeTypes().contains(mimeType);
-        } catch (Exception ex) {
-            return false;
-        }
-    }
-
-    private static String getSupportedMimeTypes() {
-        return Framework.getProperty("cp.supported.mime-types", "text/plain,application/pdf");
-    }
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters) {
-        if (doc.isFolder()) {
-            List<DocumentModel> childrenDocs = getChildrenDocuments(session, doc);
-            List<DocumentModel> childrenDocsWithStoreId = uploadFilesAndSetStoreId(childrenDocs);
-            Map<String, Object> paramsMap = buildParametersForFolder(childrenDocsWithStoreId, parameters);
-            return apiService.getInteractionResultAsStream(interactionId, paramsMap);
-        } else {
-            doc = uploadFileAndSetStoreId(doc, session);
-            Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
-            return apiService.getInteractionResultAsStream(interactionId, paramsMap);
+    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
+        doc = uploadFileAndSetStoreId(doc, session);
+        //Retry for document to have status completed
+        apiService.getStoredDocumentStatus((String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
+        if (saveMetadata) {
+            addSchemasFieldsAndVocabs(doc, session, parameters);
         }
+        Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
+        if (saveMetadata) {
+            String response = apiService.getInteractionResult(interactionId, paramsMap, false);
+            return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride);
+        }
+        return apiService.getInteractionResult(interactionId, paramsMap, true);
     }
 
-    private void addTextEmbeddings(DocumentModel doc) {
-        String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-        double[] documentEmbeddings = apiService.getDocumentEmbeddings(storeId, "text");
-        doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
-    }
-
-    private void addImageEmbeddings(DocumentModel doc) {
-        String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-        double[] documentEmbeddings = apiService.getDocumentEmbeddings(storeId, "image");
-        doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
-    }
-
-    private List<DocumentModel> uploadFilesAndSetStoreId(List<DocumentModel> docs) {
-        String ids = docs.stream().map(doc -> "'" + doc.getId() + "'").collect(Collectors.joining(", "));
-        String query = "SELECT * FROM Document WHERE ecm:uuid IN (" + ids + ") AND ecm:mixinType != 'HiddenInNavigation' AND ecm:isProxy = 0 AND ecm:isVersion = 0 AND ecm:isTrashed = 0 ";
-        BulkCommand.Builder builder = new BulkCommand.Builder(UploadDocumentAction.ACTION_NAME, query, "system");
-        BulkCommand command = builder.build();
-        BulkService bulkService = Framework.getService(BulkService.class);
-        String commandId = bulkService.submit(command);
-        //TODO wait for bulkService to finish?
-        return docs;
+    private String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride) {
+        try {
+            DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
+            JsonNode jsonNode = objectMapper.readTree(response);
+            JsonNode resultNode = jsonNode.get("result").get("result");
+            resultNode.fields().forEachRemaining(field -> {
+                String key = field.getKey();
+                String value = field.getValue().asText();
+                try {
+                    Serializable propertyValue = doc.getPropertyValue(key);
+                    if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
+                        if (!validationService.validate(key, value).hasError()) {
+                            log.debug(String.format("Saving metadata key: %s value: %s", key, value));
+                            doc.setPropertyValue(key, value);
+                        } else {
+                            log.error(String.format("Failed to save metadata key: %s value: %s", key, value));
+                        }
+                    }
+                } catch (Exception propertyException) {
+                    log.error("Failed to set metadata for " + key + ":" + value);
+                }
+            });
+            session.saveDocument(doc);
+            return objectMapper.writeValueAsString(resultNode);
+        } catch (Exception e) {
+            log.error("Could not save document metadata", e);
+            throw new RuntimeException("Failed to save document metadata: " + e.getMessage());
+        }
     }
 
     public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session) {
+        boolean isSupportedMimeType = blobIsSupportedMimeType(doc);
+        if (!isSupportedMimeType) {
+            log.debug("Document blob is not supported");
+            return doc;
+        }
         String storeId = null;
         Blob blob = (Blob) doc.getPropertyValue(FILE_CONTENT);
         if (doc.hasFacet(RESULTS_FACET)) {
@@ -101,7 +110,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         if (StringUtils.isEmpty(storeId)) {
             doc.addFacet(RESULTS_FACET);
-            Settings settings = Framework.getService(RepositoryService.class).getLocalInteractionSettings(session);
+            Settings settings = Framework.getService(RepositoryService.class).getSavedSettings(session);
             if (settings.isAwsS3AccessEnabled()) {
                 String s3Path = getS3Path(doc);
                 storeId = apiService.uploadS3FileToStore(blob, s3Path);
@@ -113,23 +122,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
             return session.saveDocument(doc);
         }
-        if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
-            addImageEmbeddings(doc);
-            doc = session.saveDocument(doc);
-        }
-
-        if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
-            addTextEmbeddings(doc);
-            doc = session.saveDocument(doc);
-        }
-
         return doc;
-    }
-
-    private List<DocumentModel> getChildrenDocuments(CoreSession session, DocumentModel parentDoc) {
-        String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:ancestorId = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0" +
-                " AND file:content IS NOT NULL", parentDoc.getId());
-        return session.query(nxqlQuery);
     }
 
     private Map<String, Object> buildParameters(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
@@ -168,31 +161,12 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             return selectedDocumentIds
                     .stream()
                     .map(docId -> coreSession.getDocument(new IdRef(docId)))
-                    .filter(RunInteractionServiceImpl::blobIsSupportedMimeType)
+                    .filter(this::blobIsSupportedMimeType)
                     .map(doc -> uploadFileAndSetStoreId(doc, coreSession))
                     .map(docWithStoreId -> "store:" + docWithStoreId.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
                     .collect(Collectors.toList());
         }
         return null;
-    }
-
-    private Map<String, Object> buildParametersForFolder(List<DocumentModel> childrenDocsWithStoreId, List<InteractionParameter> parameters) {
-        Map<String, Object> paramsMap = new HashMap<>();
-        parameters.forEach(param -> {
-            String name = param.getName();
-            Object value = param.getValue();
-            String type = param.getType();
-            String format = param.getFormat();
-            boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
-            if (isDocumentOrMediaFormat && "array".equalsIgnoreCase(type)) {
-                value = childrenDocsWithStoreId.stream()
-                        .filter(doc -> doc.hasFacet(RESULTS_FACET))
-                        .map(doc -> "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
-                        .collect(Collectors.toList());
-            }
-            paramsMap.put(name, value);
-        });
-        return paramsMap;
     }
 
     // Not used for now as Composable does not process links, will be used in the future or for media type.
@@ -214,5 +188,77 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private boolean isImage(Blob blob) {
         String mimeType = blob.getMimeType();
         return mimeType != null && mimeType.startsWith("image/");
+    }
+
+    public boolean blobIsSupportedMimeType(DocumentModel doc) {
+        if (!doc.hasSchema("file")) return false;
+        try {
+            Property blobProperty = doc.getProperty(FILE_CONTENT);
+            Blob blob = (Blob) blobProperty.getValue();
+            String mimeType = blob.getMimeType();
+            return getSupportedMimeTypes().contains(mimeType);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    private String getSupportedMimeTypes() {
+        return Framework.getService(RepositoryService.class).getSettingsProperty(MIME_TYPES, "text/plain,application/pdf");
+    }
+
+    private Map<String, String> getDictionaryValues(String directory) {
+        Map<String, String> dictionaryMap = new HashMap<>();
+        try (Session session = Framework.getService(DirectoryService.class).open(directory)) {
+            DocumentModelList entries = session.query(Map.of());
+            entries.forEach(entry -> {
+                String id = entry.getId();
+                try {
+                    String label = (String) (entry.getProperty("label")).getValue();
+                    dictionaryMap.put(id, label);
+                } catch (PropertyNotFoundException e) {
+                    log.debug("Label not found for directory: " + id);
+                }
+            });
+        }
+        return dictionaryMap;
+    }
+
+    private List<InteractionParameter> addSchemasFieldsAndVocabs(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session);
+        Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
+        Map<String, Object> dictionariesMap = new HashMap<>();
+        List<DocTypeWithSchema.Schema.Field> schemasFields = new ArrayList<>();
+
+        Arrays.stream(doc.getSchemas()).forEach(schema -> {
+            if (MapUtils.isNotEmpty(schemaSettings) && schemaSettings.containsKey(schema)) {
+                DocTypeWithSchema.Schema schemaSetting = schemaSettings.get(schema);
+                schemaSetting.getFields().stream().filter(DocTypeWithSchema.Schema.Field::isActive).forEach(activeField -> {
+                    schemasFields.add(activeField);
+                    if (StringUtils.isNotEmpty(activeField.getDirectoryName())) {
+                        Map<String, String> dictionaryValues = getDictionaryValues(activeField.getDirectoryName());
+                        dictionariesMap.put(activeField.getDirectoryName(), dictionaryValues);
+                    }
+                });
+            }
+        });
+
+        parameters.forEach(param -> {
+            if (param.getName().equals("schema")) {
+                try {
+                    param.setValue(objectMapper.writeValueAsString(schemasFields));
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            if (param.getName().equals("dictionaries")) {
+                try {
+                    param.setValue(objectMapper.writeValueAsString(dictionariesMap));
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        return parameters;
     }
 }

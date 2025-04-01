@@ -1,10 +1,11 @@
 package io.maretha.cp.core;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.operations.RuntInteractionOperation;
+import io.maretha.cp.core.services.APIService;
 import io.maretha.cp.core.services.RunInteractionService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -27,6 +28,7 @@ import org.nuxeo.runtime.test.runner.RuntimeFeature;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static io.maretha.cp.core.services.RunInteractionService.FILE_CONTENT;
@@ -50,6 +52,10 @@ public class RuntInteractionOperationTest {
     @RuntimeService
     RunInteractionService runInteractionService;
 
+    @Mock
+    @RuntimeService
+    APIService apiService;
+
     ObjectMapper mapper = new ObjectMapper();
 
     @Test
@@ -61,13 +67,48 @@ public class RuntInteractionOperationTest {
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
         when(runInteractionService.uploadFileAndSetStoreId(any(), any())).thenReturn(document);
-        when(runInteractionService.triggerInteraction(any(), any(), any(), any())).thenReturn(mockResponse);
+        when(runInteractionService.triggerInteraction(document, session, interactionId, new ArrayList<>(), false, false)).thenReturn(mockResponse);
 
         //AND the operation is called
         OperationContext ctx = new OperationContext(session);
         ctx.put("interactionId", interactionId);
         ctx.put("data", data);
         ctx.setInput(document);
+        String response = (String) automationService.run(ctx, RuntInteractionOperation.ID);
+        //THEN
+        assertNotNull(response);
+        assertEquals("{\"response\": \"test\"}", response);
+    }
+
+    @Test
+    @Ignore //todo
+    public void shouldReturnInteractionResponseForFolder() throws OperationException {
+        //GIVEN Folder exists
+        DocumentModel folderDoc = session.createDocumentModel("/", "Folder", "Folder");
+        folderDoc.setPropertyValue("dc:title", "Test Folder");
+        folderDoc.setPropertyValue("dc:description", "This is a test description");
+        folderDoc = session.createDocument(folderDoc);
+
+        //And document
+        DocumentModel document = session.createDocumentModel("/Folder", "testFile", "File");
+        document.setPropertyValue("dc:title", "Test Document");
+        document.setPropertyValue("dc:description", "This is a test description");
+        document.setPropertyValue(FILE_CONTENT, new StringBlob("Test", "text/plain"));
+        document = session.createDocument(document);
+
+        List<ObjectNode> data = new ArrayList<>();
+        String interactionId = "test-id";
+        String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
+        //WHEN the service is mocked
+        when(runInteractionService.uploadFileAndSetStoreId(any(), any())).thenReturn(document);
+        when(apiService.getStoredDocumentStatus(any())).thenReturn("completed");
+        when(apiService.getInteractionResult(interactionId, new HashMap<>(), false)).thenReturn("test");
+
+        //AND the operation is called
+        OperationContext ctx = new OperationContext(session);
+        ctx.put("interactionId", interactionId);
+        ctx.put("data", data);
+        ctx.setInput(folderDoc);
         String response = (String) automationService.run(ctx, RuntInteractionOperation.ID);
         //THEN
         assertNotNull(response);

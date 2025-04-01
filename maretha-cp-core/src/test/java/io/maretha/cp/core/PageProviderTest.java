@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
-import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TEXT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -1614,10 +1613,10 @@ public class PageProviderTest {
                 -0.012490823,
                 -0.010535615,
                 0.00039737133};
-        doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, embeddings);
-        doc = session.createDocument(doc);
-        session.save();
-        txFeature.nextTransaction();
+//        doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, embeddings);
+//        doc = session.createDocument(doc);
+//        session.save();
+//        txFeature.nextTransaction();
 
         //WHEN
         when(apiService.textToEmbeddings(any())).thenReturn(embeddings);
@@ -1626,7 +1625,6 @@ public class PageProviderTest {
         PageProviderDefinition def = PageProviderHelper.getPageProviderDefinition("searchByEmbeddings");
         HashMap<String, String> namedParameters = new HashMap<>();
         namedParameters.put("vectorQuery", Arrays.toString(embeddings));
-        namedParameters.put("vectorField", SCHEMA_EMBEDDINGS_TEXT);
         PageProvider<DocumentModel> pageProvider = (PageProvider<DocumentModel>) PageProviderHelper.getPageProvider(session, def, namedParameters);
 
         //THEN

@@ -7,6 +7,14 @@
     <xs:element name="interactions" type="nxs:interactionList"/>
     <!--S3 Path access enabled-->
     <xs:element name="awsS3AccessEnabled" type="xs:boolean"/>
+    <!--Schema Settings for saving metadata-->
+    <xs:element name="schemaSettings" type="xs:string"/>
+    <!--Elasticsearch/OpenSearch query settings-->
+    <xs:element name="esSettings" type="xs:string"/>
+    <!--Vertesia.io settings-->
+    <xs:element name="vertesiaSettings" type="xs:string"/>
+    <!-- DocType events settings with interactions mapping-->
+    <xs:element name="eventsSettings" type="xs:string"/>
 
     <!-- Definition for the interactions complex type -->
     <xs:complexType name="interactionType">
@@ -23,6 +31,7 @@
             <xs:element name="activeOnActionMenu" type="xs:boolean"/>
             <xs:element name="activeOnFolder" type="xs:boolean"/>
             <xs:element name="chat" type="xs:boolean"/>
+            <xs:element name="saveMetadata" type="xs:boolean"/>
             <xs:element name="parameters" type="nxs:interactionParameterList"/>
         </xs:sequence>
     </xs:complexType>
