@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 <component name="io.maretha.cp.core.listener.cpListener">
-
+    <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+        <listener name="interactionEventListener" async="true" postCommit="true"
+                  class="io.maretha.cp.core.events.InteractionEventListener">
+            <event>documentCreated</event>
+<!--            <event>documentModified</event>-->
+        </listener>
+    </extension>
 
 </component>

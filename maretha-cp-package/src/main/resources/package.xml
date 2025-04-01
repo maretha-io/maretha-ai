@@ -1,11 +1,11 @@
 <!-- See documentation at http://doc.nuxeo.com/x/HgIz -->
 <package type="addon" name="maretha-cp" version="@VERSION@">
-  <title>Maretha cp integration addon package</title>
+  <title>Vertesia - Nuxeo Addon</title>
   <description>
-    <p>Put here an HTML description of your Nuxeo Package.</p>
+    <p>Vertesia AI interactions integrated in Nuxeo.</p>
   </description>
   <!-- <home-page>http://doc.nuxeo.com/</home-page> -->
-  <vendor>Maretha + ComposablePrompts</vendor>
+  <vendor>Maretha.io + Vertesia.io</vendor>
   <installer restart="true" />
   <uninstaller restart="true" />
   <!-- <hotreload-support>false</hotreload-support> -->
@@ -14,11 +14,11 @@
   <nuxeo-validation>none</nuxeo-validation>
   <!-- Production State: production_ready | testing | proto -->
   <production-state>testing</production-state>
-  <supported>false</supported>
-<!--  <target-platform>-->
-<!--    <name>lts</name>-->
-<!--    <version>[@NUXEO_TARGET_VERSION@,)</version>-->
-<!--  </target-platform>-->
+  <supported>true</supported>
+  <target-platform>
+    <name>lts</name>
+    <version>[@NUXEO_TARGET_VERSION@,)</version>
+  </target-platform>
   <!-- Dependencies on other packages -->
   <!-- <dependencies> -->
   <!-- <package>another-package:1.0.0:1.0.0</package> -->

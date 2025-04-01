@@ -1,31 +1,31 @@
-## Maretha.io + Becomposable.com Integration Add-on
+## Maretha.io + Vertesia.com Integration Add-on
 
-### 1.API Key from BeComposable
-- https://cloud.becomposable.com/settings#keys
+### 1.API Key from Vertesia
+- https://cloud.vertesia.io/settings#keys
 - Create a private secret key with read/execute permissions
 
 ### 2.Nuxeo configuration nuxeo.conf
 ```
-cp.auth.token=sk-
-cp.api.url=https://api.becomposable.com
-cp.upload.url=https://zeno-server-production.api.becomposable.com
-cp.supported.mime-types=text/plain,application/pdf,image/jpeg,image/png,image/webp
-cp.project.id=
-cp.environment.id=
-cp.embedding.model=text-embedding-3-small
+vertesia.authToken=sk-
+vertesia.apiUrl=https://studio-server-production.api.vertesia.io/
+vertesia.uploadUrl=https://zeno-server-production.api.vertesia.io
+vertesia.projectId=
+vertesia.environmentId=
+vertesia.embeddingModel=amazon.titan-embed-text-v2:0
+vertesia.mimeTypes=text/plain,application/pdf,image/jpeg,image/png,image/webp
 
-# dev -> cp.api.url=https://studio-server-preview.api.becomposable.com
+# dev -> https://studio-server-preview.api.vertesia.io
 ```
 
-## 3. Create BeComposable Interactions
-### BeComposable Interactions
-![](documentation/images/BeComposable-Interactions.png)
+## 3. Create Vertesia Interactions
+### Vertesia Interactions
+![](documentation/images/Vertesia-Interactions.png)
 
-### BeComposable Interaction Prompts
-![](documentation/images/BeComposable-Document-Summary-Interaction.png)
+### Vertesia Interaction Prompts
+![](documentation/images/Vertesia-Document-Summary-Interaction.png)
 
-### BeComposable Prompt
-![](documentation/images/BeComposable-Document-Summary-Prompt.png)
+### Vertesia Prompt
+![](documentation/images/Vertesia-Document-Summary-Prompt.png)
 
 ## 4. Nuxeo UI Configuration
 
@@ -68,7 +68,7 @@ cp.embedding.model=text-embedding-3-small
 ....            
 ```
 
-```java
+```
 public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     //...
     final String TEXT_VECTOR_FIELD = "interactionresults:embeddingsText";

@@ -1,6 +1,6 @@
 <dom-module id="cp-document-interaction">
   <template>
-    <nuxeo-operation id="getInteractionsOperation" op="GetInteractionsForDocumentOperation"
+    <nuxeo-operation id="getSettingsOperation" op="GetInteractionsForDocumentOperation"
                      input="[[document]]"></nuxeo-operation>
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
                      input="[[document.uid]]"></nuxeo-operation>
@@ -154,10 +154,6 @@
                             aria-label="Interact with document" raised>
                 Run Interaction
               </paper-button>
-              <template is="dom-if" if="[[interactionResponse]]">
-                <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]"
-                                  interaction-response="[[interactionResponse]]"></cp-save-response>
-              </template>
             </div>
           </div>
 
@@ -169,6 +165,8 @@
               </template>
               <template is="dom-if" if="[[interactionResponse]]">
                 <cp-format-json-response json="[[interactionResponse]]"></cp-format-json-response>
+                <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]"
+                                  interaction-response="[[interactionResponse]]"></cp-save-response>
               </template>
 
               <template is="dom-if" if="[[showPreviousInteractions]]">
@@ -277,6 +275,7 @@
         this.set('selectedIndex', null);
         this.set('selectedInteraction', null);
         this.set('interactionResponse', null);
+        this.set('interactionResponseStream', null);
       },
 
       _documentObserver(doc) {
@@ -296,7 +295,7 @@
       },
 
       _getInteractions: function () {
-        const operation = this.$.getInteractionsOperation;
+        const operation = this.$.getSettingsOperation;
         operation.params = {};
         operation.execute().then((response) => {
           this.set('interactions', response.value);
@@ -310,9 +309,18 @@
         this.set('interactionStatus', 'Waiting for AI response...');
         this.set('interactionResponse', '');
         const operation = this.$.runInteractionOperation;
-        operation.params = { "interactionId": this.selectedInteraction.id, "data": this.selectedInteraction.parameters };
+        operation.params = {
+          "interactionId": this.selectedInteraction.id,
+          "data": this.selectedInteraction.parameters,
+          "saveMetadata": this.selectedInteraction.saveMetadata
+        };
         operation.execute().then((response) => {
-          this._stream(response.value);
+          if(this.selectedInteraction.saveMetadata) {
+              this.set('interactionResponse', response.value);
+              this.set('interactionStatus', '');
+          } else {
+            this._stream(response.value);
+          }
         }).catch((error) => {
           console.error('Error triggering operation:', error);
           this.set('interactionStatus', `<p>Error: ${error}</p>`);

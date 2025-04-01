@@ -46,86 +46,6 @@
     >
     </nuxeo-input>
 
-    <div role="widget">
-      <nuxeo-checkbox-aggregation
-              data="[[aggregations.dc_modified_agg]]"
-              value="{{params.dc_modified_agg}}"
-              label="[[i18n('defaultSearch.modifiedDate')]]"
-              collapsible
-      >
-      </nuxeo-checkbox-aggregation>
-    </div>
-
-    <div role="widget">
-      <label>[[i18n('defaultSearch.authors')]]</label>
-      <nuxeo-dropdown-aggregation
-              placeholder="[[i18n('defaultSearch.authors.placeholder')]]"
-              data="[[aggregations.dc_creator_agg]]"
-              value="{{params.dc_creator_agg}}"
-              multiple="true"
-              name="authors"
-              aria-label$="[[i18n('defaultSearch.authors')]]"
-      >
-      </nuxeo-dropdown-aggregation>
-    </div>
-
-    <div role="widget">
-      <label>[[i18n('defaultSearch.tags')]]</label>
-      <nuxeo-tag-suggestion
-              min-chars="1"
-              placeholder="[[i18n('defaultSearch.tags.placeholder')]]"
-              value="{{params.ecm_tags}}"
-              multiple="true"
-              name="tags"
-              aria-label$="[[i18n('defaultSearch.tags')]]"
-      >
-      </nuxeo-tag-suggestion>
-    </div>
-
-    <div role="widget">
-      <nuxeo-checkbox-aggregation
-              data="[[aggregations.dc_nature_agg]]"
-              value="{{params.dc_nature_agg}}"
-              name="nature"
-              label="[[i18n('defaultSearch.nature')]]"
-              collapsible
-      >
-      </nuxeo-checkbox-aggregation>
-    </div>
-
-    <div role="widget">
-      <nuxeo-checkbox-aggregation
-              data="[[aggregations.dc_subjects_agg]]"
-              value="{{params.dc_subjects_agg}}"
-              name="subject"
-              label="[[i18n('defaultSearch.subject')]]"
-              collapsible
-      >
-      </nuxeo-checkbox-aggregation>
-    </div>
-
-    <div role="widget">
-      <nuxeo-checkbox-aggregation
-              data="[[aggregations.dc_coverage_agg]]"
-              value="{{params.dc_coverage_agg}}"
-              name="coverage"
-              label="[[i18n('defaultSearch.coverage')]]"
-              collapsible
-      >
-      </nuxeo-checkbox-aggregation>
-    </div>
-
-    <div role="widget">
-      <nuxeo-checkbox-aggregation
-              data="[[aggregations.common_size_agg]]"
-              value="{{params.common_size_agg}}"
-              name="size"
-              label="[[i18n('defaultSearch.size')]]"
-              collapsible
-      >
-      </nuxeo-checkbox-aggregation>
-    </div>
-
   </template>
 
   <script>
@@ -182,7 +102,7 @@
 
       _paramsObserver(params) {
         if(!this.params.vectorField)
-          this.set('params.vectorField', "interactionresults:embeddingsText");
+          this.set('params.vectorField', "text");
         if(!this.params.min_score)
           this.set('params.min_score', 0.8);
       },

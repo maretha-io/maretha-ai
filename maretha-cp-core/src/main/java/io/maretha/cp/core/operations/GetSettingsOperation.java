@@ -14,21 +14,19 @@ import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.runtime.api.Framework;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  *
  */
-@Operation(id = GetInteractionSettingsOperation.ID, category = Constants.CAT_DOCUMENT, label = "Get CP Interactions", description = "Get Composable Prompts Interaction by API")
-public class GetInteractionSettingsOperation {
+@Operation(id = GetSettingsOperation.ID, category = Constants.CAT_DOCUMENT, label = "Get CP Interactions", description = "Get Composable Prompts Interaction by API")
+public class GetSettingsOperation {
 
-    public static final String ID = "GetInteractionsOperation";
+    public static final String ID = "GetSettingsOperation";
     private final APIService apiService = Framework.getService(APIService.class);
-    private final RepositoryService cpLocalSettingsService = Framework.getService(RepositoryService.class);
+    private final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
 
     @Param(name = "refresh", required = false)
     protected boolean refresh;
@@ -39,7 +37,7 @@ public class GetInteractionSettingsOperation {
     public Settings run() {
         Map<String, Interaction> interactionsById = new HashMap<>();
         //Get local interactions
-        Settings settings = cpLocalSettingsService.getLocalInteractionSettings(session);
+        Settings settings = repositoryService.getSavedSettings(session);
         List<Interaction> interactionSettings = settings.getInteractions();
         if (!CollectionUtils.isEmpty(interactionSettings)) {
             interactionSettings.forEach(interaction -> interactionsById.put(interaction.getId(), interaction));

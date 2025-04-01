@@ -9,7 +9,7 @@ import java.util.Map;
 public interface APIService {
     List<Interaction> getInteractions();
 
-    String getInteractionResultAsStream(String interactionId, Map<String, Object> data);
+    String getInteractionResult(String interactionId, Map<String, Object> data, boolean stream);
 
     String getBearerToken();
 
@@ -21,4 +21,9 @@ public interface APIService {
 
     double[] getDocumentEmbeddings(String docId, String type);
 
+    Map<String, Double> search(String vectorQuery, String type, int limit);
+
+    Map<String, Double> searchSimilarity(String storeId, String type, int limit);
+
+    String getStoredDocumentStatus(String storeId);
 }

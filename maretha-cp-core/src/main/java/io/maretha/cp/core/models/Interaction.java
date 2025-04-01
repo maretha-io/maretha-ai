@@ -29,4 +29,5 @@ public class Interaction {
     private boolean isChat;
     private boolean activeOnFolder;
     private boolean activeOnActionMenu;
+    private boolean saveMetadata;
 }

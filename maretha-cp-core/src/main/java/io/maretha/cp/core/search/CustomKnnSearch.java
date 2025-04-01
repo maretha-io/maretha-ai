@@ -4,7 +4,6 @@ import io.maretha.cp.core.services.APIService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -24,15 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
 import static org.nuxeo.ecm.platform.query.api.PageProviderService.NAMED_PARAMETERS;
 
 public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
-    public static final String TEXT_VECTOR_FIELD = "interactionresults:embeddingsText";
-    public static final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
-    private static final long serialVersionUID = 1L;
-    private static final int numCandidates = 1000;
-    private static final float boost = 2.0F;
-    private static final String SEMANTIC_SEARCH_K = "30";
+    public static final String RELEVANCE_SCORE = "relevance_score";
+    private final APIService apiService = Framework.getService(APIService.class);
     private List<DocumentModel> results;
 
     @Override
@@ -45,6 +41,7 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
 
     private List<DocumentModel> executeKnnSearch() {
         CoreSession session = getCoreSession();
+
         if (session == null) {
             throw new IllegalStateException("CoreSession is null in Page Provider");
         }
@@ -58,11 +55,12 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         if (namedParameters == null || MapUtils.isEmpty(namedParameters)) {
             return getEmptyResult();
         }
-
-        String vectorField = namedParameters.get("vectorField");
-        if (StringUtils.isEmpty(vectorField)) {
+        if (!namedParameters.containsKey("vectorField") && !namedParameters.containsKey("vectorQuery")) {
             return getEmptyResult();
         }
+        float minScore = Float.parseFloat(namedParameters.getOrDefault("min_score", "0.8"));
+        String vectorField = namedParameters.get("vectorField");
+        String vectorQuery = namedParameters.get("vectorQuery");
 
         if (query == null) {
             buildQuery(session);
@@ -77,58 +75,44 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         // Combine NXQL and KNN using "must" (AND logic)
         BoolQueryBuilder combinedQuery = QueryBuilders.boolQuery();
 
-        String vectorQuery = namedParameters.get("vectorQuery");
-        if (StringUtils.isNotEmpty(vectorQuery) &&
-                StringUtils.isNotEmpty(vectorField) && !"[]".equals(vectorQuery)) {
+        Map<String, Double> idsAndScores = new HashMap<>();
 
+        if (StringUtils.isNotEmpty(vectorQuery) && StringUtils.isNotEmpty(vectorField)) {
+            Map<String, Double> docIdScoreMapTextSearch = new HashMap<>();
+            Map<String, Double> docIdScoreMapImageSearch = new HashMap<>();
+            Map<String, Double> docIdScoreMapPropertiesSearch = new HashMap<>();
 
-
-            double minScore = Double.parseDouble(namedParameters.getOrDefault("min_score", "0.8"));
-
-            if (TEXT_VECTOR_FIELD.equals(vectorField)) {
+            if ("text".equals(vectorField)) {
                 APIService apiService = Framework.getService(APIService.class);
                 double[] textVectors = apiService.textToEmbeddings(vectorQuery);
-                String vectorJson = Arrays.toString(textVectors);
-
-                String knnJsonQuery = "{\n" +
-                        "  \"function_score\": {\n" +  // Wrap knn inside function_score
-                        "    \"query\": {\n" +
-                        "      \"knn\": {\n" +
-                        "        \"field\": \"" + TEXT_VECTOR_FIELD + "\",\n" +
-                        "        \"query_vector\": " + vectorJson + ",\n" +
-                        "        \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
-                        "        \"num_candidates\": " + numCandidates + "\n" +
-                        "      }\n" +
-                        "    },\n" +
-                        "    \"min_score\": " + minScore + ",\n" +  // Apply min_score inside function_score
-                        "    \"boost_mode\": \"multiply\" \n" +
-                        "  }\n" +
-                        "}";
-
-                QueryBuilder knnTextQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
-                combinedQuery = combinedQuery.must(knnTextQuery).boost(boost);
+                vectorQuery = Arrays.toString(textVectors);
+                docIdScoreMapTextSearch = apiService.search(vectorQuery, "text", 100);
+                docIdScoreMapImageSearch = apiService.search(vectorQuery, "image", 100);
+                docIdScoreMapPropertiesSearch = apiService.search(vectorQuery, "properties", 100);
             }
 
-            if (IMAGE_VECTOR_FIELD.equals(vectorField)) {
-                String knnJsonQuery = "{\n" +
-                        "  \"function_score\": {\n" +  // Wrap knn inside function_score
-                        "    \"query\": {\n" +
-                        "      \"knn\": {\n" +
-                        "        \"field\": \"" + IMAGE_VECTOR_FIELD + "\",\n" +
-                        "        \"query_vector\": " + vectorQuery + ",\n" +
-                        "        \"k\": " + SEMANTIC_SEARCH_K + ",\n" +
-                        "        \"num_candidates\": " + numCandidates + "\n" +
-                        "      }\n" +
-                        "    },\n" +
-                        "    \"min_score\": " + minScore + ",\n" +  // Apply min_score inside function_score
-                        "    \"boost_mode\": \"multiply\" \n" +
-                        "  }\n" +
-                        "}";
-
-                QueryBuilder knnImageQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
-                combinedQuery = combinedQuery.must(knnImageQuery).boost(boost);
+            if ("similarity".equals(vectorField)) {
+                String objectStoreId = vectorQuery;
+                docIdScoreMapTextSearch = apiService.searchSimilarity(objectStoreId, "text", 100);
+                docIdScoreMapImageSearch = apiService.searchSimilarity(objectStoreId, "image", 100);
+                docIdScoreMapPropertiesSearch = apiService.searchSimilarity(objectStoreId, "properties", 100);
             }
+
+            docIdScoreMapTextSearch.forEach((id, score) -> {
+                if (score >= minScore)
+                    idsAndScores.merge(id, score, Math::max);
+            });
+            docIdScoreMapImageSearch.forEach((id, score) -> {
+                if (score >= minScore)
+                    idsAndScores.merge(id, score, Math::max);
+            });
+            docIdScoreMapPropertiesSearch.forEach((id, score) -> {
+                if (score >= minScore)
+                    idsAndScores.merge(id, score, Math::max);
+            });
+            combinedQuery.must(QueryBuilders.termsQuery(RESULTS_STORE_ID_SCHEMA_PATH, idsAndScores.keySet()));
         }
+
 
         if (searchOnAllRepositories()) {
             nxQuery.searchOnAllRepositories();
@@ -150,13 +134,23 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         log.debug("ES KNN query: " + nxQuery.makeQuery());
 
         EsResult ret = esService.queryAndAggregate(nxQuery);
-        DocumentModelList dmList = ret.getDocuments();
+        List<DocumentModel> dmList = ret.getDocuments();
+
+        if (StringUtils.isNotEmpty(vectorQuery) && !"[]".equals(vectorQuery)) {
+            dmList.forEach(dcm -> {
+                String id = (String) session.getDocument(dcm.getRef()).getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
+                if (StringUtils.isNotEmpty(id) && idsAndScores.containsKey(id)) {
+                    dcm.putContextData(RELEVANCE_SCORE, idsAndScores.get(id));
+                }
+            });
+            dmList.sort((doc1, doc2) -> Double.compare((double) doc2.getContextData(RELEVANCE_SCORE), (double) doc1.getContextData(RELEVANCE_SCORE)));
+        }
 
         currentAggregates = new HashMap<>(ret.getAggregates().size());
         for (Aggregate<Bucket> agg : ret.getAggregates()) {
             currentAggregates.put(agg.getId(), agg);
         }
-        setResultsCount(dmList.totalSize());
+        setResultsCount(dmList.size());
         currentPageDocuments = dmList;
         return currentPageDocuments;
     }
@@ -165,4 +159,5 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         setResultsCount(0);
         return new DocumentModelListImpl();
     }
+
 }
