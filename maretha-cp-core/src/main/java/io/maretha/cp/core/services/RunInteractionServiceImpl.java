@@ -49,7 +49,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
-        doc = uploadFileAndSetStoreId(doc, session);
         //Retry for document to have status completed
         apiService.getStoredDocumentStatus((String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
         if (saveMetadata) {

@@ -1,5 +1,6 @@
 package io.maretha.cp.core.bulk.actions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.services.RunInteractionService;
 import org.apache.commons.logging.Log;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.nuxeo.ecm.core.bulk.BulkServiceImpl.STATUS_STREAM;
 import static org.nuxeo.lib.stream.computation.AbstractComputation.INPUT_1;
@@ -36,6 +38,7 @@ public class BulkInteractionAction implements StreamProcessorTopology {
     }
 
     public static class BulkInteractionComputation extends AbstractBulkComputation {
+        private final ObjectMapper objectMapper = new ObjectMapper();
 
         public BulkInteractionComputation() {
             super(ACTION_FULL_NAME, 1);
@@ -46,13 +49,14 @@ public class BulkInteractionAction implements StreamProcessorTopology {
             log.info("Running BulkInteractionComputation for ids: " + ids);
             RunInteractionService runInteractionService = Framework.getService(RunInteractionService.class);
             String interactionId = (String) params.get("interactionId");
-            List<InteractionParameter> parameters = (List<InteractionParameter>) params.get("parameters");
+            List<InteractionParameter> parameters = objectMapper
+                    .convertValue(params.get("parameters"), objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));
             boolean saveMetadata = (boolean) params.get("saveMetadata");
             boolean saveMetadataModeOverride = (boolean) params.get("saveMetadataModeOverride");
-            ids.forEach(docId -> {
+            ids.stream().map(docId -> {
                 DocumentModel document = session.getDocument(new IdRef(docId));
-                runInteractionService.triggerInteraction(document, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
-            });
+                return runInteractionService.uploadFileAndSetStoreId(document, session);
+            }).collect(Collectors.toList()).forEach(doc -> runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride));
         }
     }
 }
