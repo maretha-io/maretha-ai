@@ -103,7 +103,6 @@
           this.set('interactionResponse', response.value);
           this.set('interactionStatus', '');
           this.fire('document-updated');
-          this.fire('notify', { message: 'Metadata saved.' });
         }).catch((error) => {
           console.error('Error triggering operation:', error);
           this.fire('notify', { message: 'Cannot save metadata.' });
@@ -127,7 +126,6 @@
           this.set('interactionResponse', response.value);
           this.set('interactionStatus', '');
           this.fire('document-updated');
-          this.fire('notify', { message: 'Metadata saved.' });
         }).catch((error) => {
           console.error('Error triggering operation:', error);
           this.fire('notify', { message: 'Cannot save metadata.' });

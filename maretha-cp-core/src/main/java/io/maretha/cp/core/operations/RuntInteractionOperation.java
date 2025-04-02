@@ -55,13 +55,14 @@ public class RuntInteractionOperation {
                     " AND file:content IS NOT NULL", doc.getId());
             BulkCommand.Builder builder = new BulkCommand.Builder(BulkInteractionAction.ACTION_NAME, nxqlQuery, "system")
                     .param("interactionId", interactionId)
-                    .param("parameters", (Serializable) parameters)
+                    .param("parameters", (Serializable) data)
                     .param("saveMetadata", saveMetadata)
                     .param("saveMetadataModeOverride", saveMetadataModeOverride);
             BulkCommand command = builder.build();
             BulkService bulkService = Framework.getService(BulkService.class);
             return bulkService.submit(command);
         }
+        doc = runInteractionService.uploadFileAndSetStoreId(doc, session);
         return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
     }
 

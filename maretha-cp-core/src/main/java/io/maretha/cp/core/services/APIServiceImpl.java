@@ -221,6 +221,7 @@ public class APIServiceImpl implements APIService {
 
     @Override
     public Map<String, Double> search(String vectorQuery, String type, int limit) {
+        log.debug("Searching by type: " + type + " and query: " + vectorQuery);
         Map<String, Double> docIdScoreMap = new HashMap<>();
         String requestBody = String.format(
                 "{\n" +
@@ -240,14 +241,15 @@ public class APIServiceImpl implements APIService {
                 double score = obj.get("score").asDouble();
                 docIdScoreMap.put(id, score);
             });
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.error(e);
         }
         return docIdScoreMap;
     }
 
     @Override
     public Map<String, Double> searchSimilarity(String storeId, String type, int limit) {
+        log.debug("Searching similarity by type: " + type + " and storeId: " + storeId);
         Map<String, Double> docIdScoreMap = new HashMap<>();
         String requestBody = String.format(
                 "{\n" +
