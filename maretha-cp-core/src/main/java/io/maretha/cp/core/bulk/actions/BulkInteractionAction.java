@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static io.maretha.cp.core.events.InteractionEventListener.DISABLE_LISTENER;
 import static org.nuxeo.ecm.core.bulk.BulkServiceImpl.STATUS_STREAM;
 import static org.nuxeo.lib.stream.computation.AbstractComputation.INPUT_1;
 import static org.nuxeo.lib.stream.computation.AbstractComputation.OUTPUT_1;
@@ -55,6 +56,7 @@ public class BulkInteractionAction implements StreamProcessorTopology {
             boolean saveMetadataModeOverride = (boolean) params.get("saveMetadataModeOverride");
             ids.stream().map(docId -> {
                 DocumentModel document = session.getDocument(new IdRef(docId));
+                document.putContextData(DISABLE_LISTENER, true);
                 return runInteractionService.uploadFileAndSetStoreId(document, session);
             }).collect(Collectors.toList()).forEach(doc -> runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride));
         }

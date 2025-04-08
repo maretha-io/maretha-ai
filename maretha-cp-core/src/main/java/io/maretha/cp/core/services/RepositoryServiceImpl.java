@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AWS_S3_ACCESS_ENABLED;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.ES_SETTINGS;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.EVENTS_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
 
@@ -120,6 +121,12 @@ public class RepositoryServiceImpl implements RepositoryService {
             updateVertesiaSettings(vertesiaSettings, cpSettingsDoc);
         }
 
+        @SuppressWarnings("unchecked")
+        List<ObjectNode> eventsSettings = (List<ObjectNode>) configuration.get(EVENTS_SETTINGS);
+        if (!Objects.isNull(eventsSettings)) {
+            updateEventsSettings(eventsSettings, cpSettingsDoc);
+        }
+
         return session.saveDocument(cpSettingsDoc).getAdapter(Settings.class);
     }
 
@@ -154,6 +161,15 @@ public class RepositoryServiceImpl implements RepositoryService {
         try {
             String jsonString = objectMapper.writeValueAsString(esSettings);
             cpSettingsDoc.setPropertyValue(SETTINGS_ELASTICSEARCH, jsonString);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void updateEventsSettings(List<ObjectNode> settings, DocumentModel cpSettingsDoc) {
+        try {
+            String jsonString = objectMapper.writeValueAsString(settings);
+            cpSettingsDoc.setPropertyValue(SETTINGS_EVENTS, jsonString);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

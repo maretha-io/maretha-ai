@@ -40,9 +40,9 @@ public class SettingsAdapterFactory implements DocumentAdapterFactory {
             });
             Map<String, String> vertesiaSettings = getPropertyValue(doc, SETTINGS_VERTESIA, new TypeReference<>() {
             });
-            Map<String, List<EventWithInteraction>> eventsSettingsMap = getPropertyValue(doc, SETTINGS_EVENTS, new TypeReference<>() {
+            List<EventWithInteraction> eventsSettings = getPropertyValue(doc, SETTINGS_EVENTS, new TypeReference<>() {
             });
-            return new Settings(cpInteractions, awsS3AccessEnabled, schemaSettingsMap, esSettingsMap, vertesiaSettings, eventsSettingsMap);
+            return new Settings(cpInteractions, awsS3AccessEnabled, schemaSettingsMap, esSettingsMap, vertesiaSettings, eventsSettings);
         }
         return null;
     }

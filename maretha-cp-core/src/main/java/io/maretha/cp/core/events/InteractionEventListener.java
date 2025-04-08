@@ -1,20 +1,26 @@
 package io.maretha.cp.core.events;
 
+import io.maretha.cp.core.bulk.actions.BulkInteractionAction;
 import io.maretha.cp.core.models.EventWithInteraction;
+import io.maretha.cp.core.models.Interaction;
+import io.maretha.cp.core.models.Settings;
 import io.maretha.cp.core.services.RepositoryService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.bulk.BulkService;
+import org.nuxeo.ecm.core.bulk.message.BulkCommand;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.runtime.api.Framework;
 
+import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,19 +46,40 @@ public class InteractionEventListener implements EventListener {
             return;
         }
 
-        String docType = doc.getType();
-        Map<String, List<EventWithInteraction>> eventsSettings = repositoryService.getSavedSettings(session).getEventsSettings();
-        if (!Objects.isNull(eventsSettings) && eventsSettings.containsKey(docType)) {
-            List<EventWithInteraction> events = eventsSettings.get(docType);
-            Set<EventWithInteraction> eventsWithInteractions = events.stream()
-                    .filter(ev -> ev.getEventName().equals(event.getName()))
+        if (event.getName().equals("beforeDocumentModification") && !doc.getProperty("file:content").isDirty()) {
+            return; //Only if file changed
+        }
+
+        Settings savedSettings = repositoryService.getSavedSettings(session);
+        List<EventWithInteraction> eventsSettings = savedSettings.getEventsSettings();
+        if (!Objects.isNull(eventsSettings)) {
+            Set<EventWithInteraction> eventsWithInteractions = eventsSettings.stream()
+                    .filter(ev -> ev.getDocType().equals(doc.getType()))
+                    .filter(ev -> ev.getEvents().contains(event.getName()))
                     .filter(EventWithInteraction::isActive)
                     .collect(Collectors.toSet());
             eventsWithInteractions.forEach(ev -> {
-                //TODO BulkAction
-                String interactionId = ev.getInteractionId();
-                log.debug("InteractionEventListener-> running interaction: " + interactionId);
-                doc.putContextData(DISABLE_LISTENER, true);
+                List<String> interactions = ev.getInteractions();
+                interactions.forEach(interactionId -> {
+                    String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:uuid = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0" +
+                            " AND file:content IS NOT NULL", doc.getId());
+                    Optional<Interaction> optionalInteraction = savedSettings.getInteractions().stream()
+                            .filter(interaction -> interaction.getId().equals(interactionId)).findFirst();
+                    if (optionalInteraction.isPresent()) {
+                        doc.putContextData(DISABLE_LISTENER, true);
+                        Interaction interaction = optionalInteraction.get();
+                        BulkCommand.Builder builder = new BulkCommand.Builder(BulkInteractionAction.ACTION_NAME, nxqlQuery, "system")
+                                .param("interactionId", interactionId)
+                                .param("parameters", (Serializable) interaction.getParameters())
+                                .param("saveMetadata", interaction.isSaveMetadata())
+                                .param("saveMetadataModeOverride", false);
+                        BulkCommand command = builder.build();
+                        BulkService bulkService = Framework.getService(BulkService.class);
+                        String commandId = bulkService.submit(command);
+                        log.debug("InteractionEventListener-> running interaction: " + interaction.getId());
+                        log.debug("InteractionEventListener created commandId: " + commandId);
+                    }
+                });
             });
         }
     }

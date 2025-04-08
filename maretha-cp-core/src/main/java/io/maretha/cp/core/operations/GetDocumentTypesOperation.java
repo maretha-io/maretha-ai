@@ -52,7 +52,7 @@ public class GetDocumentTypesOperation {
             Settings settings = cpLocalSettingsService.getSavedSettings(session);
             return getDocTypesWithSchemaDetails(schemaManager, documentType, settings.getSchemaSettings());
         }
-        return Arrays.stream(schemaManager.getDocumentTypes()).map(Type::getName).collect(Collectors.toList());
+        return Arrays.stream(schemaManager.getDocumentTypes()).map(Type::getName).sorted().collect(Collectors.toList());
     }
 
     private List<DocTypeWithSchema> getDocTypesWithSchemaDetails(SchemaManager schemaManager, String documentType, Map<String, DocTypeWithSchema.Schema> schemaSettings) {
@@ -64,7 +64,7 @@ public class GetDocumentTypesOperation {
         } else {
             documentTypes = List.of(schemaManager.getDocumentTypes());
         }
-        documentTypes.forEach(docType -> {
+        documentTypes.stream().sorted().forEach(docType -> {
             DocTypeWithSchema docTypeWithSchema = new DocTypeWithSchema();
             docTypeWithSchema.setName(docType.getName());
             docTypes.add(docTypeWithSchema);
