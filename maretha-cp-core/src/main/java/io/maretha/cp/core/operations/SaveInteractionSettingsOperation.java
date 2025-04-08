@@ -43,7 +43,7 @@ public class SaveInteractionSettingsOperation {
     @Param(name = VERTESIA_SETTINGS, required = false)
     protected Map<String, String> vertesiaSettings;
     @Param(name = EVENTS_SETTINGS, required = false)
-    protected Map<String, String> eventsSettings;
+    protected List<ObjectNode> eventsSettings;
 
     @OperationMethod
     public Settings run() {

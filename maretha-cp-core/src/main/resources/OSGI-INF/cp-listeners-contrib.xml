@@ -5,6 +5,7 @@
                   class="io.maretha.cp.core.events.InteractionEventListener">
             <event>documentCreated</event>
 <!--            <event>documentModified</event>-->
+            <event>beforeDocumentModification</event>
         </listener>
     </extension>
 

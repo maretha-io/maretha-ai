@@ -20,5 +20,5 @@ public class Settings {
     private Map<String, DocTypeWithSchema.Schema> schemaSettings = new HashMap<>();
     private Map<String, String> esSettings = new HashMap<>();
     private Map<String, String> vertesiaSettings = new HashMap<>();
-    private Map<String, List<EventWithInteraction>> eventsSettings = new HashMap<>();
+    private List<EventWithInteraction> eventsSettings = new ArrayList<>();
 }
