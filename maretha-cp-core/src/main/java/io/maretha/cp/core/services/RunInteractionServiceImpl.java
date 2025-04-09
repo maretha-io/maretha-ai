@@ -201,7 +201,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    private String getSupportedMimeTypes() {
+    public static String getSupportedMimeTypes() {
         return Framework.getService(RepositoryService.class).getSettingsProperty(MIME_TYPES, "text/plain,application/pdf");
     }
 
