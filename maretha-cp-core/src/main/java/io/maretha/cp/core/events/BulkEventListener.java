@@ -12,8 +12,9 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.bulk.BulkService;
 import org.nuxeo.ecm.core.bulk.message.BulkCommand;
 import org.nuxeo.ecm.core.event.Event;
+import org.nuxeo.ecm.core.event.EventBundle;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
+import org.nuxeo.ecm.core.event.PostCommitEventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.runtime.api.Framework;
 
@@ -24,12 +25,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class InteractionEventListener implements EventListener {
+import static io.maretha.cp.core.events.InteractionsEventListener.ORIGINAL_EVENT_NAME;
+
+public class BulkEventListener implements PostCommitEventListener {
     public static final String DISABLE_LISTENER = "disableInteractionListener";
+    public static final String BULK_INTERACTIONS_EVENT = "bulkInteractionsEvent";
     private final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
-    private final Log log = LogFactory.getLog(InteractionEventListener.class);
+    private final Log log = LogFactory.getLog(BulkEventListener.class);
 
     @Override
+    public void handleEvent(EventBundle events) {
+        events.forEach(this::handleEvent);
+    }
+
     public void handleEvent(Event event) {
         EventContext ctx = event.getContext();
         if (!(ctx instanceof DocumentEventContext)) {
@@ -46,16 +54,14 @@ public class InteractionEventListener implements EventListener {
             return;
         }
 
-        if (event.getName().equals("beforeDocumentModification") && !doc.getProperty("file:content").isDirty()) {
-            return; //Only if file changed
-        }
 
         Settings savedSettings = repositoryService.getSavedSettings(session);
         List<EventWithInteraction> eventsSettings = savedSettings.getEventsSettings();
+        String originalEventName = (String) event.getContext().getProperty(ORIGINAL_EVENT_NAME);
         if (!Objects.isNull(eventsSettings)) {
             Set<EventWithInteraction> eventsWithInteractions = eventsSettings.stream()
                     .filter(ev -> ev.getDocType().equals(doc.getType()))
-                    .filter(ev -> ev.getEvents().contains(event.getName()))
+                    .filter(ev -> ev.getEvents().contains(originalEventName))
                     .filter(EventWithInteraction::isActive)
                     .collect(Collectors.toSet());
             eventsWithInteractions.forEach(ev -> {
@@ -83,5 +89,4 @@ public class InteractionEventListener implements EventListener {
             });
         }
     }
-
 }
