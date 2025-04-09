@@ -13,9 +13,10 @@
         display: block;
       }
     </style>
-    
-    <nuxeo-similar-documents document="[[document]]" provider-name="searchByEmbeddings">
-    </nuxeo-similar-documents>
+
+    <template is="dom-if" if="[[visible]]">
+      <nuxeo-similar-documents document="[[document]]" provider-name="searchByEmbeddings"></nuxeo-similar-documents>
+    </template>
     
   </template>
 
