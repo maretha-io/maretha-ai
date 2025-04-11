@@ -16,6 +16,7 @@ import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
@@ -70,7 +71,12 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         try {
             DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
             JsonNode jsonNode = objectMapper.readTree(response);
-            JsonNode resultNode = jsonNode.get("result").get("result");
+            JsonNode resultNode;
+            try {
+                resultNode = jsonNode.get("result").get("result");
+            } catch (Exception e) {
+                throw new NuxeoException("Missing json result from API Response", e);
+            }
             resultNode.fields().forEachRemaining(field -> {
                 String key = field.getKey();
                 String value = field.getValue().asText();
