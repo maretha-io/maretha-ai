@@ -22,12 +22,12 @@ import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.ecm.directory.Session;
 import org.nuxeo.ecm.directory.api.DirectoryService;
+import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +46,10 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
     private final APIService apiService = Framework.getService(APIService.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public static String getSupportedMimeTypes() {
+        return Framework.getService(RepositoryService.class).getSettingsProperty(MIME_TYPES, "text/plain,application/pdf");
+    }
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
@@ -99,7 +103,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             return doc;
         }
         String storeId = null;
-        Blob blob = (Blob) doc.getPropertyValue(FILE_CONTENT);
+        Blob blob = getBlob(doc);
         if (doc.hasFacet(RESULTS_FACET)) {
             storeId = (String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
             String storeDigest = (String) doc.getPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH);
@@ -122,6 +126,14 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             return session.saveDocument(doc);
         }
         return doc;
+    }
+
+    private Blob getBlob(DocumentModel doc) {
+        if (doc.hasFacet("Picture")) {
+            PictureBlobHolder pictureBlobHolder = new PictureBlobHolder(doc, "picture:views/3/content"); //FullHD
+            return pictureBlobHolder.getBlob();
+        }
+        return (Blob) doc.getPropertyValue(FILE_CONTENT);
     }
 
     private Map<String, Object> buildParameters(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
@@ -199,10 +211,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         } catch (Exception ex) {
             return false;
         }
-    }
-
-    public static String getSupportedMimeTypes() {
-        return Framework.getService(RepositoryService.class).getSettingsProperty(MIME_TYPES, "text/plain,application/pdf");
     }
 
     private Map<String, String> getDictionaryValues(String directory) {
