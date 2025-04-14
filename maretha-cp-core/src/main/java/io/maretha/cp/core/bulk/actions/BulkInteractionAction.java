@@ -54,11 +54,14 @@ public class BulkInteractionAction implements StreamProcessorTopology {
                     .convertValue(params.get("parameters"), objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));
             boolean saveMetadata = (boolean) params.get("saveMetadata");
             boolean saveMetadataModeOverride = (boolean) params.get("saveMetadataModeOverride");
-            ids.stream().map(docId -> {
-                DocumentModel document = session.getDocument(new IdRef(docId));
-                document.putContextData(DISABLE_LISTENER, true);
-                return runInteractionService.uploadFileAndSetStoreId(document, session);
-            }).collect(Collectors.toList()).forEach(doc -> runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride));
+            ids.stream()
+                    .map(docId -> {
+                        DocumentModel document = session.getDocument(new IdRef(docId));
+                        document.putContextData(DISABLE_LISTENER, true);
+                        return runInteractionService.uploadFileAndSetStoreId(document, session, false);
+                    })
+                    .collect(Collectors.toList())
+                    .forEach(doc -> runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride));
         }
     }
 }

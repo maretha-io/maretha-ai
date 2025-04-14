@@ -62,7 +62,7 @@ public class RuntInteractionOperation {
             BulkService bulkService = Framework.getService(BulkService.class);
             return bulkService.submit(command);
         }
-        doc = runInteractionService.uploadFileAndSetStoreId(doc, session);
+        doc = runInteractionService.uploadFileAndSetStoreId(doc, session, true);
         return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
     }
 
