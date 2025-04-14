@@ -54,8 +54,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
-        //Retry for document to have status completed
-        apiService.getStoredDocumentStatus((String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
         if (saveMetadata) {
             addSchemasFieldsAndVocabs(doc, session, parameters);
         }
@@ -102,7 +100,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session) {
+    public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session, boolean waitForCompletion) {
         boolean isSupportedMimeType = blobIsSupportedMimeType(doc);
         if (!isSupportedMimeType) {
             log.debug("Document blob is not supported");
@@ -130,6 +128,10 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             doc.setPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH, blob.getDigest());
             doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
             return session.saveDocument(doc);
+        }
+        //Retry for uploaded Vertesia document to have status completed
+        if (waitForCompletion) {
+            apiService.getStoredDocumentStatus(storeId);
         }
         return doc;
     }
@@ -162,7 +164,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                         value = List.of("store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
                 } else if (StringUtils.isNotEmpty(selectedDocumentId)) {
                     DocumentModel selectedDocument = doc.getCoreSession().getDocument(new IdRef(selectedDocumentId));
-                    selectedDocument = uploadFileAndSetStoreId(selectedDocument, session);
+                    selectedDocument = uploadFileAndSetStoreId(selectedDocument, session, true);
                     value = "store:" + selectedDocument.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
                 } else {
                     value = "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
@@ -179,7 +181,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                     .stream()
                     .map(docId -> coreSession.getDocument(new IdRef(docId)))
                     .filter(this::blobIsSupportedMimeType)
-                    .map(doc -> uploadFileAndSetStoreId(doc, coreSession))
+                    .map(doc -> uploadFileAndSetStoreId(doc, coreSession, false))
                     .map(docWithStoreId -> "store:" + docWithStoreId.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
                     .collect(Collectors.toList());
         }

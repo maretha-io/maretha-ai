@@ -66,7 +66,7 @@ public class RuntInteractionOperationTest {
         String interactionId = "test-id";
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
-        when(runInteractionService.uploadFileAndSetStoreId(any(), any())).thenReturn(document);
+        when(runInteractionService.uploadFileAndSetStoreId(document, session, true)).thenReturn(document);
         when(runInteractionService.triggerInteraction(document, session, interactionId, new ArrayList<>(), false, false)).thenReturn(mockResponse);
 
         //AND the operation is called
@@ -100,7 +100,7 @@ public class RuntInteractionOperationTest {
         String interactionId = "test-id";
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
-        when(runInteractionService.uploadFileAndSetStoreId(any(), any())).thenReturn(document);
+        when(runInteractionService.uploadFileAndSetStoreId(any(), any(), false)).thenReturn(document);
         when(apiService.getStoredDocumentStatus(any())).thenReturn("completed");
         when(apiService.getInteractionResult(interactionId, new HashMap<>(), false)).thenReturn("test");
 
