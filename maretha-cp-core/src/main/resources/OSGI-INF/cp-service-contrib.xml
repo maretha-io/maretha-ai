@@ -2,7 +2,7 @@
 <component name="io.maretha.cp.core.services.APIServiceImpl">
 
   <documentation>
-    Composable Prompts API Service.
+    Vertesia API Service.
   </documentation>
 
   <implementation class="io.maretha.cp.core.services.APIServiceImpl" />
