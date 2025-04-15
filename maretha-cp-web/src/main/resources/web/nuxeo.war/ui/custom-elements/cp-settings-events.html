@@ -16,114 +16,94 @@
             }
 
             .results-table {
-                min-height: 500px;
+              min-height: 500px;
             }
 
-            .selectivity-wrapper{
-
+            .event-entry,
+            .add-entry-row {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 16px;
+              padding: 16px;
+              border-bottom: 1px solid #ddd;
+              margin-bottom: 8px;
             }
 
+            .event-entry nuxeo-selectivity,
+            .add-entry-row nuxeo-selectivity {
+              flex: 1 1 220px;
+            }
+
+            paper-toggle-button {
+              align-self: center;
+            }
+
+            paper-button[raised] {
+              align-self: center;
+            }
         </style>
 
         <div id="main slot">
-
             <nuxeo-card>
                 <h3>Events Settings</h3>
                 <paper-toast id="toast"></paper-toast>
 
-                <div class="content">
-                    <nuxeo-data-table items="{{eventsSettings}}" class="results-table">
-                        <nuxeo-data-table-column name="DocType" flex="30">
-                            <template>
-                                <div class="selectivity-wrapper" style="display: inline-block;width: 100%;">
-                                    <nuxeo-selectivity class="selectivity-container" style="margin: auto;text-align: left;" min-chars="0"
-                                                       data="{{documentTypes}}" value="{{item.docType}}"
-                                                       placeholder="Select Document Type"></nuxeo-selectivity>
-                                </div>
-                            </template>
-                        </nuxeo-data-table-column>
+                <template is="dom-repeat" items="{{eventsSettings}}" as="item" index-as="index">
+                    <div class="event-entry">
+                        <!-- DocType -->
+                        <nuxeo-selectivity min-chars="0" data="{{documentTypes}}" value="{{item.docType}}"
+                                           placeholder="Select Document Type">
+                        </nuxeo-selectivity>
 
-                        <nuxeo-data-table-column name="Events" flex="50">
-                            <template>
-                                <div class="selectivity-wrapper" style="display: inline-block;width: 100%;">
-                                    <nuxeo-selectivity class="selectivity-container" style="margin: auto;text-align: left;" multiple
-                                                       min-chars="0" data="{{eventTypes}}" value="{{item.events}}"
-                                                       placeholder="Select Event Types"></nuxeo-selectivity>
-                                </div>
-                            </template>
-                        </nuxeo-data-table-column>
+                        <!-- Events -->
+                        <nuxeo-selectivity multiple min-chars="0" data="{{eventTypes}}" value="{{item.events}}"
+                                           placeholder="Select Event Types">
+                        </nuxeo-selectivity>
 
-                        <nuxeo-data-table-column name="Interactions" flex="50">
-                            <template>
-                                <div class="selectivity-wrapper" style="display: inline-block;width: 100%;">
-                                    <nuxeo-selectivity class="selectivity-container" style="margin: auto;text-align: left;" multiple
-                                                       min-chars="0" data="{{interactionsWithLabels}}" value="{{item.interactions}}"
-                                                       placeholder="Select Interactions"></nuxeo-selectivity>
-                                </div>
-                            </template>
-                        </nuxeo-data-table-column>
+                        <!-- Interactions -->
+                        <nuxeo-selectivity multiple min-chars="0" data="{{interactionsWithLabels}}" value="{{item.interactions}}"
+                                           placeholder="Select Interactions">
+                        </nuxeo-selectivity>
 
-                        <nuxeo-data-table-column name="Active" flex="10">
-                            <template>
-                                <paper-toggle-button checked="{{item.active}}" on-change="_saveEventsSettings">Active
-                                </paper-toggle-button>
-                            </template>
-                        </nuxeo-data-table-column>
+                        <!-- Active Toggle -->
+                        <paper-toggle-button checked="{{item.active}}" on-change="_saveEventsSettings">
+                            Active
+                        </paper-toggle-button>
 
-                        <nuxeo-data-table-column name="Delete" flex="10">
-                            <template>
-                                <div>
-                                    <paper-button id="deleteInteraction" on-tap="_deleteInteraction" doc-type="{{item.docType}}"
-                                                  aria-label="Delete" raised style="background-color: #f44336;color: white; ">
-                                        Delete
-                                        <iron-icon icon="icons:delete-forever"></iron-icon>
-                                    </paper-button>
-                                </div>
-                            </template>
-                        </nuxeo-data-table-column>
-                    </nuxeo-data-table>
+                        <!-- Delete Button -->
+                        <paper-button on-tap="_deleteInteraction" doc-type="{{item.docType}}" data-index$="[[index]]" raised
+                                      style="background:#f44336;color:white;">
+                            Delete
+                            <iron-icon icon="icons:delete-forever"></iron-icon>
+                        </paper-button>
+                    </div>
+                </template>
 
-                    <nuxeo-card heading="Add Entry">
-                        <div class="add-entry-row" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                <!-- Add Entry Section -->
+                <nuxeo-card heading="Add Entry">
+                    <div class="add-entry-row">
+                        <nuxeo-selectivity min-chars="0" data="{{documentTypes}}" value="{{newItem.docType}}"
+                                           placeholder="Select Document Type">
+                        </nuxeo-selectivity>
 
-                            <!-- Document Type -->
-                            <div style="flex: 1; min-width: 180px;">
-                                <nuxeo-selectivity class="selectivity-container" style="margin: auto;text-align: left;" min-chars="0"
-                                                   data="{{documentTypes}}" value="{{newItem.docType}}"
-                                                   placeholder="Select Document Type"></nuxeo-selectivity>
-                            </div>
+                        <nuxeo-selectivity multiple min-chars="0" data="{{eventTypes}}" value="{{newItem.events}}"
+                                           placeholder="Select Event Types">
+                        </nuxeo-selectivity>
 
-                            <!-- Events -->
-                            <div style="flex: 1; min-width: 180px;">
-                                <nuxeo-selectivity class="selectivity-container" style="margin: auto;text-align: left;" multiple
-                                                   min-chars="0" data="{{eventTypes}}" value="{{item.events}}"
-                                                   placeholder="Select Event Types"></nuxeo-selectivity>
-                            </div>
+                        <nuxeo-selectivity multiple min-chars="0" data="{{interactionsWithLabels}}" value="{{newItem.interactions}}"
+                                           placeholder="Select Interactions">
+                        </nuxeo-selectivity>
 
-                            <!-- Interactions -->
-                            <div style="flex: 2; min-width: 240px;">
-                                <nuxeo-selectivity multiple min-chars="0" data="{{interactionsWithLabels}}"
-                                                   value="{{newItem.interactions}}" placeholder="Select Interactions">
-                                </nuxeo-selectivity>
-                            </div>
+                        <paper-button raised class="primary" on-click="_addItem">Add</paper-button>
+                    </div>
+                </nuxeo-card>
 
-                            <!-- Add Button -->
-                            <div style="flex: 0 0 auto;">
-                                <paper-button raised class="primary" on-click="_addItem">Add</paper-button>
-                            </div>
-                        </div>
-                    </nuxeo-card>
-
-                    <paper-button id="save" on-tap="_saveEventsSettings" aria-label="Save Settings" raised style="">
-                        Save Settings
-                        <iron-icon icon="icons:save"></iron-icon>
-                    </paper-button>
-
-                </div>
+                <paper-button id="save" on-tap="_saveEventsSettings" raised>
+                    Save Settings
+                    <iron-icon icon="icons:save"></iron-icon>
+                </paper-button>
             </nuxeo-card>
         </div>
-
-
     </template>
 
     <script>
@@ -161,8 +141,8 @@
             },
 
             eventTypes: {
-                type: Array,
-                value: ['documentCreated', 'beforeDocumentModification']
+              type: Array,
+              value: ['documentCreated', 'beforeDocumentModification']
             },
           },
 
@@ -222,6 +202,7 @@
               this.set('eventsSettings', []);
             }
             this.push('eventsSettings', newItemCopy);
+            this._saveEventsSettings();
 
             // Reset form
             this.set('newItem', { docType: '', events: [], interactions: [] });
@@ -235,13 +216,15 @@
           },
 
           _deleteInteraction: function (e) {
-            const docType = e.currentTarget.docType;
-            if (confirm('Are you sure you want to remove this documentType event settings : ' + docType + ' ?')) {
-              const newEventsSettings = this.eventsSettings.filter(obj => obj.docType !== docType);
-              this.set('eventsSettings', newEventsSettings);
-              this._saveEventsSettings();
+            const index = e.currentTarget.dataset.index;
+            if (index !== undefined && index >= 0) {
+              const item = this.eventsSettings[index];
+              if (confirm(`Are you sure you want to delete the settings for: ${item.docType}?`)) {
+                this.splice('eventsSettings', index, 1);
+                this._saveEventsSettings();
+              }
             }
-          },
+          }
 
         });
     </script>
