@@ -127,7 +127,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
             doc.setPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH, blob.getDigest());
             doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
-            return session.saveDocument(doc);
+            doc = session.saveDocument(doc);
         }
         //Retry for uploaded Vertesia document to have status completed
         if (waitForCompletion) {
@@ -139,7 +139,9 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private Blob getBlob(DocumentModel doc) {
         if (doc.hasFacet("Picture")) {
             PictureBlobHolder pictureBlobHolder = new PictureBlobHolder(doc, "picture:views/3/content"); //FullHD
-            return pictureBlobHolder.getBlob();
+            Blob blob = pictureBlobHolder.getBlob();
+            if (blob != null && blob.getLength() > 0 && !blob.getFilename().contains("empty_picture"))
+                return blob;
         }
         return (Blob) doc.getPropertyValue(FILE_CONTENT);
     }
