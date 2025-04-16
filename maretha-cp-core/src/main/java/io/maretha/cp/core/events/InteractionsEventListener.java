@@ -24,8 +24,9 @@ import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.DOCUMENT_IMPORTED;
 public class InteractionsEventListener implements EventListener {
 
     public static final String DISABLE_INTERACTIONS_LISTENER = "disableInteractionsListener";
+    public static final String ORIGINAL_EVENT_NAME = "originalEventName";
+    public static final String PICTURE_VIEWS_GENERATION_DONE_EVENT = "pictureViewsGenerationDone";
     private static final Log log = LogFactory.getLog(InteractionsEventListener.class);
-    public static String ORIGINAL_EVENT_NAME = "originalEventName";
 
     @Override
     public void handleEvent(Event event) {
@@ -49,7 +50,9 @@ public class InteractionsEventListener implements EventListener {
         doc.putContextData(DISABLE_INTERACTIONS_LISTENER, Boolean.TRUE);
         doc.putContextData(BULK_INTERACTIONS_EVENT, Boolean.TRUE);
 
-        if ((DOCUMENT_CREATED.equals(event.getName()) || DOCUMENT_IMPORTED.equals(event.getName()))
+        if ((DOCUMENT_CREATED.equals(event.getName())
+                || DOCUMENT_IMPORTED.equals(event.getName())
+                || PICTURE_VIEWS_GENERATION_DONE_EVENT.equals(event.getName()))
                 && blobIsSupportedMimeType(doc)) {
             fireEvent(session, doc, event.getName());
             return;
