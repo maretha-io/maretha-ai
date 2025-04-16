@@ -142,7 +142,11 @@
 
             eventTypes: {
               type: Array,
-              value: ['documentCreated', 'beforeDocumentModification']
+              value: [
+                      {id: 'documentCreated', displayLabel: 'Document Created'},
+                      {id: 'pictureViewsGenerationDone', displayLabel: 'Rendition Created'},
+                      {id: 'beforeDocumentModification', displayLabel: 'Document Modified'}
+                     ]
             },
           },
 
