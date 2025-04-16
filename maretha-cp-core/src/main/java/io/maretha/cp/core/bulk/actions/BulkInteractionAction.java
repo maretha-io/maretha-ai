@@ -54,14 +54,22 @@ public class BulkInteractionAction implements StreamProcessorTopology {
                     .convertValue(params.get("parameters"), objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));
             boolean saveMetadata = (boolean) params.get("saveMetadata");
             boolean saveMetadataModeOverride = (boolean) params.get("saveMetadataModeOverride");
-            ids.stream()
+            List<DocumentModel> documentModels = ids.stream()
                     .map(docId -> {
                         DocumentModel document = session.getDocument(new IdRef(docId));
                         document.putContextData(DISABLE_LISTENER, true);
                         return runInteractionService.uploadFileAndSetStoreId(document, session, false);
                     })
-                    .collect(Collectors.toList())
-                    .forEach(doc -> runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride));
+                    .collect(Collectors.toList());
+            session.save(); //save Vertesia object storeId
+            documentModels
+                    .forEach(doc -> {
+                        try {
+                            runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
+                        } catch (Exception e) {
+                            log.error(String.format("Failed to run BulkAction Vertesia interactionID %s, for documentID: %s", interactionId, doc.getId()));
+                        }
+                    });
         }
     }
 }

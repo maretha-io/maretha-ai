@@ -93,7 +93,7 @@ public class APIServiceImpl implements APIService {
                 "    \"stream\": " + stream + "\n" +
                 "}";
         String bearerToken = getBearerToken();
-        String interactionResponse = postRequest(bearerToken, url, jsonBody, true);
+        String interactionResponse = postRequest(bearerToken, url, jsonBody, false);
 
         if (stream) {
             try {
