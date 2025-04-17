@@ -54,18 +54,19 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
+        List<DocTypeWithSchema.Schema.Field> schemasFields = List.of();
         if (saveMetadata) {
-            addSchemasFieldsAndVocabs(doc, session, parameters);
+            schemasFields = addSchemasFieldsAndVocabs(doc, session, parameters);
         }
         Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
         if (saveMetadata) {
             String response = apiService.getInteractionResult(interactionId, paramsMap, false);
-            return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride);
+            return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, schemasFields);
         }
         return apiService.getInteractionResult(interactionId, paramsMap, true);
     }
 
-    private String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride) {
+    private String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride, List<DocTypeWithSchema.Schema.Field> schemasFields) {
         try {
             DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
             JsonNode jsonNode = objectMapper.readTree(response);
@@ -78,6 +79,12 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             resultNode.fields().forEachRemaining(field -> {
                 String key = field.getKey();
                 String value = field.getValue().asText();
+                boolean exists = schemasFields.stream()
+                        .anyMatch(schemaField -> schemaField.getXpath().equalsIgnoreCase(key));
+                if (!exists) {
+                    log.warn("Metadata save skip on not declared xpath: " + key);
+                    return;
+                }
                 try {
                     Serializable propertyValue = doc.getPropertyValue(key);
                     if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
@@ -240,7 +247,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return dictionaryMap;
     }
 
-    private List<InteractionParameter> addSchemasFieldsAndVocabs(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
+    private List<DocTypeWithSchema.Schema.Field> addSchemasFieldsAndVocabs(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session);
         Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
         Map<String, Object> dictionariesMap = new HashMap<>();
@@ -276,6 +283,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 }
             }
         });
-        return parameters;
+        return schemasFields;
     }
 }
