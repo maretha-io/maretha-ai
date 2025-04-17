@@ -9,6 +9,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface RepositoryService {
 
@@ -80,4 +81,6 @@ public interface RepositoryService {
     DocumentModel saveInteractionResponseAsDocument(DocumentModel doc, CoreSession session, List<ObjectNode> interactions) throws OperationException;
 
     String getSettingsProperty(String name, String defaultValue);
+
+    Optional<DocumentModel> getExistingSettingsDocument(CoreSession session);
 }

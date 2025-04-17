@@ -261,7 +261,7 @@
       },
 
       _dialogOpenObserver: function (open) {
-        if (open && this.interactions.length === 0) {
+        if (open) {
           this._loadData();
         }
         if (!open) {
@@ -280,8 +280,8 @@
 
       _documentObserver(doc) {
         this._debug('_documentObserver', doc);
-        this._resetData();
-        this._loadData();
+<!--        this._resetData();-->
+<!--        this._loadData();-->
       },
 
       _loadData() {

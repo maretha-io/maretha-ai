@@ -158,13 +158,12 @@
           </div>
         </nuxeo-card>
 
-        <cp-settings-metadata></cp-settings-metadata>
-
-        <cp-settings-events interactions="[[interactions]]" document-types="[[documentTypes]]"></cp-settings-events>
-
-<!--        <cp-settings-elasticsearch></cp-settings-elasticsearch>-->
-
-        <cp-settings-vertesia></cp-settings-vertesia>
+        <template is="dom-if" if="[[visible]]">
+          <cp-settings-metadata></cp-settings-metadata>
+          <cp-settings-events interactions="[[interactions]]" document-types="[[documentTypes]]"></cp-settings-events>
+          <!--        <cp-settings-elasticsearch></cp-settings-elasticsearch>-->
+          <cp-settings-vertesia></cp-settings-vertesia>
+        </template>
 
       </div>
 
@@ -206,17 +205,17 @@
                       <template is="dom-if" if="[[item.enableDocSelection]]">
                         <paper-toggle-button checked="{{item.selectionReadOnly}}" aria-label$="EnableDocSelection"
                                              on-change="_saveInteractions">Disable Selection Edit</paper-toggle-button>
-                          <template is="dom-if" if="[[_isDocArrayType(item)]]">
+                        <template is="dom-if" if="[[_isDocArrayType(item)]]">
                           <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
                                                      multiple="[[_isDocArrayType(item)]]"
                                                      min-chars="0" name="selectedDocs" role="widget" on-change="_saveInteractions"></nuxeo-document-suggestion >
-                          </template>
-                          <template is="dom-if" if="[[!_isDocArrayType(item)]]">
-                            <nuxeo-document-suggestion value="{{item.selectedDocumentId}}" label="Selected Document"
-                                                       min-chars="0" name="selectedDoc" role="widget" on-change="_saveInteractions"></nuxeo-document-suggestion >
-                          </template>
-
                         </template>
+                        <template is="dom-if" if="[[!_isDocArrayType(item)]]">
+                          <nuxeo-document-suggestion value="{{item.selectedDocumentId}}" label="Selected Document"
+                                                     min-chars="0" name="selectedDoc" role="widget" on-change="_saveInteractions"></nuxeo-document-suggestion >
+                        </template>
+
+                      </template>
                     </div>
                   </template>
                 </nuxeo-card>
@@ -309,13 +308,16 @@
           type: Boolean,
           value: false
         },
+
+        visible: {
+          type: Boolean,
+          observer: '_visibleObserver'
+        },
       },
 
       observers: ['_interactionsChangeObserver(interactions.*)'],
 
       ready: function () {
-        this._getInteractions();
-        this._getDocumentTypes();
       },
 
       _getInteractions: function () {
@@ -420,7 +422,15 @@
         if (this.debug) {
           console.log(name, info);
         }
-      }
+      },
+
+      _visibleObserver(visible){
+        console.log(visible)
+        if(visible){
+          this._getInteractions();
+          this._getDocumentTypes();
+        }
+      },
 
     });
   </script>

@@ -43,7 +43,8 @@ public class GetSettingsOperation {
             interactionSettings.forEach(interaction -> interactionsById.put(interaction.getId(), interaction));
         }
         //Get remote interactions
-        if (refresh || CollectionUtils.isEmpty(interactionSettings)) {
+        boolean settingsDocIsPresent = repositoryService.getExistingSettingsDocument(session).isPresent();
+        if (settingsDocIsPresent && (refresh || CollectionUtils.isEmpty(interactionSettings))) {
             List<Interaction> remoteInteractions = apiService.getInteractions();
             remoteInteractions.forEach(interaction -> {
                 if (!interactionsById.containsKey(interaction.getId())) {
