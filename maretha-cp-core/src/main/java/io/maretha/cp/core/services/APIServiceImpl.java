@@ -53,7 +53,7 @@ public class APIServiceImpl implements APIService {
             .build();
     private final RetryConfig config = RetryConfig.custom()
             .maxAttempts(10) // Maximum number of attempts
-            .waitDuration(Duration.ofSeconds(10)) // Wait 10 seconds between attempts
+            .waitDuration(Duration.ofSeconds(30)) // Wait 10 seconds between attempts
             .retryExceptions(Exception.class) // Retry on all exceptions
             .build();
     private final RetryRegistry registry = RetryRegistry.of(config);
