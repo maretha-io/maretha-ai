@@ -96,14 +96,19 @@
       }
     </style>
 
-    <template is="dom-if" if="[[chatInteraction]]">
+<!--    <template is="dom-if" if="[[chatInteraction]]">-->
     <paper-icon-button icon="communication:chat" label="Chat with document" on-tap="_toggleDialog">
       <nuxeo-tooltip>Chat with document</nuxeo-tooltip>
     </paper-icon-button>
-    </template>
+<!--    </template>-->
 
     <nuxeo-dialog id="dialog" opened="{{dialogOpened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
       <div style="margin:auto; text-align:center;">
+
+        <template is="dom-if" if="[[!chatInteraction]]">
+          <h2>Chat is not active for this Document type.</h2>
+        </template>
+
         <h2>[[chatInteraction.name]]</h2>
         <p>[[chatInteraction.description]]</p>
       </div>
@@ -145,7 +150,8 @@
         },
         
         chatInteraction: {
-          type: Object
+          type: Object,
+          value: null,
         },
         
         interactionResponse: {
@@ -170,9 +176,9 @@
       },
 
       _docObserver: function(doc) {
-        if(doc){
-          this._loadData();
-        }
+<!--        if(doc){-->
+<!--          this._loadData();-->
+<!--        }-->
       },
 
       ready: function () {
@@ -194,12 +200,6 @@
         this.set('chatContext', []);
       },
 
-      _documentObserver(doc) {
-        this._debug('_documentObserver', doc);
-        this._resetData();
-        this._loadData();
-      },
-
       _loadData() {
         this._getInteractions();
       },
@@ -208,7 +208,9 @@
         const operation = this.$.getSettingsOperation;
         operation.params = {"isChat": true};
         operation.execute().then((response) => {
-          this.set('chatInteraction', response.value[0]);
+          if(response.value && response.value.length > 0){
+            this.set('chatInteraction', response.value[0]);
+          }
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });
@@ -282,7 +284,7 @@
 
       _dialogClosed: function () {
 
-      }
+      },
 
     });
   </script>

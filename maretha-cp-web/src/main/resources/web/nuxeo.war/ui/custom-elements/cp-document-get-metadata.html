@@ -11,6 +11,7 @@
               icon="icons:info-outline"
               slot="dropdown-trigger"
               aria-labelledby="iconButtonAITooltip"
+              on-tap="_toggleOpened"
       ></paper-icon-button>
       <paper-listbox no-animations="" id="menu" selectable="item" slot="dropdown-content">
         <paper-icon-item name="update" on-click="_updateMetadata">
@@ -34,7 +35,6 @@
       properties: {
         document: {
           type: Object,
-          observer: '_documentObserver'
         },
 
         interactions: {
@@ -66,7 +66,7 @@
         this.set('interactionResponse', null);
       },
 
-      _documentObserver(doc) {
+      _toggleOpened() {
         this._resetData();
         this._loadData();
       },

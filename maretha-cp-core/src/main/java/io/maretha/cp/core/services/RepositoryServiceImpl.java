@@ -239,6 +239,13 @@ public class RepositoryServiceImpl implements RepositoryService {
         return "";
     }
 
+    @Override
+    public Optional<DocumentModel> getExistingSettingsDocument(CoreSession session) {
+        String query = String.format("SELECT * FROM %s WHERE ecm:isProxy = 0 AND ecm:isVersion = 0 AND ecm:isTrashed = 0", SETTINGS_DOCUMENT_TYPE);
+        DocumentModelList documents = session.query(query);
+        return documents.stream().findFirst();
+    }
+
     private void addDocumentRelation(DocumentModel sourceDoc, CoreSession session, DocumentModel targetDoc) {
         DocumentRelationManager documentRelationManager = Framework.getService(DocumentRelationManager.class);
         String predicate = "http://www.nuxeo.org/ecm/schemas/relation#isRelatedTo";
@@ -272,12 +279,6 @@ public class RepositoryServiceImpl implements RepositoryService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error converting ObjectNode to " + type.getSimpleName(), e);
         }
-    }
-
-    private Optional<DocumentModel> getExistingSettingsDocument(CoreSession session) {
-        String query = String.format("SELECT * FROM %s WHERE ecm:isProxy = 0 AND ecm:isVersion = 0 AND ecm:isTrashed = 0", SETTINGS_DOCUMENT_TYPE);
-        DocumentModelList documents = session.query(query);
-        return documents.stream().findFirst();
     }
 
     private HashMap<String, Object> convertToInteractionComplexType(Interaction interaction) {
