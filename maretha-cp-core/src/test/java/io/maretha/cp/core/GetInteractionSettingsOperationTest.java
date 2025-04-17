@@ -16,6 +16,7 @@ import org.nuxeo.ecm.automation.OperationContext;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.test.AutomationFeature;
 import org.nuxeo.ecm.core.api.CoreSession;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.test.DefaultRepositoryInit;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
@@ -31,6 +32,8 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
+import static io.maretha.cp.core.services.RepositoryService.SETTINGS_DOCUMENT_NAME;
+import static io.maretha.cp.core.services.RepositoryService.SETTINGS_DOCUMENT_TYPE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -62,9 +65,15 @@ public class GetInteractionSettingsOperationTest {
 
     @Test
     public void shouldReturnInteractionSettingsFromAPI() throws OperationException {
+        //GIVEN
+        DocumentModel cpSettingsDoc = session.createDocumentModel("/", SETTINGS_DOCUMENT_NAME, SETTINGS_DOCUMENT_TYPE);
+        cpSettingsDoc = session.createDocument(cpSettingsDoc);
+        txFeature.nextTransaction();
         Interaction interaction = Interaction.builder().id("test").build();
+        //WHEN
         when(apiService.getInteractions()).thenReturn(List.of(interaction));
         OperationContext ctx = new OperationContext(session);
+        //THEN
         Settings settings = (Settings) automationService.run(ctx, GetSettingsOperation.ID);
         assertNotNull(settings);
         assertEquals(interaction.getId(), settings.getInteractions().stream().findFirst().get().getId());
