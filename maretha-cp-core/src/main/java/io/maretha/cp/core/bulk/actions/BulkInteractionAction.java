@@ -61,7 +61,6 @@ public class BulkInteractionAction implements StreamProcessorTopology {
                         return runInteractionService.uploadFileAndSetStoreId(document, session, false);
                     })
                     .collect(Collectors.toList());
-            session.save(); //save Vertesia object storeId
             documentModels
                     .forEach(doc -> {
                         try {
