@@ -140,20 +140,14 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
 
             doc = session.saveDocument(doc);
-            session.save(); //save Vertesia object storeId
-
-            if (TransactionHelper.isTransactionActive()) {
-                TransactionHelper.commitOrRollbackTransaction();
-                TransactionHelper.startTransaction();
-            }
-        }
-
-        //Retry for uploaded Vertesia document to have status completed
-        if (waitForCompletion) {
-            apiService.getStoredDocumentStatus(storeId);
         }
 
         try {
+            //Retry for uploaded Vertesia document to have status completed
+            if (waitForCompletion) {
+                apiService.getStoredDocumentStatus(storeId);
+            }
+
             if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
                 addImageEmbeddings(doc);
                 doc = session.saveDocument(doc);
