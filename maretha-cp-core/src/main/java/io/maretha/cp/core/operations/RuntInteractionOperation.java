@@ -62,6 +62,19 @@ public class RuntInteractionOperation {
             BulkService bulkService = Framework.getService(BulkService.class);
             return bulkService.submit(command);
         }
+
+        if (doc.hasFacet("Collection")) {
+            String nxqlQuery = String.format("SELECT * FROM Document WHERE collectionMember:collectionIds = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0" +
+                    " AND file:content IS NOT NULL", doc.getId());
+            BulkCommand.Builder builder = new BulkCommand.Builder(BulkInteractionAction.ACTION_NAME, nxqlQuery, "system")
+                    .param("interactionId", interactionId)
+                    .param("parameters", (Serializable) data)
+                    .param("saveMetadata", saveMetadata)
+                    .param("saveMetadataModeOverride", saveMetadataModeOverride);
+            BulkCommand command = builder.build();
+            BulkService bulkService = Framework.getService(BulkService.class);
+            return bulkService.submit(command);
+        }
         doc = runInteractionService.uploadFileAndSetStoreId(doc, session, true);
         return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
     }
