@@ -29,11 +29,17 @@ public class GetInteractionsForDocumentOperation {
     @Param(name = "isChat", required = false)
     protected boolean isChat;
 
+    @Param(name = "isMetadata", required = false)
+    protected boolean isMetadata;
+
     @OperationMethod
     public Collection<Interaction> run(DocumentModel doc) {
         if (doc == null) return Collections.emptyList();
         if (isChat) {
             return cpLocalSettingsService.getActiveChatInteractionsForDocumentType(session, doc.getType(), doc.hasFacet("Folder"));
+        }
+        if (isMetadata) {
+            return cpLocalSettingsService.getActiveMetadataInteractionsForDocumentType(session, doc.getType(), doc.hasFacet("Folder"));
         }
         return cpLocalSettingsService.getActiveInteractionsForDocumentType(session, doc.getType(), doc.hasFacet("Folder"));
     }
