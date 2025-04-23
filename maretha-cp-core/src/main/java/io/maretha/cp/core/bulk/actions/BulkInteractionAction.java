@@ -12,6 +12,7 @@ import org.nuxeo.ecm.core.bulk.action.computation.AbstractBulkComputation;
 import org.nuxeo.lib.stream.computation.Topology;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.stream.StreamProcessorTopology;
+import org.nuxeo.runtime.transaction.TransactionHelper;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -61,6 +62,13 @@ public class BulkInteractionAction implements StreamProcessorTopology {
                         return runInteractionService.uploadFileAndSetStoreId(document, session, false);
                     })
                     .collect(Collectors.toList());
+
+            session.save(); //save Vertesia object storeId
+            if (TransactionHelper.isTransactionActive()) {
+                TransactionHelper.commitOrRollbackTransaction();
+                TransactionHelper.startTransaction();
+            }
+
             documentModels
                     .forEach(doc -> {
                         try {
