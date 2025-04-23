@@ -52,11 +52,13 @@
           const cleanJson = stringJson
             .replace(/\\\\n|\\n/g, "")
             .trim();
+          this.set('htmlValue', cleanJson);
           const unescapedJson = JSON.parse(`"${cleanJson}"`);
           const jsonObj = JSON.parse(unescapedJson);
           if (typeof jsonObj === 'object')
             this.set('htmlValue', this._formatJson(jsonObj));
         } catch (e) {
+          //console.error(e);
         }
       },
 
