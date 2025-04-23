@@ -30,6 +30,7 @@ import org.nuxeo.runtime.transaction.TransactionHelper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,8 @@ import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORED_DATE_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_DIGEST_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
+import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_IMAGE;
+import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TEXT;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
 
@@ -144,10 +147,22 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 TransactionHelper.startTransaction();
             }
         }
+
         //Retry for uploaded Vertesia document to have status completed
         if (waitForCompletion) {
             apiService.getStoredDocumentStatus(storeId);
         }
+
+        if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
+            addImageEmbeddings(doc);
+            doc = session.saveDocument(doc);
+        }
+
+        if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
+            addTextEmbeddings(doc);
+            doc = session.saveDocument(doc);
+        }
+
         return doc;
     }
 
@@ -292,5 +307,17 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             }
         });
         return schemasFields;
+    }
+
+    private void addTextEmbeddings(DocumentModel doc) {
+        String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
+        double[] documentEmbeddings = apiService.getDocumentEmbeddings(storeId, "text");
+        doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
+    }
+
+    private void addImageEmbeddings(DocumentModel doc) {
+        String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
+        double[] documentEmbeddings = apiService.getDocumentEmbeddings(storeId, "image");
+        doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
     }
 }

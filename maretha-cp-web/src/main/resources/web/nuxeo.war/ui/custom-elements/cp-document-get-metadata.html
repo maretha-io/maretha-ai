@@ -77,7 +77,7 @@
 
       _getInteractions: function () {
         const operation = this.$.getInteractionsOp;
-        operation.params = {};
+        operation.params = {"isMetadata": true};
         operation.execute().then((response) => {
           this.set('interactions', response.value);
           const selectedInteraction = response.value.find(obj => obj.saveMetadata === true);

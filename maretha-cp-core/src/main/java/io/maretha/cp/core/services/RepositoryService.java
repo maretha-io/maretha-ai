@@ -83,4 +83,6 @@ public interface RepositoryService {
     String getSettingsProperty(String name, String defaultValue);
 
     Optional<DocumentModel> getExistingSettingsDocument(CoreSession session);
+
+    List<Interaction> getActiveMetadataInteractionsForDocumentType(CoreSession session, String type, boolean folder);
 }

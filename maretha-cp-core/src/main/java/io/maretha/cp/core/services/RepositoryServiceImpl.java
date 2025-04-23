@@ -58,6 +58,7 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .filter(Interaction::isActive)
                 .filter(Interaction::isActiveOnActionMenu)
                 .filter(interaction -> !interaction.isChat())
+                .filter(interaction -> !interaction.isSaveMetadata())
                 .filter(interaction -> {
                     if (isFolder) return interaction.isActiveOnFolder();
                     return true;
@@ -71,8 +72,21 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
-                .filter(Interaction::isActiveOnActionMenu)
                 .filter(Interaction::isChat)
+                .filter(interaction -> {
+                    if (isFolder) return interaction.isActiveOnFolder();
+                    return true;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Interaction> getActiveMetadataInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
+        return getSavedSettings(session).getInteractions()
+                .stream()
+                .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
+                .filter(Interaction::isActive)
+                .filter(Interaction::isSaveMetadata)
                 .filter(interaction -> {
                     if (isFolder) return interaction.isActiveOnFolder();
                     return true;
