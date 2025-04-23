@@ -153,14 +153,18 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             apiService.getStoredDocumentStatus(storeId);
         }
 
-        if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
-            addImageEmbeddings(doc);
-            doc = session.saveDocument(doc);
-        }
+        try {
+            if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
+                addImageEmbeddings(doc);
+                doc = session.saveDocument(doc);
+            }
 
-        if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
-            addTextEmbeddings(doc);
-            doc = session.saveDocument(doc);
+            if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
+                addTextEmbeddings(doc);
+                doc = session.saveDocument(doc);
+            }
+        } catch (Exception e) {
+            log.error("Failed to save embeddings for docId: " + doc.getId());
         }
 
         return doc;
