@@ -18,7 +18,6 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.bulk.BulkService;
 import org.nuxeo.ecm.core.bulk.message.BulkCommand;
 import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.transaction.TransactionHelper;
 
 import java.io.Serializable;
 import java.util.List;
@@ -77,12 +76,12 @@ public class RuntInteractionOperation {
             return bulkService.submit(command);
         }
         doc = runInteractionService.uploadFileAndSetStoreId(doc, session, true);
-        session.save(); //save Vertesia object storeId
-        if (TransactionHelper.isTransactionActive()) {
-            TransactionHelper.commitOrRollbackTransaction();
-            TransactionHelper.startTransaction();
+        try {
+            return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
+        } catch (Exception e) {
+            log.error("Failed to run interaction:" + interactionId, e);
+            return e.getMessage();
         }
-        return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
     }
 
 }

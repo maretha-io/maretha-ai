@@ -63,18 +63,12 @@ public class BulkInteractionAction implements StreamProcessorTopology {
                     })
                     .collect(Collectors.toList());
 
-            session.save(); //save Vertesia object storeId
-            if (TransactionHelper.isTransactionActive()) {
-                TransactionHelper.commitOrRollbackTransaction();
-                TransactionHelper.startTransaction();
-            }
-
             documentModels
                     .forEach(doc -> {
                         try {
                             runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
                         } catch (Exception e) {
-                            log.error(String.format("Failed to run BulkAction Vertesia interactionID %s, for documentID: %s", interactionId, doc.getId()));
+                            log.error(String.format("Failed to run BulkAction Vertesia interactionID %s, for documentID: %s", interactionId, doc.getId()), e);
                         }
                     });
         }
