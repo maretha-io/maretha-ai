@@ -35,6 +35,12 @@
     </template>
 </nuxeo-slot-content>
 
+<nuxeo-slot-content name="documentMetadata" slot="DOCUMENT_ACTIONS" order="0">
+    <template>
+        <cp-document-get-metadata document="[[document]]"></cp-document-get-metadata>
+    </template>
+</nuxeo-slot-content>
+
 <nuxeo-slot-content name="documentInteractions" slot="DOCUMENT_ACTIONS" order="2">
     <template>
         <cp-document-interaction document="[[document]]"></cp-document-interaction>
@@ -44,12 +50,6 @@
 <nuxeo-slot-content name="documentChat" slot="DOCUMENT_ACTIONS" order="3">
     <template>
         <cp-document-chat document="[[document]]"></cp-document-chat>
-    </template>
-</nuxeo-slot-content>
-
-<nuxeo-slot-content name="documentMetadata" slot="DOCUMENT_ACTIONS" order="3">
-    <template>
-        <cp-document-get-metadata document="[[document]]"></cp-document-get-metadata>
     </template>
 </nuxeo-slot-content>
 
