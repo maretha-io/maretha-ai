@@ -4,8 +4,8 @@
     <require>org.nuxeo.ecm.core.bulk</require>
 
     <extension target="org.nuxeo.ecm.core.bulk" point="actions">
-        <action name="bulkInteractionAction" inputStream="document/bulkInteractionAction" bucketSize="1000" batchSize="200"
-        defaultScroller="elastic" httpEnabled="false" defaultQueryLimit="${cp.upload.action.maximum.documents:=1000}" />
+        <action name="bulkInteractionAction" inputStream="document/bulkInteractionAction" bucketSize="50" batchSize="10"
+        defaultScroller="elastic" httpEnabled="false" defaultQueryLimit="${cp.upload.action.maximum.documents:=500}" />
     </extension>
 
     <extension target="org.nuxeo.runtime.stream.service" point="streamProcessor">
