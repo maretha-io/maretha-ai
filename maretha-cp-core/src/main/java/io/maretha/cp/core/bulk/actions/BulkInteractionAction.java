@@ -12,7 +12,6 @@ import org.nuxeo.ecm.core.bulk.action.computation.AbstractBulkComputation;
 import org.nuxeo.lib.stream.computation.Topology;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.stream.StreamProcessorTopology;
-import org.nuxeo.runtime.transaction.TransactionHelper;
 
 import java.io.Serializable;
 import java.util.Arrays;

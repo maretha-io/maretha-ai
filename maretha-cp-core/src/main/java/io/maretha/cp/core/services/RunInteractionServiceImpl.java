@@ -25,7 +25,6 @@ import org.nuxeo.ecm.directory.Session;
 import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
 import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.transaction.TransactionHelper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -112,11 +111,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session, boolean waitForCompletion) {
-        boolean isSupportedMimeType = blobIsSupportedMimeType(doc);
-        if (!isSupportedMimeType) {
-            log.debug("Document blob is not supported");
-            return doc;
-        }
         String storeId = null;
         Blob blob = getBlob(doc);
         if (doc.hasFacet(RESULTS_FACET)) {
@@ -186,7 +180,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
             boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
             if (isDocumentOrMediaFormat) {
-//                paramValue = getSignedS3Url(doc); //Signed s3 URl
                 if ("array".equalsIgnoreCase(type)) {
                     List<String> selectedDocumentsStoreIds = getSelectedDocumentsStoreIds(doc.getCoreSession(), selectedDocumentIds);
                     value = selectedDocumentsStoreIds;
@@ -199,6 +192,12 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 } else {
                     value = "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
                 }
+
+                //If not image type leave media empty
+                Blob blob = getBlob(doc);
+                if ("media".equalsIgnoreCase(format) && !isImage(blob)) {
+                    value = null;
+                }
             }
             paramsMap.put(name, value);
         });
@@ -210,20 +209,11 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             return selectedDocumentIds
                     .stream()
                     .map(docId -> coreSession.getDocument(new IdRef(docId)))
-                    .filter(this::blobIsSupportedMimeType)
                     .map(doc -> uploadFileAndSetStoreId(doc, coreSession, false))
                     .map(docWithStoreId -> "store:" + docWithStoreId.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
                     .collect(Collectors.toList());
         }
         return null;
-    }
-
-    // Not used for now as Composable does not process links, will be used in the future or for media type.
-    private String getSignedS3Url(DocumentModel doc) {
-        Property blobProperty = doc.getProperty(FILE_CONTENT);
-        ManagedBlob blob = (ManagedBlob) blobProperty.getValue();
-        CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
-        return cloudStorageFileShare.getPublicRemoteUri(blob).toString();
     }
 
     //source: "s3://composable-bs-test/my-photo.jpg#eu-north-1",
@@ -237,18 +227,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private boolean isImage(Blob blob) {
         String mimeType = blob.getMimeType();
         return mimeType != null && mimeType.startsWith("image/");
-    }
-
-    public boolean blobIsSupportedMimeType(DocumentModel doc) {
-        if (!doc.hasSchema("file")) return false;
-        try {
-            Property blobProperty = doc.getProperty(FILE_CONTENT);
-            Blob blob = (Blob) blobProperty.getValue();
-            String mimeType = blob.getMimeType();
-            return getSupportedMimeTypes().contains(mimeType);
-        } catch (Exception ex) {
-            return false;
-        }
     }
 
     private Map<String, String> getDictionaryValues(String directory) {
