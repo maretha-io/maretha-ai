@@ -9,14 +9,19 @@ import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.InteractionResponse;
 import io.maretha.cp.core.models.Settings;
+import io.maretha.cp.core.operations.SaveInteractionSettingsOperation;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.PathRef;
+import org.nuxeo.ecm.core.cache.Cache;
+import org.nuxeo.ecm.core.cache.CacheService;
 import org.nuxeo.ecm.platform.relations.api.DocumentRelationManager;
 import org.nuxeo.runtime.api.Framework;
 
@@ -34,18 +39,40 @@ import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AWS
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.ES_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.EVENTS_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
-import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
+import static io.maretha.cp.core.services.APIServiceImpl.VERTESIA_CACHE;
 
 public class RepositoryServiceImpl implements RepositoryService {
 
+    public static final String VERTESIA_SETTINGS = "VERTESIA_SETTINGS";
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Log log = LogFactory.getLog(RepositoryServiceImpl.class);
 
     @Override
     public Settings getSavedSettings(CoreSession session) {
+        Cache cache = Framework.getService(CacheService.class).getCache(VERTESIA_CACHE);
+        if (cache.hasEntry(VERTESIA_SETTINGS)) {
+            try {
+                String vertesiaSettings = (String) cache.get(VERTESIA_SETTINGS);
+                if (StringUtils.isNotEmpty(vertesiaSettings)) {
+                    return objectMapper.readValue(vertesiaSettings, Settings.class);
+                }
+            } catch (Exception e) {
+                log.error("Failed to get Settings from cache", e);
+            }
+        }
+        if (null == session) {
+            session = CoreInstance.getCoreSessionSystem(null);
+        }
         Optional<DocumentModel> existingSettingsDocument = getExistingSettingsDocument(session);
         if (existingSettingsDocument.isPresent()) {
             DocumentModel documentModel = existingSettingsDocument.get();
-            return documentModel.getAdapter(Settings.class);
+            Settings settings = documentModel.getAdapter(Settings.class);
+            try {
+                cache.put(VERTESIA_SETTINGS, objectMapper.writeValueAsString(settings));
+            } catch (Exception e) {
+                log.error("Failed to save VertesiaSettings in cache", e);
+            }
+            return settings;
         }
         return new Settings();
     }
@@ -130,7 +157,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, String> vertesiaSettings = (Map<String, String>) configuration.get(VERTESIA_SETTINGS);
+        Map<String, String> vertesiaSettings = (Map<String, String>) configuration.get(SaveInteractionSettingsOperation.VERTESIA_SETTINGS);
         if (!Objects.isNull(vertesiaSettings)) {
             updateVertesiaSettings(vertesiaSettings, cpSettingsDoc);
         }
@@ -141,7 +168,15 @@ public class RepositoryServiceImpl implements RepositoryService {
             updateEventsSettings(eventsSettings, cpSettingsDoc);
         }
 
-        return session.saveDocument(cpSettingsDoc).getAdapter(Settings.class);
+        Settings settings = session.saveDocument(cpSettingsDoc).getAdapter(Settings.class);
+
+        try {
+            Cache cache = Framework.getService(CacheService.class).getCache(VERTESIA_CACHE);
+            cache.put(VERTESIA_SETTINGS, objectMapper.writeValueAsString(settings));
+        } catch (Exception e) {
+            log.error("Failed to save VertesiaSettings in cache", e);
+        }
+        return settings;
     }
 
     private void updateVertesiaSettings(Map<String, String> settings, DocumentModel cpSettingsDoc) {
@@ -240,8 +275,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         if (StringUtils.isNotEmpty(property)) {
             return property;
         }
-        //TODO Cache
-        Settings settings = getSavedSettings(CoreInstance.getCoreSessionSystem(null));
+        Settings settings = getSavedSettings(null);
         String nameWithoutPrefix = name.replace("vertesia.", "");
         String savedProperty = settings.getVertesiaSettings().get(nameWithoutPrefix);
         if (StringUtils.isNotEmpty(savedProperty)) {
