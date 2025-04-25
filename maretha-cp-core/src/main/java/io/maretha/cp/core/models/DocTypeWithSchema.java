@@ -24,6 +24,7 @@ public class DocTypeWithSchema {
             private String type;
             private String directoryName;
             private boolean active;
+            private boolean multiValue;
         }
     }
 }
