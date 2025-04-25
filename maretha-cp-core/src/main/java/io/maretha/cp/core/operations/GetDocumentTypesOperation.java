@@ -15,6 +15,8 @@ import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.schema.DocumentType;
 import org.nuxeo.ecm.core.schema.SchemaManager;
+import org.nuxeo.ecm.core.schema.types.ListType;
+import org.nuxeo.ecm.core.schema.types.ListTypeImpl;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.Type;
 import org.nuxeo.ecm.core.schema.types.resolver.ObjectResolver;
@@ -89,7 +91,13 @@ public class GetDocumentTypesOperation {
                     customField.setType(field.getType().getName());
                     customField.setDescription("");
                     docTypeSchema.getFields().add(customField);
-                    ObjectResolver objectResolver = type.getObjectResolver();
+                    ObjectResolver objectResolver;
+                    if (type instanceof ListType) {
+                        customField.setMultiValue(true);
+                        objectResolver = ((ListTypeImpl) type).getFieldType().getObjectResolver();
+                    } else {
+                        objectResolver = type.getObjectResolver();
+                    }
                     if (objectResolver instanceof DirectoryEntryResolver) {
                         Directory directory = ((DirectoryEntryResolver) objectResolver).getDirectory();
                         customField.setDirectoryName(directory.getName());
