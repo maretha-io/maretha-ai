@@ -180,9 +180,6 @@
       },
 
       _docObserver: function(doc) {
-<!--        if(doc){-->
-<!--          this._loadData();-->
-<!--        }-->
       },
 
       ready: function () {
@@ -190,7 +187,7 @@
       },
 
       _dialogOpenObserver: function (open) {
-        if (open && !this.chatInteraction) {
+        if (open) {
           this._loadData();
         }
         if (!open) {
