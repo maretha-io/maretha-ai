@@ -5,26 +5,30 @@
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
                      input="[[document.uid]]"></nuxeo-operation>
 
-    <paper-menu-button id="dropdownButtonAi" close-on-activate no-overlap horizontal-align="right">
-      <paper-icon-button
-              id="aiButton"
-              icon="icons:info-outline"
-              slot="dropdown-trigger"
-              aria-labelledby="iconButtonAITooltip"
-              on-tap="_toggleOpened"
-      ></paper-icon-button>
-      <paper-listbox no-animations="" id="menu" selectable="item" slot="dropdown-content">
-        <paper-icon-item name="update" on-click="_updateMetadata">
-          <iron-icon icon="icons:info-outline" slot="item-icon">&gt;</iron-icon>
-          <div>Update metadata</div>
-        </paper-icon-item>
-        <paper-icon-item name="add" on-click="_addMissingMetadata">
-          <iron-icon icon="icons:info-outline" slot="item-icon">&gt;</iron-icon>
-          <div>Add missing metadata</div>
-        </paper-icon-item>
-      </paper-listbox>
-    </paper-menu-button>
-    <nuxeo-tooltip for="aiButton" id="iconButtonAITooltip">AI Metadata</nuxeo-tooltip>
+    <style include="nuxeo-action-button-styles"></style>
+
+    <div class="action" on-tap="_toggleOpened">
+      <paper-menu-button id="dropdownButtonAi" close-on-activate no-overlap horizontal-align="right">
+        <paper-icon-button
+                id="aiButton"
+                icon="icons:info-outline"
+                slot="dropdown-trigger"
+                aria-labelledby="iconButtonAITooltip"
+        ></paper-icon-button>
+        <paper-listbox no-animations="" id="menu" selectable="item" slot="dropdown-content">
+          <paper-icon-item name="update" on-click="_updateMetadata">
+            <iron-icon icon="icons:info-outline" slot="item-icon">&gt;</iron-icon>
+            <div>Update metadata</div>
+          </paper-icon-item>
+          <paper-icon-item name="add" on-click="_addMissingMetadata">
+            <iron-icon icon="icons:info-outline" slot="item-icon">&gt;</iron-icon>
+            <div>Add missing metadata</div>
+          </paper-icon-item>
+        </paper-listbox>
+      </paper-menu-button>
+      <nuxeo-tooltip for="dropdownButtonAi">AI Metadata</nuxeo-tooltip>
+    </div>
+
 
   </template>
 

@@ -4,7 +4,7 @@
                      input="[[document]]"></nuxeo-operation>
     <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
                      input="[[document.uid]]"></nuxeo-operation>
-    <style>
+    <style include="nuxeo-action-button-styles">
       .interaction-content {
         width: 95%;
         margin: auto;
@@ -96,11 +96,15 @@
       }
     </style>
 
-<!--    <template is="dom-if" if="[[chatInteraction]]">-->
-    <paper-icon-button icon="communication:chat" label="Chat with document" on-tap="_toggleDialog">
-      <nuxeo-tooltip>Chat with document</nuxeo-tooltip>
-    </paper-icon-button>
-<!--    </template>-->
+    <!--    <template is="dom-if" if="[[chatInteraction]]">-->
+    <div class="action" on-tap="_toggleDialog">
+      <paper-icon-button id="interactionsChatButton" icon="communication:chat" label="Chat with document">
+        <nuxeo-tooltip>Chat with document</nuxeo-tooltip>
+      </paper-icon-button>
+      <span class="label" id="interactionsChatButton">Chat with document</span>
+      <nuxeo-tooltip for="interactionsChatButton">Chat with document</nuxeo-tooltip>
+    </div>
+    <!--    </template>-->
 
     <nuxeo-dialog id="dialog" opened="{{dialogOpened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
       <div style="margin:auto; text-align:center;">
