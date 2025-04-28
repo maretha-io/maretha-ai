@@ -385,7 +385,7 @@ public class APIServiceImpl implements APIService {
         return paramsList;
     }
 
-    public String getStoredDocumentStatus(String storeId) {
+    public String waitForStatusToBeProcessed(String storeId) {
         String bearerToken = getBearerToken();
         Request request = new Request.Builder().url(getSetting(UPLOAD_API_URL) + "/api/v1/objects/" + storeId)
                 .addHeader("Accept", "application/json")

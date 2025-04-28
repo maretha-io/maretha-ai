@@ -75,7 +75,7 @@
     <div id="chatContainer" class="chat-container">
       <template is="dom-repeat" items="[[messages]]">
         <div class$="message [[_computeClass(item.role)]]">
-          <div style="white-space: pre-wrap;">[[_formatContent(item.content)]]</div>
+          <div style="white-space: pre-wrap;" inner-h-t-m-l="[[_formatContent(item.content)]]"></div>
           <span class="timestamp">[[_formatDate(item.date)]]</span>
           <template is="dom-if" if="[[_isAssistantRole(item.role)]]">
             <cp-save-response document="[[document]]" interaction="[[chatInteraction]]" interaction-response="[[item.content]]"></cp-save-response>
@@ -163,7 +163,8 @@
 
       _formatContent(content) {
         if (!content) return '';
-        let formatted = content.replace(/\\n/g, "");
+        let formatted = content.replace(/\\\\n|\\n/g, "")
+            .trim();
         return formatted;
       }
 

@@ -11,7 +11,7 @@
     <extension target="org.nuxeo.runtime.stream.service" point="streamProcessor">
         <streamProcessor name="bulkInteractionAction" class="io.maretha.cp.core.bulk.actions.BulkInteractionAction"
         defaultConcurrency="4" defaultPartitions="${cp.upload.action.partitions:=12}">
-              <policy name="default" maxRetries="2" delay="500ms" maxDelay="10s" continueOnFailure="true"/>
+              <policy name="default" maxRetries="5" delay="30s" maxDelay="5m" continueOnFailure="true"/>
         </streamProcessor>
     </extension>
 </component>

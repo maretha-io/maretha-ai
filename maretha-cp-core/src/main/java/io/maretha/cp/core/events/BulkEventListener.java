@@ -8,8 +8,6 @@ import io.maretha.cp.core.services.RepositoryService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.ecm.core.api.CoreInstance;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.bulk.BulkService;
 import org.nuxeo.ecm.core.bulk.message.BulkCommand;
@@ -30,7 +28,7 @@ import static io.maretha.cp.core.events.InteractionsEventListener.ORIGINAL_EVENT
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_DOCUMENT_TYPE;
 
 public class BulkEventListener implements PostCommitEventListener {
-    public static final String DISABLE_LISTENER = "disableInteractionListener";
+    public static final String DISABLE_BULK_LISTENER = "disableInteractionListener";
     public static final String BULK_INTERACTIONS_EVENT = "bulkInteractionsEvent";
     private final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
     private final Log log = LogFactory.getLog(BulkEventListener.class);
@@ -43,6 +41,7 @@ public class BulkEventListener implements PostCommitEventListener {
             log.error(SETTINGS_DOCUMENT_TYPE + " - eventsSettings is empty.");
             return;
         }
+        //TODO Collect all docIds by event and interaction to trigger
         events.forEach(ev -> handleEvent(ev, savedSettings));
     }
 
@@ -56,7 +55,7 @@ public class BulkEventListener implements PostCommitEventListener {
             return;
         }
 
-        Boolean block = (Boolean) doc.getContextData().get(DISABLE_LISTENER);
+        Boolean block = (Boolean) doc.getContextData().get(DISABLE_BULK_LISTENER);
         if (Boolean.TRUE.equals(block)) {
             return;
         }
@@ -68,6 +67,7 @@ public class BulkEventListener implements PostCommitEventListener {
                 .filter(ev -> ev.getEvents().contains(originalEventName))
                 .filter(EventWithInteraction::isActive)
                 .collect(Collectors.toSet());
+
         eventsWithInteractions.forEach(ev -> {
             List<String> interactions = ev.getInteractions();
             interactions.forEach(interactionId -> {
@@ -76,7 +76,7 @@ public class BulkEventListener implements PostCommitEventListener {
                 Optional<Interaction> optionalInteraction = savedSettings.getInteractions().stream()
                         .filter(interaction -> interaction.getId().equals(interactionId)).findFirst();
                 if (optionalInteraction.isPresent()) {
-                    doc.putContextData(DISABLE_LISTENER, true);
+                    doc.putContextData(DISABLE_BULK_LISTENER, true);
                     Interaction interaction = optionalInteraction.get();
                     BulkCommand.Builder builder = new BulkCommand.Builder(BulkInteractionAction.ACTION_NAME, nxqlQuery, "system")
                             .param("interactionId", interactionId)

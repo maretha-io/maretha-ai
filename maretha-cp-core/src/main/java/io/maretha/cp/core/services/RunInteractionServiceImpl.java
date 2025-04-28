@@ -18,9 +18,9 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
-import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
+import org.nuxeo.ecm.directory.Directory;
 import org.nuxeo.ecm.directory.Session;
 import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
@@ -82,21 +83,23 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             resultNode.fields().forEachRemaining(field -> {
                 String key = field.getKey();
                 String value = field.getValue().asText();
-                boolean exists = schemasFields.stream()
-                        .anyMatch(schemaField -> schemaField.getXpath().equalsIgnoreCase(key));
-                if (!exists) {
+                Optional<DocTypeWithSchema.Schema.Field> optionalField = schemasFields.stream()
+                        .filter(schemaField -> schemaField.getXpath().equalsIgnoreCase(key)).findFirst();
+                if (optionalField.isEmpty()) {
                     log.warn("Metadata save skip on not declared xpath: " + key);
+                    return;
+                }
+                if (StringUtils.isEmpty(value)) {
+                    log.warn("Metadata save skip on empty value for xpath: " + key);
                     return;
                 }
                 try {
                     Serializable propertyValue = doc.getPropertyValue(key);
                     if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
-                        if (!validationService.validate(key, value).hasError()) {
-                            log.debug(String.format("Saving metadata key: %s value: %s", key, value));
-                            doc.setPropertyValue(key, value);
-                        } else {
-                            log.error(String.format("Failed to save metadata key: %s value: %s", key, value));
+                        if (optionalField.get().isMultiValue()) {
+                            saveMetadataField(doc, validationService, key, value.split(","));
                         }
+                        saveMetadataField(doc, validationService, key, value);
                     }
                 } catch (Exception propertyException) {
                     log.error("Failed to set metadata for " + key + ":" + value);
@@ -110,7 +113,17 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
+    private void saveMetadataField(DocumentModel doc, DocumentValidationService validationService, String key, Serializable value) {
+        if (!validationService.validate(key, value).hasError()) {
+            log.debug(String.format("Saving metadata key: %s value: %s", key, value));
+            doc.setPropertyValue(key, value);
+        } else {
+            log.error(String.format("Failed to save metadata key: %s value: %s", key, value));
+        }
+    }
+
     public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session, boolean waitForCompletion) {
+        log.debug("Uploading file for documentId: " + doc.getId());
         String storeId = null;
         Blob blob = getBlob(doc);
         if (doc.hasFacet(RESULTS_FACET)) {
@@ -139,7 +152,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         try {
             //Retry for uploaded Vertesia document to have status completed
             if (waitForCompletion) {
-                apiService.getStoredDocumentStatus(storeId);
+                apiService.waitForStatusToBeProcessed(storeId);
             }
 
             if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
@@ -152,7 +165,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 doc = session.saveDocument(doc);
             }
         } catch (Exception e) {
-            log.error("Failed to save embeddings for docId: " + doc.getId());
+            log.error("Failed to save document: " + doc.getId(), e);
         }
 
         return doc;
@@ -229,19 +242,29 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return mimeType != null && mimeType.startsWith("image/");
     }
 
-    private Map<String, String> getDictionaryValues(String directory) {
+    private Map<String, String> getDictionaryValues(String directoryName) {
         Map<String, String> dictionaryMap = new HashMap<>();
-        try (Session session = Framework.getService(DirectoryService.class).open(directory)) {
-            DocumentModelList entries = session.query(Map.of());
-            entries.forEach(entry -> {
-                String id = entry.getId();
-                try {
-                    String label = (String) (entry.getProperty("label")).getValue();
-                    dictionaryMap.put(id, label);
-                } catch (PropertyNotFoundException e) {
-                    log.debug("Label not found for directory: " + id);
-                }
-            });
+        try {
+            DirectoryService directoryService = Framework.getService(DirectoryService.class);
+            Directory directory = directoryService.getDirectory(directoryName);
+            if (directory == null) {
+                log.warn(String.format("Directory '{%s}' not found, returning empty dictionary.", directoryName));
+                return dictionaryMap; // Return empty map safely
+            }
+            try (Session session = Framework.getService(DirectoryService.class).open(directoryName)) {
+                DocumentModelList entries = session.query(Map.of());
+                entries.forEach(entry -> {
+                    String id = entry.getId();
+                    try {
+                        String label = (String) (entry.getProperty("label")).getValue();
+                        dictionaryMap.put(id, label);
+                    } catch (Exception e) {
+                        log.error("Label not found for directory: " + id);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            log.error("Failed to get directory: " + directoryName, e);
         }
         return dictionaryMap;
     }

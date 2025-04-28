@@ -25,5 +25,5 @@ public interface APIService {
 
     Map<String, Double> searchSimilarity(String storeId, String type, int limit);
 
-    String getStoredDocumentStatus(String storeId);
+    String waitForStatusToBeProcessed(String storeId);
 }
