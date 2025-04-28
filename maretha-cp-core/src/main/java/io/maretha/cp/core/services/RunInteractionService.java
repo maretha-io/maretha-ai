@@ -11,5 +11,7 @@ public interface RunInteractionService {
 
     DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session, boolean waitUploadCompletion);
 
+    String validateProcessStatusCompleted(DocumentModel doc);
+
     String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride);
 }

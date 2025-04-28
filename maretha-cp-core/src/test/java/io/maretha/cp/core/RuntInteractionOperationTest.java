@@ -101,7 +101,7 @@ public class RuntInteractionOperationTest {
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
         when(runInteractionService.uploadFileAndSetStoreId(any(), any(), false)).thenReturn(document);
-        when(apiService.waitForStatusToBeProcessed(any())).thenReturn("completed");
+        when(apiService.checkProcessingStatusCompleted(any(), true)).thenReturn("completed");
         when(apiService.getInteractionResult(interactionId, new HashMap<>(), false)).thenReturn("test");
 
         //AND the operation is called

@@ -152,7 +152,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         try {
             //Retry for uploaded Vertesia document to have status completed
             if (waitForCompletion) {
-                apiService.waitForStatusToBeProcessed(storeId);
+                apiService.checkProcessingStatusCompleted(storeId, true);
             }
 
             if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
@@ -169,6 +169,18 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
 
         return doc;
+    }
+
+    @Override
+    public String validateProcessStatusCompleted(DocumentModel doc) {
+        String storeId = null;
+        if (doc.hasFacet(RESULTS_FACET)) {
+            storeId = (String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
+        }
+        if (StringUtils.isEmpty(storeId)) {
+            throw new NuxeoException("The document does not have: " + RESULTS_STORE_ID_SCHEMA_PATH + ", docID:" + doc.getId());
+        }
+        return apiService.checkProcessingStatusCompleted(storeId, false);
     }
 
     private Blob getBlob(DocumentModel doc) {
