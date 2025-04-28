@@ -323,17 +323,28 @@ public class APIServiceImpl implements APIService {
         return responseBody;
     }
 
-    private String getResponseWithRetryAndValidation(Request request) {
-        String responseBody = Retry.decorateSupplier(retry, () -> {
-            String response = executeHttpRequest(request);
-            String status = new JSONObject(response).getString("status");
+    private String getResponseWithStatusValidation(Request request, boolean withRetry) {
+        if (withRetry) {
+            String responseBody = Retry.decorateSupplier(retry, () -> {
+                String response = executeHttpRequest(request);
+                String status = new JSONObject(response).getString("status");
+                if (!status.equals("completed")) {
+                    throw new RuntimeException("Status is not completed, but:" + status);
+                }
+                return status;
+            }).get();
+            log.debug(responseBody);
+            return responseBody;
+        } else {
+            String responseBody = executeHttpRequest(request);
+            String status = new JSONObject(responseBody).getString("status");
             if (!status.equals("completed")) {
                 throw new RuntimeException("Status is not completed, but:" + status);
             }
-            return response;
-        }).get();
-        log.debug(responseBody);
-        return responseBody;
+            log.debug(responseBody);
+            return status;
+        }
+
     }
 
     private String executeHttpRequest(Request request) {
@@ -385,15 +396,18 @@ public class APIServiceImpl implements APIService {
         return paramsList;
     }
 
-    public String waitForStatusToBeProcessed(String storeId) {
+    public String checkProcessingStatusCompleted(String storeId, boolean withRetry) {
         String bearerToken = getBearerToken();
         Request request = new Request.Builder().url(getSetting(UPLOAD_API_URL) + "/api/v1/objects/" + storeId)
                 .addHeader("Accept", "application/json")
                 .addHeader("Authorization", "Bearer " + bearerToken)
                 .get()
                 .build();
-        String documentResponse = getResponseWithRetryAndValidation(request);
-        return new JSONObject(documentResponse).getString("status");
+        if (withRetry) {
+            return getResponseWithStatusValidation(request, withRetry);
+        } else {
+            return getResponseWithStatusValidation(request, false);
+        }
     }
 
     private String getSetting(String name) {

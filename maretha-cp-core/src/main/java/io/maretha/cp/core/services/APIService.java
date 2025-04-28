@@ -25,5 +25,5 @@ public interface APIService {
 
     Map<String, Double> searchSimilarity(String storeId, String type, int limit);
 
-    String waitForStatusToBeProcessed(String storeId);
+    String checkProcessingStatusCompleted(String storeId, boolean withRetry);
 }
