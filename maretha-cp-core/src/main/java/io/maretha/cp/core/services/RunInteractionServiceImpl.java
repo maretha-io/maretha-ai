@@ -97,12 +97,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 try {
                     Serializable propertyValue = doc.getPropertyValue(key);
                     if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
-                        if (optionalField.get().isMultiValue() || valueNode.isArray()) {
+                        if (optionalField.get().isMultiValue() && valueNode.isArray()) {
                             List<String> values = new ArrayList<>();
                             valueNode.forEach(element -> values.add(element.asText()));
                             saveMetadataField(doc, validationService, key, values.toArray(new String[0]));
+                        } else {
+                            saveMetadataField(doc, validationService, key, value);
                         }
-                        saveMetadataField(doc, validationService, key, value);
                     }
                 } catch (Exception propertyException) {
                     log.error("Failed to set metadata for " + key + ":" + value);
