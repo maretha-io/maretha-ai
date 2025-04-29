@@ -82,7 +82,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             }
             resultNode.fields().forEachRemaining(field -> {
                 String key = field.getKey();
-                String value = field.getValue().asText();
+                JsonNode valueNode = field.getValue();
+                String value = valueNode.asText();
                 Optional<DocTypeWithSchema.Schema.Field> optionalField = schemasFields.stream()
                         .filter(schemaField -> schemaField.getXpath().equalsIgnoreCase(key)).findFirst();
                 if (optionalField.isEmpty()) {
@@ -96,8 +97,10 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 try {
                     Serializable propertyValue = doc.getPropertyValue(key);
                     if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
-                        if (optionalField.get().isMultiValue()) {
-                            saveMetadataField(doc, validationService, key, value.split(","));
+                        if (optionalField.get().isMultiValue() || valueNode.isArray()) {
+                            List<String> values = new ArrayList<>();
+                            valueNode.forEach(element -> values.add(element.asText()));
+                            saveMetadataField(doc, validationService, key, values.toArray(new String[0]));
                         }
                         saveMetadataField(doc, validationService, key, value);
                     }
