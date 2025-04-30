@@ -39,6 +39,7 @@ import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AWS
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.ES_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.EVENTS_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
+import static io.maretha.cp.core.services.APIServiceImpl.AUTH_TOKEN;
 import static io.maretha.cp.core.services.APIServiceImpl.VERTESIA_CACHE;
 
 public class RepositoryServiceImpl implements RepositoryService {
@@ -173,6 +174,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         try {
             Cache cache = Framework.getService(CacheService.class).getCache(VERTESIA_CACHE);
             cache.put(VERTESIA_SETTINGS, objectMapper.writeValueAsString(settings));
+            cache.invalidate(AUTH_TOKEN);
         } catch (Exception e) {
             log.error("Failed to save VertesiaSettings in cache", e);
         }
