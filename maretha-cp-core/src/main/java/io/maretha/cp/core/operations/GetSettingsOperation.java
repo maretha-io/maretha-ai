@@ -37,7 +37,7 @@ public class GetSettingsOperation {
     public Settings run() {
         Map<String, Interaction> interactionsById = new HashMap<>();
         //Get local interactions
-        Settings settings = repositoryService.getSavedSettings(session);
+        Settings settings = repositoryService.getSavedSettings(session, false);
         List<Interaction> interactionSettings = settings.getInteractions();
         if (!CollectionUtils.isEmpty(interactionSettings)) {
             interactionSettings.forEach(interaction -> interactionsById.put(interaction.getId(), interaction));

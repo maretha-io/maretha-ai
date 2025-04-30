@@ -35,7 +35,7 @@ public class BulkEventListener implements PostCommitEventListener {
 
     @Override
     public void handleEvent(EventBundle events) {
-        Settings savedSettings = repositoryService.getSavedSettings(null);
+        Settings savedSettings = repositoryService.getSavedSettings(null, true);
         List<EventWithInteraction> eventsSettings = savedSettings.getEventsSettings();
         if (CollectionUtils.isEmpty(eventsSettings)) {
             log.error(SETTINGS_DOCUMENT_TYPE + " - eventsSettings is empty.");

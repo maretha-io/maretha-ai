@@ -49,9 +49,9 @@ public class RepositoryServiceImpl implements RepositoryService {
     private final Log log = LogFactory.getLog(RepositoryServiceImpl.class);
 
     @Override
-    public Settings getSavedSettings(CoreSession session) {
+    public Settings getSavedSettings(CoreSession session, boolean withCache) {
         Cache cache = Framework.getService(CacheService.class).getCache(VERTESIA_CACHE);
-        if (cache.hasEntry(VERTESIA_SETTINGS)) {
+        if (withCache && cache.hasEntry(VERTESIA_SETTINGS)) {
             try {
                 String vertesiaSettings = (String) cache.get(VERTESIA_SETTINGS);
                 if (StringUtils.isNotEmpty(vertesiaSettings)) {
@@ -80,7 +80,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Override
     public List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
-        return getSavedSettings(session).getInteractions()
+        return getSavedSettings(session, true).getInteractions()
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
@@ -96,7 +96,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Override
     public List<Interaction> getActiveChatInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
-        return getSavedSettings(session).getInteractions()
+        return getSavedSettings(session, true).getInteractions()
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
@@ -110,7 +110,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Override
     public List<Interaction> getActiveMetadataInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
-        return getSavedSettings(session).getInteractions()
+        return getSavedSettings(session, true).getInteractions()
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
@@ -277,7 +277,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         if (StringUtils.isNotEmpty(property)) {
             return property;
         }
-        Settings settings = getSavedSettings(null);
+        Settings settings = getSavedSettings(null, true);
         String nameWithoutPrefix = name.replace("vertesia.", "");
         String savedProperty = settings.getVertesiaSettings().get(nameWithoutPrefix);
         if (StringUtils.isNotEmpty(savedProperty)) {

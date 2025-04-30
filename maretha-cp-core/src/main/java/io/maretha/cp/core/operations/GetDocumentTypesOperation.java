@@ -51,7 +51,7 @@ public class GetDocumentTypesOperation {
     public List<? extends Object> run() {
         SchemaManager schemaManager = Framework.getService(SchemaManager.class);
         if (withSchemas) {
-            Settings settings = cpLocalSettingsService.getSavedSettings(session);
+            Settings settings = cpLocalSettingsService.getSavedSettings(session, true);
             return getDocTypesWithSchemaDetails(schemaManager, documentType, settings.getSchemaSettings());
         }
         return Arrays.stream(schemaManager.getDocumentTypes()).map(Type::getName).sorted().collect(Collectors.toList());

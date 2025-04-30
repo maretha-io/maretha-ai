@@ -68,7 +68,7 @@ public interface RepositoryService {
 
     String SETTINGS_DOCUMENT_NAME = "InteractionSettings";
 
-    Settings getSavedSettings(CoreSession session);
+    Settings getSavedSettings(CoreSession session, boolean cache);
 
     List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean folder);
 
