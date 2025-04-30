@@ -139,7 +139,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         if (StringUtils.isEmpty(storeId)) {
             doc.addFacet(RESULTS_FACET);
-            Settings settings = Framework.getService(RepositoryService.class).getSavedSettings(session);
+            Settings settings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
             if (settings.isAwsS3AccessEnabled()) {
                 String s3Path = getS3Path(doc);
                 storeId = apiService.uploadS3FileToStore(blob, s3Path);
@@ -286,7 +286,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     private List<DocTypeWithSchema.Schema.Field> addSchemasFieldsAndVocabs(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
-        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session);
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
         Map<String, Object> dictionariesMap = new HashMap<>();
         List<DocTypeWithSchema.Schema.Field> schemasFields = new ArrayList<>();
