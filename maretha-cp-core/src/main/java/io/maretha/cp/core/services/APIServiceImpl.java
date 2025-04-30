@@ -21,9 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.ecm.core.cache.Cache;
-import org.nuxeo.ecm.core.cache.CacheService;
 import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.runtime.kv.KeyValueService;
+import org.nuxeo.runtime.kv.KeyValueStore;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -36,14 +36,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class APIServiceImpl implements APIService {
-    public final static String EMBEDDINGS_CACHE = "embeddings_cache";
-    public final static String VERTESIA_CACHE = "vertesia_cache";
     public final static String API_URL = "vertesia.apiUrl";
     public final static String UPLOAD_API_URL = "vertesia.uploadUrl";
     public final static String AUTH_TOKEN = "vertesia.authToken";
     public final static String EMBEDDING_MODEL = "vertesia.embeddingModel";
     public final static String ENVIRONMENT_ID = "vertesia.environmentId";
     public final static String PROJECT_ID = "vertesia.projectId";
+    public static final int TOKEN_TTL = 60 * 30;
+    public static final int EMBEDDINGS_TTL = 60 * 60 * 24;
+    public static final int VERTESIA_SETTINGS_TTL = 60 * 60;
+    public static final String VERTESIA_SETTINGS_KV = "kvs_vertesiaSettings";
+    public static final String EMBEDDINGS_KV = "kvs_embeddings";
     private final Log log = LogFactory.getLog(APIServiceImpl.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final OkHttpClient client = new OkHttpClient.Builder()
@@ -108,15 +111,16 @@ public class APIServiceImpl implements APIService {
 
     @Override
     public String getBearerToken() {
-        Cache cache = Framework.getService(CacheService.class).getCache(VERTESIA_CACHE);
-        if (cache.hasEntry(AUTH_TOKEN)) {
-            return (String) cache.get(AUTH_TOKEN);
+        KeyValueStore kvStore = Framework.getService(KeyValueService.class).getKeyValueStore(VERTESIA_SETTINGS_KV);
+        String token = kvStore.getString(AUTH_TOKEN);
+        if (StringUtils.isNotEmpty(token)) {
+            return token;
         }
         String response = getRequest(getSetting(AUTH_TOKEN), getSetting(API_URL) + "/auth/token");
         JSONObject jsonObject = new JSONObject(response);
-        String token = jsonObject.getString("token");
+        token = jsonObject.getString("token");
         if (StringUtils.isNotEmpty(token)) {
-            cache.put(AUTH_TOKEN, token);
+            kvStore.put(AUTH_TOKEN, token, TOKEN_TTL);
         }
         return token;
     }
@@ -184,9 +188,14 @@ public class APIServiceImpl implements APIService {
 
     @Override
     public double[] textToEmbeddings(String queryText) {
-        Cache cache = Framework.getService(CacheService.class).getCache(EMBEDDINGS_CACHE);
-        if (cache.hasEntry(queryText)) {
-            return (double[]) cache.get(queryText);
+        KeyValueStore kvStore = Framework.getService(KeyValueService.class).getKeyValueStore(EMBEDDINGS_KV);
+        try {
+            byte[] raw = kvStore.get(queryText);
+            if (raw != null) {
+                return objectMapper.readValue(raw, double[].class);
+            }
+        } catch (Exception e) {
+            log.error("Failed to get embeddings from kvStore", e);
         }
 
         String bearerToken = getBearerToken();
@@ -199,7 +208,7 @@ public class APIServiceImpl implements APIService {
             JsonNode rootNode = objectMapper.readTree(response);
             JsonNode embeddings = rootNode.path("values");
             double[] embeddingsAsDoubles = objectMapper.convertValue(embeddings, double[].class);
-            cache.put(queryText, embeddingsAsDoubles);
+            kvStore.put(queryText, objectMapper.writeValueAsBytes(embeddingsAsDoubles), EMBEDDINGS_TTL);
             return embeddingsAsDoubles;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
