@@ -11,7 +11,7 @@
             <property name="coreSession">#{documentManager}</property>
             <property name="useUnrestrictedSession">false</property>
             <whereClause>
-                <fixedPart>ecm:mixinType != 'HiddenInNavigation' AND ecm:isVersion = 0 AND ecm:isTrashed = 0</fixedPart>
+                <fixedPart>ecm:mixinType != 'HiddenInNavigation' AND ecm:isVersion = 0 AND ecm:isTrashed = 0 AND ecm:isProxy = 0</fixedPart>
                 <predicate parameter="ecm:fulltext" operator="FULLTEXT">
                     <field schema="default_search" name="ecm_fulltext"/>
                 </predicate>
