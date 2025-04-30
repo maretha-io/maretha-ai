@@ -20,10 +20,10 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.PathRef;
-import org.nuxeo.ecm.core.cache.Cache;
-import org.nuxeo.ecm.core.cache.CacheService;
 import org.nuxeo.ecm.platform.relations.api.DocumentRelationManager;
 import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.runtime.kv.KeyValueService;
+import org.nuxeo.runtime.kv.KeyValueStore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,21 +39,22 @@ import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AWS
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.ES_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.EVENTS_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
 import static io.maretha.cp.core.services.APIServiceImpl.AUTH_TOKEN;
-import static io.maretha.cp.core.services.APIServiceImpl.VERTESIA_CACHE;
+import static io.maretha.cp.core.services.APIServiceImpl.VERTESIA_SETTINGS_KV;
+import static io.maretha.cp.core.services.APIServiceImpl.VERTESIA_SETTINGS_TTL;
 
 public class RepositoryServiceImpl implements RepositoryService {
 
-    public static final String VERTESIA_SETTINGS = "VERTESIA_SETTINGS";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Log log = LogFactory.getLog(RepositoryServiceImpl.class);
 
     @Override
     public Settings getSavedSettings(CoreSession session, boolean withCache) {
-        Cache cache = Framework.getService(CacheService.class).getCache(VERTESIA_CACHE);
-        if (withCache && cache.hasEntry(VERTESIA_SETTINGS)) {
+        KeyValueStore kvStore = Framework.getService(KeyValueService.class).getKeyValueStore(VERTESIA_SETTINGS_KV);
+        if (withCache) {
             try {
-                String vertesiaSettings = (String) cache.get(VERTESIA_SETTINGS);
+                String vertesiaSettings = kvStore.getString(VERTESIA_SETTINGS);
                 if (StringUtils.isNotEmpty(vertesiaSettings)) {
                     return objectMapper.readValue(vertesiaSettings, Settings.class);
                 }
@@ -69,7 +70,7 @@ public class RepositoryServiceImpl implements RepositoryService {
             DocumentModel documentModel = existingSettingsDocument.get();
             Settings settings = documentModel.getAdapter(Settings.class);
             try {
-                cache.put(VERTESIA_SETTINGS, objectMapper.writeValueAsString(settings));
+                kvStore.put(VERTESIA_SETTINGS, objectMapper.writeValueAsString(settings), VERTESIA_SETTINGS_TTL);
             } catch (Exception e) {
                 log.error("Failed to save VertesiaSettings in cache", e);
             }
@@ -172,9 +173,9 @@ public class RepositoryServiceImpl implements RepositoryService {
         Settings settings = session.saveDocument(cpSettingsDoc).getAdapter(Settings.class);
 
         try {
-            Cache cache = Framework.getService(CacheService.class).getCache(VERTESIA_CACHE);
-            cache.put(VERTESIA_SETTINGS, objectMapper.writeValueAsString(settings));
-            cache.invalidate(AUTH_TOKEN);
+            KeyValueStore kvStore = Framework.getService(KeyValueService.class).getKeyValueStore(VERTESIA_SETTINGS_KV);
+            kvStore.put(VERTESIA_SETTINGS, objectMapper.writeValueAsString(settings), VERTESIA_SETTINGS_TTL);
+            kvStore.put(AUTH_TOKEN, ""); //reset token
         } catch (Exception e) {
             log.error("Failed to save VertesiaSettings in cache", e);
         }
