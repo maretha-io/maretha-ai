@@ -1,6 +1,5 @@
 package io.maretha.cp.core.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.DocTypeWithSchema;
@@ -30,8 +29,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,19 +59,23 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
-        List<DocTypeWithSchema.Schema.Field> schemasFields = List.of();
-        if (saveMetadata) {
-            schemasFields = addSchemasFieldsAndVocabs(doc, session, parameters);
-        }
         Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
         if (saveMetadata) {
-            String response = Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMap, false);
+            Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true);
+            schemasFieldsInIsolation.forEach(schemasFieldInIsolation -> {
+                Map<String, Object> isolationParamsMap = addSchemasAndDictionariesToParams(Set.of(schemasFieldInIsolation), paramsMap);
+                String response = Framework.getService(APIService.class).getInteractionResult(interactionId, isolationParamsMap, false);
+                validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, Set.of(schemasFieldInIsolation));
+            });
+            Set<DocTypeWithSchema.Schema.Field> schemasFields = getSchemaFields(doc, session, false);
+            Map<String, Object> paramsMapWithSchemaFields = addSchemasAndDictionariesToParams(schemasFields, paramsMap);
+            String response = Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMapWithSchemaFields, false);
             return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, schemasFields);
         }
         return Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMap, true);
     }
 
-    private String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride, List<DocTypeWithSchema.Schema.Field> schemasFields) {
+    public String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride, Set<DocTypeWithSchema.Schema.Field> schemasFields) {
         try {
             DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
             JsonNode jsonNode = objectMapper.readTree(response);
@@ -320,43 +325,45 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return dictionaryMap;
     }
 
-    private List<DocTypeWithSchema.Schema.Field> addSchemasFieldsAndVocabs(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
+    private Set<DocTypeWithSchema.Schema.Field> getSchemaFields(DocumentModel doc, CoreSession session, boolean inIsolation) {
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
-        Map<String, Object> dictionariesMap = new HashMap<>();
-        List<DocTypeWithSchema.Schema.Field> schemasFields = new ArrayList<>();
+        if (MapUtils.isEmpty(schemaSettings)) {
+            log.error("SchemaSettings is empty");
+            return Collections.emptySet();
+        }
+
+        Set<DocTypeWithSchema.Schema.Field> schemaFields = new HashSet<>();
 
         Arrays.stream(doc.getSchemas()).forEach(schema -> {
-            if (MapUtils.isNotEmpty(schemaSettings) && schemaSettings.containsKey(schema)) {
+            if (schemaSettings.containsKey(schema)) {
                 DocTypeWithSchema.Schema schemaSetting = schemaSettings.get(schema);
-                schemaSetting.getFields().stream().filter(DocTypeWithSchema.Schema.Field::isActive).forEach(activeField -> {
-                    schemasFields.add(activeField);
-                    if (StringUtils.isNotEmpty(activeField.getDirectoryName())) {
-                        Map<String, String> dictionaryValues = getDictionaryValues(activeField.getDirectoryName());
-                        dictionariesMap.put(activeField.getDirectoryName(), dictionaryValues);
-                    }
-                });
+                Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
+                        .filter(DocTypeWithSchema.Schema.Field::isActive)
+                        .filter(field -> field.isInIsolation() == inIsolation)
+                        .collect(Collectors.toSet());
+                schemaFields.addAll(fields);
             }
         });
 
-        parameters.forEach(param -> {
-            if (param.getName().equals("schema")) {
-                try {
-                    param.setValue(objectMapper.writeValueAsString(schemasFields));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        return schemaFields;
+    }
 
-            if (param.getName().equals("dictionaries")) {
-                try {
-                    param.setValue(objectMapper.writeValueAsString(dictionariesMap));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
+    private Map<String, Object> addSchemasAndDictionariesToParams(Set<DocTypeWithSchema.Schema.Field> schemasFields, Map<String, Object> parameters) {
+        Map<String, Object> dictionariesMap = new HashMap<>();
+        schemasFields.forEach(activeField -> {
+            if (StringUtils.isNotEmpty(activeField.getDirectoryName())) {
+                Map<String, String> dictionaryValues = getDictionaryValues(activeField.getDirectoryName());
+                dictionariesMap.put(activeField.getDirectoryName(), dictionaryValues);
             }
         });
-        return schemasFields;
+        try {
+            parameters.put("schema", objectMapper.writeValueAsString(schemasFields));
+            parameters.put("dictionaries", objectMapper.writeValueAsString(dictionariesMap));
+        } catch (Exception e) {
+            log.error("Failed to add schema and dictionaries as parameters", e);
+        }
+        return parameters;
     }
 
     private void addTextEmbeddings(DocumentModel doc) {

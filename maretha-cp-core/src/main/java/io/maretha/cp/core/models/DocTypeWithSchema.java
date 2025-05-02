@@ -25,6 +25,7 @@ public class DocTypeWithSchema {
             private String directoryName;
             private boolean active;
             private boolean multiValue;
+            private boolean inIsolation;
         }
     }
 }

@@ -117,7 +117,7 @@
           <paper-dropdown-menu class="dropdown" label="Select DocumentType">
             <paper-listbox
                     class="dropdown-content"
-                    id="dropdownListbox"
+                    id="dropdownListboxDocType"
                     selected="{{selectedDocTypeIndex}}"
                     slot="dropdown-content">
               <template is="dom-repeat" items="[[documentTypes]]">
@@ -129,7 +129,7 @@
           <paper-dropdown-menu class="dropdown" label="Select Schema">
             <paper-listbox
                     class="dropdown-content"
-                    id="dropdownListbox"
+                    id="dropdownListboxSchema"
                     selected="{{selectedSchemaIndex}}"
                     slot="dropdown-content">
               <template is="dom-repeat" items="[[documentTypeWithSchema.schemas]]">
@@ -160,6 +160,13 @@
             <nuxeo-data-table-column name="Directory" flex="10">
               <template>
                 [[item.directoryName]]
+              </template>
+            </nuxeo-data-table-column>
+
+            <nuxeo-data-table-column name="Isolated" flex="10">
+              <template>
+                <paper-toggle-button checked="{{item.inIsolation}}"
+                                     on-change="_saveMetadataSettings"></paper-toggle-button>
               </template>
             </nuxeo-data-table-column>
 
@@ -237,6 +244,8 @@
         operation.params = {"withSchemas": true, "documentType": this.documentTypes[this.selectedDocTypeIndex]};
         operation.execute().then((response) => {
           this.set('documentTypeWithSchema', response.value[0]);
+          this.set('selectedSchema', null);
+          this.set('selectedSchemaIndex', -1);
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });
@@ -245,7 +254,6 @@
       _selectedDocTypeIndexObserver(selectedDocTypeIndex) {
         if(selectedDocTypeIndex > -1) {
           this._getDocumentTypeWithSchema();
-          this.set('selectedSchema', this.documentTypeWithSchema.schemas[0]);
         }
       },
 
