@@ -204,6 +204,7 @@ public class RunInteractionServiceImplTest {
         field.setXpath("testDoc:testStringArray");
         field.setType("stringList");
         field.setActive(true);
+        field.setInIsolation(true);
 
         fields.add(field);
         schemaSettingsTestDoc.setFields(fields);
@@ -221,6 +222,7 @@ public class RunInteractionServiceImplTest {
         tagField.setXpath("nxtag:tags");
         tagField.setType("tagList");
         tagField.setActive(true);
+        tagField.setInIsolation(true);
 
         tagFields.add(tagField);
         schemaSettingsTags.setFields(tagFields);
