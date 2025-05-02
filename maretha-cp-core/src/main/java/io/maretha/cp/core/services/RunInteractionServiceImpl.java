@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
@@ -49,7 +50,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     public static final String MIME_TYPES = "vertesia.mimeTypes";
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
-    private final APIService apiService = Framework.getService(APIService.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public static String getSupportedMimeTypes() {
@@ -64,10 +64,10 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
         if (saveMetadata) {
-            String response = apiService.getInteractionResult(interactionId, paramsMap, false);
+            String response = Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMap, false);
             return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, schemasFields);
         }
-        return apiService.getInteractionResult(interactionId, paramsMap, true);
+        return Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMap, true);
     }
 
     private String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride, List<DocTypeWithSchema.Schema.Field> schemasFields) {
@@ -83,30 +83,34 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             resultNode.fields().forEachRemaining(field -> {
                 String key = field.getKey();
                 JsonNode valueNode = field.getValue();
-                String value = valueNode.asText();
                 Optional<DocTypeWithSchema.Schema.Field> optionalField = schemasFields.stream()
                         .filter(schemaField -> schemaField.getXpath().equalsIgnoreCase(key)).findFirst();
                 if (optionalField.isEmpty()) {
                     log.warn("Metadata save skip on not declared xpath: " + key);
                     return;
                 }
-                if (StringUtils.isEmpty(value)) {
+                if (valueNode.isEmpty()) {
                     log.warn("Metadata save skip on empty value for xpath: " + key);
                     return;
                 }
                 try {
                     Serializable propertyValue = doc.getPropertyValue(key);
                     if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
+                        if ("nxtag:tags".equalsIgnoreCase(key)) {
+                            log.debug("Adding nxtag:tags for documentId: " + doc.getId());
+                            addTags(doc, valueNode);
+                            return;
+                        }
                         if (optionalField.get().isMultiValue() && valueNode.isArray()) {
                             List<String> values = new ArrayList<>();
                             valueNode.forEach(element -> values.add(element.asText()));
                             saveMetadataField(doc, validationService, key, values.toArray(new String[0]));
                         } else {
-                            saveMetadataField(doc, validationService, key, value);
+                            saveMetadataField(doc, validationService, key, valueNode.asText());
                         }
                     }
-                } catch (Exception propertyException) {
-                    log.error("Failed to set metadata for " + key + ":" + value);
+                } catch (Exception ex) {
+                    log.error("Failed to set metadata for " + key + ":" + valueNode.asText(), ex);
                 }
             });
             session.saveDocument(doc);
@@ -114,6 +118,37 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         } catch (Exception e) {
             log.error("Could not save document metadata", e);
             throw new RuntimeException("Failed to save document metadata: " + e.getMessage());
+        }
+    }
+
+    private void addTags(DocumentModel doc, JsonNode valueNode) {
+        List<String> newTags = new ArrayList<>();
+        valueNode.forEach(element -> newTags.add(element.asText()));
+
+        if (CollectionUtils.isNotEmpty(newTags)) {
+            if (!doc.hasFacet("NXTag")) {
+                doc.addFacet("NXTag");
+            }
+            List<Map<String, String>> existingTags = (List<Map<String, String>>) doc.getPropertyValue("nxtag:tags");
+            List<Map<String, String>> tagsList = new ArrayList<>(existingTags);
+
+            // Build a Set of existing labels for fast lookup
+            Set<String> existingLabels = tagsList.stream()
+                    .map(tagMap -> tagMap.get("label"))
+                    .collect(Collectors.toSet());
+
+            // Add new tags only if their label is not already present
+            for (String tagLabel : newTags) {
+                if (!existingLabels.contains(tagLabel)) {
+                    tagsList.add(Map.of("label", tagLabel, "username", "system"));
+                    existingLabels.add(tagLabel);  // keep the set updated
+                }
+            }
+
+            if (CollectionUtils.isNotEmpty(tagsList)) {
+                doc.setPropertyValue("nxtag:tags", (Serializable) tagsList);
+                log.debug("Updated nxtag:tags for documentId: " + doc.getId() + " new tags:" + tagsList);
+            }
         }
     }
 
@@ -142,9 +177,9 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             Settings settings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
             if (settings.isAwsS3AccessEnabled()) {
                 String s3Path = getS3Path(doc);
-                storeId = apiService.uploadS3FileToStore(blob, s3Path);
+                storeId = Framework.getService(APIService.class).uploadS3FileToStore(blob, s3Path);
             } else {
-                storeId = apiService.uploadFileToStore(blob);
+                storeId = Framework.getService(APIService.class).uploadFileToStore(blob);
             }
             doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
             doc.setPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH, blob.getDigest());
@@ -156,7 +191,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         try {
             //Retry for uploaded Vertesia document to have status completed
             if (waitForCompletion) {
-                apiService.checkProcessingStatusCompleted(storeId, true);
+                Framework.getService(APIService.class).checkProcessingStatusCompleted(storeId, true);
             }
 
             if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
@@ -184,7 +219,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         if (StringUtils.isEmpty(storeId)) {
             throw new NuxeoException("The document does not have: " + RESULTS_STORE_ID_SCHEMA_PATH + ", docID:" + doc.getId());
         }
-        return apiService.checkProcessingStatusCompleted(storeId, false);
+        return Framework.getService(APIService.class).checkProcessingStatusCompleted(storeId, false);
     }
 
     private Blob getBlob(DocumentModel doc) {
@@ -326,13 +361,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private void addTextEmbeddings(DocumentModel doc) {
         String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-        double[] documentEmbeddings = apiService.getDocumentEmbeddings(storeId, "text");
+        double[] documentEmbeddings = Framework.getService(APIService.class).getDocumentEmbeddings(storeId, "text");
         doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
     }
 
     private void addImageEmbeddings(DocumentModel doc) {
         String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-        double[] documentEmbeddings = apiService.getDocumentEmbeddings(storeId, "image");
+        double[] documentEmbeddings = Framework.getService(APIService.class).getDocumentEmbeddings(storeId, "image");
         doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
     }
 }
