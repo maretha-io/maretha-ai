@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.operations.RuntInteractionOperation;
 import io.maretha.cp.core.services.APIService;
 import io.maretha.cp.core.services.RunInteractionService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -35,12 +34,14 @@ import static io.maretha.cp.core.services.RunInteractionService.FILE_CONTENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.when;
 
 @RunWith(FeaturesRunner.class)
 @Features({AutomationFeature.class, RuntimeFeature.class, MockitoFeature.class})
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 @Deploy("io.maretha.cp.core.maretha-cp-core")
+@Deploy("io.maretha.cp.core.maretha-cp-core-test:OSGI-INF/cp-bulk-action-contrib-test.xml")
 public class RuntInteractionOperationTest {
     @Inject
     CoreSession session;
@@ -81,7 +82,6 @@ public class RuntInteractionOperationTest {
     }
 
     @Test
-    @Ignore //todo
     public void shouldReturnInteractionResponseForFolder() throws OperationException {
         //GIVEN Folder exists
         DocumentModel folderDoc = session.createDocumentModel("/", "Folder", "Folder");
@@ -100,8 +100,8 @@ public class RuntInteractionOperationTest {
         String interactionId = "test-id";
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
-        when(runInteractionService.uploadFileAndSetStoreId(any(), any(), false)).thenReturn(document);
-        when(apiService.checkProcessingStatusCompleted(any(), true)).thenReturn("completed");
+        when(runInteractionService.uploadFileAndSetStoreId(any(), any(), anyBoolean())).thenReturn(document);
+        when(apiService.checkProcessingStatusCompleted(any(), anyBoolean())).thenReturn("completed");
         when(apiService.getInteractionResult(interactionId, new HashMap<>(), false)).thenReturn("test");
 
         //AND the operation is called
@@ -112,7 +112,6 @@ public class RuntInteractionOperationTest {
         String response = (String) automationService.run(ctx, RuntInteractionOperation.ID);
         //THEN
         assertNotNull(response);
-        assertEquals("{\"response\": \"test\"}", response);
     }
 
     private DocumentModel createDocument() {

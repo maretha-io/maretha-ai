@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.bulk.actions.upload.test" version="1.0.0">
+    <!-- bulk action -->
+    <require>org.nuxeo.ecm.core.bulk</require>
+
+    <extension target="org.nuxeo.ecm.core.bulk" point="actions">
+        <action name="bulkInteractionAction" inputStream="document/bulkInteractionAction" bucketSize="50" batchSize="10"
+        defaultScroller="repository" httpEnabled="false" defaultQueryLimit="${cp.upload.action.maximum.documents:=500}" />
+    </extension>
+
+    <extension target="org.nuxeo.runtime.stream.service" point="streamProcessor">
+        <streamProcessor name="bulkInteractionAction" class="io.maretha.cp.core.bulk.actions.BulkInteractionAction"
+        defaultConcurrency="4" defaultPartitions="${cp.upload.action.partitions:=12}">
+              <policy name="default" maxRetries="5" delay="30s" maxDelay="5m" continueOnFailure="true"/>
+        </streamProcessor>
+    </extension>
+</component>
