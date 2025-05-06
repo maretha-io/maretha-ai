@@ -10,6 +10,7 @@
     <xs:element name="storedDate" type="xs:dateTime"/>
     <xs:element name="embeddingsText" type="nxs:doubleList"/>
     <xs:element name="embeddingsImage" type="nxs:doubleList"/>
+    <xs:element name="embeddingsProperties" type="nxs:doubleList"/>
 
     <!-- Definition for a list of interactions -->
     <xs:complexType name="interactionResultList">

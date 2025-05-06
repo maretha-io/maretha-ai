@@ -45,6 +45,7 @@ import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORED_DATE_
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_DIGEST_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_IMAGE;
+import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_PROPERTIES;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TEXT;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
@@ -208,6 +209,11 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 addTextEmbeddings(doc);
                 doc = session.saveDocument(doc);
             }
+
+            if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_PROPERTIES))) {
+                addPropertiesEmbeddings(doc);
+                doc = session.saveDocument(doc);
+            }
         } catch (Exception e) {
             log.error("Failed to save document: " + doc.getId(), e);
         }
@@ -367,14 +373,32 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     private void addTextEmbeddings(DocumentModel doc) {
-        String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-        double[] documentEmbeddings = Framework.getService(APIService.class).getDocumentEmbeddings(storeId, "text");
-        doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
+        try {
+            String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
+            double[] documentEmbeddings = Framework.getService(APIService.class).getDocumentEmbeddings(storeId, "text");
+            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
+        } catch (Exception e) {
+            log.error("Failed to save textEmbeddings", e);
+        }
     }
 
     private void addImageEmbeddings(DocumentModel doc) {
-        String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-        double[] documentEmbeddings = Framework.getService(APIService.class).getDocumentEmbeddings(storeId, "image");
-        doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
+        try {
+            String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
+            double[] documentEmbeddings = Framework.getService(APIService.class).getDocumentEmbeddings(storeId, "image");
+            doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
+        } catch (Exception e) {
+            log.error("Failed to save imageEmbeddings", e);
+        }
+    }
+
+    private void addPropertiesEmbeddings(DocumentModel doc) {
+        try {
+            String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
+            double[] documentEmbeddings = Framework.getService(APIService.class).getDocumentEmbeddings(storeId, "properties");
+            doc.setPropertyValue(SCHEMA_EMBEDDINGS_PROPERTIES, documentEmbeddings);
+        } catch (Exception e) {
+            log.error("Failed to save propertiesEmbeddings", e);
+        }
     }
 }

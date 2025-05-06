@@ -29,6 +29,7 @@ public interface RepositoryService {
 
     String SCHEMA_EMBEDDINGS_TEXT = "interactionresults:embeddingsText";
     String SCHEMA_EMBEDDINGS_IMAGE = "interactionresults:embeddingsImage";
+    String SCHEMA_EMBEDDINGS_PROPERTIES = "interactionresults:embeddingsProperties";
 
     String SETTINGS_DOCUMENT_TYPE = "InteractionSettings";
     String SETTINGS_SCHEMA_NAME = "interactionSettings";
