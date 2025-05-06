@@ -94,7 +94,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                     log.warn("Metadata save skip on not declared xpath: " + key);
                     return;
                 }
-                if (valueNode.isEmpty()) {
+                if (StringUtils.isEmpty(valueNode.asText()) && valueNode.isEmpty()) {
                     log.warn("Metadata save skip on empty value for xpath: " + key);
                     return;
                 }
