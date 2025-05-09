@@ -159,7 +159,7 @@
         </nuxeo-card>
 
         <template is="dom-if" if="[[visible]]">
-          <cp-settings-metadata></cp-settings-metadata>
+          <cp-settings-metadata interactions="[[interactions]]" document-types="[[documentTypes]]"></cp-settings-metadata>
           <cp-settings-events interactions="[[interactions]]" document-types="[[documentTypes]]"></cp-settings-events>
           <!--        <cp-settings-elasticsearch></cp-settings-elasticsearch>-->
           <cp-settings-vertesia></cp-settings-vertesia>
@@ -251,6 +251,12 @@
                   <div style="display: inline-flex;">
                     <span>Save Metadata:</span>
                     <paper-toggle-button checked="{{selectedInteraction.saveMetadata}}"
+                                         on-change="_saveInteractions"></paper-toggle-button>
+                  </div>
+
+                  <div style="display: inline-flex;">
+                    <span>Main Metadata:</span>
+                    <paper-toggle-button checked="{{selectedInteraction.mainMetadata}}"
                                          on-change="_saveInteractions"></paper-toggle-button>
                   </div>
                 </nuxeo-card>

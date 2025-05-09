@@ -23,6 +23,7 @@ public class DocTypeWithSchema {
             private String description;
             private String type;
             private String directoryName;
+            private String interactionId;
             private boolean active;
             private boolean multiValue;
             private boolean inIsolation;
