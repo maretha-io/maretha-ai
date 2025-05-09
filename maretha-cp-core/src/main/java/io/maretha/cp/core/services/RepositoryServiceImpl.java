@@ -116,6 +116,7 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
                 .filter(Interaction::isSaveMetadata)
+                .filter(Interaction::isMainMetadata)
                 .filter(interaction -> {
                     if (isFolder) return interaction.isActiveOnFolder();
                     return true;
@@ -346,6 +347,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         interactionMap.put(SCHEMA_ACTIVE_ON_ACTION_MENU, interaction.isActiveOnActionMenu());
         interactionMap.put(SCHEMA_IS_CHAT, interaction.isChat());
         interactionMap.put(SCHEMA_IS_SAVE_METADATA, interaction.isSaveMetadata());
+        interactionMap.put(SCHEMA_IS_MAIN_METADATA, interaction.isMainMetadata());
         interactionMap.put(SCHEMA_PARAMETERS, convertParameters(interaction.getParameters()));
         return interactionMap;
     }

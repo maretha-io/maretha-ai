@@ -30,4 +30,5 @@ public class Interaction {
     private boolean activeOnFolder;
     private boolean activeOnActionMenu;
     private boolean saveMetadata;
+    private boolean mainMetadata;
 }

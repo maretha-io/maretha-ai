@@ -64,9 +64,15 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         if (saveMetadata) {
             Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true);
             schemasFieldsInIsolation.forEach(schemasFieldInIsolation -> {
+                String interactionResponse;
                 Map<String, Object> isolationParamsMap = addSchemasAndDictionariesToParams(Set.of(schemasFieldInIsolation), paramsMap);
-                String response = Framework.getService(APIService.class).getInteractionResult(interactionId, isolationParamsMap, false);
-                validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, Set.of(schemasFieldInIsolation));
+                String customInteractionId = schemasFieldInIsolation.getInteractionId();
+                if (StringUtils.isNotEmpty(customInteractionId)) {
+                    interactionResponse = Framework.getService(APIService.class).getInteractionResult(customInteractionId, isolationParamsMap, false);
+                } else {
+                    interactionResponse = Framework.getService(APIService.class).getInteractionResult(interactionId, isolationParamsMap, false);
+                }
+                validateAndSaveMetadata(interactionResponse, doc, session, saveMetadataModeOverride, Set.of(schemasFieldInIsolation));
             });
             Set<DocTypeWithSchema.Schema.Field> schemasFields = getSchemaFields(doc, session, false);
             Map<String, Object> paramsMapWithSchemaFields = addSchemasAndDictionariesToParams(schemasFields, paramsMap);
@@ -346,7 +352,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 DocTypeWithSchema.Schema schemaSetting = schemaSettings.get(schema);
                 Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
                         .filter(DocTypeWithSchema.Schema.Field::isActive)
-                        .filter(field -> field.isInIsolation() == inIsolation)
+                        .filter(field -> (field.isInIsolation() == inIsolation))
                         .collect(Collectors.toSet());
                 schemaFields.addAll(fields);
             }

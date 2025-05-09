@@ -138,46 +138,81 @@
             </paper-listbox>
           </paper-dropdown-menu>
 
-          <nuxeo-data-table items="[[selectedSchema.fields]]" class="results-table">
-            <nuxeo-data-table-column name="Xpath" flex="10">
-              <template>
-                [[item.xpath]]
-              </template>
-            </nuxeo-data-table-column>
+          <template id="tableDom" is="dom-if" if="[[selectedSchema]]">
+            <nuxeo-data-table id="table" items="{{selectedSchema.fields}}" class="results-table">
+              <nuxeo-data-table-column name="Xpath" flex="10">
+                <template>
+                  [[item.xpath]]
+                </template>
+              </nuxeo-data-table-column>
 
-            <nuxeo-data-table-column name="Type" flex="20">
-              <template>
-                [[item.type]]
-              </template>
-            </nuxeo-data-table-column>
+              <nuxeo-data-table-column name="Type" flex="20">
+                <template>
+                  [[item.type]]
+                </template>
+              </nuxeo-data-table-column>
 
-            <nuxeo-data-table-column name="Description" flex="60">
-              <template>
-                <paper-input value="{{item.description}}" on-change="_saveMetadataSettings" style="width: 100%;"></paper-input>
-              </template>
-            </nuxeo-data-table-column>
+              <nuxeo-data-table-column name="Description" flex="60">
+                <template>
+                  <paper-input value="{{item.description}}" on-change="_saveMetadataSettings" style="width: 100%;"></paper-input>
+                </template>
+              </nuxeo-data-table-column>
 
-            <nuxeo-data-table-column name="Directory" flex="10">
-              <template>
-                [[item.directoryName]]
-              </template>
-            </nuxeo-data-table-column>
+              <nuxeo-data-table-column name="Directory" flex="10">
+                <template>
+                  [[item.directoryName]]
+                </template>
+              </nuxeo-data-table-column>
 
-            <nuxeo-data-table-column name="Isolated" flex="10">
-              <template>
-                <paper-toggle-button checked="{{item.inIsolation}}"
-                                     on-change="_saveMetadataSettings"></paper-toggle-button>
-              </template>
-            </nuxeo-data-table-column>
+              <nuxeo-data-table-column name="Interaction" flex="50">
+                <template>
+                  <template is="dom-if" if="[[item.interactionId]]">
+                    [[_getInteractionName(item.interactionId, interactions)]]
+                  </template>
+                  <template is="dom-if" if="[[item.inIsolation]]">
+                    <paper-icon-button icon="editor:mode-edit" on-tap="_openEditDialog" item="[[item]]" title="Edit"></paper-icon-button>
+                  </template>
+                </template>
+              </nuxeo-data-table-column>
 
-            <nuxeo-data-table-column name="Active" flex="10">
-              <template>
-                <paper-toggle-button checked="{{item.active}}"
-                                     on-change="_saveMetadataSettings"></paper-toggle-button>
-              </template>
-            </nuxeo-data-table-column>
+              <nuxeo-data-table-column name="Isolated" flex="10">
+                <template>
+                  <paper-toggle-button checked="{{item.inIsolation}}"
+                                       on-change="_saveMetadataSettings"></paper-toggle-button>
+                </template>
+              </nuxeo-data-table-column>
 
-          </nuxeo-data-table>
+              <nuxeo-data-table-column name="Active" flex="10">
+                <template>
+                  <paper-toggle-button checked="{{item.active}}"
+                                       on-change="_saveMetadataSettings"></paper-toggle-button>
+                </template>
+              </nuxeo-data-table-column>
+
+            </nuxeo-data-table>
+          </template>
+
+          <paper-dialog id="editDialog" modal>
+            <h2>Edit Interaction</h2>
+            <paper-dropdown-menu class="dropdown" label="Select Interaction" no-overlap allow-outside-scroll>
+              <paper-listbox
+                      class="dropdown-content"
+                      id="dropdownListboxInteractions"
+                      selected="{{currentEditingItem.interactionId}}"
+                      slot="dropdown-content"
+                      on-selected-changed="_onInteractionChanged"
+                      attr-for-selected="data-id">
+                <template is="dom-repeat" items="[[filteredInteractions]]">
+                  <paper-item data-id="[[item.id]]">[[item.name]]</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
+
+            <div class="buttons">
+              <paper-button dialog-dismiss>Cancel</paper-button>
+              <paper-button on-tap="_saveMetadataSettings" dialog-confirm>Save</paper-button>
+            </div>
+          </paper-dialog>
         </div>
       </nuxeo-card>
     </div>
@@ -213,10 +248,34 @@
         selectedSchemaIndex: {
           type: Number,
           observer: '_selectedSchemaIndexObserver',
+          notify: true
         },
 
         selectedSchema: {
           type: Object,
+          notify: true,
+        },
+
+        interactions: {
+          type: Array,
+          value: [],
+        },
+
+        filteredInteractions: {
+          type: Array,
+          computed: '_filterInteractions(interactions)',
+        },
+
+        selectedInteractionIndex: {
+          type: Object,
+        },
+
+        currentEditingItem: {
+          type: Object
+        },
+
+        shouldRenderTable: {
+          type: Boolean,
         },
 
         debugging: {
@@ -226,26 +285,16 @@
       },
 
       ready: function () {
-        this._getDocumentTypes();
       },
 
-      _getDocumentTypes: function () {
-        const operation = this.$.docTypesOp;
-        operation.params = {};
-        operation.execute().then((response) => {
-          this.set('documentTypes', response.value);
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-        });
-      },
+      observers: ['_changesObserver(selectedSchema.*)'],
 
       _getDocumentTypeWithSchema: function () {
         const operation = this.$.docTypesOp;
         operation.params = {"withSchemas": true, "documentType": this.documentTypes[this.selectedDocTypeIndex]};
         operation.execute().then((response) => {
           this.set('documentTypeWithSchema', response.value[0]);
-          this.set('selectedSchema', null);
-          this.set('selectedSchemaIndex', -1);
+          this._renderTable();
         }).catch((error) => {
           console.error('Error triggering operation:', error);
         });
@@ -271,6 +320,7 @@
         operation.execute().then((response) => {
           this._showNotification('Changes Saved!', 'success');
           this.set('schemaSettings', response.value.schemaSettings);
+          this._renderTable();
         }).catch((error) => {
           console.error('Error triggering operation:', error);
           this._showNotification('Changes NOT Saved!', 'error');
@@ -282,7 +332,6 @@
       },
 
       _schemaSettingsObserver(obs) {
-        console.log("schemaSettings", obs);
       },
 
       _showNotification(message, type) {
@@ -306,11 +355,58 @@
       _dialogClosed: function () {
       },
 
+      _filterInteractions(interactions) {
+        return interactions.filter(interaction => interaction.saveMetadata);
+      },
+
       _debug: function (name, info) {
         if (this.debug) {
           console.log(name, info);
         }
-      }
+      },
+
+      _openEditDialog(e) {
+        const item = e.currentTarget.item;  // the row's item
+        this.currentEditingItem = item;
+        this.$.editDialog.open();
+      },
+
+      _getInteractionName(interactionId, interactions) {
+        if (!interactionId || !interactions) {
+          return '';
+        }
+        const match = interactions.find(interaction => interaction.id === interactionId);
+        return match ? match.name : '';
+      },
+
+      _onInteractionChanged(e) {
+        if (this.currentEditingItem && e.detail && e.detail.value) {
+          const selectedId = e.detail.value;
+          this.set('currentEditingItem.interactionId', selectedId);
+        }
+      },
+
+      //Forces table data update
+      _renderTable() {
+        const schemas = this.documentTypeWithSchema.schemas;
+
+        if (!schemas || schemas.length === 0) {
+          console.warn('No schemas available');
+          return;
+        }
+
+        const firstIndex = 0;
+        const lastIndex = schemas.length - 1;
+
+        const selectedSchemaIndex = this.selectedSchemaIndex;
+        this.set('selectedSchemaIndex', firstIndex);
+        this.set('selectedSchemaIndex', lastIndex);
+        this.set('selectedSchemaIndex', selectedSchemaIndex);
+      },
+
+      _changesObserver(obs) {
+        this.$.tableDom.render();
+      },
 
     });
   </script>
