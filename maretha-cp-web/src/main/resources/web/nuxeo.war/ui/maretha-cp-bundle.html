@@ -37,19 +37,31 @@
 
 <nuxeo-slot-content name="documentMetadata" slot="DOCUMENT_ACTIONS" order="0">
     <template>
-        <cp-document-get-metadata document="[[document]]"></cp-document-get-metadata>
+        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-METADATA&quot;))" user="[[user]]">
+            <template>
+                <cp-document-get-metadata document="[[document]]"></cp-document-get-metadata>
+            </template>
+        </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 
 <nuxeo-slot-content name="documentInteractions" slot="DOCUMENT_ACTIONS" order="0">
     <template>
-        <cp-document-interaction document="[[document]]"></cp-document-interaction>
+        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-INTERACTION&quot;))" user="[[user]]">
+            <template>
+                <cp-document-interaction document="[[document]]"></cp-document-interaction>
+            </template>
+        </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 
 <nuxeo-slot-content name="documentChat" slot="DOCUMENT_ACTIONS" order="0">
     <template>
-        <cp-document-chat document="[[document]]"></cp-document-chat>
+        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-CHAT&quot;))" user="[[user]]">
+            <template>
+                <cp-document-chat document="[[document]]"></cp-document-chat>
+            </template>
+        </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 
