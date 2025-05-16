@@ -188,7 +188,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             doc.addFacet(RESULTS_FACET);
             Settings settings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
             if (settings.isAwsS3AccessEnabled()) {
-                String s3Path = getS3Path(doc);
+                String s3Path = getS3Path(blob);
                 storeId = Framework.getService(APIService.class).uploadS3FileToStore(blob, s3Path);
             } else {
                 storeId = Framework.getService(APIService.class).uploadFileToStore(blob);
@@ -298,11 +298,9 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     //source: "s3://composable-bs-test/my-photo.jpg#eu-north-1",
-    private String getS3Path(DocumentModel doc) {
-        Property blobProperty = doc.getProperty(FILE_CONTENT);
-        ManagedBlob blob = (ManagedBlob) blobProperty.getValue();
+    private String getS3Path(Blob blob) {
         CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
-        return cloudStorageFileShare.getS3FilePath(blob);
+        return cloudStorageFileShare.getS3FilePath((ManagedBlob) blob);
     }
 
     private boolean isImage(Blob blob) {
