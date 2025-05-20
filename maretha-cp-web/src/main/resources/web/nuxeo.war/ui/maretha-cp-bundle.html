@@ -37,7 +37,7 @@
 
 <nuxeo-slot-content name="documentMetadata" slot="DOCUMENT_ACTIONS" order="0">
     <template>
-        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-METADATA&quot;))" user="[[user]]">
+        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-METADATA&quot;))" user="[[user]]">
             <template>
                 <cp-document-get-metadata document="[[document]]"></cp-document-get-metadata>
             </template>
@@ -47,7 +47,7 @@
 
 <nuxeo-slot-content name="documentInteractions" slot="DOCUMENT_ACTIONS" order="0">
     <template>
-        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-INTERACTION&quot;))" user="[[user]]">
+        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-INTERACTION&quot;))" user="[[user]]">
             <template>
                 <cp-document-interaction document="[[document]]"></cp-document-interaction>
             </template>
@@ -57,7 +57,7 @@
 
 <nuxeo-slot-content name="documentChat" slot="DOCUMENT_ACTIONS" order="0">
     <template>
-        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-CHAT&quot;))" user="[[user]]">
+        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-CHAT&quot;))" user="[[user]]">
             <template>
                 <cp-document-chat document="[[document]]"></cp-document-chat>
             </template>
@@ -79,7 +79,7 @@
 <!-- Contribution of element 'nuxeo-menu-icon' for slot 'DRAWER_ITEMS' -->
 <nuxeo-slot-content name="Find" slot="DRAWER_ITEMS" order="1">
     <template>
-        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-SEARCH&quot;))" user="[[user]]">
+        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-SEARCH&quot;))" user="[[user]]">
             <template>
                 <nuxeo-menu-icon name="find" label="AI search" icon="icons:info-outline"></nuxeo-menu-icon>
             </template>
