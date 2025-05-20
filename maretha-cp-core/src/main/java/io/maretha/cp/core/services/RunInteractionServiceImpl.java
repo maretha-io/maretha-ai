@@ -16,7 +16,6 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.ecm.directory.Directory;
@@ -62,24 +61,28 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
         Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
         if (saveMetadata) {
-            Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true);
-            schemasFieldsInIsolation.forEach(schemasFieldInIsolation -> {
-                String interactionResponse;
-                Map<String, Object> isolationParamsMap = addSchemasAndDictionariesToParams(Set.of(schemasFieldInIsolation), paramsMap);
-                String customInteractionId = schemasFieldInIsolation.getInteractionId();
-                if (StringUtils.isNotEmpty(customInteractionId)) {
-                    interactionResponse = Framework.getService(APIService.class).getInteractionResult(customInteractionId, isolationParamsMap, false);
-                } else {
-                    interactionResponse = Framework.getService(APIService.class).getInteractionResult(interactionId, isolationParamsMap, false);
-                }
-                validateAndSaveMetadata(interactionResponse, doc, session, saveMetadataModeOverride, Set.of(schemasFieldInIsolation));
-            });
-            Set<DocTypeWithSchema.Schema.Field> schemasFields = getSchemaFields(doc, session, false);
-            Map<String, Object> paramsMapWithSchemaFields = addSchemasAndDictionariesToParams(schemasFields, paramsMap);
-            String response = Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMapWithSchemaFields, false);
-            return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, schemasFields);
+            return processSaveMetadata(doc, session, interactionId, saveMetadataModeOverride, paramsMap);
         }
         return Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMap, true);
+    }
+
+    private String processSaveMetadata(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap) {
+        Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true);
+        schemasFieldsInIsolation.forEach(schemasFieldInIsolation -> {
+            String interactionResponse;
+            Map<String, Object> isolationParamsMap = addSchemasAndDictionariesToParams(Set.of(schemasFieldInIsolation), paramsMap);
+            String customInteractionId = schemasFieldInIsolation.getInteractionId();
+            if (StringUtils.isNotEmpty(customInteractionId)) {
+                interactionResponse = Framework.getService(APIService.class).getInteractionResult(customInteractionId, isolationParamsMap, false);
+            } else {
+                interactionResponse = Framework.getService(APIService.class).getInteractionResult(interactionId, isolationParamsMap, false);
+            }
+            validateAndSaveMetadata(interactionResponse, doc, session, saveMetadataModeOverride, Set.of(schemasFieldInIsolation));
+        });
+        Set<DocTypeWithSchema.Schema.Field> schemasFields = getSchemaFields(doc, session, false);
+        Map<String, Object> paramsMapWithSchemaFields = addSchemasAndDictionariesToParams(schemasFields, paramsMap);
+        String response = Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMapWithSchemaFields, false);
+        return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, schemasFields);
     }
 
     public String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride, Set<DocTypeWithSchema.Schema.Field> schemasFields) {
@@ -90,7 +93,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             try {
                 resultNode = jsonNode.get("result").get("result");
             } catch (Exception e) {
-                throw new NuxeoException("Missing json result from API Response", e);
+                log.error("Missing json result from API Response", e);
+                return "ERROR: Missing json result from API Response";
             }
             resultNode.fields().forEachRemaining(field -> {
                 String key = field.getKey();
