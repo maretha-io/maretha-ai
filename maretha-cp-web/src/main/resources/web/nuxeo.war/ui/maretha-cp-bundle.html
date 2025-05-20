@@ -79,7 +79,11 @@
 <!-- Contribution of element 'nuxeo-menu-icon' for slot 'DRAWER_ITEMS' -->
 <nuxeo-slot-content name="Find" slot="DRAWER_ITEMS" order="1">
     <template>
-        <nuxeo-menu-icon name="find" label="AI search" icon="icons:info-outline"></nuxeo-menu-icon>
+        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-SEARCH&quot;))" user="[[user]]">
+            <template>
+                <nuxeo-menu-icon name="find" label="AI search" icon="icons:info-outline"></nuxeo-menu-icon>
+            </template>
+        </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 <!-- Contribution of element 'nuxeo-search-form' for slot 'DRAWER_PAGES' -->
