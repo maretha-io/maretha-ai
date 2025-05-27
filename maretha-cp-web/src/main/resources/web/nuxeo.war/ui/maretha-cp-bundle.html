@@ -110,3 +110,16 @@
         </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
+
+<script>
+	(function () 
+	{
+		const styleSheet = new CSSStyleSheet();
+		styleSheet.replaceSync(`nuxeo-document-create-button.maretha-cp-interactions { display: none !important }`);
+
+		document.body.querySelector('nuxeo-app').shadowRoot.adoptedStyleSheets = [
+			...document.body.querySelector('nuxeo-app').shadowRoot.adoptedStyleSheets,
+			styleSheet
+		];
+	})();
+</script>

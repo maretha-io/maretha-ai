@@ -74,12 +74,16 @@
 				margin: 1rem 1rem 0;
 				padding: 1rem;
 			}
+
+			paper-toggle-button {
+				cursor: pointer;
+			}
 		</style>
 
 		<template id="list" is="dom-repeat" items="[[ interactions ]]" as="interaction" index-as="ix">
 			<cp-collapsible-content label="[[ interaction.name ]]" description="[[ interaction.description ]]"
 				active="[[ interaction.active ]]" status="[[ interaction.status ]]" version="[[ interaction.version ]]"
-				is-dirty="[[ interaction._dirty ]]">
+				is-dirty="[[ _isDirty(interaction._dirty, changesSaved) ]]">
 
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Activation">
 					<nuxeo-selectivity class="selectivity-container" multiple min-chars="0" data="{{documentTypes}}"
@@ -91,6 +95,10 @@
 
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Settings">
 					<div class="config">
+						<paper-toggle-button checked="{{interaction.active}}" on-change="_markAsDirty">
+							Enabled
+						</paper-toggle-button>
+
 						<paper-toggle-button checked="{{interaction.activeOnActionMenu}}" on-change="_markAsDirty">
 							Available in Action Menu
 						</paper-toggle-button>
@@ -234,6 +242,10 @@
 					value: [],
 					notify: true
 				},
+				changesSaved: {
+					type: Boolean,
+					value: true
+				},
 				_selectedParameter: Object,
 				_selectedParameterIndex: Number,
 				_selectedInteractionIndex: Number,
@@ -248,12 +260,14 @@
 
 			_deleteInteraction(e)
 			{
-				if (confirm('Are you sure you want to remove this interaction: ' + this.selectedInteraction.name + ' ?'))
-				{
-					const newInteractionsArray = this.interactions.filter(obj => obj.id !== this.selectedInteraction.id);
-					this.set('interactions', newInteractionsArray);
-					this._saveInteractions();
-				}
+				const interaction = e.model.__data.interaction;
+
+				if (!confirm(`Are you sure you want to remove this interaction: ${interaction.name}?`))
+					return;
+
+				this.set('interactions', this.interactions.filter(x => x.id !== interaction.id));
+
+				this.fire('mark-as-dirty', { interactions: this.interactions });
 			},
 
 			_isDocArrayType(param)
@@ -270,14 +284,19 @@
 			{
 				this.set(`interactions.${(e.target.dataset.ix | 0)}._dirty`, true);
 
-				this.fire('mark-as-dirty', { interactions: true });
+				this.fire('mark-as-dirty', { interactions: this.interactions });
 			},
 
 			_markAsDirty(e)
 			{
 				this.set(`interactions.${e.model.__data.ix}._dirty`, true);
 
-				this.fire('mark-as-dirty', { interactions: this.interactions.filter(x => x._dirty) });
+				this.fire('mark-as-dirty', { interactions: this.interactions });
+			},
+
+			_isDirty(interactionDirty)
+			{
+				return interactionDirty && !this.changesSaved;
 			}
 		})
 	</script>
