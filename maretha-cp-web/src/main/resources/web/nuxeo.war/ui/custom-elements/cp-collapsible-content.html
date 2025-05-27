@@ -1,0 +1,254 @@
+<dom-module id="cp-collapsible-content">
+	<template>
+		<style include="nuxeo-styles">
+			:host {
+				display: block;
+			}
+
+			::-webkit-scrollbar {
+				height: 7px;
+				width: 7px;
+				background: #edeeef;
+				box-shadow: none;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #cdcdcd;
+				box-shadow: none;
+			}
+
+			.collapsible {
+				scroll-margin: 1rem;
+			}
+
+			.collapsible .toggle {
+				display: flex;
+				cursor: pointer;
+				font-weight: bold;
+				gap: 1rem;
+				padding: 1rem 1rem 0;
+				transition: all .3s ease-in-out;
+				position: relative;
+				z-index: 1;
+			}
+
+			.collapsible.visible .toggle {
+				background-color: var(--nuxeo-card_-_background-color, white);
+			}
+
+			.collapsible.visible .toggle:after {
+				content: '';
+				position: absolute;
+				bottom: -1.5rem;
+				left: 0;
+				right: 8px;
+				height: 1.5rem;
+				background: linear-gradient(180deg, rgba(255, 255, 255, 1) 30%, rgba(255, 255, 255, 0) 100%);
+			}
+
+			.toggle .state {
+				display: inline-block;
+				margin-top: 0.25rem;
+				height: 1.125rem;
+				width: 1.125rem;
+				border-radius: 50%;
+				background-color: rgb(166, 169, 181);
+				opacity: .5;
+			}
+
+			.toggle .state.active {
+				background-color: var(--nuxeo-button-primary);
+				opacity: 1;
+			}
+
+			.toggle .state.dirty {
+				box-shadow: 0 0 0 0 rgb(104, 154, 31, 1);
+				transform: scale(1);
+				animation: pulse 1s infinite;
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(0.95);
+					box-shadow: 0 0 0 0 rgb(104, 154, 31, 1);
+				}
+
+				70% {
+					transform: scale(1);
+					box-shadow: 0 0 0 10px rgb(104, 154, 31, 0);
+				}
+
+				100% {
+					transform: scale(0.95);
+					box-shadow: 0 0 0 0 rgb(104, 154, 31, 0);
+				}
+			}
+
+			.collapsible .content {
+				max-height: 0;
+				opacity: 0;
+				transform: scale(1, .5);
+				transform-origin: top center;
+				overflow: hidden;
+				padding: 0;
+				transition: all .3s ease-in-out;
+				background-color: var(--nuxeo-card_-_background-color, white);
+				box-shadow: 0 0.75rem 1rem -0.325rem rgba(0, 0, 0, .25);
+			}
+
+			.collapsible.visible .content {
+				max-height: 600px;
+				opacity: 1;
+				transform: none;
+				margin-bottom: 2rem;
+			}
+
+			.arrow {
+				border: solid black;
+				border-width: 0 2px 2px 0;
+				display: inline-block;
+				padding: 2px;
+				width: 3px;
+    			height: 3px;
+				transition: all .3s ease-in-out;
+				transform: rotate(225deg);
+			}
+
+			.collapsible.visible .arrow {
+				transform: rotate(45deg);
+			}
+
+			.body {
+				padding: 0 1rem 1rem;
+				max-height: 500px;
+				overflow: auto;
+			}
+
+			.header {
+				flex-grow: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: start;
+				line-height: 1.4;
+				padding: 0;
+			}
+
+			.header h4 {
+				margin: 0;
+			}
+
+			.header span {
+				font-weight: normal;
+				color: #888;
+			}
+
+			.footer {
+				display: flex;
+				justify-content: end;
+				gap: 1rem;
+				align-items: center;
+				padding: 1rem;
+				border-top: 1px solid rgba(0, 0, 0, .125);
+				position: relative;
+				z-index: 1;
+			}
+
+			.footer:before {
+				content: '';
+				position: absolute;
+				top: calc(-1px - 2.5rem);
+				left: 0;
+				right: 8px;
+				height: 2.5rem;
+				background: linear-gradient(0deg, rgba(255, 255, 255, 1) 30%, rgba(255, 255, 255, 0) 100%);
+			}
+
+			.footer .stats {
+				display: flex;
+				justify-content: space-between;
+				gap: 1rem;
+				align-items: center;
+			}
+		</style>
+
+		<div id="collapsible" class="collapsible">
+			<div class="toggle" on-tap="_toggle">
+				<i class$="state [[ stateCss ]]" id="state"></i>
+				<nuxeo-tooltip for="state">[[tooltip]]</nuxeo-tooltip>
+				<div class="header">
+					<h4>[[ label ]]</h4>
+					<span>[[ description ]]</span>
+				</div>
+				<i class="arrow"></i>
+			</div>
+			<div class="content">
+				<div class="body">
+					<slot></slot>
+				</div>
+
+				<div class="footer">
+					<div class="stats">
+						<nuxeo-tag>Status: <b>[[status]]</b></nuxeo-tag>
+						<nuxeo-tag>Version: <b>[[version]]</b></nuxeo-tag>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</template>
+
+	<script>
+		Polymer({
+			is: 'cp-collapsible-content',
+			behaviors: [Nuxeo.LayoutBehavior],
+			properties: {
+				expanded: Boolean,
+				label: String,
+				description: String,
+				status: String,
+				version: String,
+				active: Boolean,
+				interaction: Object,
+				isDirty: {
+					type: Boolean,
+					value: false,
+					notify: true
+				},
+				stateCss: {
+					type: String,
+					computed: '_computeStateCss(active, isDirty)'
+				}
+			},
+
+			attached()
+			{
+				if (this.expanded)
+					this.$.collapsible.classList.add('visible');
+			},
+
+			_toggle()
+			{
+				if (this.$.collapsible.classList.contains('visible'))
+					this.$.collapsible.classList.remove('visible');
+				else
+				{
+					this.$.collapsible.classList.add('visible');
+
+					setTimeout(() =>
+					{
+						this.$.collapsible.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+
+						this.fire('cp-collapsible-content-expanded', { detail: this.interaction });
+					}, 300);
+				}
+
+				this.expanded = !this.expanded;
+			},
+
+			_computeStateCss(active, isDirty)
+			{
+				return [`${active ? 'active' : ''}`, `${isDirty ? 'dirty' : ''}`].join(' ');
+			}
+		});
+	</script>
+</dom-module>

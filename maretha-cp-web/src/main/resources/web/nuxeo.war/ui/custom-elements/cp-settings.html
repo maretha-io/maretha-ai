@@ -1,443 +1,304 @@
+<link rel="import" href="./cp-settings-interactions.html">
+<link rel="import" href="./cp-settings-metadata.html">
+<link rel="import" href="./cp-settings-elasticsearch.html">
+<link rel="import" href="./cp-settings-vertesia.html">
+<link rel="import" href="./cp-settings-events.html">
+
 <dom-module id="cp-settings">
-  <template>
-    <nuxeo-operation id="getSettingsOperation" op="GetSettingsOperation"></nuxeo-operation>
-    <nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation"></nuxeo-operation>
-    <nuxeo-operation id="docTypesOp" op="GetDocumentTypesOperation"></nuxeo-operation>
-
-    <style include="nuxeo-styles">
-      .content {
-        width: 100%;
-      }
-
-      paper-checkbox {
-        padding: 10px;
-        width: 50%;
-      }
-
-      paper-toggle-button {
-        --paper-toggle-button-checked-bar-color: var(--paper-green-500);
-        --paper-toggle-button-checked-button-color: var(--paper-green-500);
-        --paper-toggle-button-checked-ink-color: var(--paper-green-500);
-        --paper-toggle-button-unchecked-bar-color: var(--paper-red-500);
-        --paper-toggle-button-unchecked-button-color: var(--paper-red-500);
-        --paper-toggle-button-unchecked-ink-color: var(--paper-red-500);
-      }
-
-      .toast-error {
-        background-color: #f44336;
-        /* Red */
-        color: white;
-      }
-
-      .toast-success {
-        background-color: #4caf50;
-        /* Green */
-        color: white;
-      }
-
-      .toast-warning {
-        background-color: #ff9800;
-        /* Orange */
-        color: white;
-      }
-
-      .table {
-        width: 100%;
-      }
-
-      #dialog {
-        width: 80%;
-        min-height: 50%;
-        margin: auto;
-      }
-
-      .buttons {
-        margin: auto;
-        display: block;
-        text-align: right;
-        padding: 15px;
-      }
-
-      .nuxeo-card {
-        width: 100%;
-        height: 100%;
-        text-align: left;
-        box-shadow: 0 3px 20px rgb(0 0 0 / 10%);
-      }
-
-      .flex-container {
-        display: flex;
-        flex-wrap: wrap;
-        text-align: center;
-      }
-
-      .flex-item-left {
-        padding: 10px;
-        flex: 30%;
-      }
-
-      .flex-item-center {
-        padding: 10px;
-        flex: 30%;
-      }
-
-      .flex-item-right {
-        padding: 10px;
-        flex: 30%;
-      }
-
-      .close-button {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: none;
-        border: none;
-        font-size: 18px;
-        cursor: pointer;
-      }
-    </style>
-
-    <nuxeo-page>
-      <div slot="header">
-        <span>AI Interactions Management</span>
-      </div>
-      <div id="main slot">
-        <paper-toast id="toast"></paper-toast>
-
-        <nuxeo-card>
-          <h3>Interactions</h3>
-          <div class="content">
-            <nuxeo-data-table items="[[interactions]]" class="results-table">
-              <nuxeo-data-table-column name="Name" flex="30">
-                <template>
-                  <a href="https://cloud.vertesia.io/studio/interactions/{{item.id}}"
-                     target="_blank">{{item.name}}</a>
-                </template>
-              </nuxeo-data-table-column>
-
-              <nuxeo-data-table-column name="Description" flex="50">
-                <template>
-                  [[item.description]]
-                </template>
-              </nuxeo-data-table-column>
-
-              <nuxeo-data-table-column name="Active" flex="10">
-                <template>
-                  <paper-toggle-button checked="{{item.active}}"
-                                       on-change="_saveInteractions">Active</paper-toggle-button>
-                </template>
-              </nuxeo-data-table-column>
-
-              <nuxeo-data-table-column name="Status" flex="5">
-                <template>
-                  [[item.status]]
-                </template>
-              </nuxeo-data-table-column>
-
-              <nuxeo-data-table-column name="Configuration" flex="5">
-                <template>
-                  <paper-icon-button icon="editor:border-color" label="Configuration" interaction="{{item}}"
-                                     on-tap="_toggleDialog">
-                    <nuxeo-tooltip>Configuration</nuxeo-tooltip>
-                  </paper-icon-button>
-                </template>
-              </nuxeo-data-table-column>
-            </nuxeo-data-table>
-
-            <div class="buttons">
-              <paper-button id="refresh" on-tap="_refresh" aria-label="Refresh" raised style="">
-                Refresh
-                <iron-icon icon="icons:refresh"></iron-icon>
-              </paper-button>
-            </div>
-
-            <div class="buttons">
-              <paper-toggle-button checked="{{awsS3AccessEnabled}}"
-                                   on-change="_saveInteractions">AWS S3 Path Enabled</paper-toggle-button>
-            </div>
-          </div>
-        </nuxeo-card>
-
-        <template is="dom-if" if="[[visible]]">
-          <cp-settings-metadata interactions="[[interactions]]" document-types="[[documentTypes]]"></cp-settings-metadata>
-          <cp-settings-events interactions="[[interactions]]" document-types="[[documentTypes]]"></cp-settings-events>
-          <!--        <cp-settings-elasticsearch></cp-settings-elasticsearch>-->
-          <cp-settings-vertesia></cp-settings-vertesia>
-        </template>
-
-      </div>
-
-      <nuxeo-dialog id="dialog" opened="{{opened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
-        <button class="close-button" on-click="_close">X</button>
-        <div class="content" style="width: auto;max-width: 100%;">
-          <h2>Configure your Vertesia Interaction</h2>
-          <div>
-            <div class="flex-container">
-              <div class="flex-item-left">
-                <nuxeo-card role="widget" class="nuxeo-card" heading="Interaction: [[selectedInteraction.name]]">
-                  <p>Description: [[selectedInteraction.description]]</p>
-                  <p>Version: [[selectedInteraction.version]]</p>
-                  <p>Status: [[selectedInteraction.status]]</p>
-                </nuxeo-card>
-              </div>
-
-              <div class="flex-item-center">
-                <nuxeo-card role="widget" class="nuxeo-card" heading="Parameters">
-                  <template is="dom-repeat" items="[[selectedInteraction.parameters]]" as="item">
-                    <div class="parameter"
-                         style="box-shadow:0 3px 5px rgb(0 0 0 / 30%);margin: auto;padding: 10px; margin-bottom: 5px;">
-                      <template is="dom-if" if="[[item.description]]">
-                        <p>Description: [[item.description]]</p>
-                      </template>
-                      <nuxeo-input role="widget" value="{{item.value}}"
-                                   label="name: [[item.name]] type: [[item.type]] [[item.format]]" type="[[item.type]]"
-                                   placeholder="default value" style="margin: auto;"></nuxeo-input>
-                      <paper-toggle-button checked="{{item.readOnly}}" aria-label$="ReadOnly"
-                                           on-change="_saveInteractions">Disable Edit</paper-toggle-button>
-                      <paper-toggle-button checked="{{item.isMainDocument}}" aria-label$="isMainDocument"
-                                           on-change="_saveInteractions">Main Document</paper-toggle-button>
-                      <paper-toggle-button checked="{{item.isContextMemoryParameter}}" aria-label$="isContextMemory"
-                                           on-change="_saveInteractions">Context Memory</paper-toggle-button>
-                      <template is="dom-if" if="[[_isDocType(item)]]">
-                        <paper-toggle-button checked="{{item.enableDocSelection}}" aria-label$="EnableDocSelection"
-                                             on-change="_saveInteractions">Enable Selection</paper-toggle-button>
-                      </template>
-                      <template is="dom-if" if="[[item.enableDocSelection]]">
-                        <paper-toggle-button checked="{{item.selectionReadOnly}}" aria-label$="EnableDocSelection"
-                                             on-change="_saveInteractions">Disable Selection Edit</paper-toggle-button>
-                        <template is="dom-if" if="[[_isDocArrayType(item)]]">
-                          <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
-                                                     multiple="[[_isDocArrayType(item)]]"
-                                                     min-chars="0" name="selectedDocs" role="widget" on-change="_saveInteractions"></nuxeo-document-suggestion >
-                        </template>
-                        <template is="dom-if" if="[[!_isDocArrayType(item)]]">
-                          <nuxeo-document-suggestion value="{{item.selectedDocumentId}}" label="Selected Document"
-                                                     min-chars="0" name="selectedDoc" role="widget" on-change="_saveInteractions"></nuxeo-document-suggestion >
-                        </template>
-
-                      </template>
-                    </div>
-                  </template>
-                </nuxeo-card>
-              </div>
-
-              <div class="flex-item-right">
-                <nuxeo-card role="widget" class="nuxeo-card" heading="Configuration">
-                  <div style="display: inline-flex;">
-                    <span>Available in Action Menu:</span>
-                    <paper-toggle-button checked="{{selectedInteraction.activeOnActionMenu}}"
-                                         on-change="_saveInteractions"></paper-toggle-button>
-                  </div>
-
-                  <div style="display: inline-flex;">
-                    <span>Executable on Folders:</span>
-                    <paper-toggle-button checked="{{selectedInteraction.activeOnFolder}}"
-                                         on-change="_saveInteractions"></paper-toggle-button>
-                  </div>
-
-                  <div style="display: inline-block;width: 100%;">
-                    <span>Active for documents:</span>
-                    <nuxeo-selectivity class="selectivity-container" style="margin: auto;text-align: left;" multiple
-                                       min-chars="0" data="{{documentTypes}}" value="{{selectedInteraction.activeOnDocumentTypes}}"
-                                       placeholder="Select Document Types"></nuxeo-selectivity>
-                  </div>
-
-                  <div style="display: inline-flex;">
-                    <span>Is Chat:</span>
-                    <paper-toggle-button checked="{{selectedInteraction.chat}}"
-                                         on-change="_saveInteractions"></paper-toggle-button>
-                  </div>
-
-                  <div style="display: inline-flex;">
-                    <span>Save Metadata:</span>
-                    <paper-toggle-button checked="{{selectedInteraction.saveMetadata}}"
-                                         on-change="_saveInteractions"></paper-toggle-button>
-                  </div>
-
-                  <div style="display: inline-flex;">
-                    <span>Main Metadata:</span>
-                    <paper-toggle-button checked="{{selectedInteraction.mainMetadata}}"
-                                         on-change="_saveInteractions"></paper-toggle-button>
-                  </div>
-                </nuxeo-card>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-        <div class="buttons" style="padding: 40px;">
-          <paper-button id="deleteInteraction" on-tap="_deleteInteraction" aria-label="Delete" raised
-                        style="background-color: #f44336;color: white; ">
-            Delete
-            <iron-icon icon="icons:delete-forever"></iron-icon>
-          </paper-button>
-
-          <paper-button id="save" on-tap="_saveInteractions" aria-label="Save Configuration" raised>
-            Save Configuration
-            <iron-icon icon="icons:save"></iron-icon>
-          </paper-button>
-        </div>
-      </nuxeo-dialog>
-
-    </nuxeo-page>
-  </template>
-
-  <script>
-    Polymer({
-      is: 'cp-settings',
-      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
-      properties: {
-        interactions: {
-          type: Array,
-          value: [],
-          observer: '_interactionsObserver',
-          notify: true
-        },
-
-        awsS3AccessEnabled: {
-          type: Boolean,
-        },
-
-        selectedInteraction: {
-          type: Object,
-          observer: '_selectedInteractionObserver',
-        },
-
-        documentTypes: {
-          type: Array,
-          value: [],
-          observer: '_documentTypesObserver'
-        },
-
-        debugging: {
-          type: Boolean,
-          value: false
-        },
-
-        visible: {
-          type: Boolean,
-          observer: '_visibleObserver'
-        },
-      },
-
-      observers: ['_interactionsChangeObserver(interactions.*)'],
-
-      ready: function () {
-      },
-
-      _getInteractions: function () {
-        const operation = this.$.getSettingsOperation;
-        operation.params = {};
-        operation.execute().then((response) => {
-          this.set('interactions', response.value.interactions);
-          this.set('awsS3AccessEnabled', response.value.awsS3AccessEnabled);
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-        });
-      },
-
-      _getDocumentTypes: function () {
-        const operation = this.$.docTypesOp;
-        operation.params = {};
-        operation.execute().then((response) => {
-          this.set('documentTypes', response.value);
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-        });
-      },
-
-      _saveInteractions: function () {
-        const operation = this.$.saveInteractionsOperation;
-        operation.params = { 'interactions': this.interactions, 'awsS3AccessEnabled': this.awsS3AccessEnabled };
-        operation.execute().then((response) => {
-          this._showNotification('Changes Saved!', 'success');
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-          this._showNotification('Changes NOT Saved!', 'error');
-        });
-      },
-
-      _interactionsObserver(obs) {
-        this._debug(`_interactionsObserver:`, obs);
-      },
-
-      _selectedInteractionObserver(obs) {
-        this._debug(`_selectedInteractionObserver`, obs);
-      },
-
-      _interactionsChangeObserver(obs) {
-        this._debug(`_interactionsObserver:`, obs);
-      },
-
-      _documentTypesObserver(obs) {
-        this._debug(`_documentTypesObserver:`, obs);
-      },
-
-      _showNotification(message, type) {
-        const toast = this.$.toast;
-        toast.text = message;
-        toast.classList.remove('toast-error', 'toast-success', 'toast-warning'); // Remove existing classes
-        if (type) {
-          toast.classList.add(`toast-${type}`);
-        }
-        toast.open();
-      },
-
-      _toggleDialog: function (e) {
-        this.set('selectedInteraction', e.currentTarget.interaction);
-        this.$.dialog.toggle();
-      },
-
-      _close: function () {
-        this.$.dialog.toggle();
-      },
-
-      _dialogClosed: function () {
-      },
-
-      _refresh: function () {
-        const operation = this.$.getSettingsOperation;
-        operation.params = { "refresh": true };
-        operation.execute().then((response) => {
-          this.set('interactions', response.value.interactions);
-          this._saveInteractions();
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-        });
-      },
-
-      _deleteInteraction: function (e) {
-        if (confirm('Are you sure you want to remove this interaction: ' + this.selectedInteraction.name + ' ?')) {
-          const newInteractionsArray = this.interactions.filter(obj => obj.id !== this.selectedInteraction.id);
-          this.set('interactions', newInteractionsArray);
-          this._saveInteractions();
-          this.$.dialog.toggle();
-        }
-      },
-
-      _isDocArrayType: function (param) {
-        return param.type === 'array' && param.format === 'document';
-      },
-
-      _isDocType: function (param) {
-        return param.format === 'document';
-      },
-
-      _debug: function (name, info) {
-        if (this.debug) {
-          console.log(name, info);
-        }
-      },
-
-      _visibleObserver(visible){
-        console.log(visible)
-        if(visible){
-          this._getInteractions();
-          this._getDocumentTypes();
-        }
-      },
-
-    });
-  </script>
+	<template>
+		<style include="nuxeo-styles">
+			::-webkit-scrollbar {
+				height: 7px;
+				width: 7px;
+				background: #edeeef;
+				box-shadow: none;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #cdcdcd;
+				box-shadow: none;
+			}
+
+			.primary:not([disabled]) {
+				--iron-icon-fill-color: var(--nx-button-primary_-_background-color);
+			}
+
+			#documentViewsItems {
+				@apply --layout-horizontal;
+				--paper-listbox-background-color: transparent;
+			}
+
+			paper-listbox {
+				padding: 0;
+			}
+
+			@media (max-width: 1024px) {
+				paper-listbox {
+					padding-right: 7rem;
+				}
+			}
+
+			.page-header {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+			}
+
+			.page-header paper-icon-button {
+				width: 2.6rem;
+				height: 2.6rem;
+				margin-bottom: .25rem;
+			}
+
+			.top-bar {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 3rem;
+			}
+
+			.top-bar .actions {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 1rem;
+				padding: 0 .5rem;
+			}
+		</style>
+
+		<nuxeo-page>
+			<div slot="header" class="page-header">
+				AI Interactions Management
+			</div>
+
+			<div slot="tabs" class="top-bar">
+				<paper-listbox id="documentViewsItems" selected="{{selectedTab}}" attr-for-selected="name">
+					<nuxeo-page-item name="interactions" label="Interactions"></nuxeo-page-item>
+					<nuxeo-page-item name="metadata" label="Metadata"></nuxeo-page-item>
+					<nuxeo-page-item name="events" label="Events"></nuxeo-page-item>
+					<nuxeo-page-item name="settings" label="Settings"></nuxeo-page-item>
+				</paper-listbox>
+
+				<div class="actions">
+					<paper-button id="saveBtn" on-tap="_saveChanges"
+						disabled$="[[ !_isDirty ]]" class="primary">
+						Save changes
+					</paper--button>
+
+					<div>
+						<paper-icon-button id="undoBtn" icon="icons:cancel" on-tap="_undoChanges"
+							disabled$="[[ !_isDirty ]]">
+						</paper-icon-button>
+						<nuxeo-tooltip for="undoBtn">
+							Discard all changes
+						</nuxeo-tooltip>
+					</div>
+
+					<div>
+						<paper-icon-button id="refreshBtn" icon="icons:refresh" on-tap="_refresh"
+							disabled$="[[ _refreshing ]]">
+						</paper-icon-button>
+						<nuxeo-tooltip for="refreshBtn">
+							Refresh interactions, metadata, events and settings
+						</nuxeo-tooltip>
+					</div>
+				</div>
+			</div>
+
+			<iron-pages selected="[[selectedTab]]" attr-for-selected="name" selected-item="{{page}}">
+				<cp-settings-interactions name="interactions" interactions="[[ interactions ]]"
+					document-types="[[ documentTypes ]]">
+				</cp-settings-interactions>
+
+				<cp-settings-metadata name="metadata" interactions="[[ interactions ]]"
+					document-types="[[ documentTypes ]]">
+				</cp-settings-metadata>
+
+				<cp-settings-events name="events" interactions="[[ interactions ]]" document-types="[[ documentTypes ]]"
+					events-settings="[[ eventsSettings ]]">
+				</cp-settings-events>
+
+				<cp-settings-vertesia name="settings" vertesia-settings="[[ vertesiaSettings ]]"
+					aws-s3-access-enabled="[[ awsS3AccessEnabled ]]">
+				</cp-settings-vertesia>
+			</iron-pages>
+
+		</nuxeo-page>
+
+		<nuxeo-operation id="getSettingsOperation" op="GetSettingsOperation"></nuxeo-operation>
+		<nuxeo-operation id="docTypesOp" op="GetDocumentTypesOperation"></nuxeo-operation>
+		<nuxeo-operation id="saveInteractionsOperation" op="SaveInteractionsOperation"></nuxeo-operation>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'cp-settings',
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour, Nuxeo.NotifyBehavior],
+			properties: {
+				selectedTab: {
+					type: String,
+					value: 'interactions'
+				},
+				page: Object,
+				interactions: {
+					type: Array,
+					value: []
+				},
+				documentTypes: {
+					type: Array,
+					value: []
+				},
+				eventsSettings: {
+					type: Array,
+					value: []
+				},
+				vertesiaSettings: {
+					type: Array,
+					value: []
+				},
+				awsS3AccessEnabled: Boolean,
+				visible: {
+					type: Boolean,
+					observer: '_visibleObserver'
+				},
+				_refreshing: Boolean,
+				_isDirty: {
+					type: Boolean,
+					value: false
+				},
+				_saveChangesParams: {
+					type: Object,
+					value: {}
+				}
+			},
+
+			attached()
+			{
+				this.addEventListener('mark-as-dirty', this._markAsDirty.bind(this));
+			},
+
+			detached()
+			{
+				this.removeEventListener('mark-as-dirty', this._markAsDirty);
+			},
+
+			_getInteractions()
+			{
+				const operation = this.$.getSettingsOperation;
+				operation.params = {};
+
+				return operation.execute()
+					.then((response) =>
+					{
+						this.set('interactions', response.value.interactions);
+						this.set('eventsSettings', response.value.eventsSettings);
+						this.set('vertesiaSettings', response.value.vertesiaSettings);
+						this.set('awsS3AccessEnabled', response.value.awsS3AccessEnabled);
+					})
+					.catch((error) =>
+					{
+						console.error('Error triggering operation:', error);
+					});
+			},
+
+			_getDocumentTypes()
+			{
+				const operation = this.$.docTypesOp;
+				operation.params = {};
+
+				return operation.execute()
+					.then((response) =>
+					{
+						this.set('documentTypes', response.value);
+					})
+					.catch((error) =>
+					{
+						console.error('Error triggering operation:', error);
+					});
+			},
+
+			_visibleObserver(visible)
+			{
+				if (visible)
+					this._undoChanges();
+			},
+
+			_undoChanges()
+			{
+				Promise.all([
+					this._getInteractions(),
+					this._getDocumentTypes()
+				])
+					.then(() =>
+					{
+						this.set('_saveChangesParams', {});
+						this.set('_isDirty', false);
+					});
+			},
+
+			_refresh()
+			{
+				if (this._refreshing)
+					return;
+
+				this.notify({ message: 'Refreshing interactions, metadata, events and settings...', type: 'info' });
+				this._refreshing = true;
+
+				const operation = this.$.getSettingsOperation;
+				operation.params = { "refresh": true };
+				operation.execute().then((response) =>
+				{
+					this.notify({ message: 'Successfully refreshed interactions, metadata, events and settings', type: 'success' });
+					this.set('interactions', response.value.interactions);
+					this._refreshing = false;
+					// this._saveInteractions();
+				}).catch((error) =>
+				{
+					console.error('Error triggering operation:', error);
+					this._refreshing = false;
+				});
+			},
+
+			_saveChanges()
+			{
+				const operation = this.$.saveInteractionsOperation;
+
+				operation.params = this._saveChangesParams;
+
+				operation.execute()
+					.then((response) =>
+					{
+						this.notify({ message: 'Changes Saved!', type: 'success' });
+
+						this.set('_saveChangesParams', {});
+						this.set('_isDirty', false);
+					})
+					.catch((error) =>
+					{
+						console.error('Error triggering operation:', error);
+						this.notify({ message: 'Error saving changes!', type: 'error' });
+					});
+			},
+
+			_markAsDirty(e)
+			{
+				if (e.detail.interactions)
+					this._saveChangesParams.interactions = e.detail.interactions;
+
+				if (e.detail.schemaSettings)
+					this._saveChangesParams.schemaSettings = e.detail.schemaSettings;
+
+				if (e.detail.eventsSettings)
+					this._saveChangesParams.eventsSettings = e.detail.eventsSettings;
+
+				if (e.detail.vertesiaSettings)
+					this._saveChangesParams.vertesiaSettings = e.detail.vertesiaSettings;
+
+				if (e.detail.awsS3AccessEnabled)
+					this._saveChangesParams.awsS3AccessEnabled = e.detail.awsS3AccessEnabled;
+
+				this.set('_isDirty', true);
+			}
+		});
+	</script>
 </dom-module>
