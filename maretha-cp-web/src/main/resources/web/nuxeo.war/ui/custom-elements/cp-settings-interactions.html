@@ -1,0 +1,284 @@
+<link rel="import" href="./cp-collapsible-content.html">
+
+<dom-module id="cp-settings-interactions">
+	<template>
+		<style include="nuxeo-styles">
+			:host {
+				--paper-checkbox-checked-color: var(--nx-button-primary_-_background-color);
+				--nuxeo-tag_-_font-size: 0.85rem;
+				--nuxeo-tag_-_line-height: 1.6;
+			}
+
+			.config {
+				display: flex;
+				align-items: center;
+				gap: 5rem;
+				height: 100%;
+			}
+
+			nuxeo-data-table-cell {
+				min-width: 0 !important;
+			}
+
+			nuxeo-data-table-cell:nth-of-type(3),
+			nuxeo-data-table-cell:nth-of-type(4),
+			nuxeo-data-table-cell:nth-of-type(5),
+			nuxeo-data-table-cell:nth-of-type(6),
+			nuxeo-data-table-cell:nth-of-type(7) {
+				justify-content: center;
+				text-align: center;
+			}
+
+			nuxeo-data-table-cell:last-of-type {
+				justify-content: end;
+				text-align: right;
+			}
+
+			nuxeo-data-table-cell paper-input,
+			nuxeo-data-table-cell nuxeo-document-suggestion {
+				width: 100%;
+			}
+
+			.parameter-name {
+				display: flex;
+				flex-direction: column;
+				line-height: 1.3;
+			}
+
+			.parameter-name div {
+				text-transform: capitalize;
+			}
+
+			.parameter-name span {
+				color: #888;
+				display: inline-flex;
+				gap: .25rem;
+			}
+
+			.delete-interaction {
+				display: flex;
+				justify-content: start;
+				padding: 1.25rem 1rem 1.25rem;
+			}
+
+			.delete-interaction paper-button {
+				background-color: #f44336;
+				color: white;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+
+			nuxeo-card {
+				box-shadow: 0 0 3px -1px rgba(0, 0, 0, .5);
+				margin: 1rem 1rem 0;
+				padding: 1rem;
+			}
+		</style>
+
+		<template id="list" is="dom-repeat" items="[[ interactions ]]" as="interaction" index-as="ix">
+			<cp-collapsible-content label="[[ interaction.name ]]" description="[[ interaction.description ]]"
+				active="[[ interaction.active ]]" status="[[ interaction.status ]]" version="[[ interaction.version ]]"
+				is-dirty="[[ interaction._dirty ]]">
+
+				<nuxeo-card role="widget" class="nuxeo-card" heading="Activation">
+					<nuxeo-selectivity class="selectivity-container" multiple min-chars="0" data="{{documentTypes}}"
+						value="{{interaction.activeOnDocumentTypes}}" required data-ix$="[[ ix ]]"
+						on-value-changed="_activeDocumentsChanged" stay-open-on-select
+						label="List of document types this interaction is active for"
+						placeholder="Select one or more document type this interaction should be active for"></nuxeo-selectivity>
+				</nuxeo-card>
+
+				<nuxeo-card role="widget" class="nuxeo-card" heading="Settings">
+					<div class="config">
+						<paper-toggle-button checked="{{interaction.activeOnActionMenu}}" on-change="_markAsDirty">
+							Available in Action Menu
+						</paper-toggle-button>
+
+						<paper-toggle-button checked="{{interaction.activeOnFolder}}" on-change="_markAsDirty">
+							Executable on Folders
+						</paper-toggle-button>
+
+						<paper-toggle-button checked="{{interaction.chat}}" on-change="_markAsDirty">
+							Is Chat
+						</paper-toggle-button>
+
+						<paper-toggle-button checked="{{interaction.saveMetadata}}" on-change="_markAsDirty">
+							Save Metadata
+						</paper-toggle-button>
+
+						<paper-toggle-button checked="{{interaction.mainMetadata}}" on-change="_markAsDirty">
+							Main Metadata
+						</paper-toggle-button>
+					</div>
+					</div>
+
+				</nuxeo-card>
+
+				<nuxeo-card role="widget" class="nuxeo-card" heading="Parameter configuration">
+					<nuxeo-data-table items="[[interaction.parameters]]" class="results-table">
+						<nuxeo-data-table-column name="Parameter name" flex="1">
+							<template>
+								<div class="parameter-name">
+									<div>[[item.name]]</div>
+									<span>
+										<template is="dom-if" if="[[ item.type ]]">
+											<small>[[ item.type ]]</s>
+										</template>
+										<template is="dom-if" if="[[ item.format ]]">
+											<small>[[ item.format ]]</small>
+										</template>
+									</span>
+								</div>
+							</template>
+						</nuxeo-data-table-column>
+
+						<nuxeo-data-table-column name="Default value" flex="2">
+							<template>
+								<paper-input type="[[item.type]]" value="{{item.value}}" on-input="_markAsDirty">
+								</paper-input>
+							</template>
+						</nuxeo-data-table-column>
+
+						<nuxeo-data-table-column name="Read-only" flex="0">
+							<template>
+								<paper-checkbox checked="{{ item.readOnly }}" on-change="_markAsDirty" />
+							</template>
+						</nuxeo-data-table-column>
+
+						<nuxeo-data-table-column name="Main document" flex="0">
+							<template>
+								<paper-checkbox checked="{{ item.isMainDocument }}" on-change="_markAsDirty" />
+							</template>
+						</nuxeo-data-table-column>
+
+						<nuxeo-data-table-column name="Context memory" flex="0">
+							<template>
+								<paper-checkbox checked="{{ item.isContextMemoryParameter }}"
+									on-change="_markAsDirty" />
+							</template>
+						</nuxeo-data-table-column>
+
+						<nuxeo-data-table-column name="Enable selection" flex="0">
+							<template>
+								<template is="dom-if" if="[[ _isDocType(item) ]]">
+									<paper-checkbox checked="{{ item.enableDocSelection }}" on-change="_markAsDirty" />
+								</template>
+
+								<template is="dom-if" if="[[ !_isDocType(item) ]]">
+									<span class="na">N/A</span>
+								</template>
+							</template>
+						</nuxeo-data-table-column>
+
+						<nuxeo-data-table-column name="Read-only selection" flex="0">
+							<template>
+								<template is="dom-if" if="[[ item.enableDocSelection ]]">
+									<paper-checkbox checked="[[ item.selectionReadOnly ]]" on-change="_markAsDirty" />
+								</template>
+
+								<template is="dom-if" if="[[ !item.enableDocSelection ]]">
+									<span class="na">N/A</span>
+								</template>
+							</template>
+						</nuxeo-data-table-column>
+
+						<nuxeo-data-table-column name="Selected document(s)" flex="2">
+							<template>
+								<template is="dom-if" if="[[ item.enableDocSelection ]]">
+									<template is="dom-if" if="[[ _isDocArrayType(item) ]]">
+										<nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" multiple
+											stay-open-on-select min-chars="0" role="widget"
+											selected-items="{{ _configurationDialogSelectedItems }}">
+										</nuxeo-document-suggestion>
+									</template>
+
+									<template is="dom-if" if="[[ !_isDocArrayType(item) ]]">
+										<nuxeo-document-suggestion value="{{item.selectedDocumentId}}" min-chars="0"
+											role="widget" selected-item="{{ _configurationDialogSelectedItem }}">
+										</nuxeo-document-suggestion>
+									</template>
+
+								</template>
+
+								<template is="dom-if" if="[[ !item.enableDocSelection ]]">
+									<span class="na">N/A</span>
+								</template>
+							</template>
+						</nuxeo-data-table-column>
+					</nuxeo-data-table>
+				</nuxeo-card>
+
+				<div class="delete-interaction">
+					<paper-button id="deleteInteraction" on-tap="_deleteInteraction" aria-label="Delete">
+						<iron-icon icon="icons:delete-forever"></iron-icon>
+						<span>Permanently delete this interaction</span>
+					</paper-button>
+				</div>
+
+			</cp-collapsible-content>
+		</template>
+	</template>
+	<script>
+		Polymer({
+			is: 'cp-settings-interactions',
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.NotifyBehavior],
+			properties: {
+				interactions: {
+					type: Array,
+					value: [],
+					notify: true
+				},
+				documentTypes: {
+					type: Array,
+					value: [],
+					notify: true
+				},
+				_selectedParameter: Object,
+				_selectedParameterIndex: Number,
+				_selectedInteractionIndex: Number,
+				_configurationDialogModeIsInput: Boolean,
+				_configurationDialogSelectedItems: Array,
+				_configurationDialogSelectedItem: String
+			},
+
+			observers: [
+				'_markAsDirty(_configurationDialogSelectedItems.splices, _configurationDialogSelectedItem)'
+			],
+
+			_deleteInteraction(e)
+			{
+				if (confirm('Are you sure you want to remove this interaction: ' + this.selectedInteraction.name + ' ?'))
+				{
+					const newInteractionsArray = this.interactions.filter(obj => obj.id !== this.selectedInteraction.id);
+					this.set('interactions', newInteractionsArray);
+					this._saveInteractions();
+				}
+			},
+
+			_isDocArrayType(param)
+			{
+				return param.type === 'array' && param.format === 'document';
+			},
+
+			_isDocType(param)
+			{
+				return param.format === 'document';
+			},
+
+			_activeDocumentsChanged(e)
+			{
+				this.set(`interactions.${(e.target.dataset.ix | 0)}._dirty`, true);
+
+				this.fire('mark-as-dirty', { interactions: true });
+			},
+
+			_markAsDirty(e)
+			{
+				this.set(`interactions.${e.model.__data.ix}._dirty`, true);
+
+				this.fire('mark-as-dirty', { interactions: this.interactions.filter(x => x._dirty) });
+			}
+		})
+	</script>
+</dom-module>
