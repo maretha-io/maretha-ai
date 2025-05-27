@@ -64,6 +64,19 @@
 				gap: 1rem;
 				padding: 0 .5rem;
 			}
+
+			.loading-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				bottom: 0;
+				right: 0;
+				background-color: rgba(0, 0, 0, .75);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+			}
 		</style>
 
 		<nuxeo-page>
@@ -80,13 +93,12 @@
 				</paper-listbox>
 
 				<div class="actions">
-					<paper-button id="saveBtn" on-tap="_saveChanges"
-						disabled$="[[ !_isDirty ]]" class="primary">
+					<paper-button id="saveBtn" on-tap="_saveChanges" disabled$="[[ !_isDirty ]]" class="primary">
 						Save changes
-					</paper--button>
+					</paper-button>
 
 					<div>
-						<paper-icon-button id="undoBtn" icon="icons:cancel" on-tap="_undoChanges"
+						<paper-icon-button id="undoBtn" icon="icons:cancel" on-tap="_loadData"
 							disabled$="[[ !_isDirty ]]">
 						</paper-icon-button>
 						<nuxeo-tooltip for="undoBtn">
@@ -107,7 +119,7 @@
 
 			<iron-pages selected="[[selectedTab]]" attr-for-selected="name" selected-item="{{page}}">
 				<cp-settings-interactions name="interactions" interactions="[[ interactions ]]"
-					document-types="[[ documentTypes ]]">
+					document-types="[[ documentTypes ]]" changes-saved="[[ !_isDirty ]]">
 				</cp-settings-interactions>
 
 				<cp-settings-metadata name="metadata" interactions="[[ interactions ]]"
@@ -123,6 +135,9 @@
 				</cp-settings-vertesia>
 			</iron-pages>
 
+			<div class="loading-overlay" hidden$="[[ !_loading ]]">
+				Loading...
+			</div>
 		</nuxeo-page>
 
 		<nuxeo-operation id="getSettingsOperation" op="GetSettingsOperation"></nuxeo-operation>
@@ -169,6 +184,10 @@
 				_saveChangesParams: {
 					type: Object,
 					value: {}
+				},
+				_loading: {
+					type: Boolean,
+					value: false
 				}
 			},
 
@@ -220,20 +239,31 @@
 			_visibleObserver(visible)
 			{
 				if (visible)
-					this._undoChanges();
+					this._loadData();
 			},
 
-			_undoChanges()
+			_loadData()
 			{
-				Promise.all([
-					this._getInteractions(),
-					this._getDocumentTypes()
-				])
-					.then(() =>
-					{
-						this.set('_saveChangesParams', {});
-						this.set('_isDirty', false);
-					});
+				this.set('_loading', true);
+
+				setTimeout(() =>
+				{
+					Promise.all([
+						this._getInteractions(),
+						this._getDocumentTypes()
+					])
+						.then(() =>
+						{
+							this.set('_saveChangesParams', {});
+							this.set('_isDirty', false);
+
+							this.set('_loading', false);
+						})
+						.catch(() =>
+						{
+							this.set('_loading', false);
+						});
+				}, 100);
 			},
 
 			_refresh()
@@ -241,21 +271,27 @@
 				if (this._refreshing)
 					return;
 
+				this.set('_loading', true);
+
 				this.notify({ message: 'Refreshing interactions, metadata, events and settings...', type: 'info' });
 				this._refreshing = true;
 
 				const operation = this.$.getSettingsOperation;
-				operation.params = { "refresh": true };
+				operation.params = { 'refresh': true };
 				operation.execute().then((response) =>
-				{
-					this.notify({ message: 'Successfully refreshed interactions, metadata, events and settings', type: 'success' });
+				{					
 					this.set('interactions', response.value.interactions);
+
 					this._refreshing = false;
-					// this._saveInteractions();
+					this.set('_loading', false);
+
+					this.notify({ message: 'Successfully refreshed interactions, metadata, events and settings', type: 'success' });
 				}).catch((error) =>
 				{
-					console.error('Error triggering operation:', error);
 					this._refreshing = false;
+					this.set('_loading', false);
+
+					console.error('Error triggering operation:', error);
 				});
 			},
 
