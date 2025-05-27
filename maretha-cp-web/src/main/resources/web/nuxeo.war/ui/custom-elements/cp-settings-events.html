@@ -1,235 +1,300 @@
 <dom-module id="cp-settings-events">
-    <template>
-        <nuxeo-operation id="saveSettingsOp" op="SaveInteractionsOperation"></nuxeo-operation>
-        <nuxeo-operation id="getSettingsOperation" op="GetSettingsOperation"></nuxeo-operation>
+	<template>
+		<style include="nuxeo-styles">
+			:host {
+				--nuxeo-tag_-_font-size: 0.85rem;
+				--nuxeo-tag_-_line-height: 1.6;
+			}
 
-        <style include="nuxeo-styles">
-            .content {
-              width: 100%;
-            }
+			.cards {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1rem;
+			}
 
-            nuxeo-card {
-              width: 100%;
-              height: 100%;
-              text-align: left;
-              box-shadow: 0 3px 20px rgb(0 0 0 / 10%);
-            }
+			.cards nuxeo-card {
+				width: calc(33.33% - 1rem);
+				margin: 0;
+			}
 
-            .results-table {
-              min-height: 500px;
-            }
+			.cards nuxeo-card .footer {
+				border-top: 1px solid rgba(0, 0, 0, .25);
+				margin-top: 2rem;
+				padding-top: 1rem;
+				display: flex;
+				align-items: center;
+				justify-content: end;
+			}
 
-            .event-entry,
-            .add-entry-row {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 16px;
-              padding: 16px;
-              border-bottom: 1px solid #ddd;
-              margin-bottom: 8px;
-            }
+			.cards nuxeo-card label {
+				margin-top: 1.5rem;
+			}
 
-            .event-entry nuxeo-selectivity,
-            .add-entry-row nuxeo-selectivity {
-              flex: 1 1 220px;
-            }
+			.cards nuxeo-card .footer paper-icon-button {
+				width: 2.75rem;
+				height: 2.75rem;
+			}
 
-            paper-toggle-button {
-              align-self: center;
-            }
+			.cards .new-event {
+				width: calc(33.33% - 1rem);
+				min-height: 20rem;
+				;
+				border: 2px dashed rgba(0, 0, 0, .5);
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: .5rem;
+			}
 
-            paper-button[raised] {
-              align-self: center;
-            }
-        </style>
+			paper-item {
+				cursor: pointer;
+			}
 
-        <div id="main slot">
-            <nuxeo-card>
-                <h3>Events</h3>
-                <paper-toast id="toast"></paper-toast>
+			nuxeo-dialog {
+				min-width: var(--nuxeo-document-form-popup-min-width, 300px);
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				padding: 1rem 0;
+			}
 
-                <template is="dom-repeat" items="{{eventsSettings}}" as="item" index-as="index">
-                    <div class="event-entry">
-                        <!-- DocType -->
-                        <nuxeo-selectivity min-chars="0" data="{{documentTypes}}" value="{{item.docType}}"
-                                           placeholder="Select Document Type">
-                        </nuxeo-selectivity>
+			nuxeo-dialog h3 {
+				margin-top: 0;
+			}
 
-                        <!-- Events -->
-                        <nuxeo-selectivity multiple min-chars="0" data="{{eventTypes}}" value="{{item.events}}"
-                                           placeholder="Select Event Types">
-                        </nuxeo-selectivity>
+			nuxeo-dialog .buttons {
+				padding: 2rem 2rem 1rem;
+				justify-content: end;
+			}
 
-                        <!-- Interactions -->
-                        <nuxeo-selectivity multiple min-chars="0" data="{{interactionsWithLabels}}" value="{{item.interactions}}"
-                                           placeholder="Select Interactions">
-                        </nuxeo-selectivity>
+			nuxeo-dialog paper-button {
+				text-transform: none;
+			}
 
-                        <!-- Active Toggle -->
-                        <paper-toggle-button checked="{{item.active}}" on-change="_saveEventsSettings">
-                            Active
-                        </paper-toggle-button>
+			nuxeo-dialog paper-button.primary {
+				background-color: var(--nx-button-primary_-_background-color);
+			}
 
-                        <!-- Delete Button -->
-                        <paper-button on-tap="_deleteInteraction" doc-type="{{item.docType}}" data-index$="[[index]]" raised
-                                      style="background:#f44336;color:white;">
-                            Delete
-                            <iron-icon icon="icons:delete-forever"></iron-icon>
-                        </paper-button>
-                    </div>
-                </template>
+			nuxeo-dialog paper-button.primary:hover,
+			nuxeo-dialog paper-button.primary:focus {
+				background-color: var(--nx-button-primary-hover_-_background-color);
+			}
 
-                <!-- Add Entry Section -->
-                <nuxeo-card heading="Add Entry">
-                    <div class="add-entry-row">
-                        <nuxeo-selectivity min-chars="0" data="{{documentTypes}}" value="{{newItem.docType}}"
-                                           placeholder="Select Document Type">
-                        </nuxeo-selectivity>
+			nuxeo-dialog .dialog-options {
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				gap: 2rem;
+			}
 
-                        <nuxeo-selectivity multiple min-chars="0" data="{{eventTypes}}" value="{{newItem.events}}"
-                                           placeholder="Select Event Types">
-                        </nuxeo-selectivity>
+			.flex-grow-1 {
+				flex-grow: 1;
+			}
+		</style>
 
-                        <nuxeo-selectivity multiple min-chars="0" data="{{interactionsWithLabels}}" value="{{newItem.interactions}}"
-                                           placeholder="Select Interactions">
-                        </nuxeo-selectivity>
+		<div class="cards">
+			<template id="list" is="dom-repeat" items="[[ eventsSettings ]]" as="item" index-as="index">
+				<nuxeo-card heading="[[ item.docType ]]">
+					<label>Events</label>
+					<template is="dom-repeat" items="[[ item.events ]]" as="eventType">
+						<nuxeo-tag>[[ _eventName(eventType) ]]</nuxeo-tag>
+					</template>
 
-                        <paper-button raised class="primary" on-click="_addItem">Add</paper-button>
-                    </div>
-                </nuxeo-card>
+					<label>Interactions</label>
+					<template is="dom-repeat" items="[[ item.interactions ]]" as="interactionId">
+						<nuxeo-tag>[[ _interactionName(interactions, interactionId) ]]</nuxeo-tag>
+					</template>
 
-                <paper-button id="save" on-tap="_saveEventsSettings" raised>
-                    Save Settings
-                    <iron-icon icon="icons:save"></iron-icon>
-                </paper-button>
-            </nuxeo-card>
-        </div>
-    </template>
+					<div class="footer">
+						<paper-toggle-button checked="{{item.active}}" on-change="_markAsDirty">
+							Active
+						</paper-toggle-button>
 
-    <script>
-        Polymer({
-          is: 'cp-settings-events',
-          behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
-          properties: {
-            eventsSettings: {
-              type: Array,
-              value: []
-            },
+						<span class="flex-grow-1"></span>
 
-            interactions: {
-              type: Array,
-              value: [],
-            },
+						<paper-icon-button icon="nuxeo:edit" on-tap="_toggleDialog" data-item-index$="[[ index ]]">
+						</paper-icon-button>
 
-            documentTypes: {
-              type: Array,
-              value: [],
-            },
+						<paper-menu-button close-on-activate allow-outside-scroll>
+							<paper-icon-button slot="dropdown-trigger" icon="icons:more-vert">
+							</paper-icon-button>
 
-            newItem: {
-              type: Object,
-              value: () => ({
-                docType: '',
-                events: [],
-                interactions: []
-              })
-            },
+							<paper-listbox slot="dropdown-content" attr-for-selected="data-id">
+								<paper-item data-item-index$="[[ index ]]" on-tap="_deleteEvent">
+									Delete this event
+								</paper-item>
+							</paper-listbox>
+						</paper-menu-button>
+					</div>
+				</nuxeo-card>
+			</template>
 
-            interactionsWithLabels: {
-              type: Array,
-              computed: '_computeInteractionsWithLabels(interactions)',
-            },
+			<div class="new-event" on-tap="_toggleDialog">
+				<iron-icon icon="icons:add"></iron-icon>
+				Add a new event
+			</div>
+		</div>
 
-            eventTypes: {
-              type: Array,
-              value: [
-                      {id: 'documentCreated', displayLabel: 'Document Created'},
-                      {id: 'pictureViewsGenerationDone', displayLabel: 'Rendition Created'},
-                      {id: 'beforeDocumentModification', displayLabel: 'Document Modified'}
-                     ]
-            },
-          },
+		<nuxeo-dialog id="dialog" opened="{{opened}}" with-backdrop>
+			<h3>Event settings</h3>
 
-          ready: function () {
-            this._getEventsSettings();
-          },
+			<div class="dialog-options">
+				<nuxeo-selectivity min-chars="0" data="{{documentTypes}}" value="{{_dialogData.docType}}"
+					placeholder="Select a document type">
+				</nuxeo-selectivity>
 
-          _getEventsSettings: function () {
-            const operation = this.$.getSettingsOperation;
-            operation.params = {};
-            operation.execute().then((response) => {
-              if (response.value.eventsSettings)
-                this.set('eventsSettings', response.value.eventsSettings);
-            }).catch((error) => {
-              console.error('Error triggering operation:', error);
-            });
-          },
+				<nuxeo-selectivity multiple min-chars="0" data="{{_eventTypes}}" value="{{_dialogData.events}}"
+					placeholder="Choose one or more event types" stay-open-on-select>
+				</nuxeo-selectivity>
 
-          _saveEventsSettings: function () {
-            const operation = this.$.saveSettingsOp;
-            operation.params = {
-              'eventsSettings': this.eventsSettings
-            };
-            operation.execute().then((response) => {
-              this._showNotification('Changes Saved!', 'success');
-              this.set('eventsSettings', response.value.eventsSettings);
-            }).catch((error) => {
-              console.error('Error triggering operation:', error);
-              this._showNotification('Changes NOT Saved!', 'error');
-            });
-          },
+				<nuxeo-selectivity multiple min-chars="0" data="{{_interactionsWithLabels}}" stay-open-on-select
+					value="{{_dialogData.interactions}}" placeholder="Pick one or more interactions">
+				</nuxeo-selectivity>
+			</div>
 
-          _showNotification(message, type) {
-            const toast = this.$.toast;
-            toast.text = message;
-            toast.classList.remove('toast-error', 'toast-success', 'toast-warning'); // Remove existing classes
-            if (type) {
-              toast.classList.add(`toast-${type}`);
-            }
-            toast.open();
-          },
+			<div class="buttons">
+				<paper-button noink dialog-dismiss class="secondary">
+					Cancel
+				</paper-button>
 
-          _toggleDialog: function (e) {
-            this.$.dialog.toggle();
-          },
+				<paper-button id="save" on-tap="_saveChanges" class="primary" raised disabled$="[[ !_dialogDirty ]]">
+					Keep changes
+				</paper-button>
+			</div>
+		</nuxeo-dialog>
 
-          _close: function () {
-            this.$.dialog.toggle();
-          },
+	</template>
 
-          _dialogClosed: function () {
-          },
+	<script>
+		Polymer({
+			is: 'cp-settings-events',
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+			properties: {
+				eventsSettings: {
+					type: Array,
+					value: []
+				},
 
-          _addItem() {
-            const newItemCopy = Object.assign({}, this.newItem);
-            if (!this.eventsSettings) {
-              this.set('eventsSettings', []);
-            }
-            this.push('eventsSettings', newItemCopy);
-            this._saveEventsSettings();
+				interactions: {
+					type: Array,
+					value: [],
+				},
 
-            // Reset form
-            this.set('newItem', { docType: '', events: [], interactions: [] });
-          },
+				documentTypes: {
+					type: Array,
+					value: [],
+				},
 
-          _computeInteractionsWithLabels() {
-            return this.interactions.map(item => ({
-              id: item.id,
-              displayLabel: item.name,
-            }));
-          },
+				_dialogData: {
+					type: Object,
+					value: {
+						docType: '',
+						events: [],
+						interactions: []
+					}
+				},
 
-          _deleteInteraction: function (e) {
-            const index = e.currentTarget.dataset.index;
-            if (index !== undefined && index >= 0) {
-              const item = this.eventsSettings[index];
-              if (confirm(`Are you sure you want to delete the settings for: ${item.docType}?`)) {
-                this.splice('eventsSettings', index, 1);
-                this._saveEventsSettings();
-              }
-            }
-          }
+				_selectedEventSettingIndex: Number,
 
-        });
-    </script>
+				_interactionsWithLabels: {
+					type: Array,
+					computed: '_compute_interactionsWithLabels(interactions)',
+				},
+
+				_eventTypes: {
+					type: Array,
+					value: [
+						{ id: 'documentCreated', displayLabel: 'Document Created' },
+						{ id: 'pictureViewsGenerationDone', displayLabel: 'Rendition Created' },
+						{ id: 'beforeDocumentModification', displayLabel: 'Document Modified' }
+					]
+				}
+			},
+
+			_toggleDialog(e)
+			{
+				this._selectedEventSettingIndex = e.target.dataset.itemIndex;
+
+				if (this._selectedEventSettingIndex != undefined)
+					this._dialogData = this.eventsSettings[this._selectedEventSettingIndex];
+				else
+					this._dialogData = {
+						docType: '',
+						events: [],
+						interactions: []
+					};
+
+				this.$.dialog.toggle();
+			},
+
+			_saveChanges()
+			{
+				if (!this.eventsSettings)
+					this.set('eventsSettings', []);
+
+				if (this._selectedEventSettingIndex == undefined)
+					this.eventsSettings.push(this._dialogData);
+				else
+					this.eventsSettings.splice(this._selectedEventSettingIndex, 1, this._dialogData);
+
+				const eventsSettings = [...this.eventsSettings];
+				this.set('eventsSettings', []);
+				setTimeout(() =>
+				{
+					this.set('eventsSettings', eventsSettings);
+
+					this._markAsDirty();
+				});
+
+				this.$.dialog.toggle();
+			},
+
+			_deleteEvent(e)
+			{
+				const index = e.currentTarget.dataset.itemIndex;
+
+				if (index == undefined || index < 0)
+					return;
+
+				const item = this.eventsSettings[index];
+				if (confirm(`Are you sure you want to delete the settings for: ${item.docType}?`))
+				{
+					this.eventsSettings.splice(index, 1);
+
+					const eventsSettings = [...this.eventsSettings];
+					this.set('eventsSettings', []);
+					setTimeout(() =>
+					{
+						this.set('eventsSettings', eventsSettings);
+
+						this._markAsDirty();
+					});
+				}
+			},
+
+			_markAsDirty()
+			{
+				this.fire('mark-as-dirty', { eventsSettings: this.eventsSettings });
+			},
+
+			_compute_interactionsWithLabels()
+			{
+				return this.interactions.map(item => ({
+					id: item.id,
+					displayLabel: item.name,
+				}));
+			},
+
+			_eventName(eventType)
+			{
+				return this._eventTypes.find(x => x.id === eventType)?.displayLabel;
+			},
+
+			_interactionName(interactions, interactionId)
+			{
+				return interactions.find(x => x.id === interactionId)?.name;
+			}
+		});
+	</script>
 </dom-module>
