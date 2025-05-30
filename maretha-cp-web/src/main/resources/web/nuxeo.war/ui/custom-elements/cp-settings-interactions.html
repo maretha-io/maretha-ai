@@ -16,29 +16,6 @@
 				height: 100%;
 			}
 
-			nuxeo-data-table-cell {
-				min-width: 0 !important;
-			}
-
-			nuxeo-data-table-cell:nth-of-type(3),
-			nuxeo-data-table-cell:nth-of-type(4),
-			nuxeo-data-table-cell:nth-of-type(5),
-			nuxeo-data-table-cell:nth-of-type(6),
-			nuxeo-data-table-cell:nth-of-type(7) {
-				justify-content: center;
-				text-align: center;
-			}
-
-			nuxeo-data-table-cell:last-of-type {
-				justify-content: end;
-				text-align: right;
-			}
-
-			nuxeo-data-table-cell paper-input,
-			nuxeo-data-table-cell nuxeo-document-suggestion {
-				width: 100%;
-			}
-
 			.parameter-name {
 				display: flex;
 				flex-direction: column;
@@ -77,6 +54,56 @@
 
 			paper-toggle-button {
 				cursor: pointer;
+			}
+
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+				width: 100%;
+			}
+
+			table thead tr,
+			table tbody tr {
+				border-bottom: var(--iron-data-table-row_-_border-bottom, 1px solid var(--nuxeo-border, #e3e3e3));
+			}
+
+			table thead tr th {
+				background-color: var(--iron-data-table-header_-_background-color);
+				color: var(--iron-data-table-header_-_color);
+				padding: 8px 24px;
+				text-align: left;
+			}
+
+			table tbody tr td {
+				padding: 8px 24px;
+				text-align: left;
+			}
+
+			table thead tr th:nth-of-type(1),
+			table tboddy tr td:nth-of-type(1) {
+				width: 7%;
+			}
+
+			table thead tr th:nth-of-type(3),
+			table thead tr th:nth-of-type(4),
+			table thead tr th:nth-of-type(5),
+			table thead tr th:nth-of-type(6),
+			table thead tr th:nth-of-type(7),
+			table tbody tr td:nth-of-type(3),
+			table tbody tr td:nth-of-type(4),
+			table tbody tr td:nth-of-type(5),
+			table tbody tr td:nth-of-type(6),
+			table tbody tr td:nth-of-type(7) {
+				text-align: center;
+				width: 7%;
+			}
+
+			table tbody tr td nuxeo-document-suggestion {
+				margin-bottom: -1rem;
+			}
+
+			table tbody tr td paper-input {
+				margin-bottom: 1rem;
 			}
 		</style>
 
@@ -124,97 +151,106 @@
 				</nuxeo-card>
 
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Parameter configuration">
-					<nuxeo-data-table items="[[interaction.parameters]]" class="results-table">
-						<nuxeo-data-table-column name="Parameter name" flex="1">
-							<template>
-								<div class="parameter-name">
-									<div>[[item.name]]</div>
-									<span>
-										<template is="dom-if" if="[[ item.type ]]">
-											<small>[[ item.type ]]</s>
+					<table>
+						<thead>
+							<tr>
+								<th>Parameter name</th>
+								<th>Default value</th>
+								<th>Read-only</th>
+								<th>Main document</th>
+								<th>Context memory</th>
+								<th>Enable selection</th>
+								<th>Read-only selection</th>
+								<th>Selected document(s)</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							<template is="dom-repeat" items="[[ interaction.parameters ]]" index-as="px">
+								<tr>
+									<td>
+										<div class="parameter-name">
+											<div>[[item.name]]</div>
+											<span>
+												<template is="dom-if" if="[[ item.type ]]">
+													<small>[[ item.type ]]</s>
+												</template>
+												<template is="dom-if" if="[[ item.format ]]">
+													<small>[[ item.format ]]</small>
+												</template>
+											</span>
+										</div>
+									</td>
+
+									<td>
+										<paper-input type="[[item.type]]" value="{{item.value}}" on-input="_markAsDirty"
+											data-ix$="[[ ix ]]" data-px$="[[ px ]]">
+										</paper-input>
+									</td>
+
+									<td>
+										<paper-checkbox checked="{{ item.readOnly }}" data-ix$="[[ ix ]]"
+											data-px$="[[ px ]]" on-change="_markAsDirty" />
+									</td>
+
+									<td>
+										<paper-checkbox checked="{{ item.isMainDocument }}" on-change="_markAsDirty"
+											data-ix$="[[ ix ]]" data-px$="[[ px ]]" />
+									</td>
+
+									<td>
+										<paper-checkbox checked="{{ item.isContextMemoryParameter }}"
+											on-change="_markAsDirty" data-ix$="[[ ix ]]" data-px$="[[ px ]]" />
+									</td>
+
+									<td>
+										<template is="dom-if" if="[[ _isDocType(item) ]]">
+											<paper-checkbox checked="{{ item.enableDocSelection }}"
+												on-change="_enableDocSelectionChanged" data-ix$="[[ ix ]]"
+												data-px$="[[ px ]]" />
 										</template>
-										<template is="dom-if" if="[[ item.format ]]">
-											<small>[[ item.format ]]</small>
+
+										<template is="dom-if" if="[[ !_isDocType(item) ]]">
+											<span class="na">N/A</span>
 										</template>
-									</span>
-								</div>
+									</td>
+
+									<td>
+										<template is="dom-if" if="[[ item.enableDocSelection ]]" restamp>
+											<paper-checkbox checked="[[ item.selectionReadOnly ]]"
+												on-change="_markAsDirty" />
+										</template>
+
+										<template is="dom-if" if="[[ !item.enableDocSelection ]]" restamp>
+											<span class="na">N/A</span>
+										</template>
+									</td>
+
+									<td on-click="_setSelectedParameterIndex" data-ix$="[[ ix ]]" data-px$="[[ px ]]">
+										<template is="dom-if" if="[[ item.enableDocSelection ]]" restamp>
+											<template is="dom-if" if="[[ _isDocArrayType(item) ]]">
+												<nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" multiple
+													stay-open-on-select min-chars="0" role="widget"
+													selected-items="{{ _configurationDialogSelectedItems }}">
+												</nuxeo-document-suggestion>
+											</template>
+
+											<template is="dom-if" if="[[ !_isDocArrayType(item) ]]">
+												<nuxeo-document-suggestion value="{{item.selectedDocumentId}}"
+													min-chars="0" role="widget"
+													selected-item="{{ _configurationDialogSelectedItem }}">
+												</nuxeo-document-suggestion>
+											</template>
+										</template>
+
+										<template is="dom-if" if="[[ !item.enableDocSelection ]]" restamp>
+											<span class="na">N/A</span>
+										</template>
+									</td>
+								</tr>
 							</template>
-						</nuxeo-data-table-column>
-
-						<nuxeo-data-table-column name="Default value" flex="2">
-							<template>
-								<paper-input type="[[item.type]]" value="{{item.value}}" on-input="_markAsDirty">
-								</paper-input>
-							</template>
-						</nuxeo-data-table-column>
-
-						<nuxeo-data-table-column name="Read-only" flex="0">
-							<template>
-								<paper-checkbox checked="{{ item.readOnly }}" on-change="_markAsDirty" />
-							</template>
-						</nuxeo-data-table-column>
-
-						<nuxeo-data-table-column name="Main document" flex="0">
-							<template>
-								<paper-checkbox checked="{{ item.isMainDocument }}" on-change="_markAsDirty" />
-							</template>
-						</nuxeo-data-table-column>
-
-						<nuxeo-data-table-column name="Context memory" flex="0">
-							<template>
-								<paper-checkbox checked="{{ item.isContextMemoryParameter }}"
-									on-change="_markAsDirty" />
-							</template>
-						</nuxeo-data-table-column>
-
-						<nuxeo-data-table-column name="Enable selection" flex="0">
-							<template>
-								<template is="dom-if" if="[[ _isDocType(item) ]]">
-									<paper-checkbox checked="{{ item.enableDocSelection }}" on-change="_markAsDirty" />
-								</template>
-
-								<template is="dom-if" if="[[ !_isDocType(item) ]]">
-									<span class="na">N/A</span>
-								</template>
-							</template>
-						</nuxeo-data-table-column>
-
-						<nuxeo-data-table-column name="Read-only selection" flex="0">
-							<template>
-								<template is="dom-if" if="[[ item.enableDocSelection ]]">
-									<paper-checkbox checked="[[ item.selectionReadOnly ]]" on-change="_markAsDirty" />
-								</template>
-
-								<template is="dom-if" if="[[ !item.enableDocSelection ]]">
-									<span class="na">N/A</span>
-								</template>
-							</template>
-						</nuxeo-data-table-column>
-
-						<nuxeo-data-table-column name="Selected document(s)" flex="2">
-							<template>
-								<template is="dom-if" if="[[ item.enableDocSelection ]]">
-									<template is="dom-if" if="[[ _isDocArrayType(item) ]]">
-										<nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" multiple
-											stay-open-on-select min-chars="0" role="widget"
-											selected-items="{{ _configurationDialogSelectedItems }}">
-										</nuxeo-document-suggestion>
-									</template>
-
-									<template is="dom-if" if="[[ !_isDocArrayType(item) ]]">
-										<nuxeo-document-suggestion value="{{item.selectedDocumentId}}" min-chars="0"
-											role="widget" selected-item="{{ _configurationDialogSelectedItem }}">
-										</nuxeo-document-suggestion>
-									</template>
-
-								</template>
-
-								<template is="dom-if" if="[[ !item.enableDocSelection ]]">
-									<span class="na">N/A</span>
-								</template>
-							</template>
-						</nuxeo-data-table-column>
-					</nuxeo-data-table>
+						</tbody>
+					</table>
 				</nuxeo-card>
 
 				<div class="delete-interaction">
@@ -246,7 +282,6 @@
 					type: Boolean,
 					value: true
 				},
-				_selectedParameter: Object,
 				_selectedParameterIndex: Number,
 				_selectedInteractionIndex: Number,
 				_configurationDialogModeIsInput: Boolean,
@@ -255,8 +290,14 @@
 			},
 
 			observers: [
-				'_markAsDirty(_configurationDialogSelectedItems.splices, _configurationDialogSelectedItem)'
+				'_markAsDirty(_configurationDialogSelectedItem, _configurationDialogSelectedItems.splices)'
 			],
+
+			_setSelectedParameterIndex(e)
+			{
+				this.set('_selectedInteractionIndex', e.target.dataset.ix);
+				this.set('_selectedParameterIndex', e.target.dataset.px);
+			},
 
 			_deleteInteraction(e)
 			{
@@ -289,7 +330,7 @@
 
 			_markAsDirty(e)
 			{
-				this.set(`interactions.${e.model.__data.ix}._dirty`, true);
+				this.set(`interactions.${e && e.model ? e.model.__data.ix : this._selectedInteractionIndex}._dirty`, true);
 
 				this.fire('mark-as-dirty', { interactions: this.interactions });
 			},
@@ -297,6 +338,14 @@
 			_isDirty(interactionDirty)
 			{
 				return interactionDirty && !this.changesSaved;
+			},
+
+			_enableDocSelectionChanged(e)
+			{
+				this._markAsDirty(e);
+
+				// Force Polymer to re-evaluate the second column's dom-if
+				this.notifyPath(`interactions.${e.model.__data.ix}.parameters.${e.target.dataset.index}.enableDocSelection`);
 			}
 		})
 	</script>
