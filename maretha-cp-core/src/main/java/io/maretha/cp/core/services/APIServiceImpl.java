@@ -110,6 +110,36 @@ public class APIServiceImpl implements APIService {
     }
 
     @Override
+    public String getInteractionResultWithResultSchema(String interaction, Map<String, Object> data, String resultSchema, boolean stream) {
+        String url = getSetting(API_URL) + "/api/v1/runs";
+        String dataParameters = "";
+        try {
+            dataParameters = objectMapper.writeValueAsString(data);
+        } catch (Exception e) {
+            throw new NuxeoException(e);
+        }
+
+        String jsonBody = "{\n" +
+                "    \"interaction\": \"" + interaction + "\",\n" +
+                "    \"data\": " + dataParameters + ",\n" +
+                "    \"result_schema\": " + resultSchema + ",\n" +
+                "    \"stream\": " + stream + "\n" +
+                "}";
+        String bearerToken = getBearerToken();
+        String interactionResponse = postRequest(bearerToken, url, jsonBody, false);
+
+        if (stream) {
+            try {
+                String id = objectMapper.readTree(interactionResponse).get("id").asText();
+                return url + "/" + id + "/stream?access_token=" + bearerToken;
+            } catch (JsonProcessingException e) {
+                throw new NuxeoException(e);
+            }
+        }
+        return interactionResponse;
+    }
+
+    @Override
     public String getBearerToken() {
         KeyValueStore kvStore = Framework.getService(KeyValueService.class).getKeyValueStore(VERTESIA_SETTINGS_KV);
         String token = kvStore.getString(AUTH_TOKEN);

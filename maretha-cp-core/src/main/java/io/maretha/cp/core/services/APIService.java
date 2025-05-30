@@ -11,6 +11,8 @@ public interface APIService {
 
     String getInteractionResult(String interactionId, Map<String, Object> data, boolean stream);
 
+    String getInteractionResultWithResultSchema(String interaction, Map<String, Object> data, String resultSchema, boolean stream);
+
     String getBearerToken();
 
     String uploadFileToStore(Blob file);
