@@ -85,7 +85,11 @@
 <!-- Contribution of element 'nuxeo-search-form' for slot 'DRAWER_PAGES' -->
 <nuxeo-slot-content name="Find" slot="DRAWER_PAGES">
     <template>
-        <nuxeo-search-form provider="searchByEmbeddings" auto="true" schemas="dublincore" search-name="embedding-search" name="find"></nuxeo-search-form>
+        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-SEARCH&quot;))" user="[[user]]">
+            <template>
+                <nuxeo-search-form provider="searchByEmbeddings" auto="true" schemas="dublincore" search-name="embedding-search" name="find"></nuxeo-search-form>
+            </template>
+        </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 
@@ -93,7 +97,7 @@
 <!-- Contribution of element 'nuxeo-page-item' for slot 'DOCUMENT_VIEWS_ITEMS' -->
 <nuxeo-slot-content name="SimilarDocumentsTab" slot="DOCUMENT_VIEWS_ITEMS" order="10">
     <template>
-        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
+        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-SEARCH&quot;))" user="[[user]]">
             <template>
                 <nuxeo-page-item name="SimilarDocumentsTab" label="More Like This"></nuxeo-page-item>
             </template>
@@ -103,7 +107,7 @@
 <!-- Contribution of element 'nuxeo-similar-documents-tab' for slot 'DOCUMENT_VIEWS_PAGES' -->
 <nuxeo-slot-content name="SimilarDocumentsTab" slot="DOCUMENT_VIEWS_PAGES">
     <template>
-        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
+        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-SEARCH&quot;))" user="[[user]]">
             <template>
                 <nuxeo-similar-documents-tab document="[[document]]" name="SimilarDocumentsTab"></nuxeo-similar-documents-tab>
             </template>
