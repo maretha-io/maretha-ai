@@ -81,7 +81,7 @@ public class RunInteractionServiceImplTest {
                 "}" +
                 "}}";
 
-        when(apiService.getInteractionResult(anyString(), anyMap(), anyBoolean())).thenReturn(mockResponse);
+        when(apiService.getInteractionResultWithResultSchema(anyString(), anyMap(), anyString(), anyBoolean())).thenReturn(mockResponse);
         when(apiService.uploadFileToStore(anyObject())).thenReturn("vertesia-store-id");
         when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
 

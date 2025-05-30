@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class DocTypeWithSchema {
@@ -23,6 +24,7 @@ public class DocTypeWithSchema {
             private String description;
             private String type;
             private String directoryName;
+            private Map<String, String> directoryValues;
             private String interactionId;
             private boolean active;
             private boolean multiValue;

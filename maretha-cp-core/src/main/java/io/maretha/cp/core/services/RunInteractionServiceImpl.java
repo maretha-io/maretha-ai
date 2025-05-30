@@ -70,18 +70,21 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true);
         schemasFieldsInIsolation.forEach(schemasFieldInIsolation -> {
             String interactionResponse;
-            Map<String, Object> isolationParamsMap = addSchemasAndDictionariesToParams(Set.of(schemasFieldInIsolation), paramsMap);
+            Map<String, Object> isolationParamsMap = addSchemasAndDictionariesToParams(getSchemaFieldsMap(Set.of(schemasFieldInIsolation)), paramsMap);
             String customInteractionId = schemasFieldInIsolation.getInteractionId();
+            String resultSchema = getResultSchema(Set.of(schemasFieldInIsolation));
             if (StringUtils.isNotEmpty(customInteractionId)) {
-                interactionResponse = Framework.getService(APIService.class).getInteractionResult(customInteractionId, isolationParamsMap, false);
+                interactionResponse = Framework.getService(APIService.class)
+                        .getInteractionResultWithResultSchema(customInteractionId, isolationParamsMap, resultSchema, false);
             } else {
-                interactionResponse = Framework.getService(APIService.class).getInteractionResult(interactionId, isolationParamsMap, false);
+                interactionResponse = Framework.getService(APIService.class)
+                        .getInteractionResultWithResultSchema(interactionId, isolationParamsMap, resultSchema, false);
             }
             validateAndSaveMetadata(interactionResponse, doc, session, saveMetadataModeOverride, Set.of(schemasFieldInIsolation));
         });
         Set<DocTypeWithSchema.Schema.Field> schemasFields = getSchemaFields(doc, session, false);
-        Map<String, Object> paramsMapWithSchemaFields = addSchemasAndDictionariesToParams(schemasFields, paramsMap);
-        String response = Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMapWithSchemaFields, false);
+        Map<String, Object> paramsMapWithSchemaFields = addSchemasAndDictionariesToParams(getSchemaFieldsMap(schemasFields), paramsMap);
+        String response = Framework.getService(APIService.class).getInteractionResultWithResultSchema(interactionId, paramsMapWithSchemaFields, getResultSchema(schemasFields), false);
         return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, schemasFields);
     }
 
@@ -363,21 +366,68 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return schemaFields;
     }
 
-    private Map<String, Object> addSchemasAndDictionariesToParams(Set<DocTypeWithSchema.Schema.Field> schemasFields, Map<String, Object> parameters) {
-        Map<String, Object> dictionariesMap = new HashMap<>();
+    private Map<String, Object> addSchemasAndDictionariesToParams(Map<String, Object> schemaFieldsMap, Map<String, Object> parameters) {
+        try {
+            parameters.put("schema", objectMapper.writeValueAsString(schemaFieldsMap));
+        } catch (Exception e) {
+            log.error("Failed to add schema as parameters", e);
+        }
+        return parameters;
+    }
+
+    private Map<String, Object> getSchemaFieldsMap(Set<DocTypeWithSchema.Schema.Field> schemasFields) {
+        Map<String, Object> schemaFieldsMap = new HashMap<>();
         schemasFields.forEach(activeField -> {
             if (StringUtils.isNotEmpty(activeField.getDirectoryName())) {
                 Map<String, String> dictionaryValues = getDictionaryValues(activeField.getDirectoryName());
-                dictionariesMap.put(activeField.getDirectoryName(), dictionaryValues);
+                activeField.setDirectoryValues(dictionaryValues);
             }
+            Map<String, Object> fieldValuesMap = new HashMap<>();
+            fieldValuesMap.put("description", activeField.getDescription());
+            fieldValuesMap.put("type", activeField.isMultiValue() ? "array" : "string");
+            if (StringUtils.isNotEmpty(activeField.getDirectoryName())) {
+                fieldValuesMap.put("dictionaryValues", activeField.getDirectoryValues());
+            }
+            schemaFieldsMap.put(activeField.getXpath(), fieldValuesMap);
         });
-        try {
-            parameters.put("schema", objectMapper.writeValueAsString(schemasFields));
-            parameters.put("dictionaries", objectMapper.writeValueAsString(dictionariesMap));
-        } catch (Exception e) {
-            log.error("Failed to add schema and dictionaries as parameters", e);
+        return schemaFieldsMap;
+    }
+
+    private String getResultSchema(Set<DocTypeWithSchema.Schema.Field> schemasFields) {
+        Map<String, Object> schema = new HashMap<>();
+        schema.put("type", "object");
+
+        Map<String, Object> resultProperties = new HashMap<>();
+        List<String> requiredFields = new ArrayList<>();
+
+        for (DocTypeWithSchema.Schema.Field field : schemasFields) {
+            Map<String, Object> fieldSchema = new HashMap<>();
+            if (field.isMultiValue()) {
+                fieldSchema.put("type", "array");
+                fieldSchema.put("items", Collections.singletonMap("type", "string"));
+            } else {
+                fieldSchema.put("type", "string");
+            }
+            resultProperties.put(field.getXpath(), fieldSchema);
+            requiredFields.add(field.getXpath());
         }
-        return parameters;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("type", "object");
+        result.put("properties", resultProperties);
+        result.put("required", requiredFields);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("result", result);
+
+        schema.put("properties", properties);
+        schema.put("required", Collections.singletonList("result"));
+
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(schema);
+        } catch (Exception e) {
+            throw new NuxeoException(e);
+        }
     }
 
     private void addTextEmbeddings(DocumentModel doc) {
