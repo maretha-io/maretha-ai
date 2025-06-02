@@ -91,85 +91,140 @@
 			.flex-grow-1 {
 				flex-grow: 1;
 			}
+
+			paper-toggle-button {
+				cursor: pointer;
+			}
+
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+				width: 100%;
+			}
+
+			table thead tr,
+			table tbody tr {
+				border-bottom: var(--iron-data-table-row_-_border-bottom, 1px solid var(--nuxeo-border, #e3e3e3));
+			}
+
+			table thead tr th {
+				background-color: var(--iron-data-table-header_-_background-color);
+				color: var(--iron-data-table-header_-_color);
+				padding: 8px 24px;
+				text-align: left;
+			}
+
+			table tbody tr td {
+				padding: 8px 24px;
+				text-align: left;
+			}
+
+			table tbody tr.invalid {
+				background-color: rgba(255, 99, 71, .25);
+			}
+
+			table thead tr th:nth-of-type(1) {
+				width: 15%;
+			}
+
+			table thead tr th:nth-of-type(2) {
+				width: 25%;
+			}
+
+			table thead tr th:nth-of-type(5) {
+				width: 1rem;
+			}
+
+			table thead tr th:nth-of-type(4),
+			table tbody tr td:nth-of-type(4) {
+				text-align: center;
+				width: 3rem;
+			}
+
+			table tbody tr td nuxeo-document-suggestion {
+				margin-bottom: -1rem;
+			}
+
+			table tbody tr td paper-input {
+				margin-bottom: 1rem;
+			}
+
+			table tfoot tr th {
+				padding: 8px 24px;
+				text-align: left;
+			}
+
+			nuxeo-tag {
+				white-space: nowrap;
+			}
 		</style>
 
-		<div class="cards">
-			<template id="list" is="dom-repeat" items="[[ eventsSettings ]]" as="item" index-as="index">
-				<nuxeo-card heading="[[ item.docType ]]">
-					<label>Events</label>
-					<template is="dom-repeat" items="[[ item.events ]]" as="eventType">
-						<nuxeo-tag>[[ _eventName(eventType) ]]</nuxeo-tag>
-					</template>
+		<table>
+			<thead>
+				<tr>
+					<th>Document type</th>
+					<th>Events</th>
+					<th>Interactions</th>
+					<th>Active</th>
+					<th></th>
+				</tr>
+			</thead>
 
-					<label>Interactions</label>
-					<template is="dom-repeat" items="[[ item.interactions ]]" as="interactionId">
-						<nuxeo-tag>[[ _interactionName(interactions, interactionId) ]]</nuxeo-tag>
-					</template>
+			<tbody>
+				<template is="dom-repeat" items="[[ eventsSettings ]]" as="item" index-as="index">
+					<tr class$="[[ item.invalid ]]">
+						<td>
+							<cp-selectivity data="[[ documentTypes ]]" value="{{item.docType}}"
+								placeholder="Select a document type" on-selection-changed="_validate">
+							</cp-selectivity>
+						</td>
+						<td>
+							<cp-selectivity multiple data="[[ _eventTypes ]]" value="{{item.events}}"
+								placeholder="Choose one or more event types" on-selection-changed="_validate">
+							</cp-selectivity>
+						</td>
+						<td>
+							<cp-selectivity multiple data="[[ _interactionsWithLabels ]]" value="{{item.interactions}}"
+								placeholder="Pick one or more interactions" on-selection-changed="_validate">
+							</cp-selectivity>
+						</td>
+						<td>
+							<paper-toggle-button checked="{{item.active}}" on-change="_markAsDirty">
+							</paper-toggle-button>
+						</td>
+						<td>
+							<paper-menu-button close-on-activate allow-outside-scroll no-overlap no-animations>
+								<paper-icon-button slot="dropdown-trigger" icon="icons:more-vert">
+								</paper-icon-button>
 
-					<div class="footer">
-						<paper-toggle-button checked="{{item.active}}" on-change="_markAsDirty">
-							Active
-						</paper-toggle-button>
+								<paper-listbox slot="dropdown-content" attr-for-selected="data-id">
+									<paper-item data-item-index$="[[ index ]]" on-tap="_deleteDocTypeEventSettings">
+										Delete
+									</paper-item>
+								</paper-listbox>
+							</paper-menu-button>
+						</td>
+					</tr>
+				</template>
+			</tbody>
 
-						<span class="flex-grow-1"></span>
-
-						<paper-icon-button icon="nuxeo:edit" on-tap="_toggleDialog" data-item-index$="[[ index ]]">
-						</paper-icon-button>
-
-						<paper-menu-button close-on-activate allow-outside-scroll>
-							<paper-icon-button slot="dropdown-trigger" icon="icons:more-vert">
-							</paper-icon-button>
-
-							<paper-listbox slot="dropdown-content" attr-for-selected="data-id">
-								<paper-item data-item-index$="[[ index ]]" on-tap="_deleteEvent">
-									Delete this event
-								</paper-item>
-							</paper-listbox>
-						</paper-menu-button>
-					</div>
-				</nuxeo-card>
-			</template>
-
-			<div class="new-event" on-tap="_toggleDialog">
-				<iron-icon icon="icons:add"></iron-icon>
-				Add a new event
-			</div>
-		</div>
-
-		<nuxeo-dialog id="dialog" opened="{{opened}}" with-backdrop>
-			<h3>Event settings</h3>
-
-			<div class="dialog-options">
-				<nuxeo-selectivity min-chars="0" data="{{documentTypes}}" value="{{_dialogData.docType}}"
-					placeholder="Select a document type">
-				</nuxeo-selectivity>
-
-				<nuxeo-selectivity multiple min-chars="0" data="{{_eventTypes}}" value="{{_dialogData.events}}"
-					placeholder="Choose one or more event types" stay-open-on-select>
-				</nuxeo-selectivity>
-
-				<nuxeo-selectivity multiple min-chars="0" data="{{_interactionsWithLabels}}" stay-open-on-select
-					value="{{_dialogData.interactions}}" placeholder="Pick one or more interactions">
-				</nuxeo-selectivity>
-			</div>
-
-			<div class="buttons">
-				<paper-button noink dialog-dismiss class="secondary">
-					Cancel
-				</paper-button>
-
-				<paper-button id="save" on-tap="_saveChanges" class="primary" raised disabled$="[[ !_dialogDirty ]]">
-					Keep changes
-				</paper-button>
-			</div>
-		</nuxeo-dialog>
+			<tfoot>
+				<tr>
+					<th colspan="5">
+						<paper-button class="secondary" on-tap="_newDocTypeEventsInteractions">
+							New document type events interactions
+						</paper-button>
+					</th>
+				</tr>
+			</tfoot>
+		</table>
 
 	</template>
 
 	<script>
 		Polymer({
 			is: 'cp-settings-events',
-			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour, Nuxeo.NotifyBehavior],
 			properties: {
 				eventsSettings: {
 					type: Array,
@@ -212,45 +267,20 @@
 				}
 			},
 
-			_toggleDialog(e)
-			{
-				this._selectedEventSettingIndex = e.target.dataset.itemIndex;
-
-				if (this._selectedEventSettingIndex != undefined)
-					this._dialogData = this.eventsSettings[this._selectedEventSettingIndex];
-				else
-					this._dialogData = {
-						docType: '',
-						events: [],
-						interactions: []
-					};
-
-				this.$.dialog.toggle();
-			},
-
-			_saveChanges()
+			_newDocTypeEventsInteractions()
 			{
 				if (!this.eventsSettings)
 					this.set('eventsSettings', []);
-
-				if (this._selectedEventSettingIndex == undefined)
-					this.eventsSettings.push(this._dialogData);
-				else
-					this.eventsSettings.splice(this._selectedEventSettingIndex, 1, this._dialogData);
-
-				const eventsSettings = [...this.eventsSettings];
-				this.set('eventsSettings', []);
-				setTimeout(() =>
-				{
-					this.set('eventsSettings', eventsSettings);
-
-					this._markAsDirty();
-				});
-
-				this.$.dialog.toggle();
+				
+				this.push('eventsSettings', {
+						docType: '',
+						events: [],
+						interactions: [],
+						invalid: 'invalid'
+					});
 			},
 
-			_deleteEvent(e)
+			_deleteDocTypeEventSettings(e)
 			{
 				const index = e.currentTarget.dataset.itemIndex;
 
@@ -258,7 +288,7 @@
 					return;
 
 				const item = this.eventsSettings[index];
-				if (confirm(`Are you sure you want to delete the settings for: ${item.docType}?`))
+				if (confirm(`Are you sure you want to delete these settings?`))
 				{
 					this.eventsSettings.splice(index, 1);
 
@@ -275,7 +305,27 @@
 
 			_markAsDirty()
 			{
-				this.fire('mark-as-dirty', { eventsSettings: this.eventsSettings });
+				this.fire('mark-as-dirty', { eventsSettings: this.eventsSettings.filter(item => item.docType && item.events?.length && item.interactions?.length) });
+			},
+
+			_validate(e)
+			{
+				const index = e?.model?.__data.index;
+				const item = e?.model?.__data.item;
+
+				if (item.docType && item.events?.length && item.interactions?.length)
+				{
+					this.set(`eventsSettings.${index}.invalid`, '');
+
+					this._markAsDirty();
+				} 
+				else
+				{
+					this.set(`eventsSettings.${index}.invalid`, 'invalid');
+				}
+
+				// Force Polymer to re-evaluate the second column's dom-if
+				this.notifyPath(`eventsSettings.${index}.invalid`);
 			},
 
 			_compute_interactionsWithLabels()
