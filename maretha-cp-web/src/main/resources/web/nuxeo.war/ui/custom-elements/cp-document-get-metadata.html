@@ -1,146 +1,204 @@
 <dom-module id="cp-document-get-metadata">
-  <template>
-    <nuxeo-operation id="getInteractionsOp" op="GetInteractionsForDocumentOperation"
-                     input="[[document]]"></nuxeo-operation>
-    <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
-                     input="[[document.uid]]"></nuxeo-operation>
+	<template>
+		<style include="nuxeo-action-button-styles">
+			paper-menu-button {
+				padding: 0
+			}
 
-    <style include="nuxeo-action-button-styles"></style>
+			paper-item {
+				@apply --layout-horizontal;
+				@apply --layout-center;
+				cursor: pointer;
+			}
 
-    <div class="action" on-tap="_toggleOpened">
-      <paper-menu-button id="dropdownButtonAi" close-on-activate no-overlap horizontal-align="right">
-        <paper-icon-button
-                id="aiButton"
-                icon="icons:info-outline"
-                slot="dropdown-trigger"
-                aria-labelledby="iconButtonAITooltip"
-        ></paper-icon-button>
-        <paper-listbox no-animations="" id="menu" selectable="item" slot="dropdown-content">
-          <paper-icon-item name="update" on-click="_updateMetadata">
-            <iron-icon icon="icons:info-outline" slot="item-icon">&gt;</iron-icon>
-            <div>Update metadata</div>
-          </paper-icon-item>
-          <paper-icon-item name="add" on-click="_addMissingMetadata">
-            <iron-icon icon="icons:info-outline" slot="item-icon">&gt;</iron-icon>
-            <div>Add missing metadata</div>
-          </paper-icon-item>
-        </paper-listbox>
-      </paper-menu-button>
-      <nuxeo-tooltip for="dropdownButtonAi">AI Metadata</nuxeo-tooltip>
-    </div>
+			paper-item {
+				gap: .5rem;
+			}
+		</style>
 
+		<template is="dom-if" if="[[ _showPopupMenuToggler ]]">
+			<div class="action">
+				<paper-menu-button id="dropdownButtonAi" no-animations close-on-activate no-overlap
+					horizontal-align="right" opened="{{ _popupMenuVisible }}">
+					<paper-icon-button id="aiButton" icon="custom-icons:ai-metadata" slot="dropdown-trigger"
+						aria-labelledby="iconButtonAITooltip">
+					</paper-icon-button>
 
-  </template>
+					<paper-listbox id="menu" selectable="item" slot="dropdown-content" role="listbox" tabindex="0">
+						<paper-item name="update" on-tap="_updateMetadata">
+							<iron-icon icon="custom-icons:ai-metadata-update"></iron-icon>
+							Update metadata
+						</paper-item>
 
-  <script>
-    Polymer({
-      is: 'cp-document-get-metadata',
-      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
-      properties: {
-        document: {
-          type: Object,
-        },
+						<paper-item name="add" on-tap="_addMissingMetadata">
+							<iron-icon icon="custom-icons:ai-metadata-missing"></iron-icon>
+							Add missing metadata
+						</paper-item>
+					</paper-listbox>
+				</paper-menu-button>
+				<nuxeo-tooltip for="dropdownButtonAi">AI Metadata</nuxeo-tooltip>
+			</div>
+		</template>
 
-        interactions: {
-          type: Array,
-          value: [],
-          notify: true
-        },
+		<nuxeo-operation id="getInteractionsOp" op="GetInteractionsForDocumentOperation" input="[[document]]">
+		</nuxeo-operation>
 
-        selectedInteraction: {
-          type: Object
-        },
+		<nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]">
+		</nuxeo-operation>
+	</template>
 
-        interactionResponse: {
-          type: String,
-        },
+	<script>
+		Polymer({
+			is: 'cp-document-get-metadata',
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+			properties: {
+				document: {
+					type: Object
+				},
 
-        dialogOpened: {
-          type: Boolean,
-        },
+				interactions: {
+					type: Array,
+					value: [],
+					notify: true
+				},
 
-        saveMetadataModeOverride: {
-          type: Boolean
-        }
+				selectedInteraction: {
+					type: Object
+				},
 
-      },
+				interactionResponse: {
+					type: String,
+				},
 
-      _resetData() {
-        this.set('interactions', []);
-        this.set('interactionResponse', null);
-      },
+				dialogOpened: {
+					type: Boolean,
+				},
 
-      _toggleOpened() {
-        this._resetData();
-        this._loadData();
-      },
+				saveMetadataModeOverride: {
+					type: Boolean
+				},
 
-      _loadData() {
-        this._getInteractions();
-      },
+				_showPopupMenuToggler: {
+					type: Boolean,
+					value: false
+				},
 
-      _getInteractions: function () {
-        const operation = this.$.getInteractionsOp;
-        operation.params = {"isMetadata": true};
-        operation.execute().then((response) => {
-          this.set('interactions', response.value);
-          const selectedInteraction = response.value.find(obj => obj.saveMetadata === true);
-          this.set('selectedInteraction', selectedInteraction);
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-        });
-      },
+				_popupMenuVisible: {
+					type: Boolean,
+					value: false
+				}
+			},
 
-      _updateMetadata: function () {
-        if (!this.selectedInteraction) return;
-        this.set('interactionStatus', 'Waiting for AI response...');
-        this.set('interactionResponse', '');
-        const operation = this.$.runInteractionOperation;
-        operation.params = {
-          "interactionId": this.selectedInteraction.id,
-          "data": this.selectedInteraction.parameters,
-          "saveMetadata": this.selectedInteraction.saveMetadata,
-          "saveMetadataModeOverride": true
-        };
-        this.fire('notify', { message: 'Metadata request in progress...' });
-        operation.execute().then((response) => {
-          this.set('interactionResponse', response.value);
-          this.set('interactionStatus', '');
-          this.fire('document-updated');
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-          this.fire('notify', { message: 'Cannot save metadata.' });
-          this.set('interactionStatus', `<p>Error: ${error}</p>`);
-        });
-      },
+			observers: [
+				'_documentUpdated(document.*)'
+			],
 
-      _addMissingMetadata: function () {
-        if (!this.selectedInteraction) return;
-        this.set('interactionStatus', 'Waiting for AI response...');
-        this.set('interactionResponse', '');
-        const operation = this.$.runInteractionOperation;
-        operation.params = {
-          "interactionId": this.selectedInteraction.id,
-          "data": this.selectedInteraction.parameters,
-          "saveMetadata": this.selectedInteraction.saveMetadata,
-          "saveMetadataModeOverride": false
-        };
-        this.fire('notify', { message: 'Metadata request in progress...' });
-        operation.execute().then((response) => {
-          this.set('interactionResponse', response.value);
-          this.set('interactionStatus', '');
-          this.fire('document-updated');
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-          this.fire('notify', { message: 'Cannot save metadata.' });
-          this.set('interactionStatus', `<p>Error: ${error}</p>`);
-        });
-      },
+			_documentUpdated(changes)
+			{
+				if (!changes.value)
+					return;
 
-      _toggleDialog: function () {
-        this.$.dialog.toggle();
-      },
+				if (!this.interactions.length)
+					this._getInteractions();
+				else
+					this.set('_showPopupMenuToggler', this.interactions.length > 0);
+			},
 
-    });
-  </script>
+			_getInteractions()
+			{
+				const operation = this.$.getInteractionsOp;
+				operation.params = { "isMetadata": true };
+
+				this.set('interactions', []);
+				this.set('interactionResponse', null);
+
+				operation.execute()
+					.then((response) =>
+					{
+						this.set('interactions', response.value);
+
+						const selectedInteraction = response.value.find(obj => obj.saveMetadata === true);
+						this.set('selectedInteraction', selectedInteraction);
+
+						this.set('_showPopupMenuToggler', this.interactions.length > 0);
+					})
+					.catch((error) =>
+					{
+						console.error('Error triggering operation:', error);
+					});
+			},
+
+			_updateMetadata()
+			{
+				if (!this.selectedInteraction) 
+				{
+					this._popupMenuVisible = false;
+					return;
+				}
+
+				this.set('_popupMenuVisible', false);
+
+				this.set('interactionStatus', 'Waiting for AI response...');
+				this.set('interactionResponse', '');
+				const operation = this.$.runInteractionOperation;
+				operation.params = {
+					"interactionId": this.selectedInteraction.id,
+					"data": this.selectedInteraction.parameters,
+					"saveMetadata": this.selectedInteraction.saveMetadata,
+					"saveMetadataModeOverride": true
+				};
+				this.fire('notify', { message: 'Metadata request in progress...' });
+				operation.execute().then((response) =>
+				{
+					this.set('interactionResponse', response.value);
+					this.set('interactionStatus', '');
+					this.fire('document-updated');
+				}).catch((error) =>
+				{
+					console.error('Error triggering operation:', error);
+					this.fire('notify', { message: 'Cannot save metadata.' });
+					this.set('interactionStatus', `<p>Error: ${error}</p>`);
+				});
+			},
+
+			_addMissingMetadata()
+			{
+				if (!this.selectedInteraction)
+				{
+					this._popupMenuVisible = false;
+					return;
+				}
+
+				this.set('_popupMenuVisible', false);
+
+				this.set('interactionStatus', 'Waiting for AI response...');
+				this.set('interactionResponse', '');
+				const operation = this.$.runInteractionOperation;
+				operation.params = {
+					"interactionId": this.selectedInteraction.id,
+					"data": this.selectedInteraction.parameters,
+					"saveMetadata": this.selectedInteraction.saveMetadata,
+					"saveMetadataModeOverride": false
+				};
+				this.fire('notify', { message: 'Metadata request in progress...' });
+				operation.execute().then((response) =>
+				{
+					this.set('interactionResponse', response.value);
+					this.set('interactionStatus', '');
+					this.fire('document-updated');
+				}).catch((error) =>
+				{
+					console.error('Error triggering operation:', error);
+					this.fire('notify', { message: 'Cannot save metadata.' });
+					this.set('interactionStatus', `<p>Error: ${error}</p>`);
+				});
+			},
+
+			_toggleDialog()
+			{
+				this.$.dialog.toggle();
+			},
+
+		});
+	</script>
 </dom-module>

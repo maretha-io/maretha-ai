@@ -6,6 +6,9 @@
 <dom-module id="nuxeo-embedding-search-search-form">
   <template>
     <style include="nuxeo-styles">
+		paper-slider {
+			width: 100%;
+		}
     </style>
 
     <!-- Embeddings -->
@@ -22,7 +25,7 @@
     <paper-slider
             role="widget"
             id="minScoreSlider"
-            label="Minimum Score"
+            label="Confidence value"
             type="number"
             min="0"
             max="1"

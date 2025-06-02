@@ -1,0 +1,50 @@
+<link rel="import" href="../../custom-elements/cp-collapsible-content.html">
+<link rel="import" href="../list/nuxeo-similar-documents.html">
+<link rel="import" href="../../custom-elements/cp-show-interaction-results.html">
+<link rel="import" href="../../custom-elements/cp-document-interaction.html">
+
+<!--
+`nuxeo-similar-documents-tab`
+@group Nuxeo UI
+@element nuxeo-similar-documents-tab
+-->
+<dom-module id="cp-ai-tab">
+	<template>
+		<style include="nuxeo-styles">
+			:host {
+				display: block;
+			}
+		</style>
+
+		<template is="dom-if" if="[[visible]]">
+			<cp-collapsible-content label="Previous interactions" expanded>
+				<cp-show-interaction-results document="[[document]]"></cp-show-interaction-results>
+			</cp-collapsible-content>
+
+			<cp-collapsible-content label="Run interactions">
+
+			</cp-collapsible-content>
+			
+			<cp-collapsible-content label="Chat with document">
+
+			</cp-collapsible-content>
+		</template>
+
+	</template>
+
+	<script>
+		Polymer({
+			is: 'cp-ai-tab',
+			properties: {
+				document: {
+					type: Object,
+				},
+
+				visible: {
+					type: Boolean
+				}
+
+			}
+		});
+	</script>
+</dom-module>

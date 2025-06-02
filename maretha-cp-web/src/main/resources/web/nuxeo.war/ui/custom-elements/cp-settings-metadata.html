@@ -76,6 +76,13 @@
 				cursor: pointer;
 			}
 
+			.table-container {
+				overflow: auto;
+				box-shadow: 0 0 3px -1px rgba(0, 0, 0, .5);
+				padding: 1rem;
+				margin: 0;
+			}
+
 			table {
 				border-collapse: collapse;
 				border-spacing: 0;
@@ -138,87 +145,67 @@
 				</template>
 
 				<template id="tableDom" is="dom-if" if="[[selectedSchema]]">
-					<table>
-						<thead>
-							<tr>
-								<th>Xpath</th>
-								<th>Active</th>
-								<th>Isolated</th>
-								<th>Interaction</th>
-								<th>Description</th>
-							</tr>
-						</thead>
-
-						<tbody>
-							<template is="dom-repeat" items="[[ selectedSchema.fields ]]">
+					<div class="table-container">
+						<table>
+							<thead>
 								<tr>
-									<td>
-										<div class="xpath">
-											<span>[[item.xpath]]</span>
-
-											<template is="dom-if" if="[[ item.directoryName ]]">
-												<nuxeo-tag>[[ item.directoryName ]]</nuxeo-tag>
-											</template>
-
-											<template is="dom-if" if="[[ !item.directoryName ]]">
-												<small>[[item.type]]</small>
-											</template>
-										</div>
-									</td>
-
-									<td>
-										<paper-checkbox checked="{{ item.active }}" on-change="_markAsDirty" />
-									</td>
-
-									<td>
-										<paper-checkbox checked="{{ item.inIsolation }}" on-change="_inIsolationChanged"
-											data-index$="[[index]]" />
-									</td>
-
-									<td>
-										<template is="dom-if" if="[[item.inIsolation]]" restamp>
-											<nuxeo-selectivity
-												value="[[_getInteractionName(item.interactionId, interactions)]]"
-												data="[[ filteredInteractions ]]" min-chars="0" tagging
-												id-function="[[_interactionIdFunction]]"
-												result-formatter="[[_interactionResultFormatter]]"
-												selection-formatter="[[_interactionResultFormatter]]">
-											</nuxeo-selectivity>
-
-
-											<!-- <div class="dropdown-trigger" on-tap="_showInteractionDropdown">
-												<paper-ripple></paper-ripple>
-												<paper-input type="text" readonly
-													value="[[_getInteractionName(item.interactionId, interactions)]]"
-													placeholder="Select an interaction" autocomplete="off"
-													data-selected-schema-field-index$="[[ index ]]">
-													<iron-icon icon="paper-dropdown-menu:arrow-drop-down" suffix
-														slot="suffix"></iron-icon>
-												</paper-input>
-											</div> -->
-										</template>
-									</td>
-
-									<td>
-										<paper-input type="[[item.type]]" value="{{item.description}}"
-											on-input="_markAsDirty">
-										</paper-input>
-									</td>
+									<th>Xpath</th>
+									<th>Active</th>
+									<th>Isolated</th>
+									<th>Interaction</th>
+									<th>Description</th>
 								</tr>
-							</template>
-						</tbody>
-					</table>
-				</template>
+							</thead>
 
-				<paper-menu-button id="interactionsDropdown" opened="{{_interactionsDropdownVisible}}"
-					on-iron-select="_onIronSelect" close-on-activate allow-outside-scroll>
-					<paper-listbox selected="{{ _selectedInteraction }}" slot="dropdown-content"
-						attr-for-selected="data-id">
-						<template is="dom-repeat" items="[[filteredInteractions]]">
-							<paper-item data-id="[[item.id]]">[[item.name]]</paper-item>
-						</template>
-					</paper-listbox>
-				</paper-menu-button>
+							<tbody>
+								<template is="dom-repeat" items="[[ selectedSchema.fields ]]">
+									<tr>
+										<td>
+											<div class="xpath">
+												<span>[[item.xpath]]</span>
+
+												<template is="dom-if" if="[[ item.directoryName ]]">
+													<nuxeo-tag>[[ item.directoryName ]]</nuxeo-tag>
+												</template>
+
+												<template is="dom-if" if="[[ !item.directoryName ]]">
+													<small>[[item.type]]</small>
+												</template>
+											</div>
+										</td>
+
+										<td>
+											<paper-checkbox checked="{{ item.active }}" on-change="_markAsDirty" />
+										</td>
+
+										<td>
+											<paper-checkbox checked="{{ item.inIsolation }}"
+												on-change="_inIsolationChanged" data-index$="[[index]]" />
+										</td>
+
+										<td>
+											<template is="dom-if" if="[[item.inIsolation]]" restamp>
+												<cp-selectivity value="{{ item.interactionId }}"
+													data="[[ filteredInteractions ]]"
+													on-selection-changed="_markAsDirty"
+													id-function="[[ _interactionIdFunction ]]"
+													result-formatter="[[ _interactionResultFormatter ]]"
+													selection-formatter="[[ _interactionResultFormatter ]]">
+												</cp-selectivity>
+											</template>
+										</td>
+
+										<td>
+											<paper-input type="[[item.type]]" value="{{item.description}}"
+												on-input="_markAsDirty">
+											</paper-input>
+										</td>
+									</tr>
+								</template>
+							</tbody>
+						</table>
+					</div>
+				</template>
 			</div>
 		</nuxeo-card>
 
@@ -271,11 +258,7 @@
 				filteredInteractions: {
 					type: Array,
 					computed: '_filterInteractions(interactions)',
-				},
-
-				_selectedSchemaFieldIndex: Number,
-				_selectedInteraction: Object,
-				_interactionsDropdownVisible: Boolean
+				}
 			},
 
 			observers: [
@@ -285,12 +268,12 @@
 
 			_interactionIdFunction(e)
 			{
-				return e.id;
+				return e ? e.id : '';
 			},
 
 			_interactionResultFormatter(e)
 			{
-				return e.name;
+				return e ? e.name : '?';
 			},
 
 			_getDocumentTypeWithSchema()
@@ -358,7 +341,7 @@
 				this.set('selectedSchemaIndex', selectedSchemaIndex);
 			},
 
-			_selectedSchemaChanged()
+			_selectedSchemaChanged(e)
 			{
 				this.$.tableDom.render();
 			},
@@ -378,16 +361,7 @@
 				});
 			},
 
-			_getInteractionName(interactionId, interactions)
-			{
-				if (!interactionId || !interactions)
-					return '';
-
-				const match = interactions.find(interaction => interaction.id === interactionId);
-				return match ? match.name : '';
-			},
-
-			_markAsDirty(e)
+			_markAsDirty()
 			{
 				this.fire('mark-as-dirty', { schemaSettings: this.selectedSchema });
 			},
@@ -398,32 +372,6 @@
 
 				// Force Polymer to re-evaluate the second column's dom-if
 				this.notifyPath(`selectedSchema.fields.${e.target.dataset.index}.inIsolation`);
-			},
-
-			_showInteractionDropdown(e)
-			{
-				this._selectedSchemaFieldIndex = e.target.dataset.selectedSchemaFieldIndex;
-
-				if (!this._interactionsDropdownVisible && this._selectedSchemaFieldIndex)
-				{
-					this.set('_selectedInteraction', this.selectedSchema.fields[this._selectedSchemaFieldIndex].interactionId);
-
-					const clientRect = e.currentTarget.getBoundingClientRect();
-					this.$.interactionsDropdown.style.top = `${clientRect.top}px`;
-					this.$.interactionsDropdown.style.left = `${clientRect.left}px`;
-					this.$.interactionsDropdown.style.display = 'block';
-
-					this.set('_interactionsDropdownVisible', true);
-				}
-				else
-					this.set('_interactionsDropdownVisible', false);
-			},
-
-			_onIronSelect(e)
-			{
-				this.set(`selectedSchema.fields.${this._selectedSchemaFieldIndex}.interactionId`, e.detail.item.dataId);
-
-				this._markAsDirty();
 			}
 		});
 	</script>

@@ -9,6 +9,9 @@
 <link rel="import" href="custom-elements/cp-document-chat.html">
 <link rel="import" href="custom-elements/cp-custom-icons.html">
 <link rel="import" href="custom-elements/tab/nuxeo-similar-documents-tab.html">
+<link rel="import" href="custom-elements/cp-selectivity.html">
+<link rel="import" href="custom-elements/tab/cp-ai-tab.html">
+
 
 <nuxeo-slot-content name="maretha-cp-interactions" slot="PAGES" order="100">
     <template>
@@ -71,13 +74,12 @@
     </template>
 </nuxeo-slot-content>
 
-
 <!-- Contribution of element 'nuxeo-menu-icon' for slot 'DRAWER_ITEMS' -->
 <nuxeo-slot-content name="Find" slot="DRAWER_ITEMS" order="1">
     <template>
         <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-SEARCH&quot;))" user="[[user]]">
             <template>
-                <nuxeo-menu-icon name="find" label="AI search" icon="icons:info-outline"></nuxeo-menu-icon>
+                <nuxeo-menu-icon name="find" label="AI search" icon="custom-icons:ai-search"></nuxeo-menu-icon>
             </template>
         </nuxeo-filter>
     </template>
@@ -92,7 +94,6 @@
         </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
-
 
 <!-- Contribution of element 'nuxeo-page-item' for slot 'DOCUMENT_VIEWS_ITEMS' -->
 <nuxeo-slot-content name="SimilarDocumentsTab" slot="DOCUMENT_VIEWS_ITEMS" order="10">
