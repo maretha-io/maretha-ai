@@ -209,7 +209,7 @@
 					name: this.chatInteraction.name,
 					status: this.chatInteraction.status,
 					createdAt: new Date().toISOString(),
-					createdBy: Nuxeo.UI.app.currentUser.id,
+					createdBy: document.querySelector('nuxeo-app').currentUser.id,
 					parameters: this.chatInteraction.parameters
 				}];
 
