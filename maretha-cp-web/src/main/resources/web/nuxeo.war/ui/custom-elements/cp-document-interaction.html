@@ -1,435 +1,425 @@
 <dom-module id="cp-document-interaction">
-  <template>
-    <nuxeo-operation id="getSettingsOperation" op="GetInteractionsForDocumentOperation"
-                     input="[[document]]"></nuxeo-operation>
-    <nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
-                     input="[[document.uid]]"></nuxeo-operation>
+	<template>
+		<style include="nuxeo-action-button-styles">
+			::-webkit-scrollbar {
+				height: 7px;
+				width: 7px;
+				background: #edeeef;
+				box-shadow: none;
+			}
 
-    <nuxeo-operation id="nxqlQueryOp" op="Document.Query" headers='{"Content-Type": "application/json"}'>
-    </nuxeo-operation>
-    <nuxeo-operation id="totalDocumentsQueryOp" op="Document.Query" headers='{"Content-Type": "application/json"}'>
-    </nuxeo-operation>
+			::-webkit-scrollbar-thumb {
+				background: #cdcdcd;
+				box-shadow: none;
+			}
 
-    <style include="nuxeo-action-button-styles">
-      .interaction-content {
-        width: 95%;
-        margin: auto;
-        padding: 10px;
-      }
+			:host {
+				display: block;
+				--paper-input-container-label_-_color: #999;
+				--paper-input-container_-_padding: 0;
+				--paper-button_-_padding: 0;
+			}
 
-      #dialog {
-        height: 90%;
-        width: 90%;
-        margin: auto;
-        overflow: auto;
-      }
+			.chat {
+				display: flex;
+				flex-direction: column;
+				border: 1px solid rgba(58, 85, 17, .3);
+				box-shadow: 0 0 3.5rem -2rem inset rgb(58, 85, 17);
+				padding: 1rem;
+				gap: 2rem;
+				overflow: hidden;
+				max-height: 459px;
+				border-radius: .325rem;
+				margin: .5rem 0;
+			}
 
-      .textarea {
-        max-height: 400px;
-        overflow-y: auto;
-        overflow-x: auto;
-      }
+			.question {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				margin: 0 0 0 1rem;
+			}
 
-      .table {
-        width: 100%;
-        text-align: left;
-      }
+			@media screen and (min-width: 1400px) {
+				.question {
+					padding: 0 max(20%, 200px);
+				}
+			}
 
-      .response-table-row {
-        height: 50px;
-        /* Set the desired height */
-        overflow: scroll;
-        /* Ensure content does not overflow */
-      }
+			.input {
+				flex-grow: 1;
+				display: flex;
+				gap: 1rem;
+				flex-wrap: wrap;
+			}
 
-      #selectInteraction {
-        max-width: 100%;
-        margin: auto;
-        text-align: left;
-      }
+			.input paper-input,
+			.input paper-dropdown-menu,
+			.input p {
+				flex: 1 0 calc(50% - 1rem);
+			}
 
-      #auditButton {
-        margin: auto;
-        padding: 10px;
-      }
+			.input p {
+				color: #999;
+				font-size: 1.125rem;
+				border-bottom: 1px solid;
+				margin: 1rem 0 0;
+				padding-top: .5rem;
+			}
 
-      #parameters {
-        max-width: 100%;
-        margin: auto;
-        text-align: left;
-        border: 3px solid #ececec;
-        border-radius: 15px;
-        padding: 10px;
-      }
+			.chat-response {
+				flex-grow: 1;
+				background-color: #f6f7f4;
+				box-shadow: 0 1rem 1.5rem -2.25rem;
+				overflow: auto;
+			}
 
-      .flex-container {
-        display: flex;
-        flex-wrap: wrap;
-        text-align: center;
-      }
+			paper-icon-button {
+				width: 3.5rem;
+				height: 3.5rem;
+				padding: .25rem;
+				color: var(--nuxeo-button-primary);
+			}
+		</style>
 
-      .flex-item-left {
-        padding: 10px;
-        flex: 25%;
-      }
+		<div class="chat">
+			<div class="chat-response">
+				<cp-format-chat-json-response messages="[[interactionContext]]" stream="[[interactionResponseStream]]"
+					document="[[document]]" chat-interaction="[[selectedInteraction]]" status="[[interactionStatus]]"
+					loading="[[loading]]">
+				</cp-format-chat-json-response>
+			</div>
 
-      .flex-item-right {
-        padding: 10px;
-        flex: 70%;
-      }
+			<div class="question">
+				<div class="input">
+					<paper-dropdown-menu label="Select AI Interaction" style="width: 100%;">
+						<paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
+							<template is="dom-repeat" items="[[interactions]]">
+								<paper-item>[[item.name]] - [[item.description]]</paper-item>
+							</template>
+						</paper-listbox>
+					</paper-dropdown-menu>
 
-      .response {
-        min-height: 400px;
-        max-height: 600px;
-        width: 100%;
-        overflow-y: scroll;
-        border: 3px solid #ececec;
-        border-radius: 15px;
-        text-align: left;
-        padding: 15px;
-      }
+					<template is="dom-repeat" items="[[selectedInteraction.parameters]]">
+						<paper-input role="widget" value="{{item.value}}" label="[[item.name]]"
+							hidden="[[item.readOnly]]" readonly="[[item.readOnly]]" type="[[item.type]]">
+						</paper-input>
 
-      .chat-response {
-        min-height: 400px;
-        max-height: 600px;
-        width: 100%;
-        overflow-y: scroll;
-        border: 3px solid #ececec;
-        border-radius: 15px;
-        text-align: left;
-        padding: 15px;
-      }
-    </style>
+						<template is="dom-if" if="[[item.description]]">
+							<p>Description: [[item.description]]</p>
+						</template>
 
-    <div class="action" on-tap="_toggleDialog">
-      <paper-icon-button id="interactionsButton"
-                         noink
-                         icon="custom-icons:ai-interact"
-                         aria-labelledby="interactionsButtonTooltip">
-      </paper-icon-button>
-      <nuxeo-tooltip for="interactionsButton" id="interactionsButtonTooltip">Interact with document</nuxeo-tooltip>
-    </div>
+						<template is="dom-if" if="[[item.isMainDocument]]">
+							<p>Main Document: [[document.properties.file:content.name]]</p>
+						</template>
 
-    <nuxeo-dialog id="dialog" opened="{{dialogOpened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
-      <div class="interaction-content">
-        <div class="flex-container">
+						<template is="dom-if" if="[[item.enableDocSelection]]">
+							<div>
+								<template is="dom-if" if="[[_isDocArrayType(item)]]">
+									<nuxeo-document-suggestion value="{{item.selectedDocumentIds}}"
+										label="Selected Documents" readonly="[[item.selectionReadOnly]]" multiple
+										min-chars="0" name="selectedDocs" role="widget">
+									</nuxeo-document-suggestion>
+								</template>
 
-          <div class="flex-item-left">
-            <div id="selectInteraction">
-              <paper-dropdown-menu label="Select AI Interaction" style="width: 100%;">
-                <paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
-                  <template is="dom-repeat" items="[[interactions]]">
-                    <paper-item>[[item.name]] - [[item.description]]</paper-item>
-                  </template>
-                </paper-listbox>
-              </paper-dropdown-menu>
-            </div>
+								<template is="dom-if" if="[[!_isDocArrayType(item)]]">
+									<nuxeo-document-suggestion value="{{item.selectedDocumentId}}"
+										label="Selected Document" readonly="[[item.selectionReadOnly]]" min-chars="0"
+										name="selectedDoc" role="widget">
+									</nuxeo-document-suggestion>
+								</template>
+							</div>
+						</template>
+					</template>
 
-            <div id="parameters">
-              <h3>Parameters</h3>
-              <template is="dom-repeat" items="[[selectedInteraction.parameters]]">
-                <nuxeo-input role="widget" value="{{item.value}}" label="[[item.name]]" hidden="[[item.readOnly]]"
-                             readonly="[[item.readOnly]]" type="[[item.type]]"></nuxeo-input>
-                <template is="dom-if" if="[[item.description]]">
-                  <p>Description: [[item.description]]</p>
-                </template>
-                <template is="dom-if" if="[[item.isMainDocument]]">
-                  <p>Main Document: [[document.properties.file:content.name]]</p>
-                </template>
-                <template is="dom-if" if="[[item.enableDocSelection]]">
-                  <div>
-                    <template is="dom-if" if="[[_isDocArrayType(item)]]">
-                      <nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" label="Selected Documents"
-                                                 readonly="[[item.selectionReadOnly]]" multiple min-chars="0" name="selectedDocs"
-                                                 role="widget"></nuxeo-document-suggestion>
-                    </template>
-                    <template is="dom-if" if="[[!_isDocArrayType(item)]]">
-                      <nuxeo-document-suggestion value="{{item.selectedDocumentId}}" label="Selected Document"
-                                                 readonly="[[item.selectionReadOnly]]" min-chars="0" name="selectedDoc"
-                                                 role="widget"></nuxeo-document-suggestion>
-                    </template>
-                  </div>
-                </template>
-              </template>
-            </div>
-            <p>Documents ready: [[documentsReady]] / [[totalDocuments]]</p>
+				</div>
 
-            <div class="buttons" style="margin:10px; text-align:center;">
-              <paper-button id="chat" style="margin: 20px;" on-tap="_interactWithDocument"
-                            aria-label="Interact with document" raised>
-                Run Interaction
-              </paper-button>
-            </div>
-          </div>
+				<paper-icon-button icon="custom-icons:ai-interact" on-tap="_interactWithDocument">
+				</paper-icon-button>
+			</div>
+		</div>
 
-          <div class="flex-item-right">
-            <div id="response" class="response">
-              [[interactionStatus]]
-              <template is="dom-if" if="[[interactionResponseStream]]">
-                [[interactionResponseStream]]
-              </template>
-              <template is="dom-if" if="[[interactionResponse]]">
-                <cp-format-json-response json="[[interactionResponse]]"></cp-format-json-response>
-                <cp-save-response document="[[document]]" interaction="[[selectedInteraction]]"
-                                  interaction-response="[[interactionResponse]]"></cp-save-response>
-              </template>
+		<nuxeo-operation id="getSettingsOperation" op="GetInteractionsForDocumentOperation" input="[[document]]">
+		</nuxeo-operation>
 
-              <template is="dom-if" if="[[showPreviousInteractions]]">
-                <cp-show-interaction-results document="{{document}}"></cp-show-interaction-results>
-              </template>
-            </div>
-            <div id="auditButton">
-              <paper-toggle-button checked="{{debugging}}"
-                                   on-change="_showPreviousInteractions">Audit</paper-toggle-button>
-            </div>
-          </div>
+		<nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]">
+		</nuxeo-operation>
 
-        </div>
-      </div>
-    </nuxeo-dialog>
+		<nuxeo-operation id="nxqlQueryOp" op="Document.Query" headers='{"Content-Type": "application/json"}'>
+		</nuxeo-operation>
 
-  </template>
+		<nuxeo-operation id="totalDocumentsQueryOp" op="Document.Query" headers='{"Content-Type": "application/json"}'>
+		</nuxeo-operation>
+	</template>
 
-  <script>
-    Polymer({
-      is: 'cp-document-interaction',
-      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
-      properties: {
-        document: {
-          type: Object,
-          observer: '_documentObserver'
-        },
+	<script>
+		Polymer({
+			is: 'cp-document-interaction',
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+			properties: {
+				document: {
+					type: Object,
+					observer: '_documentObserver'
+				},
 
-        interactions: {
-          type: Array,
-          value: [],
-          observer: '_interactionsObserver',
-          notify: true
-        },
+				interactions: {
+					type: Array,
+					value: [],
+					observer: '_interactionsObserver',
+					notify: true
+				},
 
-        selectedInteraction: {
-          type: Object,
-          computed: '_computeSelectedValue(selectedIndex, interactions)',
-          observer: '_selectedInteractionObserver',
-        },
+				selectedInteraction: {
+					type: Object,
+					computed: '_computeSelectedValue(selectedIndex, interactions)'
+				},
 
-        interactionResponse: {
-          type: String,
-          observer: '_interactionResponseObserver',
-        },
+				interactionContext: {
+					type: Array,
+					value: []
+				},
 
-        interactionResponseStream: {
-          type: String,
-          value: ''
-        },
+				interactionResponse: {
+					type: String,
+					observer: '_interactionResponseObserver',
+				},
 
-        relatedDocuments: {
-          type: Array,
-          observer: '_relatedDocumentsObserver',
-        },
+				interactionResponseStream: {
+					type: String,
+					value: ''
+				},
 
-        // Holds the selected index from the dropdown
-        selectedIndex: {
-          type: Number,
-          value: -1,
-        },
+				loading: {
+					type: Boolean,
+					value: false
+				},
 
-        dialogOpened: {
-          type: Boolean,
-          observer: '_dialogOpenObserver'
-        },
+				relatedDocuments: {
+					type: Array,
+					observer: '_relatedDocumentsObserver',
+				},
 
-        debugging: {
-          type: Boolean,
-          value: false
-        },
+				// Holds the selected index from the dropdown
+				selectedIndex: {
+					type: Number,
+					value: -1,
+				},
 
-        showPreviousInteractions: {
-          type: Boolean,
-          value: false
-        },
+				debugging: {
+					type: Boolean,
+					value: false
+				},
 
-        documentsReady: {
-          type: Number,
-          value: 0
-        },
+				documentsReady: {
+					type: Number,
+					value: 0
+				},
 
-        totalDocuments: {
-          type: Number,
-          value: 0
-        },
+				totalDocuments: {
+					type: Number,
+					value: 0
+				},
 
-        interactionStatus: {
-          type: String,
-        },
+				interactionStatus: {
+					type: String,
+				},
 
-      },
+			},
 
-      _dialogOpenObserver: function (open) {
-        if (open) {
-          this._loadData();
-        }
-        if (!open) {
-          this._resetData();
-          this.fire('document-updated');
-        }
-      },
+			_resetData()
+			{
+				this.set('interactions', []);
+				this.set('selectedIndex', null);
+				this.set('selectedInteraction', null);
+				this.set('interactionResponse', null);
+				this.set('interactionContext', []);
+				this.set('interactionResponseStream', null);
+			},
 
-      _resetData() {
-        this.set('interactions', []);
-        this.set('selectedIndex', null);
-        this.set('selectedInteraction', null);
-        this.set('interactionResponse', null);
-        this.set('interactionResponseStream', null);
-      },
+			_documentObserver(doc)
+			{
+				this._resetData();
+				this._loadData();
+			},
 
-      _documentObserver(doc) {
-        this._debug('_documentObserver', doc);
-<!--        this._resetData();-->
-<!--        this._loadData();-->
-      },
+			_loadData()
+			{
+				this._getInteractions();
+				this._executeDocumentsReadyQuery();
+				this._executeTotalDocumentsQuery();
+			},
 
-      _loadData() {
-        this._getInteractions();
-        this._executeDocumentsReadyQuery();
-        this._executeTotalDocumentsQuery();
-      },
+			_getInteractions()
+			{
+				const operation = this.$.getSettingsOperation;
 
-      ready: function () {
+				operation.params = {};
 
-      },
+				operation.execute()
+					.then((response) =>
+					{
+						this.set('interactions', response.value);
+					})
+					.catch((error) =>
+					{
+						console.error('Error triggering operation:', error);
+					});
+			},
 
-      _getInteractions: function () {
-        const operation = this.$.getSettingsOperation;
-        operation.params = {};
-        operation.execute().then((response) => {
-          this.set('interactions', response.value);
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-        });
-      },
+			_interactWithDocument()
+			{
+				if (!this.selectedInteraction)
+					return;
 
-      _interactWithDocument: function () {
-        if (!this.selectedInteraction) return;
-        this.set('interactionStatus', 'Waiting for AI response...');
-        this.set('interactionResponse', '');
-        const operation = this.$.runInteractionOperation;
-        operation.params = {
-          "interactionId": this.selectedInteraction.id,
-          "data": this.selectedInteraction.parameters,
-          "saveMetadata": this.selectedInteraction.saveMetadata
-        };
-        operation.execute().then((response) => {
-          if(this.selectedInteraction.saveMetadata) {
-              this.set('interactionResponse', response.value);
-              this.set('interactionStatus', '');
-          } else {
-            this._stream(response.value);
-          }
-        }).catch((error) => {
-          console.error('Error triggering operation:', error);
-          this.set('interactionStatus', `<p>Error: ${error}</p>`);
-        });
-      },
+				this.set('loading', true);
 
-      _stream: function (url) {
-        this.set('interactionStatus', '');
-        this.set('interactionResponseStream', '');
-        this._eventSource = new EventSource(url);
-        this._eventSource.onmessage = (event) => {
-          //remove string quotes
-          this.interactionResponseStream = this.interactionResponseStream + event.data.slice(1, -1);
-        };
+				this.set('interactionStatus', 'Waiting for AI response...');
 
-        this._eventSource.onerror = (event) => {
-          this.set('interactionResponseStream', "Failed to get response. Please try again...");
-        }
+				this.set('interactionResponse', '');
 
-        this._eventSource.addEventListener("close", (event) => {
-          const streamResponse = this.interactionResponseStream;
-          this.set('interactionResponse', streamResponse);
-          this.set('interactionResponseStream', '');
-          const closeObject = JSON.parse(event.data);
-          if (closeObject.error) {
-            this.set('interactionResponseStream', closeObject.error.message);
-          }
-          this._eventSource.close();
-        });
+				this.set('interactionContext', [{
+					role: 'user',
+					date: new Date(),
+					content: this.selectedInteraction.description
+				}]);
 
-      },
+				const operation = this.$.runInteractionOperation;
 
-      _interactionsObserver(obs) {
-        if (this.interactions) {
-          this.set('selectedIndex', 0);
-        }
-        this._debug(`_interactionsObserver:`, obs);
-      },
+				operation.params = {
+					interactionId: this.selectedInteraction.id,
+					data: this.selectedInteraction.parameters,
+					saveMetadata: this.selectedInteraction.saveMetadata
+				};
 
-      _selectedInteractionObserver(obs) {
-        this._debug('_selectedInteractionObserver', obs);
-      },
+				operation.execute()
+					.then((response) =>
+					{
+						if (this.selectedInteraction.saveMetadata)
+						{
+							this.set('interactionResponse', response.value);
 
-      _interactionResponseObserver: function (obs) {
-        this._debug('_interactionResponseObserver', obs);
-        this._executeDocumentsReadyQuery();
-      },
+							this.push('interactionContext', {
+								role: 'assistant',
+								date: new Date(),
+								content: response.value
+							});
 
-      // Compute the selected value based on the selected index
-      _computeSelectedValue: function (selectedIndex, jsonData) {
-        if (selectedIndex >= 0 && jsonData && jsonData[selectedIndex]) {
-          return jsonData[selectedIndex];
-        }
-        return '';
-      },
+							this.set('interactionStatus', '');
+						}
+						else
+							this._stream(response.value);
+					})
+					.catch((error) =>
+					{
+						console.error('Error triggering operation:', error);
+						this.set('interactionStatus', `<p>Error: ${error}</p>`);
+					});
+			},
 
-      _toggleDialog: function () {
-        this.$.dialog.toggle();
-      },
+			_stream(url)
+			{
+				this.set('interactionStatus', '');
+				this.set('interactionResponseStream', '');
 
-      _close: function () {
-      },
+				this._eventSource = new EventSource(url);
 
-      _dialogClosed: function () {
-      },
+				this._eventSource.onmessage = (event) =>
+				{
+					//remove string quotes
+					this.set('loading', false);
+					this.interactionResponseStream = this.interactionResponseStream + event.data.slice(1, -1);
+				};
 
-      _showPreviousInteractions: function () {
-        this.set('showPreviousInteractions', this.debugging);
-      },
+				this._eventSource.onerror = (event) =>
+				{
+					this.set('loading', false);
+					this.set('interactionResponseStream', "Failed to get response. Please try again...");
+				}
 
-      _executeDocumentsReadyQuery: function () {
-        if (!this.document) return;
-        const op = this.$.nxqlQueryOp;
-        op.params = {
-          query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND interactionresults:storeDigest IS NOT NULL AND ecm:mixinType = 'InteractionResultsFacet' AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
-        };
-        op.execute().then((response) => {
-          this.set('documentsReady', response.entries.length);
-        }).catch((error) => {
-        });
-      },
+				this._eventSource.addEventListener("close", (event) =>
+				{
+					const streamResponse = this.interactionResponseStream;
 
-      _executeTotalDocumentsQuery: function () {
-        if (!this.document) return;
-        const op = this.$.totalDocumentsQueryOp;
-        op.params = {
-          query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
-        };
-        op.execute().then((response) => {
-          this.set('totalDocuments', response.entries.length);
-        }).catch((error) => {
-        });
-      },
+					this.set('interactionResponse', streamResponse);
 
-      _isDocArrayType: function (param) {
-        return param.type === 'array' && param.format === 'document';
-      },
+					this.push('interactionContext', {
+						role: 'assistant',
+						date: new Date(),
+						content: streamResponse
+					});
 
-      _debug: function (name, info) {
-        if (this.debug) {
-          console.log(name, info);
-        }
-      },
+					this.set('interactionResponseStream', '');
 
-    });
-  </script>
+					const closeObject = JSON.parse(event.data);
+					if (closeObject.error)
+						this.set('interactionResponseStream', closeObject.error.message);
+
+					this._eventSource.close();
+
+					this.set('loading', false);
+				});
+
+			},
+
+			_interactionsObserver(obs)
+			{
+				if (this.interactions)
+					this.set('selectedIndex', 0);
+			},
+
+			_interactionResponseObserver(obs)
+			{
+				this._executeDocumentsReadyQuery();
+			},
+
+			// Compute the selected value based on the selected index
+			_computeSelectedValue(selectedIndex, jsonData)
+			{
+				if (selectedIndex >= 0 && jsonData && jsonData[selectedIndex])
+					return jsonData[selectedIndex];
+
+				return '';
+			},
+
+			_executeDocumentsReadyQuery()
+			{
+				if (!this.document)
+					return;
+
+				const op = this.$.nxqlQueryOp;
+
+				op.params = {
+					query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND interactionresults:storeDigest IS NOT NULL AND ecm:mixinType = 'InteractionResultsFacet' AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
+				};
+
+				op.execute()
+					.then((response) =>
+					{
+						this.set('documentsReady', response.entries.length);
+					});
+			},
+
+			_executeTotalDocumentsQuery()
+			{
+				if (!this.document)
+					return;
+
+				const op = this.$.totalDocumentsQueryOp;
+				op.params = {
+					query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
+				};
+
+				op.execute()
+					.then((response) =>
+					{
+						this.set('totalDocuments', response.entries.length);
+					});
+			},
+
+			_isDocArrayType(param)
+			{
+				return param.type === 'array' && param.format === 'document';
+			}
+		});
+	</script>
 </dom-module>

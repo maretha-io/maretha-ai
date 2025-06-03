@@ -1,90 +1,106 @@
 <dom-module id="cp-format-json-response">
-  <template>
-    <style>
-      .markdown-body {
-        font-family: Arial, sans-serif;
-        white-space: pre-wrap;
-      }
-    </style>
-    <div id="response"></div>
-    <div class="markdown-body" inner-h-t-m-l="[[htmlValue]]"></div>
+	<template>
+		<style>
+			pre {
+				margin: 0;
+				white-space: pre-line;
+				font-size: 1.125rem;
+			}
 
-  </template>
+			pre::first-letter {
+				text-transform: capitalize;
+			}
+		</style>
 
-  <script>
-    Polymer({
-      is: 'cp-format-json-response',
-      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
-      properties: {
+		<pre class="markdown-body" inner-h-t-m-l="[[htmlValue]]"></pre>
+	</template>
 
-        stringJson: {
-          type: Object,
-        },
+	<script>
+		Polymer({
+			is: 'cp-format-json-response',
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+			properties: {
 
-        json: {
-          type: Object,
-        },
+				stringJson: {
+					type: Object,
+				},
 
-        htmlValue: {
-          type: String,
-        }
+				json: {
+					type: Object,
+				},
 
-      },
+				htmlValue: {
+					type: String,
+				}
 
-      observers: ['_stringJsonToHtmlObserver(stringJson)', '_stringJsonToHtmlObserver(json)'],
+			},
 
-      ready: function () {
-      },
+			observers: ['_stringJsonToHtmlObserver(stringJson)', '_stringJsonToHtmlObserver(json)'],
 
-      _stringJsonToHtmlObserver: function (stringJson) {
-        this.set('htmlValue', stringJson);
+			ready: function ()
+			{
+			},
 
-        try {
-          //Check if the json is valid
-          const jsonObj = JSON.parse(stringJson);
-          if (typeof jsonObj === 'object')
-            this.set('htmlValue', this._formatJson(jsonObj));
-        } catch (e) {
-        }
+			_stringJsonToHtmlObserver: function (stringJson)
+			{
+				this.set('htmlValue', stringJson);
 
-        try {
-          //Try to fix the json object
-          const cleanJson = stringJson
-            .replace(/\\\\n|\\n/g, "")
-            .trim();
-          this.set('htmlValue', cleanJson);
-          const unescapedJson = JSON.parse(`"${cleanJson}"`);
-          const jsonObj = JSON.parse(unescapedJson);
-          if (typeof jsonObj === 'object')
-            this.set('htmlValue', this._formatJson(jsonObj));
-        } catch (e) {
-          //console.error(e);
-        }
-      },
+				try
+				{
+					//Check if the json is valid
+					const jsonObj = JSON.parse(stringJson);
+					if (typeof jsonObj === 'object')
+						this.set('htmlValue', this._formatJson(jsonObj));
+				} catch (e)
+				{
+				}
 
-      _formatJson: function (jsonObj, indent = 0) {
-        let result = '';
-        const indentation = '&nbsp;'.repeat(indent); // Add spaces for indentation
-        for (const key in jsonObj) {
-          if (jsonObj.hasOwnProperty(key)) {
-            const value = jsonObj[key];
-            const formattedKey = `<strong>${key.toUpperCase()}</strong>`;
-            if (typeof value === 'object' && !Array.isArray(value)) {
-              // If the value is an object, recurse and add <br>
-              result += `${indentation}${formattedKey}:<br>`;
-              result += this._formatJson(value, indent + 4);
-            } else if (Array.isArray(value)) {
-              // If the value is an array, join values with commas
-              result += `${indentation}${formattedKey}: ${value.join(', ')}<br>`;
-            } else {
-              // Key-value pair with a <br>
-              result += `${indentation}${formattedKey}: ${value}<br>`;
-            }
-          }
-        }
-        return result;
-      }
+				try
+				{
+					//Try to fix the json object
+					const cleanJson = stringJson
+						.replace(/\\\\n|\\n/g, "")
+						.trim();
+					this.set('htmlValue', cleanJson);
+					const unescapedJson = JSON.parse(`"${cleanJson}"`);
+					const jsonObj = JSON.parse(unescapedJson);
+					if (typeof jsonObj === 'object')
+						this.set('htmlValue', this._formatJson(jsonObj));
+				} catch (e)
+				{
+					//console.error(e);
+				}
+			},
 
-    });
-  </script>
+			_formatJson: function (jsonObj, indent = 0)
+			{
+				let result = '';
+				const indentation = '&nbsp;'.repeat(indent); // Add spaces for indentation
+				for (const key in jsonObj)
+				{
+					if (jsonObj.hasOwnProperty(key))
+					{
+						const value = jsonObj[key];
+						const formattedKey = `<strong>${key.toUpperCase()}</strong>`;
+						if (typeof value === 'object' && !Array.isArray(value))
+						{
+							// If the value is an object, recurse and add <br>
+							result += `${indentation}${formattedKey}:<br>`;
+							result += this._formatJson(value, indent + 4);
+						} else if (Array.isArray(value))
+						{
+							// If the value is an array, join values with commas
+							result += `${indentation}${formattedKey}: ${value.join(', ')}<br>`;
+						} else
+						{
+							// Key-value pair with a <br>
+							result += `${indentation}${formattedKey}: ${value}<br>`;
+						}
+					}
+				}
+				return result;
+			}
+
+		});
+	</script>
 </dom-module>

@@ -23,6 +23,7 @@
 
 			.collapsible .toggle {
 				display: flex;
+				align-items: center;
 				cursor: pointer;
 				font-weight: bold;
 				gap: 1rem;
@@ -30,7 +31,7 @@
 				transition: background-color .3s ease-in-out, box-shadow .6s ease-in-out;
 				position: relative;
 				z-index: 1;
-    			box-shadow: 0 0.25rem 0.75rem -0.75rem;
+				box-shadow: 0 0.25rem 0.75rem -0.75rem;
 			}
 
 			.collapsible.visible .toggle {
@@ -42,7 +43,7 @@
 			.collapsible.visible .toggle:after {
 				content: '';
 				position: absolute;
-				bottom: -1.5rem;
+				bottom: -1rem;
 				left: 0;
 				right: 8px;
 				height: 1.5rem;
@@ -100,7 +101,7 @@
 			}
 
 			.collapsible.visible .content {
-				max-height: 600px;
+				max-height: var(--collapsible-content-max-height, 600px);
 				opacity: 1;
 				transform: none;
 				margin-bottom: 2rem;
@@ -124,7 +125,8 @@
 			.body {
 				padding: 0 1rem 1rem;
 				max-height: 500px;
-				overflow: auto;
+				max-height: var(--collapsible-body-max-height, 500px);
+				overflow: var(--collapsible-body-overflow, auto);
 			}
 
 			.header {
@@ -151,8 +153,6 @@
 				justify-content: end;
 				gap: 1rem;
 				align-items: center;
-				padding: 1rem;
-				border-top: 1px solid rgba(0, 0, 0, .125);
 				position: relative;
 				z-index: 1;
 			}
@@ -168,10 +168,12 @@
 			}
 
 			.footer .stats {
+				border-top: 1px solid rgba(0, 0, 0, .125);
 				display: flex;
 				justify-content: space-between;
 				gap: 1rem;
 				align-items: center;
+				padding: 1rem;
 			}
 		</style>
 
@@ -180,7 +182,7 @@
 				<template is="dom-if" if="[[ showStats ]]">
 					<i class$="state [[ stateCss ]]" id="state"></i>
 				</template>
-				
+
 				<div class="header">
 					<h4>[[ label ]]</h4>
 					<span>[[ description ]]</span>
@@ -192,14 +194,14 @@
 					<slot></slot>
 				</div>
 
-				<template is="dom-if" if="[[ showStats ]]">
-					<div class="footer">
+				<div class="footer">
+					<template is="dom-if" if="[[ showStats ]]">
 						<div class="stats">
 							<nuxeo-tag>Status: <b>[[status]]</b></nuxeo-tag>
 							<nuxeo-tag>Version: <b>[[version]]</b></nuxeo-tag>
 						</div>
-					</div>
-				</template>
+					</template>
+				</div>
 			</div>
 		</div>
 
