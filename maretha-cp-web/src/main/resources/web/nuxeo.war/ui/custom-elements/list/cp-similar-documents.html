@@ -53,128 +53,123 @@
 			}
 		</style>
 
-		<template is="dom-if" if="[[ _isReady ]]">
-			<div class="slider-container">
-				<label>Confidence value</label>
-				<paper-slider role="widget" id="minScoreSlider" label="Confidence value" type="number" min="0" max="1"
-					step="0.1" snaps value="{{minScore}}" pin>
-				</paper-slider>
-			</div>
+		<div class="slider-container">
+			<label>Confidence value</label>
+			<paper-slider role="widget" id="minScoreSlider" label="Confidence value" type="number" min="0" max="1"
+				step="0.1" snaps value="{{minScore}}" pin>
+			</paper-slider>
+		</div>
 
-			<nuxeo-results id="results" display-mode="grid" name="[[document.uid]].similar" nx-provider="[[nxProvider]]"
-				selected-items="{{selectedItems}}" document="[[document]]" display-quick-filters
-				display-sort="[[_canSort(document, sortOptions)]]" sort-options="[[sortOptions]]">
+		<nuxeo-results id="results" display-mode="grid" name="[[document.uid]].similar" nx-provider="[[nxProvider]]"
+			selected-items="{{selectedItems}}" document="[[document]]" display-quick-filters
+			display-sort="[[_canSort(document, sortOptions)]]" sort-options="[[sortOptions]]">
 
-				<nuxeo-data-grid name="grid" icon="nuxeo:view-thumbnails" class="results" selection-enabled
-					draggable$="[[_hasWritePermission(document)]]" drop-target-filter="[[_dropTargetFilter]]">
+			<nuxeo-data-grid name="grid" icon="nuxeo:view-thumbnails" class="results" selection-enabled
+				draggable$="[[_hasWritePermission(document)]]" drop-target-filter="[[_dropTargetFilter]]">
+				<template>
+					<nuxeo-document-grid-thumbnail class="grid-box" tabindex$="{{tabIndex}}" selected$="{{selected}}"
+						index="[[index]]" doc="[[item]]" on-navigate="_navigate" selected-items="[[selectedItems]]">
+					</nuxeo-document-grid-thumbnail>
+				</template>
+			</nuxeo-data-grid>
+
+			<nuxeo-data-table name="table" icon="nuxeo:view-list" class="results" settings-enabled selection-enabled
+				on-row-clicked="_navigate" draggable$="[[_hasWritePermission(document)]]"
+				drop-target-filter="[[_dropTargetFilter]]">
+
+				<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.title')]]" field="dc:title"
+					sort-by="[[_displaySort(document, 'dc:title')]]" filter-by="dublincore_title" flex="50">
 					<template>
-						<nuxeo-document-grid-thumbnail class="grid-box" tabindex$="{{tabIndex}}"
-							selected$="{{selected}}" index="[[index]]" doc="[[item]]" on-navigate="_navigate"
-							selected-items="[[selectedItems]]">
-						</nuxeo-document-grid-thumbnail>
+						<nuxeo-document-thumbnail document="[[item]]"></nuxeo-document-thumbnail>
+						<a class="title ellipsis" href$="[[urlFor('browse', item.path)]]"
+							on-tap="_navigate">[[item.title]]</a>
 					</template>
-				</nuxeo-data-grid>
+				</nuxeo-data-table-column>
 
-				<nuxeo-data-table name="table" icon="nuxeo:view-list" class="results" settings-enabled selection-enabled
-					on-row-clicked="_navigate" draggable$="[[_hasWritePermission(document)]]"
-					drop-target-filter="[[_dropTargetFilter]]">
+				<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.modified')]]"
+					field="dc:modified" sort-by="[[_displaySort(document, 'dc:modified')]]"
+					filter-by="dublincore_modified_agg" flex="20" hidden>
+					<template is="header">
+						<nuxeo-dropdown-aggregation
+							placeholder="[[i18n('documentContentView.datatable.header.modified')]]"
+							data="[[aggregations.dublincore_modified_agg]]" value="{{column.filterValue}}" multiple>
+						</nuxeo-dropdown-aggregation>
+					</template>
+					<template>
+						<nuxeo-date datetime="[[item.properties.dc:modified]]"></nuxeo-date>
+					</template>
+				</nuxeo-data-table-column>
 
-					<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.title')]]"
-						field="dc:title" sort-by="[[_displaySort(document, 'dc:title')]]" filter-by="dublincore_title"
-						flex="50">
-						<template>
-							<nuxeo-document-thumbnail document="[[item]]"></nuxeo-document-thumbnail>
-							<a class="title ellipsis" href$="[[urlFor('browse', item.path)]]"
-								on-tap="_navigate">[[item.title]]</a>
-						</template>
-					</nuxeo-data-table-column>
+				<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.lastContributor')]]"
+					filter-by="dublincore_lastContributor_agg" field="dc:lastContributor"
+					sort-by="[[_displaySort(document, 'dc:lastContributor')]]" flex="20" hidden>
+					<template is="header">
+						<nuxeo-dropdown-aggregation
+							placeholder="[[i18n('documentContentView.datatable.header.lastContributor')]]"
+							data="[[aggregations.dublincore_lastContributor_agg]]" value="{{column.filterValue}}"
+							multiple>
+						</nuxeo-dropdown-aggregation>
+					</template>
+					<template>
+						<nuxeo-user-tag user="[[item.properties.dc:lastContributor]]"></nuxeo-user-tag>
+					</template>
+				</nuxeo-data-table-column>
 
-					<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.modified')]]"
-						field="dc:modified" sort-by="[[_displaySort(document, 'dc:modified')]]"
-						filter-by="dublincore_modified_agg" flex="20" hidden>
-						<template is="header">
-							<nuxeo-dropdown-aggregation
-								placeholder="[[i18n('documentContentView.datatable.header.modified')]]"
-								data="[[aggregations.dublincore_modified_agg]]" value="{{column.filterValue}}" multiple>
-							</nuxeo-dropdown-aggregation>
-						</template>
-						<template>
-							<nuxeo-date datetime="[[item.properties.dc:modified]]"></nuxeo-date>
-						</template>
-					</nuxeo-data-table-column>
+				<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.created')]]"
+					field="dc:created" sort-by="[[_displaySort(document, 'dc:created')]]" flex="20" hidden>
+					<template>
+						<nuxeo-date datetime="[[item.properties.dc:created]]"></nuxeo-date>
+					</template>
+				</nuxeo-data-table-column>
+				<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.author')]]"
+					filter-by="dublincore_creator_agg" flex="50" field="dc:creator"
+					sort-by="[[_displaySort(document, 'dc:creator')]]" hidden>
+					<template is="header">
+						<nuxeo-dropdown-aggregation
+							placeholder="[[i18n('documentContentView.datatable.header.author')]]"
+							data="[[aggregations.dublincore_creator_agg]]" value="{{column.filterValue}}" multiple>
+						</nuxeo-dropdown-aggregation>
+					</template>
+					<template>
+						<nuxeo-user-tag user="[[item.properties.dc:creator]]"></nuxeo-user-tag>
+					</template>
+				</nuxeo-data-table-column>
 
-					<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.lastContributor')]]"
-						filter-by="dublincore_lastContributor_agg" field="dc:lastContributor"
-						sort-by="[[_displaySort(document, 'dc:lastContributor')]]" flex="20" hidden>
-						<template is="header">
-							<nuxeo-dropdown-aggregation
-								placeholder="[[i18n('documentContentView.datatable.header.lastContributor')]]"
-								data="[[aggregations.dublincore_lastContributor_agg]]" value="{{column.filterValue}}"
-								multiple>
-							</nuxeo-dropdown-aggregation>
-						</template>
-						<template>
-							<nuxeo-user-tag user="[[item.properties.dc:lastContributor]]"></nuxeo-user-tag>
-						</template>
-					</nuxeo-data-table-column>
+				<nuxeo-data-table-column name="[[i18n('label.dublincore.expire')]]" field="dc:created"
+					sort-by="[[_displaySort(document, 'dc:expired')]]" flex="20" hidden>
+					<template>
+						<nuxeo-date datetime="[[item.properties.dc:expired]]"></nuxeo-date>
+					</template>
+				</nuxeo-data-table-column>
 
-					<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.created')]]"
-						field="dc:created" sort-by="[[_displaySort(document, 'dc:created')]]" flex="20" hidden>
-						<template>
-							<nuxeo-date datetime="[[item.properties.dc:created]]"></nuxeo-date>
-						</template>
-					</nuxeo-data-table-column>
-					<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.author')]]"
-						filter-by="dublincore_creator_agg" flex="50" field="dc:creator"
-						sort-by="[[_displaySort(document, 'dc:creator')]]" hidden>
-						<template is="header">
-							<nuxeo-dropdown-aggregation
-								placeholder="[[i18n('documentContentView.datatable.header.author')]]"
-								data="[[aggregations.dublincore_creator_agg]]" value="{{column.filterValue}}" multiple>
-							</nuxeo-dropdown-aggregation>
-						</template>
-						<template>
-							<nuxeo-user-tag user="[[item.properties.dc:creator]]"></nuxeo-user-tag>
-						</template>
-					</nuxeo-data-table-column>
+				<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.version')]]"
+					field="versionLabel" hidden flex="20">
+					<template>
+						[[formatVersion(item)]]
+					</template>
+				</nuxeo-data-table-column>
 
-					<nuxeo-data-table-column name="[[i18n('label.dublincore.expire')]]" field="dc:created"
-						sort-by="[[_displaySort(document, 'dc:expired')]]" flex="20" hidden>
-						<template>
-							<nuxeo-date datetime="[[item.properties.dc:expired]]"></nuxeo-date>
-						</template>
-					</nuxeo-data-table-column>
+				<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.state')]]"
+					field="currentLifeCycleState" flex="20"
+					sort-by="[[_displaySort(document, 'ecm:currentLifeCycleState')]]"
+					filter-by="system_currentLifeCycleState_agg">
+					<template is="header">
+						<nuxeo-dropdown-aggregation placeholder="[[i18n('documentContentView.datatable.header.state')]]"
+							data="[[aggregations.system_currentLifeCycleState_agg]]" value="{{column.filterValue}}"
+							multiple>
+						</nuxeo-dropdown-aggregation>
+					</template>
 
-					<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.version')]]"
-						field="versionLabel" hidden flex="20">
-						<template>
-							[[formatVersion(item)]]
-						</template>
-					</nuxeo-data-table-column>
+					<template><span class="capitalize">[[formatLifecycleState(item.state)]]</span></template>
+				</nuxeo-data-table-column>
 
-					<nuxeo-data-table-column name="[[i18n('documentContentView.datatable.header.state')]]"
-						field="currentLifeCycleState" flex="20"
-						sort-by="[[_displaySort(document, 'ecm:currentLifeCycleState')]]"
-						filter-by="system_currentLifeCycleState_agg">
-						<template is="header">
-							<nuxeo-dropdown-aggregation
-								placeholder="[[i18n('documentContentView.datatable.header.state')]]"
-								data="[[aggregations.system_currentLifeCycleState_agg]]" value="{{column.filterValue}}"
-								multiple>
-							</nuxeo-dropdown-aggregation>
-						</template>
+			</nuxeo-data-table>
+		</nuxeo-results>
 
-						<template><span class="capitalize">[[formatLifecycleState(item.state)]]</span></template>
-					</nuxeo-data-table-column>
-
-				</nuxeo-data-table>
-			</nuxeo-results>
-
-			<nuxeo-page-provider id="nxProvider" provider="searchByEmbeddings" page-size="40"
-				aggregations="{{aggregations}}" enrichers="thumbnail, permissions" params="[[params]]"
-				schemas="dublincore" headers="[[headers]]" fetch-aggregates method="post">
-			</nuxeo-page-provider>
-		</template>
+		<nuxeo-page-provider id="nxProvider" provider="searchByEmbeddings" page-size="40"
+			aggregations="{{aggregations}}" enrichers="thumbnail, permissions" params="[[params]]" schemas="dublincore"
+			headers="[[headers]]" fetch-aggregates method="post">
+		</nuxeo-page-provider>
 	</template>
 
 	<script>
@@ -198,8 +193,7 @@
 				},
 				headers: {
 					type: Object,
-					value: function ()
-					{
+					value: function () {
 						return {
 							"X-NXfetch.document": ["dc:creator", "dc:lastContributor"].join(','),
 							"X-NXtranslate.directoryEntry": "label"
@@ -222,24 +216,21 @@
 				}
 			},
 
-			_loadData()
-			{
+			_loadData() {
 				if (!this.initialized || !this.params.vectorQuery)
 					return;
 
 				this.$.results._refreshAndFetch();
 			},
 
-			_shouldShow(doc)
-			{
+			_shouldShow(doc) {
 				if (doc)
 					this.set('params', this._computeParams());
 
 				return this.initialized && !!doc;
 			},
 
-			_computeParams()
-			{
+			_computeParams() {
 				if (!this.document)
 					return {};
 
