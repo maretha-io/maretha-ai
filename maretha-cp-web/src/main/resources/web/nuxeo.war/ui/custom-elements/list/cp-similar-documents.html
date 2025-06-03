@@ -8,15 +8,12 @@
 		<style include="nuxeo-styles">
 			:host {
 				display: block;
-			}
-
-			*[role=widget] {
-				padding: 5px;
+				padding-top: 1rem;
 			}
 
 			nuxeo-results {
-				--nuxeo-results-view-height: calc(100vh - 174px - var(--nuxeo-app-top));
-				--nuxeo-document-content-min-height: calc(100vh - 256px - var(--nuxeo-app-top));
+				--nuxeo-results-view-height: calc(100vh - 23rem - var(--nuxeo-app-top));
+				--nuxeo-document-content-min-height: calc(100vh - 23rem - var(--nuxeo-app-top));
 			}
 
 			.results.dragging {
@@ -42,15 +39,23 @@
 			nuxeo-justified-grid {
 				height: calc(100vh - 10em);
 			}
+
+			.slider-container {
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+			}
+
+			paper-slider {
+				flex-grow: 1;
+				margin: 0 !important;
+				width: 100%;
+			}
 		</style>
 
-		<nuxeo-page-provider id="nxProvider" provider="[[providerName]]" page-size="40" aggregations="{{aggregations}}"
-			enrichers="thumbnail, permissions" params="[[params]]" schemas="dublincore" headers="[[headers]]"
-			fetch-aggregates method="post">
-		</nuxeo-page-provider>
-
-		<div style="height:30px;">
-			<paper-slider role="widget" id="minScoreSlider" label="Minimum Score" type="number" min="0" max="1"
+		<div class="slider-container">
+			<label>Confidence value</label>
+			<paper-slider role="widget" id="minScoreSlider" label="Confidence value" type="number" min="0" max="1"
 				step="0.1" snaps value="{{minScore}}" pin>
 			</paper-slider>
 		</div>
@@ -160,6 +165,11 @@
 
 			</nuxeo-data-table>
 		</nuxeo-results>
+
+		<nuxeo-page-provider id="nxProvider" provider="[[providerName]]" page-size="40" aggregations="{{aggregations}}"
+			enrichers="thumbnail, permissions" params="[[params]]" schemas="dublincore" headers="[[headers]]"
+			fetch-aggregates method="post">
+		</nuxeo-page-provider>
 	</template>
 
 	<script>
@@ -176,7 +186,8 @@
 				params: Object,
 				minScore: {
 					type: Number,
-					value: 0.5
+					value: 0.5,
+					observer: '_loadData'
 				},
 				headers: {
 					type: Object,
@@ -193,33 +204,38 @@
 					value: "similarity"
 				},
 				searchValue: String,
-				withDragAndDrop: {
+				initialized: {
 					type: Boolean,
-					value: false
+					value: false,
+					observer: '_componentVisible'
 				}
 			},
 
-			observers: ['_update(document, visible, minScore)'],
-
-			_update(document, visible, score)
+			_loadData()
 			{
-				const params = this._computeParams(document);
+				this.$.results._refreshAndFetch();
+			},
 
-				if (document && visible && score && params.vectorQuery)
+			_componentVisible(e)
+			{
+				if (e)
 				{
-					this.set('params', params);
-					this.$.results._refreshAndFetch();
+					this.set('params', this._computeParams());
+
+					this._loadData();
 				}
 			},
 
-			_computeParams(document)
+			_computeParams()
 			{
-				if (!document) return;
-				let params = {};
-				params.vectorField = this.searchProperty;
-				params.min_score = this.minScore;
-				params.vectorQuery = document.properties['interactionresults:storeId'];
-				return params;
+				if (!this.document)
+					return {};
+
+				return {
+					vectorField: this.searchProperty,
+					min_score: this.minScore,
+					vectorQuery: this.document.properties['interactionresults:storeId']
+				};
 			}
 		});
 	</script>

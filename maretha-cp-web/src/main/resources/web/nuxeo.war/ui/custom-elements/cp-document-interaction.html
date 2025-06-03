@@ -92,7 +92,8 @@
 
 			<div class="question">
 				<div class="input">
-					<paper-dropdown-menu label="Select AI Interaction" style="width: 100%;">
+					<paper-dropdown-menu label="Select AI Interaction" no-overlap no-animations horizontal-align="right"
+						vertical-align="top">
 						<paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
 							<template is="dom-repeat" items="[[interactions]]">
 								<paper-item>[[item.name]] - [[item.description]]</paper-item>
@@ -106,11 +107,15 @@
 						</paper-input>
 
 						<template is="dom-if" if="[[item.description]]">
-							<p>Description: [[item.description]]</p>
+							<paper-input role="widget" value="[[item.description]]" label="Description" disabled
+								type="text">
+							</paper-input>
 						</template>
 
 						<template is="dom-if" if="[[item.isMainDocument]]">
-							<p>Main Document: [[document.properties.file:content.name]]</p>
+							<paper-input role="widget" value="[[document.properties.file:content.name]]"
+								label="Main document" disabled type="text">
+							</paper-input>
 						</template>
 
 						<template is="dom-if" if="[[item.enableDocSelection]]">
@@ -134,8 +139,11 @@
 
 				</div>
 
-				<paper-icon-button icon="custom-icons:ai-interact" on-tap="_interactWithDocument">
-				</paper-icon-button>
+				<div>
+					<paper-icon-button icon="custom-icons:ai-interact" on-tap="_interactWithDocument">
+					</paper-icon-button>
+					<nuxeo-tooltip>Run interaction</nuxeo-tooltip>
+				</div>
 			</div>
 		</div>
 
