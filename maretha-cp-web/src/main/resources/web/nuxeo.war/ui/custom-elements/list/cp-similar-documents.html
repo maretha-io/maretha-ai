@@ -166,7 +166,7 @@
 			</nuxeo-data-table>
 		</nuxeo-results>
 
-		<nuxeo-page-provider id="nxProvider" provider="[[providerName]]" page-size="40" aggregations="{{aggregations}}"
+		<nuxeo-page-provider id="nxProvider" page-size="40" aggregations="{{aggregations}}"
 			enrichers="thumbnail, permissions" params="[[params]]" schemas="dublincore" headers="[[headers]]"
 			fetch-aggregates method="post">
 		</nuxeo-page-provider>
@@ -182,7 +182,6 @@
 					type: Boolean,
 					value: false
 				},
-				providerName: String,
 				params: Object,
 				minScore: {
 					type: Number,
@@ -213,18 +212,19 @@
 
 			_loadData()
 			{
-				if (this.params.vectorField)
-					this.$.results._refreshAndFetch();
+				if (!this.initialized)
+					return;
+
+				this.$.nxProvider.provider = 'searchByEmbeddings';
+				this.$.nxProvider.params = this._computeParams();
+
+				this.$.results._refreshAndFetch();
 			},
 
-			_componentVisible(e)
+			_componentVisible(initialized)
 			{
-				if (e)
-				{
-					this.set('params', this._computeParams());
-
+				if (initialized)
 					this._loadData();
-				}
 			},
 
 			_computeParams()
