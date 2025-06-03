@@ -213,7 +213,8 @@
 
 			_loadData()
 			{
-				this.$.results._refreshAndFetch();
+				if (this.params.vectorField)
+					this.$.results._refreshAndFetch();
 			},
 
 			_componentVisible(e)
