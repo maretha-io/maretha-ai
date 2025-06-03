@@ -12,7 +12,7 @@
 			}
 
 			.similar-documents {
-				--collapsible-content-max-height: calc(100vh - 235px);
+				--collapsible-content-max-height: calc(100vh - var(--nuxeo-app-top) - 15rem);
 				--collapsible-body-max-height: var(--collapsible-content-max-height);
 				--collapsible-body-overflow: visible;
 			}
@@ -54,8 +54,8 @@
 				user="[[user]]">
 				<template>
 					<cp-collapsible-content label="More like this" description="Discover other documents similar to this one"
-						class="similar-documents">
-						<cp-similar-documents document="[[document]]" provider-name="searchByEmbeddings">
+						class="similar-documents" on-expanded="_similarDocumentsShown">
+						<cp-similar-documents document="[[document]]" provider-name="searchByEmbeddings" initialized="[[_similarDocumentsInitialized]]">
 						</cp-similar-documents>
 					</cp-collapsible-content>
 				</template>
@@ -77,13 +77,22 @@
 					type: String,
 					value: 'Chat with document'
 				},
-				_chatInteractionDescription: String
+				_chatInteractionDescription: String,
+				_similarDocumentsInitialized: {
+					type: Boolean,
+					value: false
+				}
 			},
 
 			_chatInteractionReady(e)
 			{
 				this.set('_chatInteractionTitle', e.detail.name);
 				this.set('_chatInteractionDescription', e.detail.description);
+			},
+
+			_similarDocumentsShown()
+			{
+				this.set('_similarDocumentsInitialized', true);
 			}
 		});
 	</script>

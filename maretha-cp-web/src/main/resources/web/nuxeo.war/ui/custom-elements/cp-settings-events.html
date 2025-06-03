@@ -157,6 +157,15 @@
 			nuxeo-tag {
 				white-space: nowrap;
 			}
+
+			.new {
+				text-align: center;
+				color: var(--nuxeo-button-primary);
+			}
+
+			.new paper-icon-button {
+				padding: .25rem;
+			}
 		</style>
 
 		<table>
@@ -166,7 +175,14 @@
 					<th>Events</th>
 					<th>Interactions</th>
 					<th>Active</th>
-					<th></th>
+					<th>
+						<div class="new">
+							<paper-icon-button icon="custom-icons:add" on-tap="_newDocTypeEventsInteractions">
+							</paper-icon-button>
+
+							<nuxeo-tooltip>New document type interactions</nuxeo-tooltip>
+						</div>
+					</th>
 				</tr>
 			</thead>
 
@@ -193,13 +209,14 @@
 							</paper-toggle-button>
 						</td>
 						<td>
-							<paper-menu-button close-on-activate allow-outside-scroll no-overlap no-animations>
+							<paper-menu-button close-on-activate allow-outside-scroll no-animations close-on-activate
+								no-overlap horizontal-align="right" vertical-align="top">
 								<paper-icon-button slot="dropdown-trigger" icon="icons:more-vert">
 								</paper-icon-button>
 
 								<paper-listbox slot="dropdown-content" attr-for-selected="data-id">
 									<paper-item data-item-index$="[[ index ]]" on-tap="_deleteDocTypeEventSettings">
-										Delete
+										Delete this document type interactions
 									</paper-item>
 								</paper-listbox>
 							</paper-menu-button>
@@ -207,16 +224,6 @@
 					</tr>
 				</template>
 			</tbody>
-
-			<tfoot>
-				<tr>
-					<th colspan="5">
-						<paper-button class="secondary" on-tap="_newDocTypeEventsInteractions">
-							New document type events interactions
-						</paper-button>
-					</th>
-				</tr>
-			</tfoot>
 		</table>
 
 	</template>
@@ -271,13 +278,13 @@
 			{
 				if (!this.eventsSettings)
 					this.set('eventsSettings', []);
-				
+
 				this.push('eventsSettings', {
-						docType: '',
-						events: [],
-						interactions: [],
-						invalid: 'invalid'
-					});
+					docType: '',
+					events: [],
+					interactions: [],
+					invalid: 'invalid'
+				});
 			},
 
 			_deleteDocTypeEventSettings(e)
@@ -318,7 +325,7 @@
 					this.set(`eventsSettings.${index}.invalid`, '');
 
 					this._markAsDirty();
-				} 
+				}
 				else
 				{
 					this.set(`eventsSettings.${index}.invalid`, 'invalid');

@@ -34,6 +34,10 @@
 				box-shadow: 0 0.25rem 0.75rem -0.75rem;
 			}
 
+			.collapsible .toggle:hover {
+				background-color: #FFF;
+			}
+
 			.collapsible.visible .toggle {
 				background-color: var(--nuxeo-card_-_background-color, white);
 				box-shadow: none;
@@ -252,7 +256,7 @@
 					{
 						this.$.collapsible.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
 
-						this.fire('cp-collapsible-content-expanded', { detail: this.interaction });
+						this.fire('expanded', { detail: this.interaction });
 					}, 300);
 				}
 
