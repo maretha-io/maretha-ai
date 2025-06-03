@@ -23,8 +23,10 @@
 			.chat {
 				display: flex;
 				flex-direction: column;
-				border: 1px solid rgba(58, 85, 17, .3);
-				box-shadow: 0 0 3.5rem -2rem inset rgb(58, 85, 17);
+				border: 1px solid;
+				border-color: rgba(58, 85, 17, .3);
+				border-color: color-mix(in srgb, var(--nuxeo-button-primary) 5%, #000 18%);
+				box-shadow: 0 0 3.5rem -2rem inset color-mix(in srgb, var(--nuxeo-button-primary) 50%, #000 50%);
 				padding: 1rem;
 				gap: 2rem;
 				overflow: hidden;
@@ -69,7 +71,7 @@
 
 			.chat-response {
 				flex-grow: 1;
-				background-color: #f6f7f4;
+				background-color: color-mix(in srgb, var(--nuxeo-button-primary) 8%, #FFF 100%);
 				box-shadow: 0 1rem 1.5rem -2.25rem;
 				overflow: auto;
 			}
