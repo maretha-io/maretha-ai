@@ -1,125 +1,185 @@
 <dom-module id="cp-show-interaction-results">
-    <template>
-        <nuxeo-operation id="getRelationsOp" op="Relations.GetRelations" input="[[document]]"
-                         params='{"outgoing": "true", "predicate": "http://www.nuxeo.org/ecm/schemas/relation#isRelatedTo"}'>
-        </nuxeo-operation>
+	<template>
+		<style include="nuxeo-styles">
+			.cards {
+				display: flex;
+				flex-direction: column;
+				gap: 2rem;
+				padding: 0 1rem 1rem;
+			}
 
-        <style include="nuxeo-styles">
-            :host {
-              @apply --paper-card;
-            }
+			.card {
+				display: flex;
+				flex-direction: column;
+			}
 
-            .related-documents {
-              width: 95%;
-              margin: auto;
-            }
-        </style>
+			.card~.card {
+				border-top: 1px solid #DDD;
+				padding-top: 2rem;
+			}
 
-        <div class="related-documents">
-            <h3>Saved AI Metadata</h3>
-            <template is="dom-repeat" items="[[savedInteractions]]">
-                <nuxeo-card role="widget" class="nuxeo-card" heading="[[item.name]]">
-                    <cp-format-json-response string-json="[[item.response]]"></cp-format-json-response>
-                    <nuxeo-date role="widget" datetime="[[item.createdAt]]" format="YYYY-MM-DD HH:mm:ss"
-                                name="createdAt"></nuxeo-date>
-                    <template is="dom-if" if="[[item.doc]]">
-                        <p>Saved AI document:
-                            <a class="ellipsis" href$="[[urlFor(item.doc)]]" on-click="_navigate" target="_blank">[[item.doc.title]]</a>
-                        </p>
-                    </template>
-                </nuxeo-card>
-            </template>
-        </div>
+			.card-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 1rem 0 .5rem;
+				gap: 1rem;
+			}
 
-    </template>
+			.card-header h5 {
+				margin: 0;
+			}
 
-    <script>
-        Polymer({
-          is: 'cp-show-interaction-results',
-          behaviors: [Nuxeo.LayoutBehavior],
-          properties: {
-            document: {
-              type: Object,
-              observer: '_docObserver'
-            },
+			.card-header nuxeo-date {
+				color: #999;
+				font-size: .9rem;
+				margin: 0;
+			}
 
-            relatedDocuments: {
-              type: Array,
-              observer: '_relatedDocumentsObserver',
-            },
+			.card-body {}
 
-            savedInteractions: {
-              type: Array,
-              value: [],
-              observer: '_savedInteractionsObserver',
-              notify: true
-            },
-          },
+			a {
+				--iron-icon-width: 1.25rem;
+				--iron-icon-height: 1.25rem;
+				display: inline-flex;
+				align-items: center;
+				gap: .5rem;
+				color: var(--nuxeo-app-header-pill-active) !important;
+			}
+		</style>
 
-          ready() {
-          },
+		<div class="cards">
+			<template is="dom-repeat" items="[[savedInteractions]]">
+				<div class="card">
+					<div class="card-header">
+						<h5>[[ item.name ]]</h5>
+						<nuxeo-date role="widget" datetime="[[ item.createdAt ]]" format="YYYY-MM-DD HH:mm:ss"
+							name="createdAt">
+						</nuxeo-date>
+					</div>
 
-          _getData() {
-            this.set('savedInteractions', []);
-            if (this.hasFacet(this.document, 'InteractionResultsFacet')) {
-              this._fetchRelatedDocuments();
-              this._addMetadataInteractions();
-            }
-          },
+					<div class="card-body">
+						<cp-format-json-response string-json="[[item.response]]">
+						</cp-format-json-response>
 
-          _docObserver(doc) {
-            if (!doc) return;
-            this._getData();
-            this.classList.add('iron-selected');
-          },
+						<template is="dom-if" if="[[item.doc]]">
+							<a href$="[[urlFor(item.doc)]]" on-click="_navigate" target="_blank">
+								<iron-icon icon="custom-icons:link"></iron-icon>
+								[[item.doc.title]]
+								<nuxeo-tooltip>The document this interaction was saved as.</nuxeo-tooltip>
+							</a>
+						</template>
+					</div>
+				</div>
+			</template>
+		</div>
 
-          _savedInteractionsObserver(newVal) {
-            if (!newVal || !Array.isArray(newVal)) {
-              return;
-            }
-            this.savedInteractions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-          },
+		<nuxeo-operation id="getRelationsOp" op="Relations.GetRelations" input="[[document]]"
+			params='{"outgoing": "true", "predicate": "http://www.nuxeo.org/ecm/schemas/relation#isRelatedTo"}'>
+		</nuxeo-operation>
+	</template>
 
-          _fetchRelatedDocuments() {
-            if (this.document) {
-              this.$.getRelationsOp.execute()
-                .then((response) => {
-                  const documents = response.entries || [];
-                  this.relatedDocuments = documents.filter(doc => (doc.type === 'InteractionResults' && doc.isTrashed === false));
-                })
-                .catch((error) => {
-                  console.error('Error fetching related documents:', error);
-                });
-            }
-          },
+	<script>
+		Polymer({
+			is: 'cp-show-interaction-results',
+			behaviors: [Nuxeo.LayoutBehavior],
+			properties: {
+				document: {
+					type: Object,
+					observer: '_docObserver'
+				},
 
-          _relatedDocumentsObserver: function (obs) {
-            if (!this.relatedDocuments) return;
-            const savedInteractions = this.savedInteractions || [];
-            this.relatedDocuments.forEach(doc => {
-              const interactions = doc.properties['interactionresults:interactions'];
-              interactions.docId = doc.uuid;
-              const interactionsWithDocId = interactions.map(interaction => ({
-                ...interaction,
-                doc: doc,
-              }));
-              savedInteractions.push(...interactionsWithDocId);
-            });
+				relatedDocuments: {
+					type: Array,
+					observer: '_relatedDocumentsObserver',
+				},
 
-            this.set('savedInteractions', []);
-            this.set('savedInteractions', savedInteractions);
-          },
+				savedInteractions: {
+					type: Array,
+					value: [],
+					observer: '_savedInteractionsObserver',
+					notify: true
+				},
+			},
 
-          _addMetadataInteractions() {
-            const savedInteractions = this.savedInteractions || [];
-            const interactions = this.document.properties['interactionresults:interactions'];
-            if (interactions) {
-              this.savedInteractions.push(...interactions);
-            }
-            this.set('savedInteractions', []);
-            this.set('savedInteractions', savedInteractions);
-          },
+			ready()
+			{
+			},
 
-        });
-    </script>
+			_getData()
+			{
+				this.set('savedInteractions', []);
+				if (this.hasFacet(this.document, 'InteractionResultsFacet'))
+				{
+					this._fetchRelatedDocuments();
+					this._addMetadataInteractions();
+				}
+			},
+
+			_docObserver(doc)
+			{
+				if (!doc) return;
+				this._getData();
+				this.classList.add('iron-selected');
+			},
+
+			_savedInteractionsObserver(newVal)
+			{
+				if (!newVal || !Array.isArray(newVal))
+				{
+					return;
+				}
+				this.savedInteractions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+			},
+
+			_fetchRelatedDocuments()
+			{
+				if (this.document)
+				{
+					this.$.getRelationsOp.execute()
+						.then((response) =>
+						{
+							const documents = response.entries || [];
+							this.relatedDocuments = documents.filter(doc => (doc.type === 'InteractionResults' && doc.isTrashed === false));
+						})
+						.catch((error) =>
+						{
+							console.error('Error fetching related documents:', error);
+						});
+				}
+			},
+
+			_relatedDocumentsObserver: function (obs)
+			{
+				if (!this.relatedDocuments) return;
+				const savedInteractions = this.savedInteractions || [];
+				this.relatedDocuments.forEach(doc =>
+				{
+					const interactions = doc.properties['interactionresults:interactions'];
+					interactions.docId = doc.uuid;
+					const interactionsWithDocId = interactions.map(interaction => ({
+						...interaction,
+						doc: doc,
+					}));
+					savedInteractions.push(...interactionsWithDocId);
+				});
+
+				this.set('savedInteractions', []);
+				this.set('savedInteractions', savedInteractions);
+			},
+
+			_addMetadataInteractions()
+			{
+				const savedInteractions = this.savedInteractions || [];
+				const interactions = this.document.properties['interactionresults:interactions'];
+				if (interactions)
+				{
+					this.savedInteractions.push(...interactions);
+				}
+				this.set('savedInteractions', []);
+				this.set('savedInteractions', savedInteractions);
+			},
+
+		});
+	</script>
 </dom-module>

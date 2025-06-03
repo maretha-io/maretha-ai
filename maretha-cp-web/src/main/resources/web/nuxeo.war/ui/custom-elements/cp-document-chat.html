@@ -1,136 +1,113 @@
+<link rel="import" href="./cp-format-chat-json-response.html">
+
 <dom-module id="cp-document-chat">
 	<template>
-		<nuxeo-operation id="getSettingsOperation" op="GetInteractionsForDocumentOperation"
-			input="[[document]]"></nuxeo-operation>
-		<nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation"
-			input="[[document.uid]]"></nuxeo-operation>
 		<style include="nuxeo-action-button-styles">
-			.interaction-content {
-				width: 95%;
-				margin: auto;
-				padding: 10px;
+			::-webkit-scrollbar {
+				height: 7px;
+				width: 7px;
+				background: #edeeef;
+				box-shadow: none;
 			}
 
-			#dialog {
-				height: 80%;
-				width: 70%;
-				margin: auto;
-				overflow: auto;
+			::-webkit-scrollbar-thumb {
+				background: #cdcdcd;
+				box-shadow: none;
 			}
 
-			.textarea {
-				max-height: 400px;
-				overflow-y: auto;
-				overflow-x: auto;
+			:host {
+				display: block;
+				--paper-input-container-label_-_color: #999;
+				--paper-input-container_-_padding: 0;
+				--paper-button_-_padding: 0;
 			}
 
-			.table {
-				width: 100%;
-				text-align: left;
-			}
-
-			.response-table-row {
-				height: 50px;
-				/* Set the desired height */
-				overflow: scroll;
-				/* Ensure content does not overflow */
-			}
-
-			#selectInteraction {
-				max-width: 100%;
-				margin: auto;
-				text-align: left;
-			}
-
-			#auditButton {
-				margin: auto;
-				padding: 10px;
-			}
-
-			#parameters {
-				max-width: 100%;
-				margin: auto;
-				text-align: left;
-				border: 3px solid #ececec;
-				border-radius: 15px;
-				padding: 10px;
-			}
-
-			.flex-container {
+			.chat {
 				display: flex;
+				flex-direction: column;
+				border: 1px solid rgba(58, 85, 17, .3);
+				box-shadow: 0 0 3.5rem -2rem inset rgb(58, 85, 17);
+				padding: 1rem;
+				gap: 2rem;
+				overflow: hidden;
+				max-height: 459px;
+				border-radius: .325rem;
+				margin: .5rem 0;
+			}
+
+			.question {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				margin: 0 0 0 1rem;
+			}
+
+			@media screen and (min-width: 1400px) {
+				.question {
+					padding: 0 max(20%, 200px);
+				}
+			}
+
+			.input {
+				flex-grow: 1;
+				display: flex;
+				gap: 1rem;
 				flex-wrap: wrap;
-				text-align: center;
 			}
 
-			.flex-item-left {
-				padding: 10px;
-				flex: 25%;
-			}
-
-			.flex-item-right {
-				padding: 10px;
-				flex: 70%;
-			}
-
-			.response {
-				min-height: 400px;
-				max-height: 600px;
-				width: 100%;
-				overflow-y: scroll;
-				border: 3px solid #ececec;
-				border-radius: 15px;
-				text-align: left;
-				padding: 15px;
+			.input paper-input {
+				flex: 1 0 calc(50% - 1rem);
 			}
 
 			.chat-response {
-				min-height: 10%;
-				max-height: 60%;
-				width: 80%;
-				margin: auto;
-				display: block;
-				overflow-y: auto;
-				border: 3px solid #ececec;
-				border-radius: 15px;
-				text-align: left;
-				padding: 15px;
+				flex-grow: 1;
+				background-color: #f6f7f4;
+				box-shadow: 0 1rem 1.5rem -2.25rem;
+				overflow: auto;
+			}
+
+			paper-icon-button {
+				width: 3.5rem;
+				height: 3.5rem;
+				padding: .25rem;
+				color: var(--nuxeo-button-primary);
 			}
 		</style>
 
-		<!-- <template is="dom-if" if="[[ _showButton ]]"> -->
-			<div class="action" on-tap="_toggleDialog">
-				<paper-icon-button id="interactionsChatButton" icon="custom-icons:ai-chat" label="Chat with document">
-					<nuxeo-tooltip>Chat with document</nuxeo-tooltip>
-				</paper-icon-button>
-				<nuxeo-tooltip for="interactionsChatButton">Chat with document</nuxeo-tooltip>
-			</div>
-		<!-- </template> -->
-
-		<nuxeo-dialog id="dialog" opened="{{dialogOpened}}" on-iron-overlay-closed="_dialogClosed" with-backdrop>
-			<div style="margin:auto; text-align:center;">
-				<h2>[[chatInteraction.name]]</h2>
-				<p>[[chatInteraction.description]]</p>
+		<div class="chat">
+			<div class="chat-response">
+				<cp-format-chat-json-response messages="[[chatContext]]" stream="[[interactionResponseStream]]"
+					document="[[document]]" chat-interaction="[[chatInteraction]]" status="[[interactionStatus]]"
+					loading="[[loading]]">
+				</cp-format-chat-json-response>
 			</div>
 
-			<template is="dom-if" if="[[chatContext.length]]">
-				<div id="chatResponse" class="chat-response">
-					<cp-format-chat-json-response messages="[[chatContext]]" stream="[[interactionResponseStream]]"
-						document="[[document]]" chat-interaction="[[chatInteraction]]" status="[[interactionStatus]]"
-						loading="[[loading]]"></cp-format-chat-json-response>
+			<div class="question">
+				<div class="input">
+					<template is="dom-repeat" items="[[chatInteraction.parameters]]" as="param">
+						<paper-input role="widget" value="{{param.value}}" label="[[param.name]]"
+							hidden="[[param.readOnly]]" readonly="[[param.readOnly]]" type="[[param.type]]"
+							on-keydown="_keyPressed">
+						</paper-input>
+
+						<template is="dom-if" if="[[param.isContextMemoryParameter]]">
+							<paper-input role="widget" value="{{_computeChatValue(param, interactionResponse)}}"
+								label="[[param.name]]" hidden type="[[param.type]]">
+							</paper-input>
+						</template>
+					</template>
 				</div>
-			</template>
 
-			<template is="dom-repeat" items="[[chatInteraction.parameters]]">
-				<template is="dom-if" if="[[item.isContextMemoryParameter]]">
-					<nuxeo-input role="widget" value="{{_computeChatValue(item, interactionResponse)}}"
-						label="[[item.name]]" hidden type="[[item.type]]"></nuxeo-input>
-				</template>
-				<nuxeo-input style="width: 40%;margin: auto;margin-top: 5%;" role="widget" value="{{item.value}}"
-					label="[[item.name]]" hidden="[[item.readOnly]]" readonly="[[item.readOnly]]" type="[[item.type]]"
-					on-change="_interactWithDocument"></nuxeo-input>
-			</template>
+				<paper-icon-button icon="custom-icons:ai-chat" on-tap="_interactWithDocument">
+				</paper-icon-button>
+			</div>
+		</div>
 
-		</nuxeo-dialog>
+		<nuxeo-operation id="getSettingsOperation" op="GetInteractionsForDocumentOperation" input="[[document]]">
+		</nuxeo-operation>
+
+		<nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]">
+		</nuxeo-operation>
 	</template>
 
 	<script>
@@ -162,11 +139,6 @@
 					value: ''
 				},
 
-				dialogOpened: {
-					type: Boolean,
-					observer: '_dialogOpenObserver'
-				},
-
 				loading: {
 					type: Boolean,
 					value: false
@@ -183,7 +155,7 @@
 				'_chatInteractionChanged(chatInteraction.*)'
 			],
 
-			_documentChanged (doc)
+			_documentChanged(doc)
 			{
 				this.set('_showButton', !!this.chatInteraction);
 			},
@@ -193,83 +165,76 @@
 				this.set('_showButton', !!chatInteraction);
 			},
 
-			ready: function ()
-			{
-
-			},
-
-			_dialogOpenObserver: function (open)
-			{
-				if (open)
-				{
-					this._loadData();
-				}
-				if (!open)
-				{
-					this._resetData();
-					this.fire('document-updated');
-				}
-			},
-
-			_resetData()
-			{
-				this.set('interactionResponse', null);
-				this.set('chatContext', []);
-			},
-
-			_loadData()
-			{
-				this._getInteractions();
-			},
-
-			_getInteractions: function ()
+			ready()
 			{
 				const operation = this.$.getSettingsOperation;
 				operation.params = { "isChat": true };
-				operation.execute().then((response) =>
-				{
-					if (response.value && response.value.length > 0)
+
+				operation.execute()
+					.then((response) =>
 					{
-						this.set('chatInteraction', response.value[0]);
-					}
-				}).catch((error) =>
-				{
-					console.error('Error triggering operation:', error);
-				});
+						if (response.value && response.value.length > 0)
+						{
+							this.set('chatInteraction', response.value[0]);
+
+							this.fire('interaction-ready', this.chatInteraction);
+						}
+					})
+					.catch((error) =>
+					{
+						console.error('Error triggering operation:', error);
+					});
 			},
 
-			_interactWithDocument: function ()
+			_keyPressed(e)
 			{
-				if (!this.chatInteraction) return;
+				if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey)
+					this._interactWithDocument();
+			},
+
+			_interactWithDocument()
+			{
+				if (!this.chatInteraction)
+					return;
+
 				this._addParametersToChatContext();
+
 				this.set('loading', true);
 				this.set('interactionStatus', 'Waiting for AI response...');
 				this.set('interactionResponse', '');
+
 				const operation = this.$.runInteractionOperation;
 				operation.params = { "interactionId": this.chatInteraction.id, "data": this.chatInteraction.parameters };
-				operation.execute().then((response) =>
-				{
-					this._stream(response.value);
-				}).catch((error) =>
-				{
-					console.error('Error triggering operation:', error);
-					this.set('interactionStatus', `<p>Error: ${error}</p>`);
-				});
+				operation.execute()
+					.then((response) =>
+					{
+						this._stream(response.value);
+					})
+					.catch((error) =>
+					{
+						console.error('Error triggering operation:', error);
+						this.set('interactionStatus', `<p>Error: ${error}</p>`);
+					});
 			},
 
-			_addParametersToChatContext: function ()
+			_addParametersToChatContext()
 			{
 				this.chatInteraction.parameters.forEach((param) =>
 				{
-					if (param.isContextMemoryParameter) return;
+					if (param.isContextMemoryParameter)
+						return;
+
 					if (param.type === 'string')
-					{
-						this.push('chatContext', { "role": "user", "param": param.name, "content": param.value, "date": new Date().toISOString() });
-					}
+						this.push('chatContext', {
+							role: 'user',
+							param: param.name,
+							content: param.value,
+							date: new Date().toISOString()
+						});
 				});
 			},
 
-			_stream: function (url)
+			_stream(url)
 			{
 				this.set('interactionStatus', '');
 				this.set('interactionResponseStream', '');
@@ -306,23 +271,12 @@
 			_computeChatValue(contextParam, interactionResponse)
 			{
 				if (interactionResponse)
-				{
 					this.push('chatContext', { "role": "assistant", "content": interactionResponse, "date": new Date().toISOString() });
-				}
+
 				contextParam.value = JSON.stringify(this.chatContext);
+
 				return contextParam.value;
-			},
-
-			_toggleDialog: function ()
-			{
-				this.$.dialog.toggle();
-			},
-
-			_dialogClosed: function ()
-			{
-
-			},
-
+			}
 		});
 	</script>
 </dom-module>

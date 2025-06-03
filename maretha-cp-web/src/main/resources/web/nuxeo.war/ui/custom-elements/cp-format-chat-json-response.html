@@ -1,173 +1,226 @@
 <dom-module id="cp-format-chat-json-response">
-  <template>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #f5f5f5;
-      }
+	<template>
+		<style>
+			.chat-container {
+				display: flex;
+				flex-direction: column;
+				gap: 2rem;
+			}
 
-      :host {
-        display: block;
-        width: 95%;
-        margin: auto;
-        background: white;
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-      }
+			@media screen and (min-width: 1400px) {
+				.chat-container {
+					padding: 0 max(20%, 200px);
+				}
+			}
 
-      .chat-container {
-        min-height: 10%;
-        max-height: 50%;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        scroll-behavior: smooth;
-      }
+			.message {
+				padding: 1rem;
+				border-radius: .325rem;
+				max-width: 75%;
+				word-wrap: break-word;
+				font-size: 1.125rem;
+				line-height: 1.5;
+				display: flex;
+				gap: 1rem;
+				align-items: start;
+				justify-content: space-between;
+				position: relative;
+				margin: .25rem;
+			}
 
-      .message {
-        padding: 10px;
-        border-radius: 8px;
-        max-width: 90%;
-        word-wrap: break-word;
-        font-size: 14px;
-        line-height: 1.5;
-      }
+			.message.assistant {
+				background: rgb(130, 192, 39, .35);
+				align-self: flex-end;
+				text-align: left;
+			}
 
-      .assistant {
-        background: #e8f3ff;
-        align-self: flex-end;
-        text-align: left;
-      }
+			.message.user {
+				background: rgb(130, 192, 39, .15);
+				align-self: flex-start;
+				text-align: left;
+			}
 
-      .user {
-        background: #E5E5EA;
-        align-self: flex-start;
-        text-align: left;
-      }
+			.timestamp {
+				font-size: .85rem;
+				opacity: .75;
+				display: block;
+				position: absolute;
+				top: 0;
+				margin: .25rem .5rem;
+			}
 
-      .timestamp {
-        font-size: 10px;
-        color: gray;
-        margin-top: 5px;
-        display: block;
-      }
+			.message.user .timestamp {
+				left: 100%;
+			}
 
-      /* Loading text style */
-      .loading-text {
-        font-size: 1em;
-        font-weight: bold;
-        text-align: center;
-        margin-top: 20px;
-        color: #3498db;
-      }
+			.message.assistant .timestamp {
+				right: 100%;
+			}
 
+			pre {
+				margin: 0;
+				white-space: pre-line;
+			}
 
-    </style>
+			pre::first-letter {
+				text-transform: capitalize;
+			}
 
-    <div id="chatContainer" class="chat-container">
-      <template is="dom-repeat" items="[[messages]]">
-        <div class$="message [[_computeClass(item.role)]]">
-          <div style="white-space: pre-wrap;" inner-h-t-m-l="[[_formatContent(item.content)]]"></div>
-          <span class="timestamp">[[_formatDate(item.date)]]</span>
-          <template is="dom-if" if="[[_isAssistantRole(item.role)]]">
-            <cp-save-response document="[[document]]" interaction="[[chatInteraction]]" interaction-response="[[item.content]]"></cp-save-response>
-          </template>
-        </div>
-      </template>
+			paper-menu-button {
+				padding: 0;
+			}
 
-      <template is="dom-if" if="[[loading]]">
-        <div class="loading-text">Processing...</div>
-      </template>
+			paper-item {
+				cursor: pointer;
+			}
+		</style>
 
-      <template is="dom-if" if="[[status]]">
-        <div class="loading-text">[[status]]</div>
-      </template>
+		<div id="chatContainer" class="chat-container">
+			<template is="dom-repeat" items="[[messages]]" as="message">
+				<div class$="message [[_computeClass(message.role)]]">
+					<span class="timestamp">[[_formatDate(message.date)]]</span>
 
-      <template is="dom-if" if="[[stream]]">
-        <div class="message assistant">
-          [[stream]]
-        </div>
-      </template>
-    </div>
-  </template>
+					<pre inner-h-t-m-l="[[_formatContent(message.content)]]"></pre>
 
-  <script>
-    Polymer({
-      is: 'cp-format-chat-json-response',
-      behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
-      properties: {
+					<template is="dom-if" if="[[_isAssistantRole(message.role)]]">
+						<paper-menu-button close-on-activate no-overlap no-animations horizontal-align="right"
+							vertical-align="top">
+							<paper-icon-button slot="dropdown-trigger" icon="icons:more-vert">
+							</paper-icon-button>
 
-        document: {
-          type: Object,
-        },
+							<paper-listbox slot="dropdown-content" attr-for-selected="data-id">
+								<paper-item on-tap="_saveAsMetadata">
+									Save interaction as metadata
+								</paper-item>
+								<paper-item on-tap="_saveAsRelatedDocument">
+									Save interaction as new document
+								</paper-item>
+							</paper-listbox>
+						</paper-menu-button>
+					</template>
+				</div>
+			</template>
 
-        messages: {
-          type: Array,
-          observer: '_messagesObserver'
-        },
+			<template is="dom-if" if="[[loading]]">
+				<div id="loading" class="message assistant">
+					<pre>
+					[[ status ]]...
+				</pre>
+				</div>
+			</template>
 
-        status: {
-          type: String
-        },
+			<template is="dom-if" if="[[stream]]">
+				<pre class="message assistant">
+					[[stream]]
+				</pre>
+			</template>
+		</div>
 
-        chatInteraction: {
-          type: Object
-        },
+		<nuxeo-operation id="saveResponse" op="SaveInteractionResponseOperation" input="[[document]]"
+			sync-indexing="true">
+		</nuxeo-operation>
+	</template>
 
-        stream: {
-          type: String,
-          observer: '_streamObserver'
-        },
+	<script>
+		Polymer({
+			is: 'cp-format-chat-json-response',
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+			properties: {
 
-        loading: {
-          type: Boolean,
-          value: false
-        },
+				document: Object,
 
-      },
+				messages: Array,
 
-      ready: function () {
-      },
+				status: String,
 
-      _messagesObserver: function(messages){
-      },
+				chatInteraction: Object,
 
-      _streamObserver: function(stream){
-      // Auto-scroll to bottom after DOM update
-        this.async(() => {
-          const container = this.$.chatContainer;
-          container.scrollTop = container.scrollHeight;
-        }, 100);
-      },
+				stream: {
+					type: String,
+					observer: '_streamObserver'
+				},
 
-      _computeClass(role) {
-        return role === "user" ? "user" : "assistant";
-      },
+				loading: {
+					type: Boolean,
+					value: false,
+					observer: '_loadingObserver'
+				},
 
-      _isAssistantRole(role) {
-        return role === "assistant";
-      },
+			},
 
-      _formatDate(dateString) {
-        let date = new Date(dateString);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      },
+			_loadingObserver(loading)
+			{
+				if (loading)
+					setTimeout(() => this.$$('#loading').scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' }), 100);
+			},
 
-      _formatContent(content) {
-        if (!content) return '';
-        let formatted = content.replace(/\\\\n|\\n/g, "")
-            .trim();
-        return formatted;
-      }
+			_streamObserver(stream)
+			{
+				setTimeout(() => this.$.chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' }), 100);
+			},
 
-    });
-  </script>
+			_computeClass(role)
+			{
+				return role === "user" ? "user" : "assistant";
+			},
+
+			_isAssistantRole(role)
+			{
+				return role === "assistant";
+			},
+
+			_formatDate(dateString)
+			{
+				return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+			},
+
+			_formatContent(content)
+			{
+				return content ? content.replace(/\\\\n|\\n/g, "").trim() : '';
+			},
+
+			_saveAsMetadata(e)
+			{
+				this.$.saveResponse.params.saveOnMetadata = true;
+				this._saveInteractionResponse(e);
+			},
+
+			_saveAsRelatedDocument(e)
+			{
+				this.$.saveResponse.params.saveOnMetadata = false;
+				this._saveInteractionResponse(e);
+			},
+
+			_saveInteractionResponse(e)
+			{
+				const interactionResponse = e.model.__data.message;
+
+				if (!interactionResponse)
+				{
+					this.fire('notify', { message: 'Cannot save without a response.' });
+					return;
+				}
+
+				this.$.saveResponse.params.interactions = [{
+					id: `${this.document.uid}-${this.chatInteraction.id}-${new Date().toISOString()}`,
+					interactionId: this.chatInteraction.id,
+					documentId: this.document.uid,
+					response: interactionResponse.content,
+					name: this.chatInteraction.name,
+					status: this.chatInteraction.status,
+					createdAt: new Date().toISOString(),
+					createdBy: Nuxeo.UI.app.currentUser.id,
+					parameters: this.chatInteraction.parameters
+				}];
+
+				this.$.saveResponse.execute()
+					.then(response =>
+					{
+						this.fire('notify', { message: 'Response Saved!' });
+						this.fire('document-updated');
+					})
+					.catch(() => this.fire('notify', { message: 'Error saving response' }));
+			},
+		});
+	</script>
 </dom-module>

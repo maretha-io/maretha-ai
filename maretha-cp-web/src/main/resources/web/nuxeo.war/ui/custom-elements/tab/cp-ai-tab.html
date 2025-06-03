@@ -1,33 +1,65 @@
-<link rel="import" href="../../custom-elements/cp-collapsible-content.html">
-<link rel="import" href="../list/nuxeo-similar-documents.html">
-<link rel="import" href="../../custom-elements/cp-show-interaction-results.html">
+<link rel="import" href="../../custom-elements/cp-document-chat.html">
+<link rel="import" href="../../custom-elements/cp-format-json-response.html">
 <link rel="import" href="../../custom-elements/cp-document-interaction.html">
+<link rel="import" href="../../custom-elements/cp-show-interaction-results.html">
+<link rel="import" href="../list/cp-similar-documents.html">
 
-<!--
-`nuxeo-similar-documents-tab`
-@group Nuxeo UI
-@element nuxeo-similar-documents-tab
--->
 <dom-module id="cp-ai-tab">
 	<template>
 		<style include="nuxeo-styles">
 			:host {
 				display: block;
 			}
+
+			.similar-documents {
+				--collapsible-content-max-height: calc(100vh - 235px);
+				--collapsible-body-max-height: var(--collapsible-content-max-height);
+				--collapsible-body-overflow: visible;
+			}
 		</style>
 
 		<template is="dom-if" if="[[visible]]">
-			<cp-collapsible-content label="Previous interactions" expanded>
-				<cp-show-interaction-results document="[[document]]"></cp-show-interaction-results>
-			</cp-collapsible-content>
+			<nuxeo-filter document="[[document]]" user="[[user]]"
+				expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-CHAT&quot;))">
+				<template>
+					<cp-collapsible-content label="[[ _chatInteractionTitle ]]"
+						description="[[ _chatInteractionDescription ]]">
+						<cp-document-chat document="[[ document ]]" on-interaction-ready="_chatInteractionReady">
+						</cp-document-chat>
+					</cp-collapsible-content>
+				</template>
+			</nuxeo-filter>
 
-			<cp-collapsible-content label="Run interactions">
+			<nuxeo-filter document="[[document]]" user="[[user]]"
+				expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-INTERACTION&quot;))">
+				<template>
+					<cp-collapsible-content label="Run interactions" description="Execute different interactions against this document">
+						<cp-document-interaction document="[[document]]">
+						</cp-document-interaction>
+					</cp-collapsible-content>
+				</template>
+			</nuxeo-filter>
 
-			</cp-collapsible-content>
-			
-			<cp-collapsible-content label="Chat with document">
+			<nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
+				<template>
+					<cp-collapsible-content label="Saved interactions" description="Your previously saved interactions">
+						<cp-show-interaction-results document="[[document]]">
+						</cp-show-interaction-results>
+					</cp-collapsible-content>
+				</template>
+			</nuxeo-filter>
 
-			</cp-collapsible-content>
+			<nuxeo-filter document="[[document]]" facet="InteractionResultsFacet"
+				expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-SEARCH&quot;))"
+				user="[[user]]">
+				<template>
+					<cp-collapsible-content label="More like this" description="Discover other documents similar to this one"
+						class="similar-documents">
+						<cp-similar-documents document="[[document]]" provider-name="searchByEmbeddings">
+						</cp-similar-documents>
+					</cp-collapsible-content>
+				</template>
+			</nuxeo-filter>
 		</template>
 
 	</template>
@@ -36,14 +68,22 @@
 		Polymer({
 			is: 'cp-ai-tab',
 			properties: {
-				document: {
-					type: Object,
+				document: Object,
+				user: {
+					value: Nuxeo.UI.app.currentUser
 				},
+				visible: Boolean,
+				_chatInteractionTitle: {
+					type: String,
+					value: 'Chat with document'
+				},
+				_chatInteractionDescription: String
+			},
 
-				visible: {
-					type: Boolean
-				}
-
+			_chatInteractionReady(e)
+			{
+				this.set('_chatInteractionTitle', e.detail.name);
+				this.set('_chatInteractionDescription', e.detail.description);
 			}
 		});
 	</script>
