@@ -33,7 +33,8 @@
 			<nuxeo-filter document="[[document]]" user="[[user]]"
 				expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-INTERACTION&quot;))">
 				<template>
-					<cp-collapsible-content label="Run interactions" description="Execute different interactions against this document">
+					<cp-collapsible-content label="Run interactions"
+						description="Execute different interactions against this document">
 						<cp-document-interaction document="[[document]]">
 						</cp-document-interaction>
 					</cp-collapsible-content>
@@ -53,10 +54,14 @@
 				expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-SEARCH&quot;))"
 				user="[[user]]">
 				<template>
-					<cp-collapsible-content label="More like this" description="Discover other documents similar to this one"
-						class="similar-documents" on-expanded="_similarDocumentsShown">
-						<cp-similar-documents document="[[document]]" initialized="[[_similarDocumentsInitialized]]">
-						</cp-similar-documents>
+					<cp-collapsible-content label="More like this"
+						description="Discover other documents similar to this one" class="similar-documents"
+						on-expanded="_similarDocumentsShown">
+						<template is="dom-if" if="[[_similarDocumentsInitialized]]">
+							<cp-similar-documents document="[[document]]" visible="[[_similarDocumentsInitialized]]"
+								initialized="[[_similarDocumentsInitialized]]">
+							</cp-similar-documents>
+						</template>
 					</cp-collapsible-content>
 				</template>
 			</nuxeo-filter>
@@ -82,14 +87,12 @@
 				}
 			},
 
-			_chatInteractionReady(e)
-			{
+			_chatInteractionReady(e) {
 				this.set('_chatInteractionTitle', e.detail.name);
 				this.set('_chatInteractionDescription', e.detail.description);
 			},
 
-			_similarDocumentsShown()
-			{
+			_similarDocumentsShown() {
 				this.set('_similarDocumentsInitialized', true);
 			}
 		});
