@@ -217,6 +217,7 @@
 
 			_loadData()
 			{
+				this.set('params.min_score',  this.minScore);
 				this.$.results._refreshAndFetch();
 			}
 		});
