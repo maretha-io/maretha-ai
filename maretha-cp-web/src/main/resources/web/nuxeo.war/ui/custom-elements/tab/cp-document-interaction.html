@@ -1,3 +1,5 @@
+<link rel="import" href="./cp-format-chat-json-response.html">
+
 <dom-module id="cp-document-interaction">
 	<template>
 		<style include="nuxeo-action-button-styles">
@@ -86,9 +88,8 @@
 
 		<div class="chat">
 			<div class="chat-response">
-				<cp-format-chat-json-response messages="[[interactionContext]]" stream="[[interactionResponseStream]]"
-					document="[[document]]" chat-interaction="[[selectedInteraction]]" status="[[interactionStatus]]"
-					loading="[[loading]]">
+				<cp-format-chat-json-response messages="[[interactionContext]]" document="[[document]]"
+					chat-interaction="[[selectedInteraction]]" loading="[[loading]]">
 				</cp-format-chat-json-response>
 			</div>
 
@@ -194,11 +195,6 @@
 					observer: '_interactionResponseObserver',
 				},
 
-				interactionResponseStream: {
-					type: String,
-					value: ''
-				},
-
 				loading: {
 					type: Boolean,
 					value: false
@@ -228,11 +224,7 @@
 				totalDocuments: {
 					type: Number,
 					value: 0
-				},
-
-				interactionStatus: {
-					type: String,
-				},
+				}
 
 			},
 
@@ -243,7 +235,6 @@
 				this.set('selectedInteraction', null);
 				this.set('interactionResponse', null);
 				this.set('interactionContext', []);
-				this.set('interactionResponseStream', null);
 			},
 
 			_documentObserver(doc)
@@ -281,10 +272,6 @@
 				if (!this.selectedInteraction)
 					return;
 
-				this.set('loading', true);
-
-				this.set('interactionStatus', 'Waiting for AI response...');
-
 				this.set('interactionResponse', '');
 
 				this.set('interactionContext', [{
@@ -292,6 +279,12 @@
 					date: new Date(),
 					content: this.selectedInteraction.description
 				}]);
+
+				this.push('interactionContext', {
+					role: 'assistant',
+					date: new Date(),
+					content: 'Waiting for AI response...'
+				});
 
 				const operation = this.$.runInteractionOperation;
 
@@ -301,74 +294,68 @@
 					saveMetadata: this.selectedInteraction.saveMetadata
 				};
 
+				this.set('loading', true);
+
 				operation.execute()
 					.then((response) =>
 					{
+						const index = this.interactionContext.length - 1;
+
 						if (this.selectedInteraction.saveMetadata)
 						{
 							this.set('interactionResponse', response.value);
 
-							this.push('interactionContext', {
-								role: 'assistant',
-								date: new Date(),
-								content: response.value
-							});
-
-							this.set('interactionStatus', '');
+							this.interactionContext[index].content = response.value;
+							this.notifyPath(`interactionContext.${index}.content`);
 						}
 						else
-							this._stream(response.value);
+						{
+							this.interactionContext[index].content = '';
+
+							this._stream(response.value, index);
+						}
 					})
 					.catch((error) =>
 					{
 						console.error('Error triggering operation:', error);
-						this.set('interactionStatus', `<p>Error: ${error}</p>`);
+						this.fire('notify', { message: error });
 					});
 			},
 
-			_stream(url)
+			_stream(url, index)
 			{
-				this.set('interactionStatus', '');
-				this.set('interactionResponseStream', '');
+				const eventSource = new EventSource(url);
 
-				this._eventSource = new EventSource(url);
-
-				this._eventSource.onmessage = (event) =>
+				eventSource.onmessage = (event) =>
 				{
-					//remove string quotes
-					this.set('loading', false);
-					this.interactionResponseStream = this.interactionResponseStream + event.data.slice(1, -1);
+					this.interactionContext[index].content += event.data.slice(1, -1);
+					this.notifyPath(`interactionContext.${index}.content`);
 				};
 
-				this._eventSource.onerror = (event) =>
+				eventSource.onerror = (event) =>
 				{
+					this.interactionContext[index].content = 'Failed to get response. Please try again.';
+					this.notifyPath(`interactionContext.${index}.content`);
+
 					this.set('loading', false);
-					this.set('interactionResponseStream', "Failed to get response. Please try again...");
 				}
 
-				this._eventSource.addEventListener("close", (event) =>
+				eventSource.addEventListener('close', (event) =>
 				{
-					const streamResponse = this.interactionResponseStream;
-
-					this.set('interactionResponse', streamResponse);
-
-					this.push('interactionContext', {
-						role: 'assistant',
-						date: new Date(),
-						content: streamResponse
-					});
-
-					this.set('interactionResponseStream', '');
+					this.set('interactionResponse', this.interactionContext[index].content);
 
 					const closeObject = JSON.parse(event.data);
-					if (closeObject.error)
-						this.set('interactionResponseStream', closeObject.error.message);
 
-					this._eventSource.close();
+					if (closeObject.error)
+					{
+						this.interactionContext[index].content = closeObject.error.message;
+						this.notifyPath(`interactionContext.${index}.content`);
+					}
+
+					eventSource.close();
 
 					this.set('loading', false);
 				});
-
 			},
 
 			_interactionsObserver(obs)

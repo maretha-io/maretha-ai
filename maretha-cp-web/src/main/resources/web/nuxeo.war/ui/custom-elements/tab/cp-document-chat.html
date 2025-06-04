@@ -78,9 +78,8 @@
 
 		<div class="chat">
 			<div class="chat-response">
-				<cp-format-chat-json-response messages="[[chatContext]]" stream="[[interactionResponseStream]]"
-					document="[[document]]" chat-interaction="[[chatInteraction]]" status="[[interactionStatus]]"
-					loading="[[loading]]">
+				<cp-format-chat-json-response messages="[[chatContext]]" document="[[document]]"
+					chat-interaction="[[chatInteraction]]" loading="[[loading]]">
 				</cp-format-chat-json-response>
 			</div>
 
@@ -137,11 +136,6 @@
 
 				interactionResponse: {
 					type: String,
-				},
-
-				interactionResponseStream: {
-					type: String,
-					value: ''
 				},
 
 				loading: {
@@ -202,23 +196,38 @@
 				if (!this.chatInteraction)
 					return;
 
-				this._addParametersToChatContext();
-
-				this.set('loading', true);
-				this.set('interactionStatus', 'Waiting for AI response...');
 				this.set('interactionResponse', '');
 
+				this._addParametersToChatContext();
+
+				this.push('chatContext', {
+					role: 'assistant',
+					date: new Date().toISOString(),
+					content: 'Waiting for AI response...'
+				});
+
 				const operation = this.$.runInteractionOperation;
-				operation.params = { "interactionId": this.chatInteraction.id, "data": this.chatInteraction.parameters };
+
+				operation.params = {
+					interactionId: this.chatInteraction.id,
+					data: this.chatInteraction.parameters
+				};
+
+				this.set('loading', true);
+
 				operation.execute()
 					.then((response) =>
 					{
-						this._stream(response.value);
+						const index = this.chatContext.length - 1;
+
+						this.chatContext[index].content = '';
+
+						this._stream(response.value, index);
 					})
 					.catch((error) =>
 					{
 						console.error('Error triggering operation:', error);
-						this.set('interactionStatus', `<p>Error: ${error}</p>`);
+						this.fire('notify', { message: error });
 					});
 			},
 
@@ -239,45 +248,44 @@
 				});
 			},
 
-			_stream(url)
+			_stream(url, index)
 			{
-				this.set('interactionStatus', '');
-				this.set('interactionResponseStream', '');
-				this._eventSource = new EventSource(url);
-				this._eventSource.onmessage = (event) =>
+				const eventSource = new EventSource(url);
+
+				eventSource.onmessage = (event) =>
 				{
-					//remove string quotes
-					this.set('loading', false);
-					this.interactionResponseStream = this.interactionResponseStream + event.data.slice(1, -1);
+					this.chatContext[index].content += event.data.slice(1, -1);
+					this.notifyPath(`chatContext.${index}.content`);
 				};
 
-				this._eventSource.onerror = (event) =>
+				eventSource.onerror = (event) =>
 				{
-					this.set('interactionResponseStream', "Failed to get response. Please try again...");
+					this.chatContext[index].content = 'Failed to get response. Please try again.';
+					this.notifyPath(`chatContext.${index}.content`);
+
 					this.set('loading', false);
 				}
 
-				this._eventSource.addEventListener("close", (event) =>
+				eventSource.addEventListener('close', (event) =>
 				{
-					const streamResponse = this.interactionResponseStream;
-					this.set('interactionResponse', streamResponse);
-					this.set('interactionResponseStream', '');
+					this.set('interactionResponse', this.chatContext[index].content);
+
 					const closeObject = JSON.parse(event.data);
+
 					if (closeObject.error)
 					{
-						this.set('interactionResponseStream', closeObject.error.message);
+						this.chatContext[index].content = closeObject.error.message;
+						this.notifyPath(`chatContext.${index}.content`);
 					}
-					this._eventSource.close();
+
+					eventSource.close();
+
 					this.set('loading', false);
 				});
-
 			},
 
 			_computeChatValue(contextParam, interactionResponse)
 			{
-				if (interactionResponse)
-					this.push('chatContext', { "role": "assistant", "content": interactionResponse, "date": new Date().toISOString() });
-
 				contextParam.value = JSON.stringify(this.chatContext);
 
 				return contextParam.value;

@@ -235,6 +235,10 @@
 				showStats: {
 					type: Boolean,
 					value: false
+				},
+				scrollIntoViewDelay: {
+					type: Number,
+					value: 300
 				}
 			},
 
@@ -252,12 +256,13 @@
 				{
 					this.$.collapsible.classList.add('visible');
 
+					this.fire('expanded', { detail: this.interaction });
+					
 					setTimeout(() =>
 					{
 						this.$.collapsible.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
 
-						this.fire('expanded', { detail: this.interaction });
-					}, 300);
+					}, this.scrollIntoViewDelay);
 				}
 
 				this.expanded = !this.expanded;
