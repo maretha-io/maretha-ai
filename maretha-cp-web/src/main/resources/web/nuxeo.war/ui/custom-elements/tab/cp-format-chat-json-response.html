@@ -26,6 +26,36 @@
 				justify-content: space-between;
 				position: relative;
 				margin: .25rem;
+				opacity: 0;
+				transform: scale(0);
+				transform-origin: top left;
+				animation: fadeIn 0.5s, expandCorner 0.5s;
+				animation-fill-mode: forwards;
+			}
+
+			.chat-container>.message:nth-of-type(even) {
+				transform-origin: top right;
+				animation-delay: .5s;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+
+				to {
+					opacity: 1;
+				}
+			}
+
+			@keyframes expandCorner {
+				from {
+					transform: scale(0);
+				}
+
+				to {
+					transform: scale(1);
+				}
 			}
 
 			.message.assistant {
@@ -84,7 +114,7 @@
 
 					<pre inner-h-t-m-l="[[_formatContent(message.content)]]"></pre>
 
-					<template is="dom-if" if="[[_isAssistantRole(message.role)]]">
+					<template is="dom-if" if="[[_showMenuButton(message.role, loading)]]">
 						<paper-menu-button close-on-activate no-overlap no-animations horizontal-align="right"
 							vertical-align="top">
 							<paper-icon-button slot="dropdown-trigger" icon="icons:more-vert">
@@ -102,20 +132,6 @@
 					</template>
 				</div>
 			</template>
-
-			<template is="dom-if" if="[[loading]]">
-				<div id="loading" class="message assistant">
-					<pre>
-					[[ status ]]...
-				</pre>
-				</div>
-			</template>
-
-			<template is="dom-if" if="[[stream]]">
-				<pre class="message assistant">
-					[[stream]]
-				</pre>
-			</template>
 		</div>
 
 		<nuxeo-operation id="saveResponse" op="SaveInteractionResponseOperation" input="[[document]]"
@@ -130,18 +146,8 @@
 			properties: {
 
 				document: Object,
-
 				messages: Array,
-
-				status: String,
-
 				chatInteraction: Object,
-
-				stream: {
-					type: String,
-					observer: '_streamObserver'
-				},
-
 				loading: {
 					type: Boolean,
 					value: false,
@@ -153,12 +159,7 @@
 			_loadingObserver(loading)
 			{
 				if (loading)
-					setTimeout(() => this.$$('#loading').scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' }), 100);
-			},
-
-			_streamObserver(stream)
-			{
-				setTimeout(() => this.$.chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' }), 100);
+					setTimeout(() => this.$.chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' }), 100);
 			},
 
 			_computeClass(role)
@@ -166,9 +167,9 @@
 				return role === "user" ? "user" : "assistant";
 			},
 
-			_isAssistantRole(role)
+			_showMenuButton(role, loading)
 			{
-				return role === "assistant";
+				return role === 'assistant' && !loading;
 			},
 
 			_formatDate(dateString)

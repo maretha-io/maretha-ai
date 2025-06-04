@@ -1,8 +1,8 @@
-<link rel="import" href="../../custom-elements/cp-document-chat.html">
-<link rel="import" href="../../custom-elements/cp-format-json-response.html">
-<link rel="import" href="../../custom-elements/cp-document-interaction.html">
-<link rel="import" href="../../custom-elements/cp-show-interaction-results.html">
-<link rel="import" href="../list/cp-similar-documents.html">
+<link rel="import" href="./cp-document-chat.html">
+<link rel="import" href="./cp-format-json-response.html">
+<link rel="import" href="./cp-document-interaction.html">
+<link rel="import" href="./cp-show-interaction-results.html">
+<link rel="import" href="./cp-similar-documents.html">
 
 <dom-module id="cp-ai-tab">
 	<template>
@@ -56,10 +56,9 @@
 				<template>
 					<cp-collapsible-content label="More like this"
 						description="Discover other documents similar to this one" class="similar-documents"
-						on-expanded="_similarDocumentsShown">
-						<template is="dom-if" if="[[_similarDocumentsInitialized]]">
-							<cp-similar-documents document="[[document]]" visible="[[_similarDocumentsInitialized]]"
-								initialized="[[_similarDocumentsInitialized]]">
+						on-expanded="_similarDocumentsShown" scroll-into-view-delay="600">
+						<template is="dom-if" if="[[ _similarDocumentsInitialized ]]">
+							<cp-similar-documents document="[[document]]">
 							</cp-similar-documents>
 						</template>
 					</cp-collapsible-content>
@@ -92,8 +91,9 @@
 				this.set('_chatInteractionDescription', e.detail.description);
 			},
 
-			_similarDocumentsShown() {
-				this.set('_similarDocumentsInitialized', true);
+			_similarDocumentsShown()
+			{
+				this.set('_similarDocumentsInitialized', !!this.document);
 			}
 		});
 	</script>

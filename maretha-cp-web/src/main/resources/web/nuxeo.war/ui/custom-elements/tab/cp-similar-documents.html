@@ -185,7 +185,10 @@
 					type: Boolean,
 					value: false
 				},
-				params: Object,
+				params: {
+					type: Object,
+					value: undefined
+				},
 				minScore: {
 					type: Number,
 					value: 0.5,
@@ -193,52 +196,28 @@
 				},
 				headers: {
 					type: Object,
-					value: function () {
+					value: function ()
+					{
 						return {
 							"X-NXfetch.document": ["dc:creator", "dc:lastContributor"].join(','),
 							"X-NXtranslate.directoryEntry": "label"
 						}
 					}
-				},
-				searchProperty: {
-					type: String,
-					value: "similarity"
-				},
-				searchValue: String,
-				initialized: {
-					type: Boolean,
-					value: false
-				},
-				_isReady: {
-					type: Boolean,
-					value: false,
-					computed: '_shouldShow(initialized, document)'
 				}
 			},
 
-			_loadData() {
-				if (!this.initialized || !this.params.vectorQuery)
-					return;
-
-				this.$.results._refreshAndFetch();
-			},
-
-			_shouldShow(doc) {
-				if (doc)
-					this.set('params', this._computeParams());
-
-				return this.initialized && !!doc;
-			},
-
-			_computeParams() {
-				if (!this.document)
-					return {};
-
-				return {
-					vectorField: this.searchProperty,
+			_documentUpdated()
+			{
+				this.set('params', {
+					vectorField: 'similarity',
 					min_score: this.minScore,
 					vectorQuery: this.document.properties['interactionresults:storeId']
-				};
+				});
+			},
+
+			_loadData()
+			{
+				this.$.results._refreshAndFetch();
 			}
 		});
 	</script>
