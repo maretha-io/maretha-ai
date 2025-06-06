@@ -2,5 +2,4 @@
 <install>
   @BUNDLES@
   @LIBS@
-  @TEMPLATES@
 </install>

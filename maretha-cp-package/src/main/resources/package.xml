@@ -1,5 +1,5 @@
 <!-- See documentation at http://doc.nuxeo.com/x/HgIz -->
-<package type="addon" name="maretha-cp" version="@VERSION@">
+<package type="addon" name="church-maretha-cp" version="@VERSION@">
   <title>Vertesia - Nuxeo Addon</title>
   <description>
     <p>Vertesia AI interactions integrated in Nuxeo.</p>
