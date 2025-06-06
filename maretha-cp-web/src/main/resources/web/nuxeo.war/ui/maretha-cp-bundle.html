@@ -61,7 +61,7 @@
 
 <nuxeo-slot-content name="AiTab" slot="DOCUMENT_VIEWS_ITEMS" order="10">
     <template>
-        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
+        <nuxeo-filter document="[[document]]">
             <template>
                 <nuxeo-page-item name="AiTab" label="AI"></nuxeo-page-item>
             </template>
@@ -71,7 +71,7 @@
 
 <nuxeo-slot-content name="AiTab" slot="DOCUMENT_VIEWS_PAGES">
     <template>
-        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet">
+        <nuxeo-filter document="[[document]]">
             <template>
                 <cp-ai-tab document="[[document]]" user="[[user]]" name="AiTab"></cp-ai-tab>
             </template>
