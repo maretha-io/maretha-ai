@@ -98,6 +98,42 @@ public class RunInteractionServiceImplTest {
         assertEquals(List.of(Map.of("label", "tag-1", "username", "system"), Map.of("label", "tag-2", "username", "system")), tags);
     }
 
+    @Test
+    public void shouldAddMetadataIfMissing() throws JsonProcessingException {
+        DocumentModel document = createDocument();
+        createSettingsDocument();
+
+        Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
+
+        String mockResponse = "{\"result\":{\"result\":" +
+                "{\"dc:title\":\"Green Bird on Branch\"," +
+                "\"dc:description\":\"A small green bird with speckled breast perched on a tree branch in a lush forest setting.\"," +
+                "\"dc:language\":\"en\"," +
+                "\"testDoc:testStringArray\":[\"test-111\", \"test-123\"]," +
+                "\"nxtag:tags\":[\"tag-1\", \"tag-2\", \"tag-1\"]," +
+                "\"dc:subjects\":[]" +
+                "}" +
+                "}}";
+
+        //WHEN
+        when(apiService.getInteractionResultWithResultSchema(anyString(), anyMap(), anyString(), anyBoolean())).thenReturn(mockResponse);
+        when(apiService.uploadFileToStore(anyObject())).thenReturn("vertesia-store-id");
+        when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
+
+        List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
+        document = runInteractionService.uploadFileAndSetStoreId(document, session, false);
+        runInteractionService.triggerInteraction(document, session, "interactionID", parameters, true, false);
+
+        //THEN
+        DocumentModel updatedDoc = session.getDocument(document.getRef());
+        assertEquals("Test Document", document.getPropertyValue("dc:title"));
+        List<String> testStringArray = (List<String>) updatedDoc.getPropertyValue("testDoc:testStringArray");
+        assertEquals(List.of("test-111", "test-123"), testStringArray);
+
+        List<Map<String, String>> tags = (List<Map<String, String>>) updatedDoc.getPropertyValue("nxtag:tags");
+        assertEquals(List.of(Map.of("label", "tag-1", "username", "system"), Map.of("label", "tag-2", "username", "system")), tags);
+    }
+
     private DocumentModel createDocument() {
         DocumentModel doc = session.createDocumentModel("/", "testDocument", "TestDoc");
         doc.setPropertyValue("dc:title", "Test Document");
