@@ -126,13 +126,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                         if (optionalField.get().isMultiValue() && valueNode.isArray()) {
                             List<String> values = new ArrayList<>();
                             valueNode.forEach(element -> values.add(element.asText()));
-                            saveMetadataField(doc, validationService, key, values.toArray(new String[0]));
+                            saveMetadataField(doc, validationService, key, values.toArray(String[]::new));
                         } else {
                             saveMetadataField(doc, validationService, key, valueNode.asText());
                         }
                     }
                 } catch (Exception ex) {
-                    log.error("Failed to set metadata for " + key + ":" + valueNode.asText(), ex);
+                    log.error("Failed to set metadata for " + key + ":" + valueNode.toPrettyString(), ex);
                 }
             });
             session.saveDocument(doc);
@@ -175,10 +175,18 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private void saveMetadataField(DocumentModel doc, DocumentValidationService validationService, String key, Serializable value) {
         if (!validationService.validate(key, value).hasError()) {
-            log.debug(String.format("Saving metadata key: %s value: %s", key, value));
             doc.setPropertyValue(key, value);
+            log.debug(String.format("Saved metadata key: %s value: %s", key, formatValue(value)));
         } else {
-            log.error(String.format("Failed to save metadata key: %s value: %s", key, value));
+            log.error(String.format("Failed to save metadata key: %s value: %s", key, formatValue(value)));
+        }
+    }
+
+    private String formatValue(Serializable value) {
+        if (value instanceof String[]) {
+            return Arrays.toString((String[]) value);
+        } else {
+            return String.valueOf(value);
         }
     }
 
