@@ -425,11 +425,22 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 }
             }
             Map<String, Object> fieldSchema = new HashMap<>();
+            Map<String, String> directoryValues = field.getDirectoryValues();
             if (field.isMultiValue()) {
                 fieldSchema.put("type", "array");
-                fieldSchema.put("items", Collections.singletonMap("type", "string"));
+                Map<String, Object> itemsMap = new HashMap<>();
+                itemsMap.put("type", "string");
+                if (MapUtils.isNotEmpty(directoryValues)) {
+                    Set<String> directoryKeys = directoryValues.keySet();
+                    itemsMap.put("enum", directoryKeys);
+                }
+                fieldSchema.put("items", itemsMap);
             } else {
                 fieldSchema.put("type", "string");
+                if (MapUtils.isNotEmpty(directoryValues)) {
+                    Set<String> directoryKeys = directoryValues.keySet();
+                    fieldSchema.put("enum", directoryKeys);
+                }
             }
             resultProperties.put(field.getXpath(), fieldSchema);
             requiredFields.add(field.getXpath());
