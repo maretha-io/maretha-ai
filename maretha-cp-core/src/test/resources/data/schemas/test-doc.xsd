@@ -1,12 +1,25 @@
 <?xml version="1.0"?>
 <xs:schema targetNamespace="http://www.nuxeo.core/ecm/schemas/testDoc/"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:ref="http://www.nuxeo.org/ecm/schemas/core/external-references/"
            xmlns:nxs="http://www.nuxeo.core/ecm/schemas/testDoc/">
 
     <xs:element name="testString" type="xs:string"/>
     <xs:element name="testDate" type="xs:dateTime"/>
     <xs:element name="testDoubleArray" type="nxs:doubleList"/>
     <xs:element name="testStringArray" type="nxs:stringList"/>
+
+    <xs:element name="eventTypes">
+        <xs:simpleType>
+            <xs:list>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string" ref:resolver="directoryResolver" ref:directory="eventTypes">
+                        <xs:maxLength value="100"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:list>
+        </xs:simpleType>
+    </xs:element>
 
     <xs:complexType name="stringList">
         <xs:sequence>

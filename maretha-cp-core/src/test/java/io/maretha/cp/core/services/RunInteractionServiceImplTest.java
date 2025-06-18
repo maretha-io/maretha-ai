@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -47,6 +48,7 @@ import static org.mockito.Mockito.when;
 @Deploy("io.maretha.cp.core.maretha-cp-core")
 @Deploy("org.nuxeo.ecm.platform.tag")
 @Deploy("io.maretha.cp.core.maretha-cp-core-test:OSGI-INF/cp-test-doc-schema-contrib-test.xml")
+@Deploy("io.maretha.cp.core.maretha-cp-core-test:OSGI-INF/cp-test-directories-contrib.xml")
 public class RunInteractionServiceImplTest {
 
     @Inject
@@ -77,7 +79,8 @@ public class RunInteractionServiceImplTest {
                 "\"dc:language\":\"en\"," +
                 "\"testDoc:testStringArray\":[\"test-111\", \"test-123\"]," +
                 "\"nxtag:tags\":[\"tag-1\", \"tag-2\", \"tag-1\"]," +
-                "\"dc:subjects\":[]" +
+                "\"testDoc:eventTypes\":[\"documentCreated\", \"documentSecurityUpdated\"]," +
+                "\"dc:subjects\":[\"article\", \"certificate\"]" +
                 "}" +
                 "}}";
 
@@ -96,6 +99,9 @@ public class RunInteractionServiceImplTest {
 
         List<Map<String, String>> tags = (List<Map<String, String>>) updatedDoc.getPropertyValue("nxtag:tags");
         assertEquals(List.of(Map.of("label", "tag-1", "username", "system"), Map.of("label", "tag-2", "username", "system")), tags);
+
+        String[] testEventsVocabArray = (String[]) updatedDoc.getPropertyValue("testDoc:eventTypes");
+        assertEquals(List.of("documentCreated", "documentSecurityUpdated").toArray(), testEventsVocabArray);
     }
 
     @Test
@@ -111,7 +117,7 @@ public class RunInteractionServiceImplTest {
                 "\"dc:language\":\"en\"," +
                 "\"testDoc:testStringArray\":[\"test-111\", \"test-123\"]," +
                 "\"nxtag:tags\":[\"tag-1\", \"tag-2\", \"tag-1\"]," +
-                "\"dc:subjects\":[]" +
+                "\"dc:subjects\":[\"article\", \"certificate\"]" +
                 "}" +
                 "}}";
 
@@ -231,41 +237,45 @@ public class RunInteractionServiceImplTest {
         ObjectNode objectNode = (ObjectNode) objectMapper.readTree(dynamicMetadataInteractionJson);
         interactions.add(objectNode);
 
-        DocTypeWithSchema.Schema schemaSettingsTestDoc = new DocTypeWithSchema.Schema();
-        schemaSettingsTestDoc.setName("testDoc");
-        ArrayList<DocTypeWithSchema.Schema.Field> fields = new ArrayList<>();
+        DocTypeWithSchema.Schema.Field testDocfield_1 = createField(true,
+                "testDoc:testStringArray", "stringList", true, true, null);
+        DocTypeWithSchema.Schema.Field testDocfield_2 = createField(true,
+                "testDoc:eventTypes", "stringList", true, true, "eventTypes");
 
+        addSchemaConfiguration(configurationMap, interactions, "testDoc", List.of(testDocfield_1, testDocfield_2));
+
+        DocTypeWithSchema.Schema.Field dublinCoreField_1 = createField( true,
+                "dc:subjects", "subjectList", true, true, "l10nsubjects");
+
+        addSchemaConfiguration(configurationMap, interactions, "dublincore", List.of(dublinCoreField_1));
+
+        DocTypeWithSchema.Schema.Field tagField_1 = createField( true,
+                "nxtag:tags", "tagList", true, true, null);
+        addSchemaConfiguration(configurationMap, interactions, "facetedTag", List.of(tagField_1));
+
+
+    }
+
+    private void addSchemaConfiguration(Map<String, Object> configurationMap, List<ObjectNode> interactions,
+                                        String schemaName, List<DocTypeWithSchema.Schema.Field> fields) {
+        DocTypeWithSchema.Schema schema = new DocTypeWithSchema.Schema();
+        schema.setName(schemaName);
+        schema.setFields(fields);
+        configurationMap.put(SCHEMA_SETTINGS, schema);
+
+        Framework.getService(RepositoryService.class).saveInteractionSettings(session, interactions, configurationMap);
+        txFeature.nextTransaction();
+    }
+
+    private static DocTypeWithSchema.Schema.@NotNull Field createField(boolean multiValue, String xpath, String type, boolean active, boolean inIsolation, String directoryName) {
         DocTypeWithSchema.Schema.Field field = new DocTypeWithSchema.Schema.Field();
-        field.setMultiValue(true);
-        field.setXpath("testDoc:testStringArray");
-        field.setType("stringList");
-        field.setActive(true);
-        field.setInIsolation(true);
-
-        fields.add(field);
-        schemaSettingsTestDoc.setFields(fields);
-        configurationMap.put(SCHEMA_SETTINGS, schemaSettingsTestDoc);
-
-        Framework.getService(RepositoryService.class).saveInteractionSettings(session, interactions, configurationMap);
-        txFeature.nextTransaction();
-
-        DocTypeWithSchema.Schema schemaSettingsTags = new DocTypeWithSchema.Schema();
-        schemaSettingsTags.setName("facetedTag");
-        ArrayList<DocTypeWithSchema.Schema.Field> tagFields = new ArrayList<>();
-
-        DocTypeWithSchema.Schema.Field tagField = new DocTypeWithSchema.Schema.Field();
-        tagField.setMultiValue(true);
-        tagField.setXpath("nxtag:tags");
-        tagField.setType("tagList");
-        tagField.setActive(true);
-        tagField.setInIsolation(true);
-
-        tagFields.add(tagField);
-        schemaSettingsTags.setFields(tagFields);
-        configurationMap.put(SCHEMA_SETTINGS, schemaSettingsTags);
-
-        Framework.getService(RepositoryService.class).saveInteractionSettings(session, interactions, configurationMap);
-        txFeature.nextTransaction();
+        field.setMultiValue(multiValue);
+        field.setXpath(xpath);
+        field.setType(type);
+        field.setActive(active);
+        field.setInIsolation(inIsolation);
+        field.setDirectoryName(directoryName);
+        return field;
     }
 
 }
