@@ -16,6 +16,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.ecm.directory.Directory;
@@ -339,10 +340,18 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 entries.forEach(entry -> {
                     String id = entry.getId();
                     try {
+                        Property property = entry.getProperty("obsolete");
+                        if (property != null) {
+                            long isObsolete = (long) property.getValue();
+                            if (isObsolete > 0) {
+                                log.debug("Skipping obsolete directory value: " + directoryName + ":" + id);
+                                return;
+                            }
+                        }
                         String label = (String) (entry.getProperty("label")).getValue();
                         dictionaryMap.put(id, label);
                     } catch (Exception e) {
-                        log.error("Label not found for directory: " + id);
+                        log.error("Failed to get directory: " + directoryName + ":" + id, e);
                     }
                 });
             }
@@ -431,17 +440,22 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 Map<String, Object> itemsMap = new HashMap<>();
                 itemsMap.put("type", "string");
                 if (MapUtils.isNotEmpty(directoryValues)) {
-                    Set<String> directoryKeys = directoryValues.keySet();
+                    Set<String> directoryKeys = new HashSet<>(directoryValues.keySet());
+                    directoryKeys.add(null);
                     itemsMap.put("enum", directoryKeys);
+                    fieldSchema.put("nullable", true);
                 }
                 fieldSchema.put("items", itemsMap);
             } else {
                 fieldSchema.put("type", "string");
                 if (MapUtils.isNotEmpty(directoryValues)) {
-                    Set<String> directoryKeys = directoryValues.keySet();
+                    Set<String> directoryKeys = new HashSet<>(directoryValues.keySet());
+                    directoryKeys.add(null);
                     fieldSchema.put("enum", directoryKeys);
+                    fieldSchema.put("nullable", true);
                 }
             }
+            fieldSchema.put("description", field.getDescription());
             resultProperties.put(field.getXpath(), fieldSchema);
             requiredFields.add(field.getXpath());
         }
