@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
+import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -277,6 +278,11 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             List<String> selectedDocumentIds = param.getSelectedDocumentIds();
             String selectedDocumentId = param.getSelectedDocumentId();
 
+            if (param.isAdditionalContext()) {
+                String additionalContext = getAdditionalContext(session, doc);
+                paramsMap.put(name, additionalContext);
+                return;
+            }
             boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
             if (isDocumentOrMediaFormat) {
                 if ("array".equalsIgnoreCase(type)) {
@@ -301,6 +307,40 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             paramsMap.put(name, value);
         });
         return paramsMap;
+    }
+
+    @SneakyThrows
+    private String getAdditionalContext(CoreSession session, DocumentModel doc) {
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+        Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
+        if (MapUtils.isEmpty(schemaSettings)) {
+            log.error("SchemaSettings is empty");
+            return "";
+        }
+
+        Set<DocTypeWithSchema.Schema.Field> schemaFields = new HashSet<>();
+
+        Arrays.stream(doc.getSchemas()).forEach(schema -> {
+            DocTypeWithSchema.Schema schemaSetting = getSchemaSetting(schemaSettings, doc.getType(), schema);
+            if (schemaSetting != null) {
+                Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
+                        .filter(DocTypeWithSchema.Schema.Field::isAdditionalContext)
+                        .collect(Collectors.toSet());
+                schemaFields.addAll(fields);
+            }
+        });
+
+        Map<String, String> valuesMap = new HashMap<>();
+        schemaFields.forEach(field -> {
+            String xpath = field.getXpath();
+            try {
+                Serializable propertyValue = doc.getPropertyValue(xpath);
+                String value = objectMapper.writeValueAsString(propertyValue);
+                valuesMap.put(xpath, value);
+            } catch (Exception ignored) {
+            }
+        });
+        return objectMapper.writeValueAsString(valuesMap);
     }
 
     private List<String> getSelectedDocumentsStoreIds(CoreSession coreSession, List<String> selectedDocumentIds) {

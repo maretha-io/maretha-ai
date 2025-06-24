@@ -30,6 +30,7 @@ public class DocTypeWithSchema {
             private boolean active;
             private boolean multiValue;
             private boolean inIsolation;
+            private boolean additionalContext;
         }
     }
 }

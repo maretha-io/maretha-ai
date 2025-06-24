@@ -152,6 +152,7 @@
 								<tr>
 									<th>Xpath</th>
 									<th>Active</th>
+									<th>Context</th>
 									<th>Isolated</th>
 									<th>Interaction</th>
 									<th>Description</th>
@@ -177,6 +178,10 @@
 
 										<td>
 											<paper-checkbox checked="{{ item.active }}" on-change="_markAsDirty" />
+										</td>
+
+										<td>
+											<paper-checkbox checked="{{ item.additionalContext }}" on-change="_markAsDirty" />
 										</td>
 
 										<td>
