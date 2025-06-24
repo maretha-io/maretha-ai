@@ -373,6 +373,7 @@ public class RepositoryServiceImpl implements RepositoryService {
             paramMap.put(PARAMETER_SCHEMA_SELECTED_DOC_ID, param.getSelectedDocumentId());
             paramMap.put(PARAMETER_SCHEMA_ENABLE_DOC_SELECTION, param.isEnableDocSelection());
             paramMap.put(PARAMETER_SCHEMA_IS_CONTEXT_MEMORY, param.isContextMemoryParameter());
+            paramMap.put(PARAMETER_SCHEMA_IS_ADDITIONAL_CONTEXT, param.isAdditionalContext());
             return paramMap;
         }).collect(Collectors.toList());
     }

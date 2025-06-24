@@ -28,6 +28,7 @@ import java.util.Map;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_DESCRIPTION;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_ENABLE_DOC_SELECTION;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_FORMAT;
+import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_IS_ADDITIONAL_CONTEXT;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_IS_CONTEXT_MEMORY;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_IS_MAIN_DOCUMENT;
 import static io.maretha.cp.core.services.RepositoryService.PARAMETER_SCHEMA_NAME;
@@ -170,6 +171,7 @@ public class DocumentSchemasTest {
         param1.put(PARAMETER_SCHEMA_SELECTION_READ_ONLY, true);
         param1.put(PARAMETER_SCHEMA_SELECTED_DOC_IDS, List.of("test"));
         param1.put(PARAMETER_SCHEMA_IS_CONTEXT_MEMORY, true);
+        param1.put(PARAMETER_SCHEMA_IS_ADDITIONAL_CONTEXT, true);
         param1.put(PARAMETER_SCHEMA_SELECTED_DOC_ID, null);
         param1.put(PARAMETER_SCHEMA_DESCRIPTION, "description");
         parameters.add(param1);
@@ -186,6 +188,7 @@ public class DocumentSchemasTest {
         param2.put(PARAMETER_SCHEMA_SELECTION_READ_ONLY, false);
         param2.put(PARAMETER_SCHEMA_SELECTED_DOC_IDS, List.of());
         param2.put(PARAMETER_SCHEMA_IS_CONTEXT_MEMORY, false);
+        param2.put(PARAMETER_SCHEMA_IS_ADDITIONAL_CONTEXT, false);
         param2.put(PARAMETER_SCHEMA_SELECTED_DOC_ID, null);
         param2.put(PARAMETER_SCHEMA_DESCRIPTION, "description");
         parameters.add(param2);

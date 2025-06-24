@@ -28,6 +28,8 @@ public class InteractionParameter {
     private boolean selectionReadOnly;
     @JsonProperty("isContextMemoryParameter")
     private boolean isContextMemoryParameter;
+    @JsonProperty("isAdditionalContext")
+    private boolean isAdditionalContext;
     private List<String> selectedDocumentIds;
     private String selectedDocumentId;
 }
