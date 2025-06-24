@@ -74,10 +74,18 @@ public class GetDocumentTypesOperation {
 
             schemas.forEach(schema -> {
                 String schemaName = schema.getName();
-                if (MapUtils.isNotEmpty(schemaSettings) && schemaSettings.containsKey(schemaName)) {
-                    //add existing saved schema settings
-                    docTypeWithSchema.getSchemas().add(schemaSettings.get(schemaName));
-                    return;
+                String docTypeSchemaKey = docType.getName() + "_" + schemaName;
+                if (MapUtils.isNotEmpty(schemaSettings)) {
+                    if (schemaSettings.containsKey(docTypeSchemaKey)) {
+                        //add existing saved schema settings by docType + schema
+                        docTypeWithSchema.getSchemas().add(schemaSettings.get(docTypeSchemaKey));
+                        return;
+                    }
+                    if (schemaSettings.containsKey(schemaName)) {
+                        //add existing saved schema settings
+                        docTypeWithSchema.getSchemas().add(schemaSettings.get(schemaName));
+                        return;
+                    }
                 }
                 DocTypeWithSchema.Schema docTypeSchema = new DocTypeWithSchema.Schema();
                 docTypeSchema.setName(schemaName);

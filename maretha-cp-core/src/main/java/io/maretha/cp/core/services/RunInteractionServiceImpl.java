@@ -372,8 +372,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         Set<DocTypeWithSchema.Schema.Field> schemaFields = new HashSet<>();
 
         Arrays.stream(doc.getSchemas()).forEach(schema -> {
-            if (schemaSettings.containsKey(schema)) {
-                DocTypeWithSchema.Schema schemaSetting = schemaSettings.get(schema);
+            DocTypeWithSchema.Schema schemaSetting = getSchemaSetting(schemaSettings, doc.getType(), schema);
+            if (schemaSetting != null) {
                 Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
                         .filter(DocTypeWithSchema.Schema.Field::isActive)
                         .filter(field -> (field.isInIsolation() == inIsolation))
@@ -390,6 +390,19 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         });
 
         return schemaFields;
+    }
+
+    private DocTypeWithSchema.Schema getSchemaSetting(Map<String, DocTypeWithSchema.Schema> schemaSettings, String docType, String schemaName) {
+        String docTypeSchemaKey = docType + "_" + schemaName;
+        if (schemaSettings.containsKey(docTypeSchemaKey)) {
+            log.debug("Schema settings by docTye + schemaName : " + docTypeSchemaKey);
+            return schemaSettings.get(docTypeSchemaKey);
+        }
+        if (schemaSettings.containsKey(schemaName)) {
+            log.debug("Schema settings by schemaName : " + schemaName);
+            return schemaSettings.get(schemaName);
+        }
+        return null;
     }
 
     private Map<String, Object> addSchemasAndDictionariesToParams(Map<String, Object> schemaFieldsMap, Map<String, Object> parameters) {

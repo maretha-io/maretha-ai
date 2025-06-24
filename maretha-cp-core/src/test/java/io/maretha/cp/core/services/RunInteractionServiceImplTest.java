@@ -247,11 +247,17 @@ public class RunInteractionServiceImplTest {
         DocTypeWithSchema.Schema.Field dublinCoreField_1 = createField( true,
                 "dc:subjects", "subjectList", true, true, "l10nsubjects");
 
-        addSchemaConfiguration(configurationMap, interactions, "dublincore", List.of(dublinCoreField_1));
+        addSchemaConfiguration(configurationMap, interactions, "TestDoc_dublincore", List.of(dublinCoreField_1));
+
+        DocTypeWithSchema.Schema.Field tagField_0 = createField( true,
+                "nxtag:tags", "tagList", true, true, null);
+        //generic schema settings
+        addSchemaConfiguration(configurationMap, interactions, "facetedTag", List.of(tagField_0));
 
         DocTypeWithSchema.Schema.Field tagField_1 = createField( true,
                 "nxtag:tags", "tagList", true, true, null);
-        addSchemaConfiguration(configurationMap, interactions, "facetedTag", List.of(tagField_1));
+        //specific schema settings for TestDoc
+        addSchemaConfiguration(configurationMap, interactions, "TestDoc_facetedTag", List.of(tagField_1));
 
 
     }
