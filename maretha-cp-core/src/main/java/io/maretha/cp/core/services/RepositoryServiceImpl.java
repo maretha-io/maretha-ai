@@ -202,7 +202,12 @@ public class RepositoryServiceImpl implements RepositoryService {
                 });
             }
             String schemaName = schemaSettingsInput.getName();
-            schemaSettingsMap.put(schemaName, schemaSettingsInput);
+            String docType = schemaSettingsInput.getDocType();
+            if (StringUtils.isNotEmpty(docType)) {
+                schemaSettingsMap.put(docType + "_" + schemaName, schemaSettingsInput);
+            } else {
+                schemaSettingsMap.put(schemaName, schemaSettingsInput);
+            }
             String jsonString = objectMapper.writeValueAsString(schemaSettingsMap);
             cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_METADATA, jsonString);
         } catch (Exception e) {
@@ -368,6 +373,7 @@ public class RepositoryServiceImpl implements RepositoryService {
             paramMap.put(PARAMETER_SCHEMA_SELECTED_DOC_ID, param.getSelectedDocumentId());
             paramMap.put(PARAMETER_SCHEMA_ENABLE_DOC_SELECTION, param.isEnableDocSelection());
             paramMap.put(PARAMETER_SCHEMA_IS_CONTEXT_MEMORY, param.isContextMemoryParameter());
+            paramMap.put(PARAMETER_SCHEMA_IS_ADDITIONAL_CONTEXT, param.isAdditionalContext());
             return paramMap;
         }).collect(Collectors.toList());
     }

@@ -15,6 +15,7 @@ public class DocTypeWithSchema {
     @Data
     public static class Schema {
         private String name;
+        private String docType;
         private List<Field> fields = new ArrayList<>();
 
         @Data
@@ -29,6 +30,7 @@ public class DocTypeWithSchema {
             private boolean active;
             private boolean multiValue;
             private boolean inIsolation;
+            private boolean additionalContext;
         }
     }
 }

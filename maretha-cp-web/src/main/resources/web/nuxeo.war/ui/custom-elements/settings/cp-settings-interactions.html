@@ -113,15 +113,15 @@
 
 		<template id="list" is="dom-repeat" items="[[ interactions ]]" as="interaction" index-as="ix">
 			<cp-collapsible-content label="[[ interaction.name ]]" description="[[ interaction.description ]]"
-				active="[[ interaction.active ]]" status="[[ interaction.status ]]" version="[[ interaction.version ]]"
-				is-dirty="[[ _isDirty(interaction._dirty, changesSaved) ]]" show-stats>
+									active="[[ interaction.active ]]" status="[[ interaction.status ]]" version="[[ interaction.version ]]"
+									is-dirty="[[ _isDirty(interaction._dirty, changesSaved) ]]" show-stats>
 
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Activation">
 					<nuxeo-selectivity class="selectivity-container" multiple min-chars="0" data="{{documentTypes}}"
-						value="{{interaction.activeOnDocumentTypes}}" required data-ix$="[[ ix ]]"
-						on-value-changed="_activeDocumentsChanged" stay-open-on-select
-						label="List of document types this interaction is active for"
-						placeholder="Select one or more document type this interaction should be active for"></nuxeo-selectivity>
+									   value="{{interaction.activeOnDocumentTypes}}" required data-ix$="[[ ix ]]"
+									   on-value-changed="_activeDocumentsChanged" stay-open-on-select
+									   label="List of document types this interaction is active for"
+									   placeholder="Select one or more document type this interaction should be active for"></nuxeo-selectivity>
 				</nuxeo-card>
 
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Settings">
@@ -147,7 +147,7 @@
 						</paper-toggle-button>
 
 						<paper-toggle-button disabled$="[[ !interaction.saveMetadata ]]"
-							checked="{{interaction.mainMetadata}}" on-change="_markAsDirty">
+											 checked="{{interaction.mainMetadata}}" on-change="_markAsDirty">
 							Main Metadata
 						</paper-toggle-button>
 					</div>
@@ -158,114 +158,120 @@
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Parameter configuration">
 					<table>
 						<thead>
-							<tr>
-								<th>Parameter name</th>
-								<th>Default value</th>
-								<th>Read-only</th>
-								<th>Main document</th>
-								<th>Context memory</th>
-								<th>Enable selection</th>
-								<th>Selected document(s)</th>
-								<th>Read-only selection</th>
-							</tr>
+						<tr>
+							<th>Parameter name</th>
+							<th>Default value</th>
+							<th>Read-only</th>
+							<th>Main document</th>
+							<th>Additional context</th>
+							<th>Context memory</th>
+							<th>Enable selection</th>
+							<th>Selected document(s)</th>
+							<th>Read-only selection</th>
+						</tr>
 						</thead>
 
 						<tbody>
-							<template is="dom-repeat" items="[[ interaction.parameters ]]" index-as="px">
-								<tr>
-									<td>
-										<div class="parameter-name">
-											<div>[[item.name]]</div>
-											<span>
+						<template is="dom-repeat" items="[[ interaction.parameters ]]" index-as="px">
+							<tr>
+								<td>
+									<div class="parameter-name">
+										<div>[[item.name]]</div>
+										<span>
 												<template is="dom-if" if="[[ item.type ]]">
-													<small>[[ item.type ]]</s>
+													<small>[[ item.type ]]</small>
 												</template>
 												<template is="dom-if" if="[[ item.format ]]">
 													<small>[[ item.format ]]</small>
 												</template>
 											</span>
-										</div>
-									</td>
+									</div>
+								</td>
 
-									<td>
-										<template is="dom-if" if="[[ _hasDefaultValue(item.format) ]]">
-											<paper-input type="[[ item.type ]]" value="{{ item.value }}"
-												on-input="_markAsDirty" data-ix$="[[ ix ]]" data-px$="[[ px ]]">
-											</paper-input>
+								<td>
+									<template is="dom-if" if="[[ _hasDefaultValue(item.format) ]]">
+										<paper-input type="[[ item.type ]]" value="{{ item.value }}"
+													 on-input="_markAsDirty" data-ix$="[[ ix ]]" data-px$="[[ px ]]">
+										</paper-input>
+									</template>
+
+									<template is="dom-if" if="[[ !_hasDefaultValue(item.format) ]]">
+										<div class="na">N/A</div>
+									</template>
+								</td>
+
+								<td>
+									<paper-checkbox checked="{{ item.readOnly }}" data-ix$="[[ ix ]]"
+													data-px$="[[ px ]]" on-change="_markAsDirty" />
+								</td>
+
+								<td>
+									<paper-checkbox checked="{{ item.isMainDocument }}" on-change="_markAsDirty"
+													data-ix$="[[ ix ]]" data-px$="[[ px ]]" />
+								</td>
+
+								<td>
+									<paper-checkbox checked="{{ item.isAdditionalContext }}" data-ix$="[[ ix ]]"
+													data-px$="[[ px ]]" on-change="_markAsDirty" />
+								</td>
+
+								<td>
+									<template is="dom-if" if="[[ interaction.chat ]]">
+										<paper-checkbox checked="{{ item.isContextMemoryParameter }}"
+														on-change="_markAsDirty" data-ix$="[[ ix ]]" data-px$="[[ px ]]" />
+									</template>
+
+									<template is="dom-if" if="[[ !interaction.chat ]]">
+										<div class="na">N/A</div>
+									</template>
+								</td>
+
+								<td>
+									<template is="dom-if" if="[[ _isDocType(item) ]]">
+										<paper-checkbox checked="{{ item.enableDocSelection }}"
+														on-change="_enableDocSelectionChanged" data-ix$="[[ ix ]]"
+														data-px$="[[ px ]]" />
+									</template>
+
+									<template is="dom-if" if="[[ !_isDocType(item) ]]">
+										<div class="na">N/A</div>
+									</template>
+								</td>
+
+								<td on-click="_setSelectedParameterIndex" data-ix$="[[ ix ]]" data-px$="[[ px ]]">
+									<template is="dom-if" if="[[ item.enableDocSelection ]]" restamp>
+										<template is="dom-if" if="[[ _isDocArrayType(item) ]]">
+											<nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" multiple
+																	   stay-open-on-select min-chars="0" role="widget"
+																	   selected-items="{{ _selectedItems }}">
+											</nuxeo-document-suggestion>
 										</template>
 
-										<template is="dom-if" if="[[ !_hasDefaultValue(item.format) ]]">
-											<div class="na">N/A</div>
+										<template is="dom-if" if="[[ !_isDocArrayType(item) ]]">
+											<nuxeo-document-suggestion value="{{item.selectedDocumentId}}"
+																	   min-chars="0" role="widget"
+																	   selected-item="{{ _selectedItem }}">
+											</nuxeo-document-suggestion>
 										</template>
-									</td>
+									</template>
 
-									<td>
-										<paper-checkbox checked="{{ item.readOnly }}" data-ix$="[[ ix ]]"
-											data-px$="[[ px ]]" on-change="_markAsDirty" />
-									</td>
+									<template is="dom-if" if="[[ !item.enableDocSelection ]]" restamp>
+										<span class="na">N/A</span>
+									</template>
+								</td>
 
-									<td>
-										<paper-checkbox checked="{{ item.isMainDocument }}" on-change="_markAsDirty"
-											data-ix$="[[ ix ]]" data-px$="[[ px ]]" />
-									</td>
+								<td>
+									<template is="dom-if" if="[[ item.enableDocSelection ]]" restamp>
+										<paper-checkbox checked="[[ item.selectionReadOnly ]]"
+														on-change="_markAsDirty" />
+									</template>
 
-									<td>
-										<template is="dom-if" if="[[ interaction.chat ]]">
-											<paper-checkbox checked="{{ item.isContextMemoryParameter }}"
-												on-change="_markAsDirty" data-ix$="[[ ix ]]" data-px$="[[ px ]]" />
-										</template>
-
-										<template is="dom-if" if="[[ !interaction.chat ]]">
-											<div class="na">N/A</div>
-										</template>
-									</td>
-
-									<td>
-										<template is="dom-if" if="[[ _isDocType(item) ]]">
-											<paper-checkbox checked="{{ item.enableDocSelection }}"
-												on-change="_enableDocSelectionChanged" data-ix$="[[ ix ]]"
-												data-px$="[[ px ]]" />
-										</template>
-
-										<template is="dom-if" if="[[ !_isDocType(item) ]]">
-											<div class="na">N/A</div>
-										</template>
-									</td>
-
-									<td on-click="_setSelectedParameterIndex" data-ix$="[[ ix ]]" data-px$="[[ px ]]">
-										<template is="dom-if" if="[[ item.enableDocSelection ]]" restamp>
-											<template is="dom-if" if="[[ _isDocArrayType(item) ]]">
-												<nuxeo-document-suggestion value="{{item.selectedDocumentIds}}" multiple
-													stay-open-on-select min-chars="0" role="widget"
-													selected-items="{{ _selectedItems }}">
-												</nuxeo-document-suggestion>
-											</template>
-
-											<template is="dom-if" if="[[ !_isDocArrayType(item) ]]">
-												<nuxeo-document-suggestion value="{{item.selectedDocumentId}}"
-													min-chars="0" role="widget"
-													selected-item="{{ _selectedItem }}">
-												</nuxeo-document-suggestion>
-											</template>
-										</template>
-
-										<template is="dom-if" if="[[ !item.enableDocSelection ]]" restamp>
-											<span class="na">N/A</span>
-										</template>
-									</td>
-
-									<td>
-										<template is="dom-if" if="[[ item.enableDocSelection ]]" restamp>
-											<paper-checkbox checked="[[ item.selectionReadOnly ]]"
-												on-change="_markAsDirty" />
-										</template>
-
-										<template is="dom-if" if="[[ !item.enableDocSelection ]]" restamp>
-											<div class="na">N/A</div>
-										</template>
-									</td>
-								</tr>
-							</template>
+									<template is="dom-if" if="[[ !item.enableDocSelection ]]" restamp>
+										<div class="na">N/A</div>
+									</template>
+								</td>
+							</tr>
+						</template>
 						</tbody>
 					</table>
 				</nuxeo-card>

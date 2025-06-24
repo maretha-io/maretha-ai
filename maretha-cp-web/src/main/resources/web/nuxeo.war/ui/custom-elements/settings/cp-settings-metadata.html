@@ -152,6 +152,7 @@
 								<tr>
 									<th>Xpath</th>
 									<th>Active</th>
+									<th>Context</th>
 									<th>Isolated</th>
 									<th>Interaction</th>
 									<th>Description</th>
@@ -177,6 +178,10 @@
 
 										<td>
 											<paper-checkbox checked="{{ item.active }}" on-change="_markAsDirty" />
+										</td>
+
+										<td>
+											<paper-checkbox checked="{{ item.additionalContext }}" on-change="_markAsDirty" />
 										</td>
 
 										<td>
@@ -305,7 +310,12 @@
 			_selectedSchemaIndexObserver(selectedSchemaIndex)
 			{
 				if (selectedSchemaIndex > -1)
-					this.set('selectedSchema', this.documentTypeWithSchema.schemas[selectedSchemaIndex]);
+					{
+						const documentTypeWithSchema = this.documentTypeWithSchema;
+						const selectedSchema = documentTypeWithSchema.schemas[selectedSchemaIndex];
+						selectedSchema.docType = documentTypeWithSchema.name; //assign docType
+						this.set('selectedSchema', selectedSchema);
+					}
 			},
 
 			_filterInteractions(interactions)

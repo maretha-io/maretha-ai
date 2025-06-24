@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
+import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +17,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.ecm.directory.Directory;
@@ -61,18 +63,19 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
         Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
         if (saveMetadata) {
-            return processSaveMetadata(doc, session, interactionId, saveMetadataModeOverride, paramsMap);
+            processSaveMetadata(doc, session, interactionId, saveMetadataModeOverride, paramsMap);
+            return "Metadata Saved";
         }
         return Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMap, true);
     }
 
-    private String processSaveMetadata(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap) {
-        Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true);
+    private void processSaveMetadata(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap) {
+        Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true, saveMetadataModeOverride);
         schemasFieldsInIsolation.forEach(schemasFieldInIsolation -> {
             String interactionResponse;
             Map<String, Object> isolationParamsMap = addSchemasAndDictionariesToParams(getSchemaFieldsMap(Set.of(schemasFieldInIsolation)), paramsMap);
             String customInteractionId = schemasFieldInIsolation.getInteractionId();
-            String resultSchema = getResultSchema(Set.of(schemasFieldInIsolation));
+            String resultSchema = getResultSchema(Set.of(schemasFieldInIsolation), saveMetadataModeOverride, doc);
             if (StringUtils.isNotEmpty(customInteractionId)) {
                 interactionResponse = Framework.getService(APIService.class)
                         .getInteractionResultWithResultSchema(customInteractionId, isolationParamsMap, resultSchema, false);
@@ -82,13 +85,15 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             }
             validateAndSaveMetadata(interactionResponse, doc, session, saveMetadataModeOverride, Set.of(schemasFieldInIsolation));
         });
-        Set<DocTypeWithSchema.Schema.Field> schemasFields = getSchemaFields(doc, session, false);
-        Map<String, Object> paramsMapWithSchemaFields = addSchemasAndDictionariesToParams(getSchemaFieldsMap(schemasFields), paramsMap);
-        String response = Framework.getService(APIService.class).getInteractionResultWithResultSchema(interactionId, paramsMapWithSchemaFields, getResultSchema(schemasFields), false);
-        return validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, schemasFields);
+        Set<DocTypeWithSchema.Schema.Field> schemaFieldsNotInIsolation = getSchemaFields(doc, session, false, saveMetadataModeOverride);
+        if (CollectionUtils.isNotEmpty(schemaFieldsNotInIsolation)) {
+            Map<String, Object> paramsMapWithSchemaFields = addSchemasAndDictionariesToParams(getSchemaFieldsMap(schemaFieldsNotInIsolation), paramsMap);
+            String response = Framework.getService(APIService.class).getInteractionResultWithResultSchema(interactionId, paramsMapWithSchemaFields, getResultSchema(schemaFieldsNotInIsolation, saveMetadataModeOverride, doc), false);
+            validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, schemaFieldsNotInIsolation);
+        }
     }
 
-    public String validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride, Set<DocTypeWithSchema.Schema.Field> schemasFields) {
+    public void validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride, Set<DocTypeWithSchema.Schema.Field> schemasFields) {
         try {
             DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
             JsonNode jsonNode = objectMapper.readTree(response);
@@ -97,7 +102,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 resultNode = jsonNode.get("result").get("result");
             } catch (Exception e) {
                 log.error("Missing json result from API Response", e);
-                return "ERROR: Missing json result from API Response";
+                throw e;
             }
             resultNode.fields().forEachRemaining(field -> {
                 String key = field.getKey();
@@ -114,7 +119,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 }
                 try {
                     Serializable propertyValue = doc.getPropertyValue(key);
-                    if (Objects.isNull(propertyValue) || saveMetadataModeOverride) {
+                    if (isNullOrEmpty(propertyValue) || saveMetadataModeOverride) {
                         if ("nxtag:tags".equalsIgnoreCase(key)) {
                             log.debug("Adding nxtag:tags for documentId: " + doc.getId());
                             addTags(doc, valueNode);
@@ -123,17 +128,16 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                         if (optionalField.get().isMultiValue() && valueNode.isArray()) {
                             List<String> values = new ArrayList<>();
                             valueNode.forEach(element -> values.add(element.asText()));
-                            saveMetadataField(doc, validationService, key, values.toArray(new String[0]));
+                            saveMetadataField(doc, validationService, key, values.toArray(String[]::new));
                         } else {
                             saveMetadataField(doc, validationService, key, valueNode.asText());
                         }
                     }
                 } catch (Exception ex) {
-                    log.error("Failed to set metadata for " + key + ":" + valueNode.asText(), ex);
+                    log.error("Failed to set metadata for " + key + ":" + valueNode.toPrettyString(), ex);
                 }
             });
             session.saveDocument(doc);
-            return objectMapper.writeValueAsString(resultNode);
         } catch (Exception e) {
             log.error("Could not save document metadata", e);
             throw new RuntimeException("Failed to save document metadata: " + e.getMessage());
@@ -173,10 +177,18 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private void saveMetadataField(DocumentModel doc, DocumentValidationService validationService, String key, Serializable value) {
         if (!validationService.validate(key, value).hasError()) {
-            log.debug(String.format("Saving metadata key: %s value: %s", key, value));
             doc.setPropertyValue(key, value);
+            log.debug(String.format("Saved metadata key: %s value: %s", key, formatValue(value)));
         } else {
-            log.error(String.format("Failed to save metadata key: %s value: %s", key, value));
+            log.error(String.format("Failed to save metadata key: %s value: %s", key, formatValue(value)));
+        }
+    }
+
+    private String formatValue(Serializable value) {
+        if (value instanceof String[]) {
+            return Arrays.toString((String[]) value);
+        } else {
+            return String.valueOf(value);
         }
     }
 
@@ -266,6 +278,11 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             List<String> selectedDocumentIds = param.getSelectedDocumentIds();
             String selectedDocumentId = param.getSelectedDocumentId();
 
+            if (param.isAdditionalContext()) {
+                String additionalContext = getAdditionalContext(session, doc);
+                paramsMap.put(name, additionalContext);
+                return;
+            }
             boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
             if (isDocumentOrMediaFormat) {
                 if ("array".equalsIgnoreCase(type)) {
@@ -290,6 +307,40 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             paramsMap.put(name, value);
         });
         return paramsMap;
+    }
+
+    @SneakyThrows
+    private String getAdditionalContext(CoreSession session, DocumentModel doc) {
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+        Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
+        if (MapUtils.isEmpty(schemaSettings)) {
+            log.error("SchemaSettings is empty");
+            return "";
+        }
+
+        Set<DocTypeWithSchema.Schema.Field> schemaFields = new HashSet<>();
+
+        Arrays.stream(doc.getSchemas()).forEach(schema -> {
+            DocTypeWithSchema.Schema schemaSetting = getSchemaSetting(schemaSettings, doc.getType(), schema);
+            if (schemaSetting != null) {
+                Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
+                        .filter(DocTypeWithSchema.Schema.Field::isAdditionalContext)
+                        .collect(Collectors.toSet());
+                schemaFields.addAll(fields);
+            }
+        });
+
+        Map<String, String> valuesMap = new HashMap<>();
+        schemaFields.forEach(field -> {
+            String xpath = field.getXpath();
+            try {
+                Serializable propertyValue = doc.getPropertyValue(xpath);
+                String value = objectMapper.writeValueAsString(propertyValue);
+                valuesMap.put(xpath, value);
+            } catch (Exception ignored) {
+            }
+        });
+        return objectMapper.writeValueAsString(valuesMap);
     }
 
     private List<String> getSelectedDocumentsStoreIds(CoreSession coreSession, List<String> selectedDocumentIds) {
@@ -329,10 +380,18 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 entries.forEach(entry -> {
                     String id = entry.getId();
                     try {
+                        Property property = entry.getProperty("obsolete");
+                        if (property != null) {
+                            long isObsolete = (long) property.getValue();
+                            if (isObsolete > 0) {
+                                log.debug("Skipping obsolete directory value: " + directoryName + ":" + id);
+                                return;
+                            }
+                        }
                         String label = (String) (entry.getProperty("label")).getValue();
                         dictionaryMap.put(id, label);
                     } catch (Exception e) {
-                        log.error("Label not found for directory: " + id);
+                        log.error("Failed to get directory: " + directoryName + ":" + id, e);
                     }
                 });
             }
@@ -342,7 +401,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return dictionaryMap;
     }
 
-    private Set<DocTypeWithSchema.Schema.Field> getSchemaFields(DocumentModel doc, CoreSession session, boolean inIsolation) {
+    private Set<DocTypeWithSchema.Schema.Field> getSchemaFields(DocumentModel doc, CoreSession session, boolean inIsolation, boolean saveMetadataModeOverride) {
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
         if (MapUtils.isEmpty(schemaSettings)) {
@@ -353,17 +412,37 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         Set<DocTypeWithSchema.Schema.Field> schemaFields = new HashSet<>();
 
         Arrays.stream(doc.getSchemas()).forEach(schema -> {
-            if (schemaSettings.containsKey(schema)) {
-                DocTypeWithSchema.Schema schemaSetting = schemaSettings.get(schema);
+            DocTypeWithSchema.Schema schemaSetting = getSchemaSetting(schemaSettings, doc.getType(), schema);
+            if (schemaSetting != null) {
                 Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
                         .filter(DocTypeWithSchema.Schema.Field::isActive)
                         .filter(field -> (field.isInIsolation() == inIsolation))
+                        .filter(field -> {
+                            if (!saveMetadataModeOverride) {
+                                Serializable propertyValue = doc.getPropertyValue(field.getXpath());
+                                return isNullOrEmpty(propertyValue);
+                            }
+                            return true;
+                        })
                         .collect(Collectors.toSet());
                 schemaFields.addAll(fields);
             }
         });
 
         return schemaFields;
+    }
+
+    private DocTypeWithSchema.Schema getSchemaSetting(Map<String, DocTypeWithSchema.Schema> schemaSettings, String docType, String schemaName) {
+        String docTypeSchemaKey = docType + "_" + schemaName;
+        if (schemaSettings.containsKey(docTypeSchemaKey)) {
+            log.debug("Schema settings by docTye + schemaName : " + docTypeSchemaKey);
+            return schemaSettings.get(docTypeSchemaKey);
+        }
+        if (schemaSettings.containsKey(schemaName)) {
+            log.debug("Schema settings by schemaName : " + schemaName);
+            return schemaSettings.get(schemaName);
+        }
+        return null;
     }
 
     private Map<String, Object> addSchemasAndDictionariesToParams(Map<String, Object> schemaFieldsMap, Map<String, Object> parameters) {
@@ -393,7 +472,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return schemaFieldsMap;
     }
 
-    private String getResultSchema(Set<DocTypeWithSchema.Schema.Field> schemasFields) {
+    private String getResultSchema(Set<DocTypeWithSchema.Schema.Field> schemasFields, boolean saveMetadataModeOverride, DocumentModel doc) {
         Map<String, Object> schema = new HashMap<>();
         schema.put("type", "object");
 
@@ -401,13 +480,35 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         List<String> requiredFields = new ArrayList<>();
 
         for (DocTypeWithSchema.Schema.Field field : schemasFields) {
+            if (!saveMetadataModeOverride) {
+                Serializable propertyValue = doc.getPropertyValue(field.getXpath());
+                if (!isNullOrEmpty(propertyValue)) {
+                    continue;
+                }
+            }
             Map<String, Object> fieldSchema = new HashMap<>();
+            Map<String, String> directoryValues = field.getDirectoryValues();
             if (field.isMultiValue()) {
                 fieldSchema.put("type", "array");
-                fieldSchema.put("items", Collections.singletonMap("type", "string"));
+                Map<String, Object> itemsMap = new HashMap<>();
+                itemsMap.put("type", "string");
+                if (MapUtils.isNotEmpty(directoryValues)) {
+                    Set<String> directoryKeys = new HashSet<>(directoryValues.keySet());
+                    directoryKeys.add(null);
+                    itemsMap.put("enum", directoryKeys);
+                    fieldSchema.put("nullable", true);
+                }
+                fieldSchema.put("items", itemsMap);
             } else {
                 fieldSchema.put("type", "string");
+                if (MapUtils.isNotEmpty(directoryValues)) {
+                    Set<String> directoryKeys = new HashSet<>(directoryValues.keySet());
+                    directoryKeys.add(null);
+                    fieldSchema.put("enum", directoryKeys);
+                    fieldSchema.put("nullable", true);
+                }
             }
+            fieldSchema.put("description", field.getDescription());
             resultProperties.put(field.getXpath(), fieldSchema);
             requiredFields.add(field.getXpath());
         }
@@ -458,5 +559,15 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         } catch (Exception e) {
             log.error("Failed to save propertiesEmbeddings", e);
         }
+    }
+
+    private boolean isNullOrEmpty(Serializable propertyValue) {
+        if (propertyValue instanceof String) {
+            return StringUtils.isEmpty((CharSequence) propertyValue);
+        }
+        if (propertyValue instanceof List) {
+            return CollectionUtils.isEmpty((Collection) propertyValue);
+        }
+        return Objects.isNull(propertyValue);
     }
 }
