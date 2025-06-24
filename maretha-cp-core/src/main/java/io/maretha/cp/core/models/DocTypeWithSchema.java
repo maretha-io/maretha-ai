@@ -15,6 +15,7 @@ public class DocTypeWithSchema {
     @Data
     public static class Schema {
         private String name;
+        private String docType;
         private List<Field> fields = new ArrayList<>();
 
         @Data
