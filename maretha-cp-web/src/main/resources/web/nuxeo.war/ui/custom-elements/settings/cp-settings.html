@@ -99,7 +99,7 @@
 
 					<div>
 						<paper-icon-button id="undoBtn" icon="icons:cancel" on-tap="_loadData"
-							disabled$="[[ !_isDirty ]]">
+										   disabled$="[[ !_isDirty ]]">
 						</paper-icon-button>
 						<nuxeo-tooltip for="undoBtn">
 							Discard all changes
@@ -108,7 +108,7 @@
 
 					<div>
 						<paper-icon-button id="refreshBtn" icon="icons:refresh" on-tap="_refresh"
-							disabled$="[[ _refreshing ]]">
+										   disabled$="[[ _refreshing ]]">
 						</paper-icon-button>
 						<nuxeo-tooltip for="refreshBtn">
 							Refresh interactions, metadata, events and settings
@@ -119,19 +119,19 @@
 
 			<iron-pages selected="[[selectedTab]]" attr-for-selected="name" selected-item="{{page}}">
 				<cp-settings-interactions name="interactions" interactions="[[ interactions ]]"
-					document-types="[[ documentTypes ]]" changes-saved="[[ !_isDirty ]]">
+										  document-types="[[ documentTypes ]]" changes-saved="[[ !_isDirty ]]">
 				</cp-settings-interactions>
 
 				<cp-settings-metadata name="metadata" interactions="[[ interactions ]]"
-					document-types="[[ documentTypes ]]">
+									  document-types="[[ documentTypes ]]">
 				</cp-settings-metadata>
 
 				<cp-settings-events name="events" interactions="[[ interactions ]]" document-types="[[ documentTypes ]]"
-					events-settings="[[ eventsSettings ]]">
+									events-settings="[[ eventsSettings ]]">
 				</cp-settings-events>
 
 				<cp-settings-vertesia name="settings" vertesia-settings="[[ vertesiaSettings ]]"
-					aws-s3-access-enabled="[[ awsS3AccessEnabled ]]">
+									  aws-s3-access-enabled="[[ awsS3AccessEnabled ]]">
 				</cp-settings-vertesia>
 			</iron-pages>
 
@@ -160,16 +160,16 @@
 					value: []
 				},
 				documentTypes: {
-					type: Array,
-					value: []
+					type: Object,
+					value: {}
 				},
 				eventsSettings: {
 					type: Array,
 					value: []
 				},
 				vertesiaSettings: {
-					type: Array,
-					value: []
+					type: Object,
+					value: {}
 				},
 				awsS3AccessEnabled: Boolean,
 				visible: {
@@ -209,10 +209,19 @@
 				return operation.execute()
 					.then((response) =>
 					{
-						this.set('interactions', response.value.interactions);
-						this.set('eventsSettings', response.value.eventsSettings);
-						this.set('vertesiaSettings', response.value.vertesiaSettings);
-						this.set('awsS3AccessEnabled', response.value.awsS3AccessEnabled);
+						const { interactions, eventsSettings, vertesiaSettings, awsS3AccessEnabled } = response.value || {};
+						if (interactions != null) {
+							this.set('interactions', interactions);
+						}
+						if (eventsSettings != null) {
+							this.set('eventsSettings', eventsSettings);
+						}
+						if (vertesiaSettings != null) {
+							this.set('vertesiaSettings', vertesiaSettings);
+						}
+						if (awsS3AccessEnabled != null) {
+							this.set('awsS3AccessEnabled', awsS3AccessEnabled);
+						}
 					})
 					.catch((error) =>
 					{
