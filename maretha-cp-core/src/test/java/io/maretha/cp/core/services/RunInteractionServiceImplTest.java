@@ -273,7 +273,7 @@ public class RunInteractionServiceImplTest {
         txFeature.nextTransaction();
     }
 
-    private static DocTypeWithSchema.Schema.@NotNull Field createField(boolean multiValue, String xpath, String type, boolean active, boolean inIsolation, String directoryName) {
+    private static DocTypeWithSchema.Schema.Field createField(boolean multiValue, String xpath, String type, boolean active, boolean inIsolation, String directoryName) {
         DocTypeWithSchema.Schema.Field field = new DocTypeWithSchema.Schema.Field();
         field.setMultiValue(multiValue);
         field.setXpath(xpath);
