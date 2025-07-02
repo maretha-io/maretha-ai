@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -119,19 +120,19 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 }
                 try {
                     Serializable propertyValue = doc.getPropertyValue(key);
+                    if ("nxtag:tags".equalsIgnoreCase(key)) {
+                        log.debug("Adding nxtag:tags for documentId: " + doc.getId());
+                        appendTags(doc, valueNode);
+                        return;
+                    }
+                    if (optionalField.get().isMultiValue() && valueNode.isArray()) {
+                        Set<String> values = new LinkedHashSet<>();
+                        valueNode.forEach(element -> values.add(element.asText()));
+                        appendMetadataFieldArray(doc, validationService, key, values);
+                        return;
+                    }
                     if (isNullOrEmpty(propertyValue) || saveMetadataModeOverride) {
-                        if ("nxtag:tags".equalsIgnoreCase(key)) {
-                            log.debug("Adding nxtag:tags for documentId: " + doc.getId());
-                            addTags(doc, valueNode);
-                            return;
-                        }
-                        if (optionalField.get().isMultiValue() && valueNode.isArray()) {
-                            List<String> values = new ArrayList<>();
-                            valueNode.forEach(element -> values.add(element.asText()));
-                            saveMetadataField(doc, validationService, key, values.toArray(String[]::new));
-                        } else {
-                            saveMetadataField(doc, validationService, key, valueNode.asText());
-                        }
+                        saveMetadataField(doc, validationService, key, valueNode.asText());
                     }
                 } catch (Exception ex) {
                     log.error("Failed to set metadata for " + key + ":" + valueNode.toPrettyString(), ex);
@@ -144,7 +145,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    private void addTags(DocumentModel doc, JsonNode valueNode) {
+    private void appendTags(DocumentModel doc, JsonNode valueNode) {
         List<String> newTags = new ArrayList<>();
         valueNode.forEach(element -> newTags.add(element.asText()));
 
@@ -181,6 +182,34 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             log.debug(String.format("Saved metadata key: %s value: %s", key, formatValue(value)));
         } else {
             log.error(String.format("Failed to save metadata key: %s value: %s", key, formatValue(value)));
+        }
+    }
+
+    private void appendMetadataFieldArray(DocumentModel doc, DocumentValidationService validationService, String key, Set<String> newValues) {
+        if (newValues == null || newValues.isEmpty()) {
+            log.error(String.format("Skip save metadata for key: %s on empty value: %s", key, formatValue((Serializable) newValues)));
+            return;
+        }
+
+        @SuppressWarnings("unchecked")
+        ArrayList<String> existingValues = (ArrayList<String>) doc.getPropertyValue(key);
+
+        if (existingValues == null) {
+            existingValues = new ArrayList<>();
+        }
+
+        // Use LinkedHashSet to preserve order: new first, then existing (if not duplicated)
+        LinkedHashSet<String> combined = new LinkedHashSet<>();
+        combined.addAll(newValues);
+        combined.addAll(existingValues);
+
+        ArrayList<String> result = new ArrayList<>(combined);
+
+        if (!validationService.validate(key, result).hasError()) {
+            doc.setPropertyValue(key, result);
+            log.debug(String.format("Saved metadata key: %s value: %s", key, formatValue(result)));
+        } else {
+            log.error(String.format("Failed to save metadata key: %s value: %s", key, formatValue(result)));
         }
     }
 
@@ -417,13 +446,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
                         .filter(DocTypeWithSchema.Schema.Field::isActive)
                         .filter(field -> (field.isInIsolation() == inIsolation))
-                        .filter(field -> {
-                            if (!saveMetadataModeOverride) {
-                                Serializable propertyValue = doc.getPropertyValue(field.getXpath());
-                                return isNullOrEmpty(propertyValue);
-                            }
-                            return true;
-                        })
                         .collect(Collectors.toSet());
                 schemaFields.addAll(fields);
             }
@@ -480,12 +502,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         List<String> requiredFields = new ArrayList<>();
 
         for (DocTypeWithSchema.Schema.Field field : schemasFields) {
-            if (!saveMetadataModeOverride) {
-                Serializable propertyValue = doc.getPropertyValue(field.getXpath());
-                if (!isNullOrEmpty(propertyValue)) {
-                    continue;
-                }
-            }
             Map<String, Object> fieldSchema = new HashMap<>();
             Map<String, String> directoryValues = field.getDirectoryValues();
             if (field.isMultiValue()) {
