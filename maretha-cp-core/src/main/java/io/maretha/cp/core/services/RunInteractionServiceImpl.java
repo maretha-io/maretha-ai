@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,7 @@ import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TE
 public class RunInteractionServiceImpl implements RunInteractionService {
 
     public static final String MIME_TYPES = "vertesia.mimeTypes";
+    private static final String DEFAULT_DIRECTORY_BUCKET_SIZE = "100";
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -71,27 +73,54 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     private void processSaveMetadata(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap) {
-        Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true, saveMetadataModeOverride);
-        schemasFieldsInIsolation.forEach(schemasFieldInIsolation -> {
-            String interactionResponse;
-            Map<String, Object> isolationParamsMap = addSchemasAndDictionariesToParams(getSchemaFieldsMap(Set.of(schemasFieldInIsolation)), paramsMap);
-            String customInteractionId = schemasFieldInIsolation.getInteractionId();
-            String resultSchema = getResultSchema(Set.of(schemasFieldInIsolation), saveMetadataModeOverride, doc);
-            if (StringUtils.isNotEmpty(customInteractionId)) {
-                interactionResponse = Framework.getService(APIService.class)
-                        .getInteractionResultWithResultSchema(customInteractionId, isolationParamsMap, resultSchema, false);
+        Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true);
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+        String bucketSizeStr = (savedSettings.getVertesiaSettings() != null)
+                ? savedSettings.getVertesiaSettings().getOrDefault("directoryBucketSize", DEFAULT_DIRECTORY_BUCKET_SIZE)
+                : DEFAULT_DIRECTORY_BUCKET_SIZE;
+        int bucketSize = Integer.parseInt(bucketSizeStr);
+        schemasFieldsInIsolation.forEach(schemaField -> {
+            Map<String, String> directoryValues = schemaField.getDirectoryValues();
+            if (MapUtils.isNotEmpty(directoryValues) && directoryValues.size() > bucketSize) {
+                List<Map<String, String>> partitionedMap = partitionMap(directoryValues, bucketSize);
+                partitionedMap.forEach(partition -> {
+                    schemaField.setDirectoryValues(partition);
+                    processSchemaFieldInIsolation(doc, session, interactionId, saveMetadataModeOverride, paramsMap, schemaField);
+                });
             } else {
-                interactionResponse = Framework.getService(APIService.class)
-                        .getInteractionResultWithResultSchema(interactionId, isolationParamsMap, resultSchema, false);
+                processSchemaFieldInIsolation(doc, session, interactionId, saveMetadataModeOverride, paramsMap, schemaField);
             }
-            validateAndSaveMetadata(interactionResponse, doc, session, saveMetadataModeOverride, Set.of(schemasFieldInIsolation));
         });
-        Set<DocTypeWithSchema.Schema.Field> schemaFieldsNotInIsolation = getSchemaFields(doc, session, false, saveMetadataModeOverride);
+
+        Set<DocTypeWithSchema.Schema.Field> schemaFieldsNotInIsolation = getSchemaFields(doc, session, false);
         if (CollectionUtils.isNotEmpty(schemaFieldsNotInIsolation)) {
-            Map<String, Object> paramsMapWithSchemaFields = addSchemasAndDictionariesToParams(getSchemaFieldsMap(schemaFieldsNotInIsolation), paramsMap);
-            String response = Framework.getService(APIService.class).getInteractionResultWithResultSchema(interactionId, paramsMapWithSchemaFields, getResultSchema(schemaFieldsNotInIsolation, saveMetadataModeOverride, doc), false);
-            validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, schemaFieldsNotInIsolation);
+            processSchemaFieldsNotInIsolation(doc, session, interactionId, saveMetadataModeOverride, paramsMap, schemaFieldsNotInIsolation);
         }
+    }
+
+    private void processSchemaFieldsNotInIsolation(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap, Set<DocTypeWithSchema.Schema.Field> schemaFieldsNotInIsolation) {
+        Map<String, Object> schemaFieldsMap = getSchemaFieldsMap(schemaFieldsNotInIsolation);
+        Map<String, Object> paramsMapWithSchemaFields = addSchemasAndDictionariesToParams(schemaFieldsMap, paramsMap);
+        String resultSchema = getResultSchema(schemaFieldsNotInIsolation);
+        String response = Framework.getService(APIService.class).getInteractionResultWithResultSchema(interactionId, paramsMapWithSchemaFields, resultSchema, false);
+        validateAndSaveMetadata(response, doc, session, saveMetadataModeOverride, schemaFieldsNotInIsolation);
+    }
+
+    private void processSchemaFieldInIsolation(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap, DocTypeWithSchema.Schema.Field schemaField) {
+        String interactionResponse;
+        Set<DocTypeWithSchema.Schema.Field> schemasFieldInIsolationSet = Set.of(schemaField);
+        Map<String, Object> schemaFieldsMap = getSchemaFieldsMap(schemasFieldInIsolationSet);
+        Map<String, Object> isolationParamsMap = addSchemasAndDictionariesToParams(schemaFieldsMap, paramsMap);
+        String customInteractionId = schemaField.getInteractionId();
+        String resultSchema = getResultSchema(schemasFieldInIsolationSet);
+        if (StringUtils.isNotEmpty(customInteractionId)) {
+            interactionResponse = Framework.getService(APIService.class)
+                    .getInteractionResultWithResultSchema(customInteractionId, isolationParamsMap, resultSchema, false);
+        } else {
+            interactionResponse = Framework.getService(APIService.class)
+                    .getInteractionResultWithResultSchema(interactionId, isolationParamsMap, resultSchema, false);
+        }
+        validateAndSaveMetadata(interactionResponse, doc, session, saveMetadataModeOverride, schemasFieldInIsolationSet);
     }
 
     public void validateAndSaveMetadata(String response, DocumentModel doc, CoreSession session, boolean saveMetadataModeOverride, Set<DocTypeWithSchema.Schema.Field> schemasFields) {
@@ -430,7 +459,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return dictionaryMap;
     }
 
-    private Set<DocTypeWithSchema.Schema.Field> getSchemaFields(DocumentModel doc, CoreSession session, boolean inIsolation, boolean saveMetadataModeOverride) {
+    private Set<DocTypeWithSchema.Schema.Field> getSchemaFields(DocumentModel doc, CoreSession session, boolean inIsolation) {
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
         if (MapUtils.isEmpty(schemaSettings)) {
@@ -446,6 +475,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
                         .filter(DocTypeWithSchema.Schema.Field::isActive)
                         .filter(field -> (field.isInIsolation() == inIsolation))
+                        .map(schemaField -> {
+                            if (StringUtils.isNotEmpty(schemaField.getDirectoryName())) {
+                                Map<String, String> dictionaryValues = getDictionaryValues(schemaField.getDirectoryName());
+                                schemaField.setDirectoryValues(dictionaryValues);
+                            }
+                            return schemaField;
+                        })
                         .collect(Collectors.toSet());
                 schemaFields.addAll(fields);
             }
@@ -479,14 +515,10 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private Map<String, Object> getSchemaFieldsMap(Set<DocTypeWithSchema.Schema.Field> schemasFields) {
         Map<String, Object> schemaFieldsMap = new HashMap<>();
         schemasFields.forEach(activeField -> {
-            if (StringUtils.isNotEmpty(activeField.getDirectoryName())) {
-                Map<String, String> dictionaryValues = getDictionaryValues(activeField.getDirectoryName());
-                activeField.setDirectoryValues(dictionaryValues);
-            }
             Map<String, Object> fieldValuesMap = new HashMap<>();
             fieldValuesMap.put("description", activeField.getDescription());
             fieldValuesMap.put("type", activeField.isMultiValue() ? "array" : "string");
-            if (StringUtils.isNotEmpty(activeField.getDirectoryName())) {
+            if (MapUtils.isNotEmpty(activeField.getDirectoryValues())) {
                 fieldValuesMap.put("dictionaryValues", activeField.getDirectoryValues());
             }
             schemaFieldsMap.put(activeField.getXpath(), fieldValuesMap);
@@ -494,7 +526,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return schemaFieldsMap;
     }
 
-    private String getResultSchema(Set<DocTypeWithSchema.Schema.Field> schemasFields, boolean saveMetadataModeOverride, DocumentModel doc) {
+    private String getResultSchema(Set<DocTypeWithSchema.Schema.Field> schemasFields) {
         Map<String, Object> schema = new HashMap<>();
         schema.put("type", "object");
 
@@ -585,5 +617,27 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             return CollectionUtils.isEmpty((Collection) propertyValue);
         }
         return Objects.isNull(propertyValue);
+    }
+
+    private <K, V> List<Map<K, V>> partitionMap(Map<K, V> originalMap, int bucketSize) {
+        List<Map<K, V>> buckets = new ArrayList<>();
+        Map<K, V> currentBucket = new LinkedHashMap<>();
+        int count = 0;
+
+        for (Map.Entry<K, V> entry : originalMap.entrySet()) {
+            currentBucket.put(entry.getKey(), entry.getValue());
+            count++;
+
+            if (count % bucketSize == 0) {
+                buckets.add(currentBucket);
+                currentBucket = new LinkedHashMap<>();
+            }
+        }
+
+        if (!currentBucket.isEmpty()) {
+            buckets.add(currentBucket);
+        }
+
+        return buckets;
     }
 }
