@@ -220,11 +220,16 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             return;
         }
 
-        @SuppressWarnings("unchecked")
-        ArrayList<String> existingValues = (ArrayList<String>) doc.getPropertyValue(key);
+        Object value = doc.getPropertyValue(key);
+        ArrayList<String> existingValues;
 
-        if (existingValues == null) {
-            existingValues = new ArrayList<>();
+        if (value instanceof String[]) {
+            String[] valuesArray = (String[]) value;
+            existingValues = new ArrayList<>(Arrays.asList(valuesArray));
+        } else if (value instanceof ArrayList) {
+            existingValues = (ArrayList<String>) value;
+        } else {
+            existingValues = new ArrayList<>(); // fallback if null or unexpected type
         }
 
         // Use LinkedHashSet to preserve order: new first, then existing (if not duplicated)
