@@ -52,6 +52,11 @@
         <artifactId>maretha-cp-package</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>io.maretha.cp</groupId>
+        <artifactId>maretha-cp-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

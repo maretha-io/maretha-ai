@@ -1,12 +1,12 @@
 package io.maretha.cp.core.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -34,7 +34,9 @@ import java.util.List;
 import java.util.Map;
 
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
 import static io.maretha.cp.core.services.RunInteractionService.FILE_CONTENT;
+import static io.maretha.cp.core.services.RunInteractionServiceImpl.CALLBACK_NOTIFY_URL;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyMap;
@@ -66,6 +68,17 @@ public class RunInteractionServiceImplTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
+    private static DocTypeWithSchema.Schema.Field createField(boolean multiValue, String xpath, String type, boolean active, boolean inIsolation, String directoryName) {
+        DocTypeWithSchema.Schema.Field field = new DocTypeWithSchema.Schema.Field();
+        field.setMultiValue(multiValue);
+        field.setXpath(xpath);
+        field.setType(type);
+        field.setActive(active);
+        field.setInIsolation(inIsolation);
+        field.setDirectoryName(directoryName);
+        return field;
+    }
+
     @Test
     public void shouldSaveMetadataArraysAndTags() throws JsonProcessingException {
         DocumentModel document = createDocument();
@@ -73,25 +86,37 @@ public class RunInteractionServiceImplTest {
 
         Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
 
-        String mockResponse = "{\"result\":{\"result\":" +
-                "{\"dc:title\":\"Green Bird on Branch\"," +
-                "\"dc:description\":\"A small green bird with speckled breast perched on a tree branch in a lush forest setting.\"," +
-                "\"dc:language\":\"en\"," +
-                "\"testDoc:testStringArray\":[\"test-111\", \"test-123\"]," +
-                "\"nxtag:tags\":[\"tag-1\", \"tag-2\", \"tag-1\"]," +
-                "\"testDoc:eventTypes\":[\"documentCreated\", \"documentSecurityUpdated\"]," +
-                "\"dc:subjects\":[\"article\", \"certificate\"]" +
-                "}" +
-                "}}";
-
-        when(apiService.getInteractionResultWithResultSchema(anyString(), anyMap(), anyString(), anyBoolean())).thenReturn(mockResponse);
         when(apiService.uploadFileToStore(anyObject())).thenReturn("vertesia-store-id");
         when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
         document = runInteractionService.uploadFileAndSetStoreId(document, session, false);
-        runInteractionService.triggerInteraction(document, session, "interactionID", parameters, true, true);
+        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, true);
 
+        String jsonPayload = "{\n" +
+                "          \"event\" : \"workflow_finished\",\n" +
+                "          \"data\" : {\n" +
+                "            \"interaction_run_id\" : \"686d5cf79e02af71b2ec7b32\",\n" +
+                "            \"workflow_id\" : \"generation:ExecuteInteractionWorkflow:DynamicMetadata:jief03ard\",\n" +
+                "            \"workflow_run_id\" : \"0197eb33-271e-7f2d-9dbd-1f0c730619fd\",\n" +
+                "            \"status\" : \"completed\",\n" +
+                "            \"result\" : {\n" +
+                "              \"result\" : {\n" +
+                "                   \"dc:title\":\"Green Bird on Branch.\"," +
+                "                   \"dc:description\":\"A small green bird with speckled breast perched on a tree branch in a lush forest setting.\"," +
+                "                   \"dc:language\":\"en\"," +
+                "                   \"testDoc:testStringArray\":[\"test-111\", \"test-123\"]," +
+                "                   \"nxtag:tags\":[\"tag-1\", \"tag-2\", \"tag-1\"]," +
+                "                   \"testDoc:eventTypes\":[\"documentCreated\", \"documentSecurityUpdated\"]," +
+                "                   \"dc:subjects\":[\"article\", \"certificate\"]" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }";
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(jsonPayload);
+        runInteractionService.validateAndSaveMetadata(jsonNode, document.getId(), true);
 
         DocumentModel updatedDoc = session.getDocument(document.getRef());
         List<String> testStringArray = (List<String>) updatedDoc.getPropertyValue("testDoc:testStringArray");
@@ -111,24 +136,38 @@ public class RunInteractionServiceImplTest {
 
         Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
 
-        String mockResponse = "{\"result\":{\"result\":" +
-                "{\"dc:title\":\"Green Bird on Branch\"," +
-                "\"dc:description\":\"A small green bird with speckled breast perched on a tree branch in a lush forest setting.\"," +
-                "\"dc:language\":\"en\"," +
-                "\"testDoc:testStringArray\":[\"test-111\", \"test-123\"]," +
-                "\"nxtag:tags\":[\"tag-1\", \"tag-2\", \"tag-1\"]," +
-                "\"dc:subjects\":[\"article\", \"certificate\"]" +
-                "}" +
-                "}}";
-
         //WHEN
-        when(apiService.getInteractionResultWithResultSchema(anyString(), anyMap(), anyString(), anyBoolean())).thenReturn(mockResponse);
         when(apiService.uploadFileToStore(anyObject())).thenReturn("vertesia-store-id");
         when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
+        when(apiService.getInteractionResultWithResultSchemaAsync(anyString(), anyMap(), anyString(), anyString())).thenReturn("apiResponse");
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
         document = runInteractionService.uploadFileAndSetStoreId(document, session, false);
-        runInteractionService.triggerInteraction(document, session, "interactionID", parameters, true, false);
+        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false);
+
+        String jsonPayload = "{\n" +
+                "          \"event\" : \"workflow_finished\",\n" +
+                "          \"data\" : {\n" +
+                "            \"interaction_run_id\" : \"686d5cf79e02af71b2ec7b32\",\n" +
+                "            \"workflow_id\" : \"generation:ExecuteInteractionWorkflow:DynamicMetadata:jief03ard\",\n" +
+                "            \"workflow_run_id\" : \"0197eb33-271e-7f2d-9dbd-1f0c730619fd\",\n" +
+                "            \"status\" : \"completed\",\n" +
+                "            \"result\" : {\n" +
+                "              \"result\" : {\n" +
+                "                   \"dc:title\":\"Green Bird on Branch.\"," +
+                "                   \"dc:description\":\"A small green bird with speckled breast perched on a tree branch in a lush forest setting.\"," +
+                "                   \"dc:language\":\"en\"," +
+                "                   \"testDoc:testStringArray\":[\"test-111\", \"test-123\"]," +
+                "                   \"nxtag:tags\":[\"tag-1\", \"tag-2\", \"tag-1\"]," +
+                "                   \"dc:subjects\":[\"article\", \"certificate\"]" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }";
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(jsonPayload);
+        runInteractionService.validateAndSaveMetadata(jsonNode, document.getId(), false);
 
         //THEN
         DocumentModel updatedDoc = session.getDocument(document.getRef());
@@ -169,6 +208,7 @@ public class RunInteractionServiceImplTest {
                 "    \"activeOnFolder\": true,\n" +
                 "    \"chat\": false,\n" +
                 "    \"name\": \"Dynamic Metadata\",\n" +
+                "    \"endpoint\": \"DynamicMetadata\",\n" +
                 "    \"saveMetadata\": true,\n" +
                 "    \"id\": \"67d966033bbe22f0d50c7c6d\",\n" +
                 "    \"activeOnActionMenu\": false,\n" +
@@ -244,21 +284,26 @@ public class RunInteractionServiceImplTest {
 
         addSchemaConfiguration(configurationMap, interactions, "testDoc", List.of(testDocfield_1, testDocfield_2));
 
-        DocTypeWithSchema.Schema.Field dublinCoreField_1 = createField( true,
+        DocTypeWithSchema.Schema.Field dublinCoreField_1 = createField(true,
                 "dc:subjects", "subjectList", true, true, "l10nsubjects");
 
         addSchemaConfiguration(configurationMap, interactions, "TestDoc_dublincore", List.of(dublinCoreField_1));
 
-        DocTypeWithSchema.Schema.Field tagField_0 = createField( true,
+        DocTypeWithSchema.Schema.Field tagField_0 = createField(true,
                 "nxtag:tags", "tagList", true, true, null);
         //generic schema settings
         addSchemaConfiguration(configurationMap, interactions, "facetedTag", List.of(tagField_0));
 
-        DocTypeWithSchema.Schema.Field tagField_1 = createField( true,
+        DocTypeWithSchema.Schema.Field tagField_1 = createField(true,
                 "nxtag:tags", "tagList", true, true, null);
         //specific schema settings for TestDoc
         addSchemaConfiguration(configurationMap, interactions, "TestDoc_facetedTag", List.of(tagField_1));
 
+
+        //add callbackNotifyUrl
+        configurationMap.put(VERTESIA_SETTINGS, Map.of(CALLBACK_NOTIFY_URL, "callbackNotifyUrl"));
+        Framework.getService(RepositoryService.class).saveInteractionSettings(session, interactions, configurationMap);
+        txFeature.nextTransaction();
 
     }
 
@@ -271,17 +316,6 @@ public class RunInteractionServiceImplTest {
 
         Framework.getService(RepositoryService.class).saveInteractionSettings(session, interactions, configurationMap);
         txFeature.nextTransaction();
-    }
-
-    private static DocTypeWithSchema.Schema.Field createField(boolean multiValue, String xpath, String type, boolean active, boolean inIsolation, String directoryName) {
-        DocTypeWithSchema.Schema.Field field = new DocTypeWithSchema.Schema.Field();
-        field.setMultiValue(multiValue);
-        field.setXpath(xpath);
-        field.setType(type);
-        field.setActive(active);
-        field.setInIsolation(inIsolation);
-        field.setDirectoryName(directoryName);
-        return field;
     }
 
 }
