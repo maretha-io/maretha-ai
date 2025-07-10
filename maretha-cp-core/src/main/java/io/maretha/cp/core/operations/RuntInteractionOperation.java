@@ -53,12 +53,7 @@ public class RuntInteractionOperation {
         if (doc.isFolder()) {
             String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:ancestorId = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0" +
                     " AND file:content IS NOT NULL", doc.getId());
-            BulkCommand.Builder builder = new BulkCommand.Builder(BulkInteractionAction.ACTION_NAME, nxqlQuery, "system")
-                    .param("interactionId", interactionId)
-                    .param("parameters", (Serializable) data)
-                    .param("saveMetadata", saveMetadata)
-                    .param("saveMetadataModeOverride", saveMetadataModeOverride);
-            BulkCommand command = builder.build();
+            BulkCommand command = getBulkCommand(nxqlQuery);
             BulkService bulkService = Framework.getService(BulkService.class);
             return bulkService.submit(command);
         }
@@ -66,15 +61,11 @@ public class RuntInteractionOperation {
         if (doc.hasFacet("Collection")) {
             String nxqlQuery = String.format("SELECT * FROM Document WHERE collectionMember:collectionIds = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0" +
                     " AND file:content IS NOT NULL", doc.getId());
-            BulkCommand.Builder builder = new BulkCommand.Builder(BulkInteractionAction.ACTION_NAME, nxqlQuery, "system")
-                    .param("interactionId", interactionId)
-                    .param("parameters", (Serializable) data)
-                    .param("saveMetadata", saveMetadata)
-                    .param("saveMetadataModeOverride", saveMetadataModeOverride);
-            BulkCommand command = builder.build();
+            BulkCommand command = getBulkCommand(nxqlQuery);
             BulkService bulkService = Framework.getService(BulkService.class);
             return bulkService.submit(command);
         }
+
         doc = runInteractionService.uploadFileAndSetStoreId(doc, session, true);
         try {
             return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
@@ -82,6 +73,15 @@ public class RuntInteractionOperation {
             log.error("Failed to run interaction:" + interactionId, e);
             return e.getMessage();
         }
+    }
+
+    private BulkCommand getBulkCommand(String nxqlQuery) {
+        BulkCommand.Builder builder = new BulkCommand.Builder(BulkInteractionAction.ACTION_NAME, nxqlQuery, "system")
+                .param("interactionId", interactionId)
+                .param("parameters", (Serializable) data)
+                .param("saveMetadata", saveMetadata)
+                .param("saveMetadataModeOverride", saveMetadataModeOverride);
+        return builder.build();
     }
 
 }

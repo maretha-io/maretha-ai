@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0
 Bundle-Name: maretha-cp-core
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: io.maretha.cp.core.maretha-cp-core;singleton=true
+Nuxeo-WebModule: org.nuxeo.ecm.webengine.app.WebEngineModule;name=io.maretha.cp.core.maretha-cp-core;extends=base;headless=true;package=io/maretha/cp/core/callback
 Nuxeo-Component: OSGI-INF/cp-operations-contrib.xml,
  OSGI-INF/cp-types-contrib.xml,
  OSGI-INF/cp-service-contrib.xml,
@@ -17,3 +18,4 @@ Nuxeo-Component: OSGI-INF/cp-operations-contrib.xml,
  OSGI-INF/cp-bulk-action-contrib.xml,
  OSGI-INF/cp-kv-contrib.xml,
  OSGI-INF/cp-page-provider-contrib.xml,
+ OSGI-INF/cp-auth-contrib.xml,
