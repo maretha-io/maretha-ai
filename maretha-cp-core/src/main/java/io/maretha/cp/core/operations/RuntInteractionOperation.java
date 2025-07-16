@@ -31,7 +31,7 @@ public class RuntInteractionOperation {
     public static final String ID = "RunInteractionOperation";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RunInteractionService runInteractionService = Framework.getService(RunInteractionService.class);
-    private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
+    private final Log log = LogFactory.getLog(RuntInteractionOperation.class);
 
     @Context
     protected CoreSession session;
@@ -68,7 +68,7 @@ public class RuntInteractionOperation {
 
         doc = runInteractionService.uploadFileAndSetStoreId(doc, session, true);
         try {
-            return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
+            return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride, false);
         } catch (Exception e) {
             log.error("Failed to run interaction:" + interactionId, e);
             return e.getMessage();

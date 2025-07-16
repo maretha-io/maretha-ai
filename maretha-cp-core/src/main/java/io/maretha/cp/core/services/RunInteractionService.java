@@ -14,7 +14,7 @@ public interface RunInteractionService {
 
     String validateProcessStatusCompleted(DocumentModel doc);
 
-    String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride);
+    String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride, boolean asyncMode);
 
     void validateAndSaveMetadata(JsonNode response, String docId, boolean saveMetadataModeOverride);
 

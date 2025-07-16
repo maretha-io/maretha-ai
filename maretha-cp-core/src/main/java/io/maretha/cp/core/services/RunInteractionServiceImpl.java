@@ -68,16 +68,16 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     @Override
-    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride) {
+    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride, boolean asyncMode) {
         Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
         if (saveMetadata) {
-            triggerSaveMetadataAsyncRequest(doc, session, interactionId, saveMetadataModeOverride, paramsMap);
-            return "Metadata request in progress (async mode).";
+            triggerSaveMetadataRequest(doc, session, interactionId, saveMetadataModeOverride, paramsMap, asyncMode);
+            return "Metadata request in progress.";
         }
         return Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMap, true);
     }
 
-    private void triggerSaveMetadataAsyncRequest(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap) {
+    private void triggerSaveMetadataRequest(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap, boolean asyncMode) {
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         int bucketSize = getBucketSize(savedSettings);
 
@@ -88,16 +88,16 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 List<Map<String, String>> partitionedMap = partitionMap(directoryValues, bucketSize);
                 partitionedMap.forEach(partition -> {
                     schemaField.setDirectoryValues(partition);
-                    sendInteractionAsyncRequest(interactionId, paramsMap, Set.of(schemaField), saveMetadataModeOverride, doc, savedSettings);
+                    sendInteractionRequest(interactionId, paramsMap, Set.of(schemaField), saveMetadataModeOverride, doc, savedSettings, asyncMode);
                 });
             } else {
-                sendInteractionAsyncRequest(interactionId, paramsMap, Set.of(schemaField), saveMetadataModeOverride, doc, savedSettings);
+                sendInteractionRequest(interactionId, paramsMap, Set.of(schemaField), saveMetadataModeOverride, doc, savedSettings, asyncMode);
             }
         });
 
         Set<DocTypeWithSchema.Schema.Field> schemaFieldsNotInIsolation = getSchemaFields(doc, session, false);
         if (CollectionUtils.isNotEmpty(schemaFieldsNotInIsolation)) {
-            sendInteractionAsyncRequest(interactionId, paramsMap, schemaFieldsNotInIsolation, saveMetadataModeOverride, doc, savedSettings);
+            sendInteractionRequest(interactionId, paramsMap, schemaFieldsNotInIsolation, saveMetadataModeOverride, doc, savedSettings, asyncMode);
         }
     }
 
@@ -114,13 +114,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return interactionById;
     }
 
-    private void sendInteractionAsyncRequest(String interactionId, Map<String, Object> paramsMap, Set<DocTypeWithSchema.Schema.Field> schemaFields, boolean saveMetadataModeOverride, DocumentModel doc, Settings savedSettings) {
+    private void sendInteractionRequest(String interactionId, Map<String, Object> paramsMap, Set<DocTypeWithSchema.Schema.Field> schemaFields, boolean saveMetadataModeOverride, DocumentModel doc, Settings savedSettings, boolean asyncMode) {
         Interaction interaction = getInteractionById(savedSettings, interactionId);
         String callbackNotifyUrl = getCallbackNotifyUrl(savedSettings, doc, interactionId, saveMetadataModeOverride);
         String interactionEndpoint = interaction.getEndpoint();
 
         Map<String, Object> schemaFieldsMap = getSchemaFieldsMap(schemaFields);
-        Map<String, Object> isolationParamsMap = addSchemasAndDictionariesToParams(schemaFieldsMap, paramsMap);
+        Map<String, Object> paramsData = addSchemasAndDictionariesToParams(schemaFieldsMap, paramsMap);
         if (schemaFields.size() == 1) {
             DocTypeWithSchema.Schema.Field schemaField = schemaFields.stream().findFirst().get();
             if (schemaField.isInIsolation()) {
@@ -133,9 +133,19 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         String resultSchema = getResultSchema(schemaFields);
 
-        String response = Framework.getService(APIService.class)
-                .getInteractionResultWithResultSchemaAsync(interactionEndpoint, isolationParamsMap, resultSchema, callbackNotifyUrl);
-        log.debug("API Response: " + response);
+        String response;
+        if (asyncMode) {
+            response = Framework.getService(APIService.class).getInteractionResultWithResultSchemaAsync(interactionEndpoint, paramsData, resultSchema, callbackNotifyUrl);
+        } else {
+            response = Framework.getService(APIService.class).getInteractionResultWithResultSchema(interactionId, paramsData, resultSchema, false);
+            try {
+                JsonNode jsonNode = objectMapper.readTree(response);
+                validateAndSaveMetadata(jsonNode, doc.getId(), saveMetadataModeOverride);
+            } catch (Exception e) {
+                throw new NuxeoException("Failed to save metadata for document: " + doc.getId(), e);
+            }
+        }
+        log.debug("API Response sendInteractionRequest: " + response);
     }
 
     @Override
@@ -150,7 +160,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
             JsonNode resultNode;
             try {
-                resultNode = jsonNode.get("data").get("result").get("result");
+                resultNode = jsonNode.get("result").get("result");
             } catch (Exception e) {
                 log.error("Missing json result from API Response", e);
                 throw e;
