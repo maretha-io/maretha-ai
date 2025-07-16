@@ -91,7 +91,7 @@ public class RunInteractionServiceImplTest {
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
         document = runInteractionService.uploadFileAndSetStoreId(document, session, false);
-        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, true);
+        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, true, true);
 
         String jsonPayload = "{\n" +
                 "          \"event\" : \"workflow_finished\",\n" +
@@ -116,7 +116,7 @@ public class RunInteractionServiceImplTest {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(jsonPayload);
-        runInteractionService.validateAndSaveMetadata(jsonNode, document.getId(), true);
+        runInteractionService.validateAndSaveMetadata(jsonNode.get("data"), document.getId(), true);
 
         DocumentModel updatedDoc = session.getDocument(document.getRef());
         List<String> testStringArray = (List<String>) updatedDoc.getPropertyValue("testDoc:testStringArray");
@@ -143,7 +143,7 @@ public class RunInteractionServiceImplTest {
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
         document = runInteractionService.uploadFileAndSetStoreId(document, session, false);
-        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false);
+        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false, true);
 
         String jsonPayload = "{\n" +
                 "          \"event\" : \"workflow_finished\",\n" +
@@ -167,7 +167,46 @@ public class RunInteractionServiceImplTest {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(jsonPayload);
-        runInteractionService.validateAndSaveMetadata(jsonNode, document.getId(), false);
+        runInteractionService.validateAndSaveMetadata(jsonNode.get("data"), document.getId(), false);
+
+        //THEN
+        DocumentModel updatedDoc = session.getDocument(document.getRef());
+        assertEquals("Test Document", document.getPropertyValue("dc:title"));
+        List<String> testStringArray = (List<String>) updatedDoc.getPropertyValue("testDoc:testStringArray");
+        assertEquals(List.of("test-111", "test-123"), testStringArray);
+
+        List<Map<String, String>> tags = (List<Map<String, String>>) updatedDoc.getPropertyValue("nxtag:tags");
+        assertEquals(List.of(Map.of("label", "tag-1", "username", "system"), Map.of("label", "tag-2", "username", "system")), tags);
+    }
+
+    @Test
+    public void shouldAddMetadataIfMissingSyncMode() throws JsonProcessingException {
+        DocumentModel document = createDocument();
+        createSettingsDocument();
+
+        Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
+
+        String mockResponse = "{\"result\":{\"result\":" +
+                "{\"dc:title\":\"Green Bird on Branch\"," +
+                "\"dc:description\":\"A small green bird with speckled breast perched on a tree branch in a lush forest setting.\"," +
+                "\"dc:language\":\"en\"," +
+                "\"testDoc:testStringArray\":[\"test-111\", \"test-123\"]," +
+                "\"nxtag:tags\":[\"tag-1\", \"tag-2\", \"tag-1\"]," +
+                "\"testDoc:eventTypes\":[\"documentCreated\", \"documentSecurityUpdated\"]," +
+                "\"dc:subjects\":[\"article\", \"certificate\"]" +
+                "}" +
+                "}}";
+
+        //WHEN
+        when(apiService.uploadFileToStore(anyObject())).thenReturn("vertesia-store-id");
+        when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
+        when(apiService.getInteractionResultWithResultSchema(anyString(), anyMap(), anyString(), anyBoolean())).thenReturn(mockResponse);
+
+        List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
+        document = runInteractionService.uploadFileAndSetStoreId(document, session, false);
+        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false, false);
+
+
 
         //THEN
         DocumentModel updatedDoc = session.getDocument(document.getRef());
