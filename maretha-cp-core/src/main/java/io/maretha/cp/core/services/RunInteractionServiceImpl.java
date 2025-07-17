@@ -118,6 +118,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         Interaction interaction = getInteractionById(savedSettings, interactionId);
         String callbackNotifyUrl = getCallbackNotifyUrl(savedSettings, doc, interactionId, saveMetadataModeOverride);
         String interactionEndpoint = interaction.getEndpoint();
+        String resultSchema = getResultSchema(schemaFields);
+        String response;
 
         Map<String, Object> schemaFieldsMap = getSchemaFieldsMap(schemaFields);
         Map<String, Object> paramsData = addSchemasAndDictionariesToParams(schemaFieldsMap, paramsMap);
@@ -128,12 +130,11 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 if (StringUtils.isNotEmpty(customInteractionId)) {
                     interactionEndpoint = getInteractionById(savedSettings, customInteractionId).getEndpoint();
                     callbackNotifyUrl = getCallbackNotifyUrl(savedSettings, doc, customInteractionId, saveMetadataModeOverride);
+                    interactionId = customInteractionId;
                 }
             }
         }
-        String resultSchema = getResultSchema(schemaFields);
 
-        String response;
         if (asyncMode) {
             response = Framework.getService(APIService.class).getInteractionResultWithResultSchemaAsync(interactionEndpoint, paramsData, resultSchema, callbackNotifyUrl);
         } else {
