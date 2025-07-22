@@ -49,6 +49,16 @@
 					<nuxeo-input role="widget" value="{{vertesiaSettings.mimeTypes}}" label="mimeTypes" type="text"
 						on-input="_markAsDirty">
 					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{vertesiaSettings.directoryBucketSize}}" label="directoryBucketSize" type="number"
+								 min="0"
+								 step="10"
+								 on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{vertesiaSettings.callbackNotifyUrl}}" label="callbackNotifyUrl" type="text"
+								 on-input="_markAsDirty">
+					</nuxeo-input>
 				</div>
 			</nuxeo-card>
 		</div>
