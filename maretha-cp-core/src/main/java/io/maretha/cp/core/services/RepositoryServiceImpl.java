@@ -341,6 +341,7 @@ public class RepositoryServiceImpl implements RepositoryService {
     private HashMap<String, Object> convertToInteractionComplexType(Interaction interaction) {
         HashMap<String, Object> interactionMap = new HashMap<>();
         interactionMap.put(SCHEMA_ID, interaction.getId());
+        interactionMap.put(SCHEMA_ENDPOINT, interaction.getEndpoint());
         interactionMap.put(SCHEMA_DESCRIPTION, interaction.getDescription());
         interactionMap.put(SCHEMA_NAME, interaction.getName());
         interactionMap.put(SCHEMA_STATUS, interaction.getStatus());

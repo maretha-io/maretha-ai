@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 public class Interaction {
     private String id;
+    private String endpoint;
     private String description;
     private String name;
     private String status;

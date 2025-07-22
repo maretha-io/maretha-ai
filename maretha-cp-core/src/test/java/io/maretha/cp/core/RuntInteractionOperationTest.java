@@ -68,7 +68,7 @@ public class RuntInteractionOperationTest {
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
         when(runInteractionService.uploadFileAndSetStoreId(document, session, true)).thenReturn(document);
-        when(runInteractionService.triggerInteraction(document, session, interactionId, new ArrayList<>(), false, false)).thenReturn(mockResponse);
+        when(runInteractionService.triggerInteraction(document, session, interactionId, new ArrayList<>(), false, false, false)).thenReturn(mockResponse);
 
         //AND the operation is called
         OperationContext ctx = new OperationContext(session);
