@@ -130,7 +130,7 @@
 									events-settings="[[ eventsSettings ]]">
 				</cp-settings-events>
 
-				<cp-settings-vertesia name="settings" vertesia-settings="[[ vertesiaSettings ]]"
+				<cp-settings-vertesia name="settings" vertesia-settings="[[ vertesiaSettings ]]" es-settings="[[ esSettings ]]"
 									  aws-s3-access-enabled="[[ awsS3AccessEnabled ]]">
 				</cp-settings-vertesia>
 			</iron-pages>
@@ -168,6 +168,10 @@
 					value: []
 				},
 				vertesiaSettings: {
+					type: Object,
+					value: {}
+				},
+				esSettings: {
 					type: Object,
 					value: {}
 				},
@@ -209,7 +213,7 @@
 				return operation.execute()
 					.then((response) =>
 					{
-						const { interactions, eventsSettings, vertesiaSettings, awsS3AccessEnabled } = response.value || {};
+						const { interactions, eventsSettings, vertesiaSettings, awsS3AccessEnabled, esSettings } = response.value || {};
 						if (interactions != null) {
 							this.set('interactions', interactions);
 						}
@@ -218,6 +222,9 @@
 						}
 						if (vertesiaSettings != null) {
 							this.set('vertesiaSettings', vertesiaSettings);
+						}
+						if (esSettings != null) {
+							this.set('esSettings', esSettings);
 						}
 						if (awsS3AccessEnabled != null) {
 							this.set('awsS3AccessEnabled', awsS3AccessEnabled);
@@ -338,6 +345,9 @@
 
 				if (e.detail.vertesiaSettings)
 					this._saveChangesParams.vertesiaSettings = e.detail.vertesiaSettings;
+
+				if (e.detail.esSettings)
+					this._saveChangesParams.esSettings = e.detail.esSettings;
 
 				if (e.detail.awsS3AccessEnabled)
 					this._saveChangesParams.awsS3AccessEnabled = e.detail.awsS3AccessEnabled;

@@ -5,6 +5,7 @@ import io.maretha.cp.core.models.Settings;
 import io.maretha.cp.core.services.APIService;
 import io.maretha.cp.core.services.RepositoryService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
@@ -43,7 +44,7 @@ public class GetSettingsOperation {
             interactionSettings.forEach(interaction -> interactionsById.put(interaction.getId(), interaction));
         }
         //Get remote interactions
-        if (refresh || CollectionUtils.isEmpty(interactionSettings)) {
+        if (refresh || (CollectionUtils.isEmpty(interactionSettings) && MapUtils.isNotEmpty(settings.getVertesiaSettings()))) {
             List<Interaction> remoteInteractions = apiService.getInteractions();
             remoteInteractions.forEach(interaction -> {
                 if (!interactionsById.containsKey(interaction.getId())) {
