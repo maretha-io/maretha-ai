@@ -49,6 +49,41 @@
 					<nuxeo-input role="widget" value="{{vertesiaSettings.mimeTypes}}" label="mimeTypes" type="text"
 						on-input="_markAsDirty">
 					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{vertesiaSettings.directoryBucketSize}}" label="directoryBucketSize" type="number"
+								 min="0"
+								 step="10"
+								 on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{vertesiaSettings.callbackNotifyUrl}}" label="callbackNotifyUrl" type="text"
+								 on-input="_markAsDirty">
+					</nuxeo-input>
+				</div>
+			</nuxeo-card>
+
+			<nuxeo-card>
+				<h3>Elasticsearch Query Settings</h3>
+				<paper-toast id="toast"></paper-toast>
+
+				<div class="content">
+
+					<nuxeo-input role="widget" value="{{esSettings.BOOST}}"
+								 label="BOOST" type="text"
+								 placeholder="" on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.TEXT_WEIGHT}}"
+								 label="TEXT_WEIGHT" type="text"
+								 placeholder=""  on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.IMAGE_WEIGHT}}"
+								 label="IMAGE_WEIGHT" type="text"
+								 placeholder=""  on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.SCORE_MODE}}"
+								 label="SCORE_MODE" type="text"
+								 placeholder=""  on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.BOOST_MODE}}"
+								 label="BOOST_MODE" type="text"
+								 placeholder="" on-change="_markAsDirty"></nuxeo-input>
+
 				</div>
 			</nuxeo-card>
 		</div>
@@ -64,6 +99,11 @@
 					value: {}
 				},
 
+				esSettings: {
+					type: Object,
+					value: {}
+				},
+
 				awsS3AccessEnabled: Boolean
 			},
 
@@ -74,7 +114,7 @@
 
 			_markAsDirty()
 			{
-				this.fire('mark-as-dirty', { vertesiaSettings: this.vertesiaSettings });
+				this.fire('mark-as-dirty', { vertesiaSettings: this.vertesiaSettings, esSettings: this.esSettings });
 			}
 		});
 	</script>

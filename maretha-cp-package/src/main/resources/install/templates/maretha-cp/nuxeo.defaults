@@ -1,2 +1,0 @@
-maretha-cp.target=.
-nuxeo.template.includes=common,mongodb,maretha-cp

@@ -41,6 +41,7 @@ public interface RepositoryService {
     String SETTINGS_EVENTS = "interactionsettings:eventsSettings";
 
     String SCHEMA_ID = "id";
+    String SCHEMA_ENDPOINT = "endpoint";
     String SCHEMA_DESCRIPTION = "description";
     String SCHEMA_NAME = "name";
     String SCHEMA_STATUS = "status";

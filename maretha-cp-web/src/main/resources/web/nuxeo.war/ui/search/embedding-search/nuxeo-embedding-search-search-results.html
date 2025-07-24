@@ -6,27 +6,44 @@
 <dom-module id="nuxeo-embedding-search-search-results">
   <template>
     <style include="nuxeo-styles"></style>
-    
-    <nuxeo-results name="embedding-search" nx-provider="[[nxProvider]]" selected-items="{{selectedItems}}">
-      
-      <nuxeo-data-grid name="grid" icon="nuxeo:view-thumbnails" class="results" empty-label="[[i18n('searchResults.noResults')]]" last-index="[[_lastIndex]]" selection-enabled>
+
+    <nuxeo-results name="embedding-search" nx-provider="[[nxProvider]]"
+                   display-sort=""
+                   sort-options="[[sortOptions]]"
+                   sort-label="[[i18n('searchResults.sort.label')]]" selected-items="{{selectedItems}}">
+
+      <nuxeo-data-grid name="grid" icon="nuxeo:view-thumbnails" class="results"
+                       empty-label="[[i18n('searchResults.noResults')]]"
+                       sort-label="[[i18n('searchResults.sort.label')]]"
+                       last-index="[[_lastIndex]]" selection-enabled>
         <template>
-          <nuxeo-document-grid-thumbnail tabindex$="{{_computeTabAndLastIndex(index)}}" selected$="{{selected}}" doc="[[item]]" index="[[index]]" 
+          <nuxeo-document-grid-thumbnail tabindex$="{{_computeTabAndLastIndex(index)}}" selected$="{{selected}}" doc="[[item]]" index="[[index]]"
                                          on-navigate="_navigate" selected-items="[[selectedItems]]">
           </nuxeo-document-grid-thumbnail>
         </template>
       </nuxeo-data-grid>
 
-      <nuxeo-data-table class="results" settings-enabled empty-label="[[i18n('searchResults.noResults')]]" selection-enabled on-row-clicked="_navigate" icon="nuxeo:view-list" name="table">
+      <nuxeo-data-table class="results" settings-enabled empty-label="[[i18n('searchResults.noResults')]]"
+                        selection-enabled on-row-clicked="_navigate"
+                        icon="nuxeo:view-list"
+                        display-sort=""
+                        sort-options="[[sortOptions]]"
+                        name="table">
 
-        <nuxeo-data-table-column name="Title" field="dc:title" flex="100">
+        <nuxeo-data-table-column name="Title" field="dc:title" sort-by="dc:title" flex="100">
           <template>
             <nuxeo-document-thumbnail document="[[item]]"></nuxeo-document-thumbnail>
             <a class="ellipsis" href$="[[urlFor(item)]]" on-click="_navigate">[[item.title]]</a>
           </template>
         </nuxeo-data-table-column>
 
-        <nuxeo-data-table-column name="Modified" field="dc:modified" flex="50">
+        <nuxeo-data-table-column name="Relevance" field="contextParameters.relevance_score" sort-by="contextParameters.relevance_score" flex="50">
+          <template>
+            [[_formatScore(item.contextParameters.relevance_score)]]
+          </template>
+        </nuxeo-data-table-column>
+
+        <nuxeo-data-table-column name="Modified" field="dc:modified" sort-by="dc:modified" flex="50">
           <template>
             [[formatDate(item.properties.dc:modified)]]
           </template>
@@ -41,33 +58,55 @@
 
     </nuxeo-results>
   </template>
-  
+
   <script>
-  Polymer({
-    is: 'nuxeo-embedding-search-search-results',
+    Polymer({
+      is: 'nuxeo-embedding-search-search-results',
 
-    behaviors: [Nuxeo.LayoutBehavior],
+      behaviors: [Nuxeo.LayoutBehavior],
 
-    properties: {
+      properties: {
 
-      nxProvider: Object,
+        nxProvider: Object,
 
-      _lastIndex: {
-        type: Number,
-        value: 0,
+        sortOptions: {
+            type: Array,
+            value: []
+        },
+
+        _lastIndex: {
+          type: Number,
+          value: 0,
+        },
       },
-    },
 
-    _navigate: function(e) {
-      this.fire('navigate', { doc: (e.model || e.detail).item, index: (e.model || e.detail).index });
-    },
+      attached: function () {
+          this.sortOptions = [
+              {field: 'dc:title', label: this.i18n('searchResults.sort.field.title'), order: 'asc'},
+              {field: 'contextParameters.relevance_score', label: 'Relevance', order: 'desc', selected: true},
+              {field: 'dc:created', label: this.i18n('searchResults.sort.field.created'), order: 'asc'},
+              {field: 'dc:modified', label: this.i18n('searchResults.sort.field.modified'), order: 'desc'},
+          ];
+      },
 
-    _computeTabAndLastIndex(index) {
-      let  tabindex = index+1;
-      this._lastIndex = this.nxProvider.resultsCount;
-      return tabindex.toString();
-    }
+      _navigate: function(e) {
+        this.fire('navigate', { doc: (e.model || e.detail).item, index: (e.model || e.detail).index });
+      },
 
-  });
+      _computeTabAndLastIndex(index) {
+        let  tabindex = index+1;
+        this._lastIndex = this.nxProvider.resultsCount;
+        return tabindex.toString();
+      },
+
+      _formatScore(score) {
+        if (!score) {
+          return '-';
+        }
+        const rounded = Math.round(score * 10) / 10;
+        return rounded.toString();
+      }
+
+    });
   </script>
 </dom-module>

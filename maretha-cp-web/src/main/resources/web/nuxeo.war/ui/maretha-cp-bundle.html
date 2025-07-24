@@ -52,7 +52,7 @@
     <template>
         <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-SEARCH&quot;))" user="[[user]]">
             <template>
-                <nuxeo-search-form provider="searchByEmbeddings" auto="true" schemas="dublincore" search-name="embedding-search" name="find"></nuxeo-search-form>
+                <nuxeo-search-form provider="searchByEmbeddings" auto="true" enrichers="thumbnail, permissions, highlight, relevance_score" schemas="dublincore" search-name="embedding-search" name="find"></nuxeo-search-form>
             </template>
         </nuxeo-filter>
     </template>

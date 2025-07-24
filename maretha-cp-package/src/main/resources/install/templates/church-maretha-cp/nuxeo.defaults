@@ -1,0 +1,7 @@
+church-maretha-cp.target=.
+nuxeo.template.includes=common,mongodb,church-maretha-cp
+
+cp.upload.action.bucketSize=1
+cp.upload.action.batchSize=1
+cp.upload.action.defaultConcurrency=4
+cp.upload.action.partitions=12
