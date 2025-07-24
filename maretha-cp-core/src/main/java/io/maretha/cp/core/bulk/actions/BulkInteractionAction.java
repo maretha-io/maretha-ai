@@ -76,7 +76,7 @@ public class BulkInteractionAction implements StreamProcessorTopology {
                 runInteractionService.validateProcessStatusCompleted(doc); //Prevents calling the API if object processing not completed
                 doc.putContextData(DISABLE_BULK_LISTENER, true);
                 doc.putContextData(DISABLE_INTERACTIONS_LISTENER, true);
-                runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride);
+                runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride, true);
             });
         }
     }

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.marshallers">
+    <extension target="org.nuxeo.ecm.core.io.MarshallerRegistry" point="marshallers">
+        <register class="io.maretha.cp.core.enricher.PageProviderEnricher" enable="true"/>
+    </extension>
+</component>

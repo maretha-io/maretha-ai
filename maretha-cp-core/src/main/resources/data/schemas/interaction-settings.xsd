@@ -20,6 +20,7 @@
     <xs:complexType name="interactionType">
         <xs:sequence>
             <xs:element name="id" type="xs:string"/>
+            <xs:element name="endpoint" type="xs:string"/>
             <xs:element name="description" type="xs:string"/>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="status" type="xs:string"/>

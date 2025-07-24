@@ -32,7 +32,7 @@
 
 						<paper-item name="add" on-tap="_addMissingMetadata">
 							<iron-icon icon="custom-icons:ai-metadata-missing"></iron-icon>
-							Add missing metadata
+							Enhance metadata
 						</paper-item>
 					</paper-listbox>
 				</paper-menu-button>
@@ -180,7 +180,7 @@
 					"saveMetadata": this.selectedInteraction.saveMetadata,
 					"saveMetadataModeOverride": false
 				};
-				this.fire('notify', { message: 'Metadata request in progress...' });
+				this.fire('notify', { message: 'Metadata enhance request in progress...' });
 				operation.execute().then((response) =>
 				{
 					this.set('interactionResponse', response.value);

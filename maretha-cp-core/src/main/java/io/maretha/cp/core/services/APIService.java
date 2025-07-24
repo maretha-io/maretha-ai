@@ -13,6 +13,8 @@ public interface APIService {
 
     String getInteractionResultWithResultSchema(String interaction, Map<String, Object> data, String resultSchema, boolean stream);
 
+    String getInteractionResultWithResultSchemaAsync(String interaction, Map<String, Object> data, String resultSchema, String notifyEndpoint);
+
     String getBearerToken();
 
     String uploadFileToStore(Blob file);
