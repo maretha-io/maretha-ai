@@ -73,7 +73,7 @@ public class BulkInteractionAction implements StreamProcessorTopology {
             TransactionHelper.startTransaction(); // Start fresh transaction for next part
 
             documentModels.forEach(doc -> {
-                runInteractionService.validateProcessStatusCompleted(doc); //Prevents calling the API if object processing not completed
+//                runInteractionService.validateProcessStatusCompleted(doc); //Prevents calling the API if object processing not completed
                 doc.putContextData(DISABLE_BULK_LISTENER, true);
                 doc.putContextData(DISABLE_INTERACTIONS_LISTENER, true);
                 runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride, true);
