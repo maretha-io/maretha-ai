@@ -71,7 +71,7 @@ public class BulkEventListener implements PostCommitEventListener {
         eventsWithInteractions.forEach(ev -> {
             List<String> interactions = ev.getInteractions();
             interactions.forEach(interactionId -> {
-                String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:uuid = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0" +
+                String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:uuid = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0 AND ecm:isVersion = 0 " +
                         " AND file:content IS NOT NULL", doc.getId());
                 Optional<Interaction> optionalInteraction = savedSettings.getInteractions().stream()
                         .filter(interaction -> interaction.getId().equals(interactionId)).findFirst();
