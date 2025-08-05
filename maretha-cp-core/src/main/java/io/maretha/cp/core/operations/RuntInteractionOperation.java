@@ -51,7 +51,7 @@ public class RuntInteractionOperation {
                 .convertValue(data, objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));
 
         if (doc.isFolder()) {
-            String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:ancestorId = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0" +
+            String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:ancestorId = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0 AND ecm:isVersion = 0 " +
                     " AND file:content IS NOT NULL", doc.getId());
             BulkCommand command = getBulkCommand(nxqlQuery);
             BulkService bulkService = Framework.getService(BulkService.class);
@@ -59,7 +59,7 @@ public class RuntInteractionOperation {
         }
 
         if (doc.hasFacet("Collection")) {
-            String nxqlQuery = String.format("SELECT * FROM Document WHERE collectionMember:collectionIds = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0" +
+            String nxqlQuery = String.format("SELECT * FROM Document WHERE collectionMember:collectionIds = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0 AND ecm:isVersion = 0 " +
                     " AND file:content IS NOT NULL", doc.getId());
             BulkCommand command = getBulkCommand(nxqlQuery);
             BulkService bulkService = Framework.getService(BulkService.class);
