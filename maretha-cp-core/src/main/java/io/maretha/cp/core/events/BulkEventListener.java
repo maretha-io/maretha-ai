@@ -16,6 +16,7 @@ import org.nuxeo.ecm.core.event.EventBundle;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.PostCommitEventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
+import org.nuxeo.ecm.platform.audit.api.AuditLogger;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.Serializable;
@@ -26,12 +27,14 @@ import java.util.stream.Collectors;
 
 import static io.maretha.cp.core.events.InteractionsEventListener.ORIGINAL_EVENT_NAME;
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_DOCUMENT_TYPE;
+import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
 
 public class BulkEventListener implements PostCommitEventListener {
     public static final String DISABLE_BULK_LISTENER = "disableInteractionListener";
     public static final String BULK_INTERACTIONS_EVENT = "bulkInteractionsEvent";
     private final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
     private final Log log = LogFactory.getLog(BulkEventListener.class);
+    private final AuditLogger auditLogger = Framework.getService(AuditLogger.class);
 
     @Override
     public void handleEvent(EventBundle events) {
@@ -88,6 +91,7 @@ public class BulkEventListener implements PostCommitEventListener {
                     String commandId = bulkService.submit(command);
                     log.debug("InteractionEventListener-> running interaction: " + interaction.getId());
                     log.debug("InteractionEventListener created commandId: " + commandId);
+                    logAIAudit(ctx.getCoreSession(), doc, commandId, "AI Interaction triggered by event: " + originalEventName);
                 }
             });
         });
