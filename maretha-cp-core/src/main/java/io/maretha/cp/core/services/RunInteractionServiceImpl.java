@@ -54,6 +54,7 @@ import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCH
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_IMAGE;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_PROPERTIES;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TEXT;
+import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
 
@@ -69,6 +70,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride, boolean asyncMode) {
+        logAIAudit(session, doc, "", "Triggering AI Interaction with id: " + interactionId);
         Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
         if (saveMetadata) {
             triggerSaveMetadataRequest(doc, session, interactionId, saveMetadataModeOverride, paramsMap, asyncMode);
@@ -153,10 +155,12 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     public void validateAndSaveMetadata(JsonNode jsonNode, String docId, boolean saveMetadataModeOverride) {
         CoreSession session = CoreInstance.getCoreSessionSystem(null);
         DocumentModel doc = session.getDocument(new IdRef(docId));
+
         Set<DocTypeWithSchema.Schema.Field> schemaFieldsNotInIsolation = getSchemaFields(doc, session, false);
         Set<DocTypeWithSchema.Schema.Field> schemaFieldsInIsolation = getSchemaFields(doc, session, true);
         Set<DocTypeWithSchema.Schema.Field> schemasFields = Stream.concat(schemaFieldsNotInIsolation.stream(), schemaFieldsInIsolation.stream())
                 .collect(Collectors.toSet());
+
         try {
             DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
             JsonNode resultNode;
@@ -183,17 +187,22 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                     Serializable propertyValue = doc.getPropertyValue(key);
                     if ("nxtag:tags".equalsIgnoreCase(key)) {
                         log.debug("Adding nxtag:tags for documentId: " + doc.getId());
-                        appendTags(doc, valueNode);
+                        List<String> newTags = new ArrayList<>();
+                        valueNode.forEach(element -> newTags.add(element.asText()));
+                        appendTags(doc, newTags);
+                        logAIAudit(session, doc, "", "Saved AI metadata nxtag:tags : " + newTags);
                         return;
                     }
                     if (optionalField.get().isMultiValue() && valueNode.isArray()) {
                         Set<String> values = new LinkedHashSet<>();
                         valueNode.forEach(element -> values.add(element.asText()));
                         appendMetadataFieldArray(doc, validationService, key, values);
+                        logAIAudit(session, doc, "", "Saved AI metadata " + key + " : " + values);
                         return;
                     }
                     if (isNullOrEmpty(propertyValue) || saveMetadataModeOverride) {
                         saveMetadataField(doc, validationService, key, valueNode.asText());
+                        logAIAudit(session, doc, "", "Saved AI metadata " + key + " : " + valueNode.asText());
                     }
                 } catch (Exception ex) {
                     log.error("Failed to set metadata for " + key + ":" + valueNode.toPrettyString(), ex);
@@ -206,10 +215,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    private void appendTags(DocumentModel doc, JsonNode valueNode) {
-        List<String> newTags = new ArrayList<>();
-        valueNode.forEach(element -> newTags.add(element.asText()));
-
+    private void appendTags(DocumentModel doc, List<String> newTags) {
         if (CollectionUtils.isNotEmpty(newTags)) {
             if (!doc.hasFacet("NXTag")) {
                 doc.addFacet("NXTag");
@@ -301,6 +307,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         if (StringUtils.isEmpty(storeId)) {
             doc.addFacet(RESULTS_FACET);
             Settings settings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+            logAIAudit(session, doc, "", "Sending blob/rendition for AI processing.");
             if (settings.isAwsS3AccessEnabled()) {
                 String s3Path = getS3Path(blob);
                 storeId = Framework.getService(APIService.class).uploadS3FileToStore(blob, s3Path);

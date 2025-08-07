@@ -18,10 +18,12 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.maretha.cp.core.events.BulkEventListener.DISABLE_BULK_LISTENER;
 import static io.maretha.cp.core.events.InteractionsEventListener.DISABLE_INTERACTIONS_LISTENER;
+import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
 import static org.nuxeo.ecm.core.bulk.BulkServiceImpl.STATUS_STREAM;
 import static org.nuxeo.lib.stream.computation.AbstractComputation.INPUT_1;
 import static org.nuxeo.lib.stream.computation.AbstractComputation.OUTPUT_1;
@@ -49,7 +51,8 @@ public class BulkInteractionAction implements StreamProcessorTopology {
 
         @Override
         protected void compute(CoreSession session, List<String> ids, Map<String, Serializable> params) {
-            log.info("Running BulkInteractionComputation for ids: " + ids);
+            String commandId = this.command.getId();
+            log.info("Running BulkInteractionComputation: " + commandId + " for ids: " + ids);
             RunInteractionService runInteractionService = Framework.getService(RunInteractionService.class);
             String interactionId = (String) params.get("interactionId");
             List<InteractionParameter> parameters = objectMapper
@@ -59,11 +62,17 @@ public class BulkInteractionAction implements StreamProcessorTopology {
 
             List<DocumentModel> documentModels = ids.stream()
                     .map(docId -> {
+                        if (!session.exists(new IdRef(docId))) {
+                            log.error("Skipping non existing document by uuid: " + docId);
+                            return null;
+                        }
                         DocumentModel document = session.getDocument(new IdRef(docId));
                         document.putContextData(DISABLE_BULK_LISTENER, true);
                         document.putContextData(DISABLE_INTERACTIONS_LISTENER, true);
+                        logAIAudit(session, document, commandId, "Processing document");
                         return runInteractionService.uploadFileAndSetStoreId(document, session, false);
                     })
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
             session.save(); //save Vertesia object storeId
@@ -73,9 +82,9 @@ public class BulkInteractionAction implements StreamProcessorTopology {
             TransactionHelper.startTransaction(); // Start fresh transaction for next part
 
             documentModels.forEach(doc -> {
-//                runInteractionService.validateProcessStatusCompleted(doc); //Prevents calling the API if object processing not completed
                 doc.putContextData(DISABLE_BULK_LISTENER, true);
                 doc.putContextData(DISABLE_INTERACTIONS_LISTENER, true);
+                logAIAudit(session, doc, commandId, "Triggering AI interaction: " + interactionId);
                 runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride, true);
             });
         }

@@ -17,6 +17,8 @@ import org.nuxeo.ecm.core.api.impl.blob.StringBlob;
 import org.nuxeo.ecm.core.test.DefaultRepositoryInit;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
+import org.nuxeo.ecm.platform.audit.AuditFeature;
+import org.nuxeo.ecm.platform.audit.api.AuditLogger;
 import org.nuxeo.ecm.platform.test.PlatformFeature;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.mockito.MockitoFeature;
@@ -37,7 +39,9 @@ import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCH
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
 import static io.maretha.cp.core.services.RunInteractionService.FILE_CONTENT;
 import static io.maretha.cp.core.services.RunInteractionServiceImpl.CALLBACK_NOTIFY_URL;
+import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyObject;
@@ -45,12 +49,16 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(FeaturesRunner.class)
-@Features({AutomationFeature.class, RuntimeFeature.class, PlatformFeature.class, MockitoFeature.class})
+@Features({AutomationFeature.class, RuntimeFeature.class, PlatformFeature.class, MockitoFeature.class, AuditFeature.class})
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 @Deploy("io.maretha.cp.core.maretha-cp-core")
 @Deploy("org.nuxeo.ecm.platform.tag")
 @Deploy("io.maretha.cp.core.maretha-cp-core-test:OSGI-INF/cp-test-doc-schema-contrib-test.xml")
 @Deploy("io.maretha.cp.core.maretha-cp-core-test:OSGI-INF/cp-test-directories-contrib.xml")
+@Deploy({
+        "org.nuxeo.ecm.platform.audit",
+        "org.nuxeo.ecm.platform.audit.api"
+})
 public class RunInteractionServiceImplTest {
 
     @Inject
@@ -68,15 +76,10 @@ public class RunInteractionServiceImplTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    private static DocTypeWithSchema.Schema.Field createField(boolean multiValue, String xpath, String type, boolean active, boolean inIsolation, String directoryName) {
-        DocTypeWithSchema.Schema.Field field = new DocTypeWithSchema.Schema.Field();
-        field.setMultiValue(multiValue);
-        field.setXpath(xpath);
-        field.setType(type);
-        field.setActive(active);
-        field.setInIsolation(inIsolation);
-        field.setDirectoryName(directoryName);
-        return field;
+    @Test
+    public void testAuditLoggerIsAvailable() {
+        AuditLogger logger = Framework.getService(AuditLogger.class);
+        assertNotNull("AuditLogger should not be null", logger);
     }
 
     @Test
@@ -355,6 +358,17 @@ public class RunInteractionServiceImplTest {
 
         Framework.getService(RepositoryService.class).saveInteractionSettings(session, interactions, configurationMap);
         txFeature.nextTransaction();
+    }
+
+    private DocTypeWithSchema.Schema.Field createField(boolean multiValue, String xpath, String type, boolean active, boolean inIsolation, String directoryName) {
+        DocTypeWithSchema.Schema.Field field = new DocTypeWithSchema.Schema.Field();
+        field.setMultiValue(multiValue);
+        field.setXpath(xpath);
+        field.setType(type);
+        field.setActive(active);
+        field.setInIsolation(inIsolation);
+        field.setDirectoryName(directoryName);
+        return field;
     }
 
 }
