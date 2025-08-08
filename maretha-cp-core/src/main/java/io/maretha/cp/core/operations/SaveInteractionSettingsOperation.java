@@ -35,7 +35,7 @@ public class SaveInteractionSettingsOperation {
     @Param(name = "interactions", required = false)
     protected List<ObjectNode> interactions;
     @Param(name = AWS_S3_ACCESS_ENABLED, required = false)
-    protected boolean awsS3AccessEnabled;
+    protected Boolean awsS3AccessEnabled;
     @Param(name = SCHEMA_SETTINGS, required = false)
     protected DocTypeWithSchema.Schema schemaSettings;
     @Param(name = ES_SETTINGS, required = false)

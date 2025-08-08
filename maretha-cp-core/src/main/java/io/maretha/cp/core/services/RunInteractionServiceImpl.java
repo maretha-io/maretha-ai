@@ -307,12 +307,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         if (StringUtils.isEmpty(storeId)) {
             doc.addFacet(RESULTS_FACET);
             Settings settings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+            String fileTypeId = settings.getVertesiaSettings().getOrDefault("fileTypeId", "");
             logAIAudit(session, doc, "", "Sending blob/rendition for AI processing.");
             if (settings.isAwsS3AccessEnabled()) {
                 String s3Path = getS3Path(blob);
-                storeId = Framework.getService(APIService.class).uploadS3FileToStore(blob, s3Path);
+                storeId = Framework.getService(APIService.class).uploadS3FileToStore(blob, s3Path, fileTypeId);
             } else {
-                storeId = Framework.getService(APIService.class).uploadFileToStore(blob);
+                storeId = Framework.getService(APIService.class).uploadFileToStore(blob, fileTypeId);
             }
             doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
             doc.setPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH, blob.getDigest());
