@@ -179,7 +179,7 @@ public class APIServiceImpl implements APIService {
     }
 
     @Override
-    public String uploadFileToStore(Blob file) {
+    public String uploadFileToStore(Blob file, String fileTypeId) {
         log.debug(String.format("uploadFileToStore: fileName:[%s], digest:[%s]", file.getFilename(), file.getDigest()));
 
         String bearerToken = getBearerToken();
@@ -206,7 +206,13 @@ public class APIServiceImpl implements APIService {
             throw new NuxeoException("Failed to upload the file");
         }
 
+        String fileType = "";
+        if (StringUtils.isNotEmpty(fileTypeId)) {
+            fileType = "  \"type\": \"" + fileTypeId + "\",\n";
+        }
+
         String bodyJsonObject = "{\n" +
+                fileType +
                 "    \"content\": {\n" +
                 "        \"source\": \"" + uploadId + "\",\n" +
                 "        \"name\": \"" + filename + "\",\n" +
@@ -221,11 +227,17 @@ public class APIServiceImpl implements APIService {
     }
 
     @Override
-    public String uploadS3FileToStore(Blob file, String s3Path) {
+    public String uploadS3FileToStore(Blob file, String s3Path, String fileTypeId) {
         String bearerToken = getBearerToken();
+
+        String fileType = "";
+        if (StringUtils.isNotEmpty(fileTypeId)) {
+            fileType = "  \"type\": \"" + fileTypeId + "\",\n";
+        }
 
         String bodyJsonObject = "{\n" +
                 "  \"name\": \"" + file.getFilename() + "\",\n" +
+                fileType +
                 "  \"content\": {\n" +
                 "    \"source\": \"" + s3Path + "\",\n" +
                 "    \"name\": \"" + file.getFilename() + "\",\n" +

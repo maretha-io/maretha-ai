@@ -39,7 +39,6 @@ import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCH
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
 import static io.maretha.cp.core.services.RunInteractionService.FILE_CONTENT;
 import static io.maretha.cp.core.services.RunInteractionServiceImpl.CALLBACK_NOTIFY_URL;
-import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.anyBoolean;
@@ -89,7 +88,7 @@ public class RunInteractionServiceImplTest {
 
         Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
 
-        when(apiService.uploadFileToStore(anyObject())).thenReturn("vertesia-store-id");
+        when(apiService.uploadFileToStore(anyObject(), anyString())).thenReturn("vertesia-store-id");
         when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
@@ -140,7 +139,7 @@ public class RunInteractionServiceImplTest {
         Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
 
         //WHEN
-        when(apiService.uploadFileToStore(anyObject())).thenReturn("vertesia-store-id");
+        when(apiService.uploadFileToStore(anyObject(), anyString())).thenReturn("vertesia-store-id");
         when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
         when(apiService.getInteractionResultWithResultSchemaAsync(anyString(), anyMap(), anyString(), anyString())).thenReturn("apiResponse");
 
@@ -201,7 +200,7 @@ public class RunInteractionServiceImplTest {
                 "}}";
 
         //WHEN
-        when(apiService.uploadFileToStore(anyObject())).thenReturn("vertesia-store-id");
+        when(apiService.uploadFileToStore(anyObject(), anyString())).thenReturn("vertesia-store-id");
         when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
         when(apiService.getInteractionResultWithResultSchema(anyString(), anyMap(), anyString(), anyBoolean())).thenReturn(mockResponse);
 
