@@ -146,7 +146,9 @@ public class RepositoryServiceImpl implements RepositoryService {
         }
 
         Boolean awsS3AccessEnabled = (Boolean) configuration.get(AWS_S3_ACCESS_ENABLED);
-        cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_AWS_S3_ACCESS, awsS3AccessEnabled);
+        if (Objects.nonNull(awsS3AccessEnabled)) {
+            cpSettingsDoc.setPropertyValue(SETTINGS_SCHEMA_AWS_S3_ACCESS, awsS3AccessEnabled);
+        }
 
         DocTypeWithSchema.Schema schemaSettings = (DocTypeWithSchema.Schema) configuration.get(SCHEMA_SETTINGS);
         if (!Objects.isNull(schemaSettings)) {
