@@ -49,21 +49,6 @@
 					</cp-collapsible-content>
 				</template>
 			</nuxeo-filter>
-
-			<nuxeo-filter document="[[document]]" facet="InteractionResultsFacet"
-				expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;VERTESIA-SEARCH&quot;))"
-				user="[[user]]">
-				<template>
-					<cp-collapsible-content label="More like this"
-						description="Discover other documents similar to this one" class="similar-documents"
-						on-expanded="_similarDocumentsShown" scroll-into-view-delay="600">
-						<template is="dom-if" if="[[ _similarDocumentsInitialized ]]">
-							<cp-similar-documents document="[[document]]">
-							</cp-similar-documents>
-						</template>
-					</cp-collapsible-content>
-				</template>
-			</nuxeo-filter>
 		</template>
 
 	</template>
