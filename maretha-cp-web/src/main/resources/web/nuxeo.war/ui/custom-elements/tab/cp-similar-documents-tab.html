@@ -1,0 +1,35 @@
+<link rel="import" href="../tab/cp-similar-documents.html">
+
+<dom-module id="cp-similar-documents-tab">
+  <template>
+    <style include="nuxeo-styles">
+      :host {
+        display: block;
+      }
+    </style>
+
+    <template is="dom-if" if="[[visible]]">
+      <cp-similar-documents document="[[document]]" provider-name="searchByEmbeddings"></cp-similar-documents>
+    </template>
+    
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cp-similar-documents-tab',
+      properties: {
+        document: {
+          type: Object,
+        },
+        
+        visible: {
+          type: Boolean
+        }
+
+      },
+
+      
+    });
+  </script>
+</dom-module>
+

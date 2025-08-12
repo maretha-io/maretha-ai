@@ -75,6 +75,15 @@
     </dependency>
 
     <dependency>
+      <groupId>org.nuxeo.ecm.platform</groupId>
+      <artifactId>nuxeo-platform-audit-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.ecm.platform</groupId>
+      <artifactId>nuxeo-platform-audit-core</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.nuxeo.ecm.core</groupId>
       <artifactId>nuxeo-core-binarymanager-s3</artifactId>
     </dependency>
@@ -108,6 +117,13 @@
       <groupId>org.nuxeo.ecm.platform</groupId>
       <artifactId>nuxeo-rest-api-test</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.nuxeo.ecm.platform</groupId>
+      <artifactId>nuxeo-platform-audit-core</artifactId>
+      <scope>test</scope>
+      <type>test-jar</type>
     </dependency>
 
   </dependencies>

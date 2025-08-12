@@ -17,9 +17,9 @@ public interface APIService {
 
     String getBearerToken();
 
-    String uploadFileToStore(Blob file);
+    String uploadFileToStore(Blob file, String fileTypeId);
 
-    String uploadS3FileToStore(Blob file, String s3Path);
+    String uploadS3FileToStore(Blob file, String s3Path, String fileTypeId);
 
     double[] textToEmbeddings(String text);
 

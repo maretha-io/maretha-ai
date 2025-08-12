@@ -3,7 +3,7 @@
 		<nuxeo-selectivity value="{{ value }}" data="[[ data ]]" min-chars="0" tagging id-function="[[ idFunction ]]"
 			result-formatter="[[ resultFormatter ]]" selection-formatter="[[ selectionFormatter ]]"
 			selected-item="{{ _selectedInteraction }}" selected-items="{{ _selectedInteractions }}"
-			multiple="[[ multiple ]]" stay-open-on-select="[[ multiple ]]" min-chars="0">
+			multiple="[[ multiple ]]" stay-open-on-select="[[ multiple ]]" required="[[ required ]]" min-chars="0">
 		</nuxeo-selectivity>
 	</template>
 
@@ -45,6 +45,8 @@
 				},
 
 				multiple: Boolean,
+
+				required: Boolean,
 
 				_selectedInteraction: {
 					type: Object,
