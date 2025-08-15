@@ -25,9 +25,9 @@ public interface APIService {
 
     double[] getDocumentEmbeddings(String docId, String type);
 
-    Map<String, Double> search(String vectorQuery, String type, int limit);
+    Map<String, Double> search(String vectorQuery, int limit);
 
-    Map<String, Double> searchSimilarity(String storeId, String type, int limit);
+    Map<String, Double> searchSimilarity(String storeId, int limit);
 
     String checkProcessingStatusCompleted(String storeId, boolean withRetry);
 }

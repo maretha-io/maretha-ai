@@ -79,34 +79,18 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
 
         if (StringUtils.isNotEmpty(vectorQuery) && StringUtils.isNotEmpty(vectorField)) {
             Map<String, Double> docIdScoreMapTextSearch = new HashMap<>();
-            Map<String, Double> docIdScoreMapImageSearch = new HashMap<>();
-            Map<String, Double> docIdScoreMapPropertiesSearch = new HashMap<>();
 
             if ("text".equals(vectorField)) {
                 APIService apiService = Framework.getService(APIService.class);
-                double[] textVectors = apiService.textToEmbeddings(vectorQuery);
-                vectorQuery = Arrays.toString(textVectors);
-                docIdScoreMapTextSearch = apiService.search(vectorQuery, "text", 100);
-                docIdScoreMapImageSearch = apiService.search(vectorQuery, "image", 100);
-                docIdScoreMapPropertiesSearch = apiService.search(vectorQuery, "properties", 100);
+                docIdScoreMapTextSearch = apiService.search(vectorQuery, 100);
             }
 
             if ("similarity".equals(vectorField)) {
                 String objectStoreId = vectorQuery;
-                docIdScoreMapTextSearch = apiService.searchSimilarity(objectStoreId, "text", 100);
-                docIdScoreMapImageSearch = apiService.searchSimilarity(objectStoreId, "image", 100);
-                docIdScoreMapPropertiesSearch = apiService.searchSimilarity(objectStoreId, "properties", 100);
+                docIdScoreMapTextSearch = apiService.searchSimilarity(objectStoreId, 100);
             }
 
             docIdScoreMapTextSearch.forEach((id, score) -> {
-                if (score >= minScore)
-                    idsAndScores.merge(id, score, Math::max);
-            });
-            docIdScoreMapImageSearch.forEach((id, score) -> {
-                if (score >= minScore)
-                    idsAndScores.merge(id, score, Math::max);
-            });
-            docIdScoreMapPropertiesSearch.forEach((id, score) -> {
                 if (score >= minScore)
                     idsAndScores.merge(id, score, Math::max);
             });

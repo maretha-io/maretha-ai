@@ -294,23 +294,33 @@ public class APIServiceImpl implements APIService {
     }
 
     @Override
-    public Map<String, Double> search(String vectorQuery, String type, int limit) {
-        log.debug("Searching by type: " + type + " and query: " + vectorQuery);
+    public Map<String, Double> search(String textQuery, int limit) {
+        log.debug("Searching by query: " + textQuery);
         Map<String, Double> docIdScoreMap = new HashMap<>();
+        boolean textEnabled = true;
+        boolean imageEnabled = true;
+        boolean propertiesEnabled = true;
         String requestBody = String.format(
                 "{\n" +
-                        "  \"limit\": %s,\n" +
-                        "  \"offset\": 0,\n" +
-                        "  \"query\": {\n" +
-                        "    \"vector\": {\n" +
-                        "      \"values\": %s,\n" +
-                        "      \"type\": \"%s\"\n" +
-                        "    }\n" +
-                        "  }\n" +
-                        "}", limit, vectorQuery, type);
+                "  \"limit\": %s,\n" +
+                "  \"offset\": 0,\n" +
+                "  \"query\": {\n" +
+                "    \"vector\": {\n" +
+                "      \"text\": \"%s\",\n" +
+                "      \"config\": {\n" +
+                "        \"text\": %b,\n" +
+                "        \"image\": %b,\n" +
+                "        \"properties\": %b\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"fullText\": \"%s\"\n" +
+                "  }\n" +
+                "}",
+                limit, textQuery, textEnabled, imageEnabled, propertiesEnabled, textQuery
+        );
         try {
             String response = postRequest(getBearerToken(), getSetting(UPLOAD_API_URL) + "/api/v1/objects/search", requestBody, false);
-            objectMapper.readTree(response).forEach(obj -> {
+            objectMapper.readTree(response).get("results").forEach(obj -> {
                 String id = obj.get("id").asText();
                 double score = obj.get("score").asDouble();
                 docIdScoreMap.put(id, score);
@@ -322,24 +332,30 @@ public class APIServiceImpl implements APIService {
     }
 
     @Override
-    public Map<String, Double> searchSimilarity(String storeId, String type, int limit) {
-        log.debug("Searching similarity by type: " + type + " and storeId: " + storeId);
+    public Map<String, Double> searchSimilarity(String storeId, int limit) {
+        log.debug("Searching similarity by storeId: " + storeId);
+        boolean textEnabled = true;
+        boolean imageEnabled = true;
+        boolean propertiesEnabled = true;
         Map<String, Double> docIdScoreMap = new HashMap<>();
         String requestBody = String.format(
                 "{\n" +
-                        "  \"limit\": %s,\n" +
-                        "  \"offset\": 0,\n" +
-                        "  \"query\": {\n" +
-                        "    \"similarTo\": \"%s\",\n" +
-                        "    \"vector\": {\n" +
-                        "      \"objectId\": \"%s\",\n" +
-                        "      \"type\": \"%s\"\n" +
-                        "    }\n" +
-                        "  }\n" +
-                        "}", limit, storeId, storeId, type);
+                "  \"limit\": %s,\n" +
+                "  \"offset\": 0,\n" +
+                "  \"query\": {\n" +
+                "    \"vector\": {\n" +
+                "      \"objectId\": \"%s\",\n" +
+                "      \"config\": {\n" +
+                "        \"text\": %b,\n" +
+                "        \"image\": %b,\n" +
+                "        \"properties\": %b\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}", limit, storeId, textEnabled, imageEnabled, propertiesEnabled);
         try {
             String response = postRequest(getBearerToken(), getSetting(UPLOAD_API_URL) + "/api/v1/objects/search", requestBody, false);
-            objectMapper.readTree(response).forEach(obj -> {
+            objectMapper.readTree(response).get("results").forEach(obj -> {
                 String id = obj.get("id").asText();
                 double score = obj.get("score").asDouble();
                 docIdScoreMap.put(id, score);
