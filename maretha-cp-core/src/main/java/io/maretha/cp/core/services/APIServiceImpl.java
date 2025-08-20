@@ -313,7 +313,7 @@ public class APIServiceImpl implements APIService {
                 "        \"properties\": %b\n" +
                 "      }\n" +
                 "    },\n" +
-                "    \"fullText\": \"%s\"\n" +
+                "    \"full_text\": \"%s\"\n" +
                 "  }\n" +
                 "}",
                 limit, textQuery, textEnabled, imageEnabled, propertiesEnabled, textQuery
