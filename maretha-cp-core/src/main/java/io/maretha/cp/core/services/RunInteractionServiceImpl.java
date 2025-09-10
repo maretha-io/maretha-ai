@@ -12,19 +12,18 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.nuxeo.ecm.automation.AutomationService;
+import org.nuxeo.ecm.automation.OperationContext;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
+import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
-import org.nuxeo.ecm.directory.Directory;
-import org.nuxeo.ecm.directory.Session;
-import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
 import org.nuxeo.runtime.api.Framework;
 
@@ -121,6 +120,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         String callbackNotifyUrl = getCallbackNotifyUrl(savedSettings, doc, interactionId, saveMetadataModeOverride);
         String interactionEndpoint = interaction.getEndpoint();
         String resultSchema = getResultSchema(schemaFields);
+        String taskQueue = savedSettings.getVertesiaSettings().getOrDefault("taskQueue", "");
         String response;
 
         Map<String, Object> schemaFieldsMap = getSchemaFieldsMap(schemaFields);
@@ -138,7 +138,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
 
         if (asyncMode) {
-            response = Framework.getService(APIService.class).getInteractionResultWithResultSchemaAsync(interactionEndpoint, paramsData, resultSchema, callbackNotifyUrl);
+            response = Framework.getService(APIService.class).getInteractionResultWithResultSchemaAsync(interactionEndpoint, paramsData, resultSchema, callbackNotifyUrl, taskQueue);
         } else {
             response = Framework.getService(APIService.class).getInteractionResultWithResultSchema(interactionId, paramsData, resultSchema, false);
             try {
@@ -293,7 +293,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session, boolean waitForCompletion) {
+    public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session, boolean waitForCompletion, boolean lowPriority) {
         log.debug("Uploading file for documentId: " + doc.getId());
         String storeId = null;
         Blob blob = getBlob(doc);
@@ -311,9 +311,9 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             logAIAudit(session, doc, "", "Sending blob/rendition for AI processing.");
             if (settings.isAwsS3AccessEnabled()) {
                 String s3Path = getS3Path(blob);
-                storeId = Framework.getService(APIService.class).uploadS3FileToStore(blob, s3Path, fileTypeId);
+                storeId = Framework.getService(APIService.class).uploadS3FileToStore(blob, s3Path, fileTypeId, lowPriority);
             } else {
-                storeId = Framework.getService(APIService.class).uploadFileToStore(blob, fileTypeId);
+                storeId = Framework.getService(APIService.class).uploadFileToStore(blob, fileTypeId , lowPriority);
             }
             doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
             doc.setPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH, blob.getDigest());
@@ -395,7 +395,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                         value = List.of("store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
                 } else if (StringUtils.isNotEmpty(selectedDocumentId)) {
                     DocumentModel selectedDocument = doc.getCoreSession().getDocument(new IdRef(selectedDocumentId));
-                    selectedDocument = uploadFileAndSetStoreId(selectedDocument, session, true);
+                    selectedDocument = uploadFileAndSetStoreId(selectedDocument, session, true, true);
                     value = "store:" + selectedDocument.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
                 } else {
                     value = "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
@@ -451,7 +451,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             return selectedDocumentIds
                     .stream()
                     .map(docId -> coreSession.getDocument(new IdRef(docId)))
-                    .map(doc -> uploadFileAndSetStoreId(doc, coreSession, false))
+                    .map(doc -> uploadFileAndSetStoreId(doc, coreSession, false, true))
                     .map(docWithStoreId -> "store:" + docWithStoreId.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
                     .collect(Collectors.toList());
         }
@@ -469,34 +469,41 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return mimeType != null && mimeType.startsWith("image/");
     }
 
-    private Map<String, String> getDictionaryValues(String directoryName) {
+    private Map<String, String> getDictionaryValues(CoreSession session, DocumentModel doc, String directoryName) {
         Map<String, String> dictionaryMap = new HashMap<>();
         try {
-            DirectoryService directoryService = Framework.getService(DirectoryService.class);
-            Directory directory = directoryService.getDirectory(directoryName);
-            if (directory == null) {
-                log.warn(String.format("Directory '{%s}' not found, returning empty dictionary.", directoryName));
-                return dictionaryMap; // Return empty map safely
+            Map<String, Serializable> params = new HashMap<>();
+            params.put("directoryName", directoryName);
+            try {
+                Property prodlineProp = doc.getProperty("licensing:product_line");
+                if (prodlineProp != null && prodlineProp.getValue() != null) {
+                    String prodlineId = prodlineProp.getValue().toString();
+                    params.put("prodline", prodlineId);
+                }
+            } catch (PropertyNotFoundException propertyNotFoundException) {
+                //ignore
             }
-            try (Session session = Framework.getService(DirectoryService.class).open(directoryName)) {
-                DocumentModelList entries = session.query(Map.of());
-                entries.forEach(entry -> {
-                    String id = entry.getId();
-                    try {
-                        Property property = entry.getProperty("obsolete");
-                        if (property != null) {
-                            long isObsolete = (long) property.getValue();
-                            if (isObsolete > 0) {
-                                log.debug("Skipping obsolete directory value: " + directoryName + ":" + id);
-                                return;
-                            }
-                        }
-                        String label = (String) (entry.getProperty("label")).getValue();
-                        dictionaryMap.put(id, label);
-                    } catch (Exception e) {
-                        log.error("Failed to get directory: " + directoryName + ":" + id, e);
-                    }
-                });
+            OperationContext ctx = new OperationContext(session);
+            Blob directoriesJsonBlob = (Blob) Framework.getService(AutomationService.class).run(ctx, "Directory.SuggestEntries", params);
+
+            if (directoriesJsonBlob == null) {
+                log.warn("No suggestions returned for directory: " + directoryName);
+                return dictionaryMap;
+            }
+
+            // Parse JSON as tree
+            String json = directoriesJsonBlob.getString();
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(json);
+
+            // Iterate array
+            for (JsonNode node : root) {
+                boolean isObsolete = node.has("obsolete") &&
+                        (node.get("obsolete").asLong(0) > 0 || node.get("obsolete").asBoolean(false));
+
+                if (!isObsolete && node.hasNonNull("id") && node.hasNonNull("label")) {
+                    dictionaryMap.put(node.get("id").asText(), node.get("label").asText());
+                }
             }
         } catch (Exception e) {
             log.error("Failed to get directory: " + directoryName, e);
@@ -522,7 +529,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                         .filter(field -> (field.isInIsolation() == inIsolation))
                         .map(schemaField -> {
                             if (StringUtils.isNotEmpty(schemaField.getDirectoryName())) {
-                                Map<String, String> dictionaryValues = getDictionaryValues(schemaField.getDirectoryName());
+                                Map<String, String> dictionaryValues = getDictionaryValues(session, doc, schemaField.getDirectoryName());
                                 schemaField.setDirectoryValues(dictionaryValues);
                             }
                             return schemaField;

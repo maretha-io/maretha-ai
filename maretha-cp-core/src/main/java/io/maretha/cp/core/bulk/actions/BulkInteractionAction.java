@@ -70,7 +70,7 @@ public class BulkInteractionAction implements StreamProcessorTopology {
                         document.putContextData(DISABLE_BULK_LISTENER, true);
                         document.putContextData(DISABLE_INTERACTIONS_LISTENER, true);
                         logAIAudit(session, document, commandId, "Processing document");
-                        return runInteractionService.uploadFileAndSetStoreId(document, session, false);
+                        return runInteractionService.uploadFileAndSetStoreId(document, session, false, true);
                     })
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
