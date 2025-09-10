@@ -24,6 +24,7 @@ import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
 import org.nuxeo.runtime.test.runner.RuntimeFeature;
+import org.nuxeo.runtime.test.runner.TransactionalFeature;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -57,6 +58,9 @@ public class RuntInteractionOperationTest {
     @RuntimeService
     APIService apiService;
 
+    @Inject
+    TransactionalFeature txFeature;
+
     ObjectMapper mapper = new ObjectMapper();
 
     @Test
@@ -67,7 +71,7 @@ public class RuntInteractionOperationTest {
         String interactionId = "test-id";
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
-        when(runInteractionService.uploadFileAndSetStoreId(document, session, true)).thenReturn(document);
+        when(runInteractionService.uploadFileAndSetStoreId(document, session, true, false)).thenReturn(document);
         when(runInteractionService.triggerInteraction(document, session, interactionId, new ArrayList<>(), false, false, false)).thenReturn(mockResponse);
 
         //AND the operation is called
@@ -100,7 +104,7 @@ public class RuntInteractionOperationTest {
         String interactionId = "test-id";
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
-        when(runInteractionService.uploadFileAndSetStoreId(any(), any(), anyBoolean())).thenReturn(document);
+        when(runInteractionService.uploadFileAndSetStoreId(any(), any(), anyBoolean(), anyBoolean())).thenReturn(document);
         when(apiService.checkProcessingStatusCompleted(any(), anyBoolean())).thenReturn("completed");
         when(apiService.getInteractionResult(interactionId, new HashMap<>(), false)).thenReturn("test");
 
@@ -121,6 +125,7 @@ public class RuntInteractionOperationTest {
         doc.setPropertyValue(FILE_CONTENT, new StringBlob("Test", "text/plain"));
         doc = session.createDocument(doc);
         session.save();
+        txFeature.nextTransaction();
         return doc;
     }
 }
