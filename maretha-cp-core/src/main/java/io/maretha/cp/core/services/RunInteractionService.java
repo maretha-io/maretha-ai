@@ -10,7 +10,7 @@ import java.util.List;
 public interface RunInteractionService {
     String FILE_CONTENT = "file:content";
 
-    DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session, boolean waitUploadCompletion);
+    DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session, boolean waitUploadCompletion, boolean lowPriority);
 
     String validateProcessStatusCompleted(DocumentModel doc);
 

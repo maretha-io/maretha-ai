@@ -10,13 +10,19 @@ import io.maretha.cp.core.models.Settings;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.nuxeo.directory.test.DirectoryFeature;
+import org.nuxeo.ecm.automation.AutomationService;
+import org.nuxeo.ecm.automation.OperationContext;
+import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.test.AutomationFeature;
+import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.impl.blob.StringBlob;
 import org.nuxeo.ecm.core.test.DefaultRepositoryInit;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
+import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.ecm.platform.audit.AuditFeature;
 import org.nuxeo.ecm.platform.audit.api.AuditLogger;
 import org.nuxeo.ecm.platform.test.PlatformFeature;
@@ -30,6 +36,7 @@ import org.nuxeo.runtime.test.runner.RuntimeFeature;
 import org.nuxeo.runtime.test.runner.TransactionalFeature;
 
 import javax.inject.Inject;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +48,7 @@ import static io.maretha.cp.core.services.RunInteractionService.FILE_CONTENT;
 import static io.maretha.cp.core.services.RunInteractionServiceImpl.CALLBACK_NOTIFY_URL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyObject;
@@ -48,7 +56,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(FeaturesRunner.class)
-@Features({AutomationFeature.class, RuntimeFeature.class, PlatformFeature.class, MockitoFeature.class, AuditFeature.class})
+@Features({AutomationFeature.class, RuntimeFeature.class, PlatformFeature.class, MockitoFeature.class, AuditFeature.class, DirectoryFeature.class})
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 @Deploy("io.maretha.cp.core.maretha-cp-core")
 @Deploy("org.nuxeo.ecm.platform.tag")
@@ -88,11 +96,11 @@ public class RunInteractionServiceImplTest {
 
         Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
 
-        when(apiService.uploadFileToStore(anyObject(), anyString())).thenReturn("vertesia-store-id");
+        when(apiService.uploadFileToStore(anyObject(), anyString(), anyBoolean())).thenReturn("vertesia-store-id");
         when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.uploadFileAndSetStoreId(document, session, false);
+        document = runInteractionService.uploadFileAndSetStoreId(document, session, false, true);
         runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, true, true);
 
         String jsonPayload = "{\n" +
@@ -139,12 +147,12 @@ public class RunInteractionServiceImplTest {
         Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
 
         //WHEN
-        when(apiService.uploadFileToStore(anyObject(), anyString())).thenReturn("vertesia-store-id");
+        when(apiService.uploadFileToStore(anyObject(), anyString(), anyBoolean())).thenReturn("vertesia-store-id");
         when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
-        when(apiService.getInteractionResultWithResultSchemaAsync(anyString(), anyMap(), anyString(), anyString())).thenReturn("apiResponse");
+        when(apiService.getInteractionResultWithResultSchemaAsync(anyString(), anyMap(), anyString(), anyString(), anyString())).thenReturn("apiResponse");
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.uploadFileAndSetStoreId(document, session, false);
+        document = runInteractionService.uploadFileAndSetStoreId(document, session, false, true);
         runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false, true);
 
         String jsonPayload = "{\n" +
@@ -200,12 +208,12 @@ public class RunInteractionServiceImplTest {
                 "}}";
 
         //WHEN
-        when(apiService.uploadFileToStore(anyObject(), anyString())).thenReturn("vertesia-store-id");
+        when(apiService.uploadFileToStore(anyObject(), anyString(), anyBoolean())).thenReturn("vertesia-store-id");
         when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
         when(apiService.getInteractionResultWithResultSchema(anyString(), anyMap(), anyString(), anyBoolean())).thenReturn(mockResponse);
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.uploadFileAndSetStoreId(document, session, false);
+        document = runInteractionService.uploadFileAndSetStoreId(document, session, false, true);
         runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false, false);
 
 
@@ -218,6 +226,20 @@ public class RunInteractionServiceImplTest {
 
         List<Map<String, String>> tags = (List<Map<String, String>>) updatedDoc.getPropertyValue("nxtag:tags");
         assertEquals(List.of(Map.of("label", "tag-1", "username", "system"), Map.of("label", "tag-2", "username", "system")), tags);
+    }
+
+    @Test
+    public void shouldHaveVocabularyFromOperation() throws OperationException {
+        DirectoryService ds = Framework.getService(DirectoryService.class);
+        System.out.println("Known directories: " + String.join(", ", ds.getDirectoryNames()));
+
+        assertTrue(ds.getDirectoryNames().contains("eventTypes"));
+
+        Map<String, Serializable> params = new HashMap<>();
+        params.put("directoryName", "eventTypes");
+        OperationContext ctx = new OperationContext(session);
+        Blob directoriesJsonBlob = (Blob) Framework.getService(AutomationService.class).run(ctx, "Directory.SuggestEntries", params);
+        assertNotNull(directoriesJsonBlob);
     }
 
     private DocumentModel createDocument() {
