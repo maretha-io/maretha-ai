@@ -140,7 +140,7 @@ public class APIServiceImpl implements APIService {
     }
 
     @Override
-    public String getInteractionResultWithResultSchemaAsync(String interaction, Map<String, Object> data, String resultSchema, String notifyEndpoint) {
+    public String getInteractionResultWithResultSchemaAsync(String interaction, Map<String, Object> data, String resultSchema, String notifyEndpoint, String taskQueue) {
         String url = getSetting(API_URL) + "/api/v1/execute/async";
         boolean stream = false;
         String dataParameters = "";
@@ -155,7 +155,8 @@ public class APIServiceImpl implements APIService {
                 "  \"data\": " + dataParameters + ",\n" +
                 "  \"result_schema\": " + resultSchema + ",\n" +
                 "  \"stream\": " + stream + ",\n" +
-                "  \"notify_endpoints\": [\"" + notifyEndpoint + "\"]\n" +
+                "  \"notify_endpoints\": [\"" + notifyEndpoint + "\"],\n" +
+                "  \"task_queue\": \"" + taskQueue + "\"\n" +
                 "}";
         String bearerToken = getBearerToken();
         log.debug("Request: " + url + " data: " + jsonBody + " token:" + bearerToken);
@@ -179,7 +180,7 @@ public class APIServiceImpl implements APIService {
     }
 
     @Override
-    public String uploadFileToStore(Blob file, String fileTypeId) {
+    public String uploadFileToStore(Blob file, String fileTypeId, boolean lowPriority) {
         log.debug(String.format("uploadFileToStore: fileName:[%s], digest:[%s]", file.getFilename(), file.getDigest()));
 
         String bearerToken = getBearerToken();
@@ -221,13 +222,18 @@ public class APIServiceImpl implements APIService {
                 "    }\n" +
                 "}";
 
-        String uploadedResponse = postRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects", bodyJsonObject, true);
+        String lowPriorityTag = "";
+        if (lowPriority) {
+            lowPriorityTag = "?processing_priority=low";
+        }
+
+        String uploadedResponse = postRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects" + lowPriorityTag, bodyJsonObject, true);
         JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
         return uploadedResponseObject.getString("id");
     }
 
     @Override
-    public String uploadS3FileToStore(Blob file, String s3Path, String fileTypeId) {
+    public String uploadS3FileToStore(Blob file, String s3Path, String fileTypeId, boolean lowPriority) {
         String bearerToken = getBearerToken();
 
         String fileType = "";
@@ -245,8 +251,13 @@ public class APIServiceImpl implements APIService {
                 "  }\n" +
                 "}";
 
+        String lowPriorityTag = "";
+        if (lowPriority) {
+            lowPriorityTag = "?processing_priority=low";
+        }
+
         log.debug(String.format("uploadS3FileToStore: fileName:[%s], digest:[%s], body:%s", file.getFilename(), file.getDigest(), bodyJsonObject));
-        String uploadedResponse = postRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects", bodyJsonObject, true);
+        String uploadedResponse = postRequest(bearerToken, getSetting(UPLOAD_API_URL) + "/api/v1/objects" + lowPriorityTag, bodyJsonObject, true);
         JSONObject uploadedResponseObject = new JSONObject(uploadedResponse);
         return uploadedResponseObject.getString("id");
     }
@@ -294,23 +305,33 @@ public class APIServiceImpl implements APIService {
     }
 
     @Override
-    public Map<String, Double> search(String vectorQuery, String type, int limit) {
-        log.debug("Searching by type: " + type + " and query: " + vectorQuery);
+    public Map<String, Double> search(String textQuery, int limit) {
+        log.debug("Searching by query: " + textQuery);
         Map<String, Double> docIdScoreMap = new HashMap<>();
+        boolean textEnabled = true;
+        boolean imageEnabled = true;
+        boolean propertiesEnabled = true;
         String requestBody = String.format(
                 "{\n" +
                         "  \"limit\": %s,\n" +
                         "  \"offset\": 0,\n" +
                         "  \"query\": {\n" +
                         "    \"vector\": {\n" +
-                        "      \"values\": %s,\n" +
-                        "      \"type\": \"%s\"\n" +
-                        "    }\n" +
+                        "      \"text\": \"%s\",\n" +
+                        "      \"config\": {\n" +
+                        "        \"text\": %b,\n" +
+                        "        \"image\": %b,\n" +
+                        "        \"properties\": %b\n" +
+                        "      }\n" +
+                        "    },\n" +
+                        "    \"full_text\": \"%s\"\n" +
                         "  }\n" +
-                        "}", limit, vectorQuery, type);
+                        "}",
+                limit, textQuery, textEnabled, imageEnabled, propertiesEnabled, textQuery
+        );
         try {
             String response = postRequest(getBearerToken(), getSetting(UPLOAD_API_URL) + "/api/v1/objects/search", requestBody, false);
-            objectMapper.readTree(response).forEach(obj -> {
+            objectMapper.readTree(response).get("results").forEach(obj -> {
                 String id = obj.get("id").asText();
                 double score = obj.get("score").asDouble();
                 docIdScoreMap.put(id, score);
@@ -322,24 +343,30 @@ public class APIServiceImpl implements APIService {
     }
 
     @Override
-    public Map<String, Double> searchSimilarity(String storeId, String type, int limit) {
-        log.debug("Searching similarity by type: " + type + " and storeId: " + storeId);
+    public Map<String, Double> searchSimilarity(String storeId, int limit) {
+        log.debug("Searching similarity by storeId: " + storeId);
+        boolean textEnabled = true;
+        boolean imageEnabled = true;
+        boolean propertiesEnabled = true;
         Map<String, Double> docIdScoreMap = new HashMap<>();
         String requestBody = String.format(
                 "{\n" +
                         "  \"limit\": %s,\n" +
                         "  \"offset\": 0,\n" +
                         "  \"query\": {\n" +
-                        "    \"similarTo\": \"%s\",\n" +
                         "    \"vector\": {\n" +
                         "      \"objectId\": \"%s\",\n" +
-                        "      \"type\": \"%s\"\n" +
+                        "      \"config\": {\n" +
+                        "        \"text\": %b,\n" +
+                        "        \"image\": %b,\n" +
+                        "        \"properties\": %b\n" +
+                        "      }\n" +
                         "    }\n" +
                         "  }\n" +
-                        "}", limit, storeId, storeId, type);
+                        "}", limit, storeId, textEnabled, imageEnabled, propertiesEnabled);
         try {
             String response = postRequest(getBearerToken(), getSetting(UPLOAD_API_URL) + "/api/v1/objects/search", requestBody, false);
-            objectMapper.readTree(response).forEach(obj -> {
+            objectMapper.readTree(response).get("results").forEach(obj -> {
                 String id = obj.get("id").asText();
                 double score = obj.get("score").asDouble();
                 docIdScoreMap.put(id, score);

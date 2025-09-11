@@ -53,7 +53,7 @@ public class VertesiaCallback extends ModuleRoot {
 
         log.debug("Received JSON payload: " + jsonPayload.toPrettyString());
 
-        runInteractionService.validateAndSaveMetadata(jsonPayload.get("data"), documentId, Boolean.parseBoolean(metadataOverride));
+        runInteractionService.validateAndSaveMetadata(jsonPayload.get("result"), documentId, Boolean.parseBoolean(metadataOverride));
 
         return Response.ok(documentId).build();
     }

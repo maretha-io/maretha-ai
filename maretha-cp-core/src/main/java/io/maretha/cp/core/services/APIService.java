@@ -13,21 +13,21 @@ public interface APIService {
 
     String getInteractionResultWithResultSchema(String interaction, Map<String, Object> data, String resultSchema, boolean stream);
 
-    String getInteractionResultWithResultSchemaAsync(String interaction, Map<String, Object> data, String resultSchema, String notifyEndpoint);
+    String getInteractionResultWithResultSchemaAsync(String interaction, Map<String, Object> data, String resultSchema, String notifyEndpoint, String taskQueue);
 
     String getBearerToken();
 
-    String uploadFileToStore(Blob file, String fileTypeId);
+    String uploadFileToStore(Blob file, String fileTypeId, boolean lowPriority);
 
-    String uploadS3FileToStore(Blob file, String s3Path, String fileTypeId);
+    String uploadS3FileToStore(Blob file, String s3Path, String fileTypeId, boolean lowPriority);
 
     double[] textToEmbeddings(String text);
 
     double[] getDocumentEmbeddings(String docId, String type);
 
-    Map<String, Double> search(String vectorQuery, String type, int limit);
+    Map<String, Double> search(String vectorQuery, int limit);
 
-    Map<String, Double> searchSimilarity(String storeId, String type, int limit);
+    Map<String, Double> searchSimilarity(String storeId, int limit);
 
     String checkProcessingStatusCompleted(String storeId, boolean withRetry);
 }

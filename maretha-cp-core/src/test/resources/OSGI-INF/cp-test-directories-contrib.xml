@@ -1,14 +1,14 @@
 <component name="io.maretha.cp.directories.contrib">
+    <require>org.nuxeo.runtime.started</require>
     <extension target="org.nuxeo.ecm.directory.GenericDirectory" point="directories">
-
-        <directory name="eventTypes" extends="template-vocabulary">
-            <createTablePolicy>on_missing_columns</createTablePolicy>
+        <directory name="eventTypes" extends="template-directory">
+            <createTablePolicy>always</createTablePolicy>
+            <idField>id</idField>
+            <schema>vocabulary</schema>
             <dataFile>data/schemas/vocabularies/eventtypes.csv</dataFile>
             <types>
                 <type>system</type>
             </types>
         </directory>
-
     </extension>
-
 </component>
