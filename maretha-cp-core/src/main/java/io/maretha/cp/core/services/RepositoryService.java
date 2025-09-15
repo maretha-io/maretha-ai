@@ -37,12 +37,13 @@ public interface RepositoryService {
     String SETTINGS_SCHEMA_AWS_S3_ACCESS = "interactionsettings:awsS3AccessEnabled";
     String SETTINGS_SCHEMA_METADATA = "interactionsettings:schemaSettings";
     String SETTINGS_ELASTICSEARCH = "interactionsettings:esSettings";
-    String SETTINGS_VERTESIA = "interactionsettings:vertesiaSettings";
+    String SETTINGS_AI = "interactionsettings:aiSettings";
     String SETTINGS_EVENTS = "interactionsettings:eventsSettings";
 
     String SCHEMA_ID = "id";
     String SCHEMA_ENDPOINT = "endpoint";
     String SCHEMA_DESCRIPTION = "description";
+    String SCHEMA_PROMPT = "prompt";
     String SCHEMA_NAME = "name";
     String SCHEMA_STATUS = "status";
     String SCHEMA_VERSION = "version";

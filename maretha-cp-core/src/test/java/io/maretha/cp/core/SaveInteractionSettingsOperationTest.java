@@ -30,7 +30,7 @@ import java.util.Map;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AWS_S3_ACCESS_ENABLED;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.ES_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
-import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AI_SETTINGS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -117,11 +117,11 @@ public class SaveInteractionSettingsOperationTest {
         ObjectNode settingsAsJson = mapper.convertValue(vertesoaSettingsMap, ObjectNode.class);
 
         //WHEN
-        ctx.put(VERTESIA_SETTINGS, settingsAsJson);
+        ctx.put(AI_SETTINGS, settingsAsJson);
         Settings settings = (Settings) automationService.run(ctx, SaveInteractionSettingsOperation.ID);
         //THEN
         assertNotNull(settings);
-        Map<String, String> savedSettings = settings.getVertesiaSettings();
+        Map<String, Object> savedSettings = settings.getAiSettings();
         assertNotNull(savedSettings);
         assertEquals("http://test.com", savedSettings.get("vertesia.apiUrl"));
     }

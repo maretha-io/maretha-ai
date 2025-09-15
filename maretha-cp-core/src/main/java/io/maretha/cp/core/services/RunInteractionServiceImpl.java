@@ -120,7 +120,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         String callbackNotifyUrl = getCallbackNotifyUrl(savedSettings, doc, interactionId, saveMetadataModeOverride);
         String interactionEndpoint = interaction.getEndpoint();
         String resultSchema = getResultSchema(schemaFields);
-        String taskQueue = savedSettings.getVertesiaSettings().getOrDefault("taskQueue", "");
+        String taskQueue = (String) savedSettings.getAiSettings().getOrDefault("taskQueue", "");
         String response;
 
         Map<String, Object> schemaFieldsMap = getSchemaFieldsMap(schemaFields);
@@ -307,7 +307,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         if (StringUtils.isEmpty(storeId)) {
             doc.addFacet(RESULTS_FACET);
             Settings settings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
-            String fileTypeId = settings.getVertesiaSettings().getOrDefault("fileTypeId", "");
+            String fileTypeId = (String) settings.getAiSettings().getOrDefault("fileTypeId", "");
             logAIAudit(session, doc, "", "Sending blob/rendition for AI processing.");
             if (settings.isAwsS3AccessEnabled()) {
                 String s3Path = getS3Path(blob);
@@ -694,15 +694,15 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     private int getBucketSize(Settings savedSettings) {
-        String bucketSizeStr = (savedSettings.getVertesiaSettings() != null)
-                ? savedSettings.getVertesiaSettings().getOrDefault("directoryBucketSize", DEFAULT_DIRECTORY_BUCKET_SIZE)
+        String bucketSizeStr = (savedSettings.getAiSettings() != null)
+                ? (String) savedSettings.getAiSettings().getOrDefault("directoryBucketSize", DEFAULT_DIRECTORY_BUCKET_SIZE)
                 : DEFAULT_DIRECTORY_BUCKET_SIZE;
         return Integer.parseInt(bucketSizeStr);
     }
 
     private String getCallbackNotifyUrl(Settings savedSettings, DocumentModel doc, String interactionId, boolean saveMetadataModeOverride) {
-        String settingsCallbackNotifyUrl = (savedSettings.getVertesiaSettings() != null)
-                ? savedSettings.getVertesiaSettings().get(CALLBACK_NOTIFY_URL)
+        String settingsCallbackNotifyUrl = (savedSettings.getAiSettings() != null)
+                ? (String) savedSettings.getAiSettings().get(CALLBACK_NOTIFY_URL)
                 : null;
         if (StringUtils.isEmpty(settingsCallbackNotifyUrl)) {
             throw new NuxeoException("AI Settings - callbackNotifyUrl is empty");

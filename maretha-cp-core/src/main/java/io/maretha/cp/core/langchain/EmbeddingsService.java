@@ -11,7 +11,6 @@ import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingStore;
-import dev.langchain4j.store.embedding.opensearch.OpenSearchEmbeddingStore;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -19,11 +18,12 @@ import java.util.List;
 public class EmbeddingsService {
 
     public void embeddings() throws InterruptedException {
-        EmbeddingStore<TextSegment> embeddingStore = OpenSearchEmbeddingStore.builder()
-                .serverUrl("opensearch.getHttpHostAddress()")
-                .indexName("embeddings")
-//                .openSearchClient("")
-                .build();
+        EmbeddingStore<TextSegment> embeddingStore = null;
+//                OpenSearchEmbeddingStore.builder()
+//                .serverUrl("opensearch.getHttpHostAddress()") //TODO
+//                .indexName("embeddings")
+////                .openSearchClient("")
+//                .build();
 
         EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
 

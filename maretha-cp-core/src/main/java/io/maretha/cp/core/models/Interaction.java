@@ -18,6 +18,7 @@ public class Interaction {
     private String id;
     private String endpoint;
     private String description;
+    private String prompt;
     private String name;
     private String status;
     private String version;

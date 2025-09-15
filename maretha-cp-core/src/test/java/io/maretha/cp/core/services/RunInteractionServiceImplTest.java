@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
-import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AI_SETTINGS;
 import static io.maretha.cp.core.services.RunInteractionService.FILE_CONTENT;
 import static io.maretha.cp.core.services.RunInteractionServiceImpl.CALLBACK_NOTIFY_URL;
 import static org.junit.Assert.assertEquals;
@@ -364,7 +364,7 @@ public class RunInteractionServiceImplTest {
 
 
         //add callbackNotifyUrl
-        configurationMap.put(VERTESIA_SETTINGS, Map.of(CALLBACK_NOTIFY_URL, "callbackNotifyUrl"));
+        configurationMap.put(AI_SETTINGS, Map.of(CALLBACK_NOTIFY_URL, "callbackNotifyUrl"));
         Framework.getService(RepositoryService.class).saveInteractionSettings(session, interactions, configurationMap);
         txFeature.nextTransaction();
 

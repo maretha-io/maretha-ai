@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>maretha-cp-web</artifactId>
-    <name>Maretha CP WEB</name>
+    <name>Maretha AI WEB</name>
     <description>WEB module</description>
 
     <properties>

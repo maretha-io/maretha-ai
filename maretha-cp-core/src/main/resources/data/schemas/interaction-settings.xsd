@@ -12,7 +12,7 @@
     <!--Elasticsearch/OpenSearch query settings-->
     <xs:element name="esSettings" type="xs:string"/>
     <!--Vertesia.io settings-->
-    <xs:element name="vertesiaSettings" type="xs:string"/>
+    <xs:element name="aiSettings" type="xs:string"/>
     <!-- DocType events settings with interactions mapping-->
     <xs:element name="eventsSettings" type="xs:string"/>
 
@@ -35,6 +35,7 @@
             <xs:element name="saveMetadata" type="xs:boolean"/>
             <xs:element name="mainMetadata" type="xs:boolean"/>
             <xs:element name="parameters" type="nxs:interactionParameterList"/>
+            <xs:element name="prompt" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

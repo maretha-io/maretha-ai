@@ -7,7 +7,7 @@
     <version>1.0.23</version>
   </parent>
   <artifactId>maretha-cp-core</artifactId>
-  <name>Maretha CP core</name>
+  <name>Maretha AI core</name>
   <description>Core module</description>
 
   <dependencies>
@@ -50,11 +50,11 @@
       <version>1.4.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>dev.langchain4j</groupId>
-      <artifactId>langchain4j-opensearch</artifactId>
-      <version>1.4.0-beta10</version>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>dev.langchain4j</groupId>-->
+<!--      <artifactId>langchain4j-opensearch</artifactId>-->
+<!--      <version>1.4.0-beta10</version>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>dev.langchain4j</groupId>
