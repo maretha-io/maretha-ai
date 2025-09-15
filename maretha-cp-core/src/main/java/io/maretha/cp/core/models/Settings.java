@@ -19,6 +19,6 @@ public class Settings {
     private boolean awsS3AccessEnabled;
     private Map<String, DocTypeWithSchema.Schema> schemaSettings = new HashMap<>();
     private Map<String, String> esSettings = new HashMap<>();
-    private Map<String, String> vertesiaSettings = new HashMap<>();
+    private Map<String, Object> aiSettings = new HashMap<>();
     private List<EventWithInteraction> eventsSettings = new ArrayList<>();
 }

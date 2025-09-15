@@ -19,7 +19,7 @@ import static io.maretha.cp.core.services.RepositoryService.SETTINGS_ELASTICSEAR
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_EVENTS;
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_SCHEMA_AWS_S3_ACCESS;
 import static io.maretha.cp.core.services.RepositoryService.SETTINGS_SCHEMA_METADATA;
-import static io.maretha.cp.core.services.RepositoryService.SETTINGS_VERTESIA;
+import static io.maretha.cp.core.services.RepositoryService.SETTINGS_AI;
 import static io.maretha.cp.core.services.RepositoryServiceImpl.SETTINGS_DOCUMENT_TYPE;
 import static io.maretha.cp.core.services.RepositoryServiceImpl.SETTINGS_SCHEMA_PATH;
 
@@ -38,11 +38,11 @@ public class SettingsAdapterFactory implements DocumentAdapterFactory {
             });
             Map<String, String> esSettingsMap = getPropertyValue(doc, SETTINGS_ELASTICSEARCH, new TypeReference<>() {
             });
-            Map<String, String> vertesiaSettings = getPropertyValue(doc, SETTINGS_VERTESIA, new TypeReference<>() {
+            Map<String, Object> aiSettings = getPropertyValue(doc, SETTINGS_AI, new TypeReference<>() {
             });
             List<EventWithInteraction> eventsSettings = getPropertyValue(doc, SETTINGS_EVENTS, new TypeReference<>() {
             });
-            return new Settings(cpInteractions, awsS3AccessEnabled, schemaSettingsMap, esSettingsMap, vertesiaSettings, eventsSettings);
+            return new Settings(cpInteractions, awsS3AccessEnabled, schemaSettingsMap, esSettingsMap, aiSettings, eventsSettings);
         }
         return null;
     }

@@ -1,7 +1,6 @@
 <link rel="import" href="./cp-settings-interactions.html">
 <link rel="import" href="./cp-settings-metadata.html">
-<link rel="import" href="./cp-settings-elasticsearch.html">
-<link rel="import" href="./cp-settings-vertesia.html">
+<link rel="import" href="./cp-settings-ai.html">
 <link rel="import" href="./cp-settings-events.html">
 
 <dom-module id="cp-settings">
@@ -130,9 +129,9 @@
 									events-settings="[[ eventsSettings ]]">
 				</cp-settings-events>
 
-				<cp-settings-vertesia name="settings" vertesia-settings="[[ vertesiaSettings ]]" es-settings="[[ esSettings ]]"
+				<cp-settings-ai name="settings" ai-settings="[[ aiSettings ]]" es-settings="[[ esSettings ]]"
 									  aws-s3-access-enabled="[[ awsS3AccessEnabled ]]">
-				</cp-settings-vertesia>
+				</cp-settings-ai>
 			</iron-pages>
 
 			<div class="loading-overlay" hidden$="[[ !_loading ]]">
@@ -167,7 +166,7 @@
 					type: Array,
 					value: []
 				},
-				vertesiaSettings: {
+				aiSettings: {
 					type: Object,
 					value: {}
 				},
@@ -213,15 +212,15 @@
 				return operation.execute()
 					.then((response) =>
 					{
-						const { interactions, eventsSettings, vertesiaSettings, awsS3AccessEnabled, esSettings } = response.value || {};
+						const { interactions, eventsSettings, aiSettings, awsS3AccessEnabled, esSettings } = response.value || {};
 						if (interactions != null) {
 							this.set('interactions', interactions);
 						}
 						if (eventsSettings != null) {
 							this.set('eventsSettings', eventsSettings);
 						}
-						if (vertesiaSettings != null) {
-							this.set('vertesiaSettings', vertesiaSettings);
+						if (aiSettings != null) {
+							this.set('aiSettings', aiSettings);
 						}
 						if (esSettings != null) {
 							this.set('esSettings', esSettings);
@@ -343,8 +342,8 @@
 				if (e.detail.eventsSettings)
 					this._saveChangesParams.eventsSettings = e.detail.eventsSettings;
 
-				if (e.detail.vertesiaSettings)
-					this._saveChangesParams.vertesiaSettings = e.detail.vertesiaSettings;
+				if (e.detail.aiSettings)
+					this._saveChangesParams.aiSettings = e.detail.aiSettings;
 
 				if (e.detail.esSettings)
 					this._saveChangesParams.esSettings = e.detail.esSettings;

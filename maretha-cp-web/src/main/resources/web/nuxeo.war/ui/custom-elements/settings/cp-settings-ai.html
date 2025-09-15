@@ -1,0 +1,193 @@
+<dom-module id="cp-settings-ai">
+	<template>
+		<style include="nuxeo-styles">
+			.content {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			paper-toggle-button {
+				cursor: pointer;
+			}
+		</style>
+
+		<div id="main slot">
+
+			<nuxeo-card heading="AI settings">
+				<div class="content">
+
+					<table class="ai-table">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Token</th>
+							<th>Model</th>
+							<th></th>
+						</tr>
+						</thead>
+						<tbody>
+						<template is="dom-repeat" items="{{aiSettings.providers}}" as="provider" index-as="index">
+							<tr>
+								<td>
+									<nuxeo-input
+											value="{{provider.name::input}}"
+											label="Name"
+											type="text"
+											no-label-float
+											on-input="_markAsDirty">
+									</nuxeo-input>
+								</td>
+								<td>
+									<nuxeo-input
+											value="{{provider.token::input}}"
+											label="Token"
+											type="password"
+											no-label-float
+											on-input="_markAsDirty">
+									</nuxeo-input>
+								</td>
+								<td>
+									<nuxeo-input
+											value="{{provider.model::input}}"
+											label="Model"
+											type="text"
+											no-label-float
+											on-input="_markAsDirty">
+									</nuxeo-input>
+								</td>
+								<td>
+									<paper-icon-button
+											icon="icons:delete"
+											on-tap="_removeProvider"
+											data-index$="[[index]]">
+									</paper-icon-button>
+								</td>
+							</tr>
+						</template>
+						</tbody>
+					</table>
+
+					<paper-button noink class="primary" on-tap="_addProvider">
+						Add Provider
+					</paper-button>
+
+					<nuxeo-input role="widget" value="{{aiSettings.apiUrl}}" label="apiUrl" type="text"
+						on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{aiSettings.uploadUrl}}" label="uploadUrl" type="text"
+						on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{aiSettings.authToken}}" label="authToken" type="text"
+						on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{aiSettings.projectId}}" label="projectId" type="text"
+						on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{aiSettings.environmentId}}" label="environmentId"
+						type="text" on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{aiSettings.embeddingModel}}" label="embeddingModel"
+						type="text" on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{aiSettings.mimeTypes}}" label="mimeTypes" type="text"
+						on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{aiSettings.directoryBucketSize}}" label="directoryBucketSize" type="number"
+								 min="0"
+								 step="10"
+								 on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{aiSettings.callbackNotifyUrl}}" label="callbackNotifyUrl" type="text"
+								 on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{aiSettings.fileTypeId}}" label="fileTypeId" type="text"
+								 on-input="_markAsDirty">
+					</nuxeo-input>
+
+					<nuxeo-input role="widget" value="{{aiSettings.taskQueue}}" label="taskQueue" type="text"
+								 on-input="_markAsDirty">
+					</nuxeo-input>
+				</div>
+			</nuxeo-card>
+
+			<nuxeo-card>
+				<h3>Elasticsearch Query Settings</h3>
+				<paper-toast id="toast"></paper-toast>
+
+				<div class="content">
+
+					<nuxeo-input role="widget" value="{{esSettings.BOOST}}"
+								 label="BOOST" type="text"
+								 placeholder="" on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.TEXT_WEIGHT}}"
+								 label="TEXT_WEIGHT" type="text"
+								 placeholder=""  on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.IMAGE_WEIGHT}}"
+								 label="IMAGE_WEIGHT" type="text"
+								 placeholder=""  on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.SCORE_MODE}}"
+								 label="SCORE_MODE" type="text"
+								 placeholder=""  on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.BOOST_MODE}}"
+								 label="BOOST_MODE" type="text"
+								 placeholder="" on-change="_markAsDirty"></nuxeo-input>
+
+				</div>
+			</nuxeo-card>
+		</div>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'cp-settings-ai',
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+			properties: {
+				aiSettings: {
+					type: Object,
+					value: {}
+				},
+
+				esSettings: {
+					type: Object,
+					value: {}
+				},
+
+				awsS3AccessEnabled: Boolean
+			},
+
+			_saveAws()
+			{
+				this.fire('mark-as-dirty', { awsS3AccessEnabled: this.awsS3AccessEnabled });
+			},
+
+			_markAsDirty()
+			{
+				this.fire('mark-as-dirty', { aiSettings: this.aiSettings, esSettings: this.esSettings });
+			},
+
+			_addProvider() {
+			  if (!this.aiSettings.providers) {
+				this.set('aiSettings.providers', []);
+			  }
+			  this.push('aiSettings.providers', { name: '', token: '', model: '' });
+			  this._markAsDirty();
+			},
+
+			_removeProvider(e) {
+			  const index = e.model.index;
+			  this.splice('aiSettings.providers', index, 1);
+			  this._markAsDirty();
+			}
+		});
+	</script>
+</dom-module>

@@ -7,9 +7,9 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>church-maretha-cp-package</artifactId>
+  <artifactId>maretha-ai-package</artifactId>
   <packaging>zip</packaging>
-  <name>Maretha CP package</name>
+  <name>Maretha AI package</name>
 
   <dependencies>
     <!-- Base distribution(s) for the MP -->

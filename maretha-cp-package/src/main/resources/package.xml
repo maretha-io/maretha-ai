@@ -1,11 +1,11 @@
 <!-- See documentation at http://doc.nuxeo.com/x/HgIz -->
-<package type="addon" name="church-maretha-cp" version="@VERSION@">
-  <title>Vertesia - Nuxeo Addon</title>
+<package type="addon" name="maretha-ai" version="@VERSION@">
+  <title>AI - Nuxeo Addon</title>
   <description>
-    <p>Vertesia AI interactions integrated in Nuxeo.</p>
+    <p>AI interactions integrated in Nuxeo.</p>
   </description>
   <!-- <home-page>http://doc.nuxeo.com/</home-page> -->
-  <vendor>Maretha.io + Vertesia.io</vendor>
+  <vendor>Maretha.io</vendor>
   <installer restart="true" />
   <uninstaller restart="true" />
   <!-- <hotreload-support>false</hotreload-support> -->

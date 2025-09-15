@@ -1,5 +1,5 @@
-church-maretha-cp.target=.
-nuxeo.template.includes=common,mongodb,church-maretha-cp
+maretha-ai.target=.
+nuxeo.template.includes=common,mongodb,maretha-ai
 
 cp.upload.action.bucketSize=1
 cp.upload.action.batchSize=1

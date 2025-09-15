@@ -39,7 +39,7 @@ import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AWS
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.ES_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.EVENTS_SETTINGS;
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
-import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.VERTESIA_SETTINGS;
+import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AI_SETTINGS;
 import static io.maretha.cp.core.services.APIServiceImpl.AUTH_TOKEN;
 import static io.maretha.cp.core.services.APIServiceImpl.VERTESIA_SETTINGS_KV;
 import static io.maretha.cp.core.services.APIServiceImpl.VERTESIA_SETTINGS_TTL;
@@ -54,7 +54,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         KeyValueStore kvStore = Framework.getService(KeyValueService.class).getKeyValueStore(VERTESIA_SETTINGS_KV);
         if (withCache) {
             try {
-                String vertesiaSettings = kvStore.getString(VERTESIA_SETTINGS);
+                String vertesiaSettings = kvStore.getString(AI_SETTINGS);
                 if (StringUtils.isNotEmpty(vertesiaSettings)) {
                     return objectMapper.readValue(vertesiaSettings, Settings.class);
                 }
@@ -70,7 +70,7 @@ public class RepositoryServiceImpl implements RepositoryService {
             DocumentModel documentModel = existingSettingsDocument.get();
             Settings settings = documentModel.getAdapter(Settings.class);
             try {
-                kvStore.put(VERTESIA_SETTINGS, objectMapper.writeValueAsString(settings), VERTESIA_SETTINGS_TTL);
+                kvStore.put(AI_SETTINGS, objectMapper.writeValueAsString(settings), VERTESIA_SETTINGS_TTL);
             } catch (Exception e) {
                 log.error("Failed to save VertesiaSettings in cache", e);
             }
@@ -162,9 +162,9 @@ public class RepositoryServiceImpl implements RepositoryService {
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, String> vertesiaSettings = (Map<String, String>) configuration.get(SaveInteractionSettingsOperation.VERTESIA_SETTINGS);
+        Map<String, Object> vertesiaSettings = (Map<String, Object>) configuration.get(SaveInteractionSettingsOperation.AI_SETTINGS);
         if (!Objects.isNull(vertesiaSettings)) {
-            updateVertesiaSettings(vertesiaSettings, cpSettingsDoc);
+            updateAISettings(vertesiaSettings, cpSettingsDoc);
         }
 
         @SuppressWarnings("unchecked")
@@ -177,7 +177,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 
         try {
             KeyValueStore kvStore = Framework.getService(KeyValueService.class).getKeyValueStore(VERTESIA_SETTINGS_KV);
-            kvStore.put(VERTESIA_SETTINGS, objectMapper.writeValueAsString(settings), VERTESIA_SETTINGS_TTL);
+            kvStore.put(AI_SETTINGS, objectMapper.writeValueAsString(settings), VERTESIA_SETTINGS_TTL);
             kvStore.put(AUTH_TOKEN, ""); //reset token
         } catch (Exception e) {
             log.error("Failed to save VertesiaSettings in cache", e);
@@ -185,10 +185,10 @@ public class RepositoryServiceImpl implements RepositoryService {
         return settings;
     }
 
-    private void updateVertesiaSettings(Map<String, String> settings, DocumentModel cpSettingsDoc) {
+    private void updateAISettings(Map<String, Object> settings, DocumentModel cpSettingsDoc) {
         try {
             String jsonString = objectMapper.writeValueAsString(settings);
-            cpSettingsDoc.setPropertyValue(SETTINGS_VERTESIA, jsonString);
+            cpSettingsDoc.setPropertyValue(SETTINGS_AI, jsonString);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -288,9 +288,9 @@ public class RepositoryServiceImpl implements RepositoryService {
         }
         Settings settings = getSavedSettings(null, true);
         String nameWithoutPrefix = name.replace("vertesia.", "");
-        String savedProperty = settings.getVertesiaSettings().get(nameWithoutPrefix);
-        if (StringUtils.isNotEmpty(savedProperty)) {
-            return savedProperty;
+        Object savedProperty = settings.getAiSettings().get(nameWithoutPrefix);
+        if (Objects.isNull(savedProperty)) {
+            return (String) savedProperty;
         }
         if (StringUtils.isNotEmpty(defaultValue)) {
             return defaultValue;
@@ -345,6 +345,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         interactionMap.put(SCHEMA_ID, interaction.getId());
         interactionMap.put(SCHEMA_ENDPOINT, interaction.getEndpoint());
         interactionMap.put(SCHEMA_DESCRIPTION, interaction.getDescription());
+        interactionMap.put(SCHEMA_PROMPT, interaction.getPrompt());
         interactionMap.put(SCHEMA_NAME, interaction.getName());
         interactionMap.put(SCHEMA_STATUS, interaction.getStatus());
         interactionMap.put(SCHEMA_VERSION, interaction.getVersion());
