@@ -1,21 +1,17 @@
 package io.maretha.cp.core.langchain;
 
-import dev.langchain4j.model.chat.StreamingChatModel;
-import dev.langchain4j.model.chat.response.ChatResponse;
+import com.amazonaws.SdkClientException;
 import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
-import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
-import dev.langchain4j.service.AiServices;
-import dev.langchain4j.service.TokenStream;
+import org.json.JSONObject;
+import org.json.JSONPointer;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static dev.langchain4j.model.openai.OpenAiChatModelName.GPT_4_O_MINI;
 
 public class InteractionService {
     public String promptToText() {
@@ -32,29 +28,65 @@ public class InteractionService {
         return text;
     }
 
-    interface Assistant {
-        TokenStream chat(String message);
-    }
+    public static String invokeModel() {
 
-    public String interactWithAi() throws ExecutionException, InterruptedException, TimeoutException {
-        StreamingChatModel model = OpenAiStreamingChatModel.builder()
-//                .apiKey(ApiKeys.OPENAI_API_KEY)//TODO
-                .modelName(GPT_4_O_MINI)
+        // Create a Bedrock Runtime client in the AWS Region you want to use.
+        // Replace the DefaultCredentialsProvider with your preferred credentials provider.
+        var client = BedrockRuntimeClient.builder()
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .region(Region.US_EAST_1)
                 .build();
 
-        Assistant assistant = AiServices.create(Assistant.class, model);
+        // Set the model ID, e.g., Command Light.
+        var modelId = "cohere.command-light-text-v14";
 
-        TokenStream tokenStream = assistant.chat("Tell me a joke");
+        // The InvokeModel API uses the model's native payload.
+        // Learn more about the available inference parameters and response fields at:
+        // https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-cohere-command.html
+        var nativeRequestTemplate = "{ \"prompt\": \"{{prompt}}\" }";
 
-        CompletableFuture<ChatResponse> futureResponse = new CompletableFuture<>();
+        // Define the prompt for the model.
+        var prompt = "Describe the purpose of a 'hello world' program in one line.";
 
-        tokenStream.onPartialResponse(System.out::print)
-                .onCompleteResponse(futureResponse::complete)
-                .onError(futureResponse::completeExceptionally)
-                .start();
+        // Embed the prompt in the model's native request payload.
+        String nativeRequest = nativeRequestTemplate.replace("{{prompt}}", prompt);
 
-        ChatResponse chatResponse = futureResponse.get(30, TimeUnit.SECONDS);
-        System.out.println("\n" + chatResponse);
-        return chatResponse.aiMessage().text();
+        // Build JSON request payload
+        String requestBody = """
+        {
+          "message": "Describe the purpose of a 'hello world' program in one line.",
+          "response_format": {
+            "type": "json",
+            "json_schema": {
+              "type": "object",
+              "properties": {
+                "explanation": { "type": "string" }
+              },
+              "required": ["explanation"]
+            }
+          }
+        }
+        """;
+
+        try {
+            // Encode and send the request to the Bedrock Runtime.
+            var response = client.invokeModel(request -> request
+                    .body(SdkBytes.fromUtf8String(nativeRequest))
+                    .modelId(modelId)
+            );
+
+            // Decode the response body.
+            var responseBody = new JSONObject(response.body().asUtf8String());
+
+            // Retrieve the generated text from the model's response.
+            var text = new JSONPointer("/generations/0/text").queryFrom(responseBody).toString();
+            System.out.println(text);
+
+            return text;
+
+        } catch (SdkClientException e) {
+            System.err.printf("ERROR: Can't invoke '%s'. Reason: %s", modelId, e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }
