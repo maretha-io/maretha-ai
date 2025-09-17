@@ -130,6 +130,14 @@
 									   placeholder="Select one or more document type this interaction should be active for"></nuxeo-selectivity>
 				</nuxeo-card>
 
+				<nuxeo-card role="widget" class="nuxeo-card" heading="AI Model">
+					<nuxeo-selectivity class="selectivity-container" min-chars="0" data="[[modelChoices]]"
+									   value="{{interaction.model}}" required data-ix$="[[ ix ]]"
+									   on-value-changed="_activeDocumentsChanged" stay-open-on-select
+									   label="AI model"
+									   placeholder="Select the AI model"></nuxeo-selectivity>
+				</nuxeo-card>
+
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Settings">
 					<div class="config">
 						<paper-toggle-button checked="{{interaction.active}}" on-change="_markAsDirty">
@@ -346,6 +354,15 @@
 					value: [],
 					notify: true
 				},
+				aiSettings: {
+					type: Array,
+					value: [],
+					notify: true
+				},
+				modelChoices: {
+				  type: Array,
+				  computed: "_computeModelChoices(aiSettings.providers)"
+				},
 				changesSaved: {
 					type: Boolean,
 					value: true
@@ -369,7 +386,7 @@
 			{
 				console.log('_selectedItemsChanged', e);
 			},
-			
+
 			_setSelectedParameterIndex(e)
 			{
 				this.set('_selectedInteractionIndex', e.target.dataset.ix);
@@ -441,6 +458,22 @@
 				selectionReadOnly: false,
 			  };
 			  this.push(`interactions.${(e.target.dataset.ix)}.parameters`, newParam);
+			},
+
+			_computeModelChoices(providers) {
+			  if (!providers) {
+				return [];
+			  }
+			return providers.flatMap(p => {
+				const models = Array.isArray(p.models)
+				  ? p.models
+				  : (p.model || "").split(",").map(m => m.trim());
+
+				return models.map(m => ({
+				  id: `${p.name}:${m}`,
+				  text: `${p.name} - ${m}`
+				}));
+			  });
 			}
 
 		})

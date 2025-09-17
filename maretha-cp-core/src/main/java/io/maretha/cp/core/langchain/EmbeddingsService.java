@@ -6,26 +6,104 @@ import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
-import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
+import dev.langchain4j.model.output.Response;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.nuxeo.ecm.core.api.Blob;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.elasticsearch.api.ElasticSearchAdmin;
+import org.nuxeo.runtime.api.Framework;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
+import org.opensearch.action.index.IndexRequest;
+import org.opensearch.common.xcontent.XContentType;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class EmbeddingsService {
 
+    public void textEmbeddings(DocumentModel doc, Blob blob) {
+        // 1. Create a PDF parser
+        ApachePdfBoxDocumentParser pdfParser = new ApachePdfBoxDocumentParser();
+
+        // Parse directly from InputStream
+        Document document = null;
+        try {
+            document = pdfParser.parse(blob.getStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        var splitter = DocumentSplitters.recursive(1000, 100); // ~1000 chars, 100 overlap
+        List<TextSegment> segments = splitter.split(document);
+        BulkRequest bulk = new BulkRequest();
+        EmbeddingModel embeddingModel = null;
+
+        for (TextSegment segment : segments) {
+            Response<Embedding> embedded = embeddingModel.embed(segment);
+            Map<String, Object> jsonMap = Map.of(
+                    "doc_id", doc.getId(),
+                    "title", doc.getTitle(),
+                    "content", segment.text(),
+                    "text_embeddings", embedded.content().vector() // must match your index mapping dimension
+            );
+
+            IndexRequest req = new IndexRequest("embeddings")
+//                    .id("123")
+                    .source(jsonMap, XContentType.JSON);
+            bulk.add(req);
+        }
+
+        ElasticSearchAdmin esService = Framework.getService(ElasticSearchAdmin.class);
+
+        BulkResponse response = esService.getClient().bulk(bulk);
+
+        if (response.hasFailures()) {
+            System.err.println("Bulk had failures: " + response.buildFailureMessage());
+        } else {
+            System.out.println("Bulk indexing succeeded: " + response.getItems().length + " docs");
+        }
+    }
+
+    public void imageEmbeddings(DocumentModel doc, Blob blob) {
+        BulkRequest bulk = new BulkRequest();
+        float[] embeddings = null; //TODO
+        try {
+            byte[] byteArray = blob.getByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Map<String, Object> jsonMap = Map.of(
+                "doc_id", doc.getId(),
+                "title", doc.getTitle(),
+                "content", blob.getDigest(),
+                "image_embeddings", embeddings // must match your index mapping dimension
+        );
+
+        IndexRequest req = new IndexRequest("embeddings")
+//                    .id("123")
+                .source(jsonMap, XContentType.JSON);
+        bulk.add(req);
+        ElasticSearchAdmin esService = Framework.getService(ElasticSearchAdmin.class);
+        BulkResponse response = esService.getClient().bulk(bulk);
+    }
+
     public void embeddings() throws InterruptedException {
+//        OpenSearchClient openSearchClient = Framework.getService(OpenSearchClient.class);
+
         EmbeddingStore<TextSegment> embeddingStore = null;
 //                OpenSearchEmbeddingStore.builder()
 //                .serverUrl("opensearch.getHttpHostAddress()") //TODO
 //                .indexName("embeddings")
-////                .openSearchClient("")
+//                .openSearchClient(openSearchClient.)
 //                .build();
 
-        EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+        EmbeddingModel embeddingModel = null;
 
         TextSegment segment1 = TextSegment.from("I like football.");
         Embedding embedding1 = embeddingModel.embed(segment1).content();
@@ -63,11 +141,7 @@ public class EmbeddingsService {
         System.out.println("First segment: " + segments.get(0).text());
 
         // 3. Create embedding model (OpenAI example)
-        EmbeddingModel embeddingModel = OpenAiEmbeddingModel.builder()
-                .apiKey(System.getenv("OPENAI_API_KEY"))
-                .modelName("text-embedding-3-small") // or "text-embedding-3-large"
-                .build();
-
+        EmbeddingModel embeddingModel = null;
         // 4. In-memory vector store
 //        EmbeddingStore<TextSegment> store = new EmbeddingStoreInMemory<>();
 
@@ -77,4 +151,5 @@ public class EmbeddingsService {
         }
 
     }
+
 }
