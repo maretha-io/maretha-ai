@@ -25,6 +25,7 @@ public class InteractionService {
     public String invokeModel(Interaction interaction, Map<String, Object> paramsData, String resultSchema) {
         var modelId = interaction.getModel();
         var prompt = interaction.getPrompt();
+        //todo add paramsData in prompt
         String requestBody = """
                 {
                   "message": "{{prompt}}",
