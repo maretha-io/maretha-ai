@@ -44,6 +44,7 @@ public interface RepositoryService {
     String SCHEMA_ENDPOINT = "endpoint";
     String SCHEMA_DESCRIPTION = "description";
     String SCHEMA_PROMPT = "prompt";
+    String SCHEMA_RESULT_SCHEMA = "resultSchema";
     String SCHEMA_NAME = "name";
     String SCHEMA_STATUS = "status";
     String SCHEMA_VERSION = "version";
