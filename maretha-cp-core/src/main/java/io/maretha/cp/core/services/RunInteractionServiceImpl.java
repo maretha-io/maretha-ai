@@ -76,7 +76,9 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             triggerSaveMetadataRequest(doc, session, interactionId, saveMetadataModeOverride, paramsMap, asyncMode);
             return "Metadata request in progress.";
         }
-        return Framework.getService(APIService.class).getInteractionResult(interactionId, paramsMap, true);
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+        Interaction interaction = getInteractionById(savedSettings, interactionId);
+        return Framework.getService(InteractionService.class).invokeModel(interaction, paramsMap, interaction.getResultSchema());
     }
 
     private void triggerSaveMetadataRequest(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap, boolean asyncMode) {
