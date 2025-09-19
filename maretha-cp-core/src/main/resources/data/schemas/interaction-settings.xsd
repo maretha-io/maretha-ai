@@ -37,6 +37,7 @@
             <xs:element name="mainMetadata" type="xs:boolean"/>
             <xs:element name="parameters" type="nxs:interactionParameterList"/>
             <xs:element name="prompt" type="xs:string"/>
+            <xs:element name="resultSchema" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

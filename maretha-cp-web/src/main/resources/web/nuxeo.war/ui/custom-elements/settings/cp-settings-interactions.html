@@ -122,6 +122,12 @@
 					</paper-textarea>
 				</nuxeo-card>
 
+				<nuxeo-card role="widget" class="nuxeo-card" heading="Result Schema">
+					<paper-textarea type="text" value="{{interaction.resultSchema}}"
+									on-input="_markAsDirty">
+					</paper-textarea>
+				</nuxeo-card>
+
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Activation">
 					<nuxeo-selectivity class="selectivity-container" multiple min-chars="0" data="{{documentTypes}}"
 									   value="{{interaction.activeOnDocumentTypes}}" required data-ix$="[[ ix ]]"

@@ -1,39 +1,30 @@
 package io.maretha.cp.core.langchain;
 
 import com.amazonaws.SdkClientException;
+import io.maretha.cp.core.models.Interaction;
 import org.json.JSONObject;
 import org.json.JSONPointer;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 
+import java.util.Map;
+
 public class InteractionService {
-    public static String invokeModel() {
+    private final BedrockRuntimeClient client = BedrockRuntimeClient.builder()
+            .credentialsProvider(
+                    StaticCredentialsProvider.create(
+                            AwsBasicCredentials.create("YOUR_ACCESS_KEY", "YOUR_SECRET_KEY")
+                    )
+            )
+            .region(Region.US_EAST_1)
+            .build();
 
-        // Create a Bedrock Runtime client in the AWS Region you want to use.
-        // Replace the DefaultCredentialsProvider with your preferred credentials provider.
-        var client = BedrockRuntimeClient.builder()
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .region(Region.US_EAST_1)
-                .build();
-
-        // Set the model ID, e.g., Command Light.
-        var modelId = "cohere.command-light-text-v14";
-
-        // Define the prompt for the model.
-        var prompt = "Describe the purpose of a 'hello world' program in one line.";
-        var responseSchema = """
-                {
-                "type": "object",
-                "properties": {
-                  "explanation": { "type": "string" }
-                },
-                "required": ["explanation"]
-                }
-                """;
-
-        // Build JSON request payload
+    public String invokeModel(Interaction interaction, Map<String, Object> paramsData, String resultSchema) {
+        var modelId = interaction.getModel();
+        var prompt = interaction.getPrompt();
         String requestBody = """
                 {
                   "message": "{{prompt}}",
@@ -44,7 +35,7 @@ public class InteractionService {
                 }
                 """
                 .replace("{{prompt}}", prompt)
-                .replace("{{responseSchema}}", responseSchema);
+                .replace("{{responseSchema}}", resultSchema);
 
         try {
             // Encode and send the request to the Bedrock Runtime.
@@ -57,13 +48,9 @@ public class InteractionService {
             var responseBody = new JSONObject(response.body().asUtf8String());
 
             // Retrieve the generated text from the model's response.
-            var text = new JSONPointer("/generations/0/text").queryFrom(responseBody).toString();
-            System.out.println(text);
-
-            return text;
+            return new JSONPointer("/generations/0/text").queryFrom(responseBody).toString();
 
         } catch (SdkClientException e) {
-            System.err.printf("ERROR: Can't invoke '%s'. Reason: %s", modelId, e.getMessage());
             throw new RuntimeException(e);
         }
     }

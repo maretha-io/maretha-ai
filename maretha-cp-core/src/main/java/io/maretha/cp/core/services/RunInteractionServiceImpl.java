@@ -2,6 +2,7 @@ package io.maretha.cp.core.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.maretha.cp.core.langchain.InteractionService;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
@@ -117,10 +118,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private void sendInteractionRequest(String interactionId, Map<String, Object> paramsMap, Set<DocTypeWithSchema.Schema.Field> schemaFields, boolean saveMetadataModeOverride, DocumentModel doc, Settings savedSettings, boolean asyncMode) {
         Interaction interaction = getInteractionById(savedSettings, interactionId);
-        String callbackNotifyUrl = getCallbackNotifyUrl(savedSettings, doc, interactionId, saveMetadataModeOverride);
-        String interactionEndpoint = interaction.getEndpoint();
         String resultSchema = getResultSchema(schemaFields);
-        String taskQueue = (String) savedSettings.getAiSettings().getOrDefault("taskQueue", "");
         String response;
 
         Map<String, Object> schemaFieldsMap = getSchemaFieldsMap(schemaFields);
@@ -130,23 +128,17 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             if (schemaField.isInIsolation()) {
                 String customInteractionId = schemaField.getInteractionId();
                 if (StringUtils.isNotEmpty(customInteractionId)) {
-                    interactionEndpoint = getInteractionById(savedSettings, customInteractionId).getEndpoint();
-                    callbackNotifyUrl = getCallbackNotifyUrl(savedSettings, doc, customInteractionId, saveMetadataModeOverride);
-                    interactionId = customInteractionId;
+                    interaction = getInteractionById(savedSettings, customInteractionId);
                 }
             }
         }
 
-        if (asyncMode) {
-            response = Framework.getService(APIService.class).getInteractionResultWithResultSchemaAsync(interactionEndpoint, paramsData, resultSchema, callbackNotifyUrl, taskQueue);
-        } else {
-            response = Framework.getService(APIService.class).getInteractionResultWithResultSchema(interactionId, paramsData, resultSchema, false);
-            try {
-                JsonNode jsonNode = objectMapper.readTree(response);
-                validateAndSaveMetadata(jsonNode, doc.getId(), saveMetadataModeOverride);
-            } catch (Exception e) {
-                throw new NuxeoException("Failed to save metadata for document: " + doc.getId(), e);
-            }
+        response = Framework.getService(InteractionService.class).invokeModel(interaction, paramsData, resultSchema);
+        try {
+            JsonNode jsonNode = objectMapper.readTree(response);
+            validateAndSaveMetadata(jsonNode, doc.getId(), saveMetadataModeOverride);
+        } catch (Exception e) {
+            throw new NuxeoException("Failed to save metadata for document: " + doc.getId(), e);
         }
         log.debug("API Response sendInteractionRequest: " + response);
     }
@@ -313,7 +305,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 String s3Path = getS3Path(blob);
                 storeId = Framework.getService(APIService.class).uploadS3FileToStore(blob, s3Path, fileTypeId, lowPriority);
             } else {
-                storeId = Framework.getService(APIService.class).uploadFileToStore(blob, fileTypeId , lowPriority);
+                storeId = Framework.getService(APIService.class).uploadFileToStore(blob, fileTypeId, lowPriority);
             }
             doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
             doc.setPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH, blob.getDigest());
