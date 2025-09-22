@@ -1,4 +1,4 @@
-package io.maretha.cp.core.langchain;
+package io.maretha.cp.core.services.ai;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;

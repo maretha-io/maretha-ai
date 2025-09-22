@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
-<component name="io.maretha.cp.core.services.APIServiceImpl">
+<component name="io.maretha.cp.core.services.ai.InteractionServiceImpl">
 
   <documentation>
-    Vertesia API Service.
+    AI Service.
   </documentation>
 
-  <implementation class="io.maretha.cp.core.services.APIServiceImpl" />
+  <implementation class="io.maretha.cp.core.services.ai.InteractionServiceImpl" />
 
   <service>
-    <provide interface="io.maretha.cp.core.services.APIService" />
+    <provide interface="io.maretha.cp.core.services.ai.InteractionService" />
   </service>
 </component>

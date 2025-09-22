@@ -36,6 +36,13 @@
       <version>2.33.10</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.apache.tika/tika-core -->
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
+      <version>3.2.3</version>
+    </dependency>
+
     <!-- LangChain4j core -->
     <dependency>
       <groupId>dev.langchain4j</groupId>

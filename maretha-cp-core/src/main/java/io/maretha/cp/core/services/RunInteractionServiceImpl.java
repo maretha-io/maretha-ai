@@ -2,17 +2,18 @@ package io.maretha.cp.core.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.maretha.cp.core.langchain.InteractionService;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
+import io.maretha.cp.core.services.ai.InteractionService;
 import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tika.Tika;
 import org.nuxeo.ecm.automation.AutomationService;
 import org.nuxeo.ecm.automation.OperationContext;
 import org.nuxeo.ecm.core.api.Blob;
@@ -28,9 +29,12 @@ import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
 import org.nuxeo.runtime.api.Framework;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -316,29 +320,29 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             doc = session.saveDocument(doc);
         }
 
-        try {
-            //Retry for uploaded Vertesia document to have status completed
-            if (waitForCompletion) {
-                Framework.getService(APIService.class).checkProcessingStatusCompleted(storeId, true);
-            }
-
-            if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
-                addImageEmbeddings(doc);
-                doc = session.saveDocument(doc);
-            }
-
-            if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
-                addTextEmbeddings(doc);
-                doc = session.saveDocument(doc);
-            }
-
-            if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_PROPERTIES))) {
-                addPropertiesEmbeddings(doc);
-                doc = session.saveDocument(doc);
-            }
-        } catch (Exception e) {
-            log.error("Failed to save document: " + doc.getId(), e);
-        }
+//        try {
+//            //Retry for uploaded Vertesia document to have status completed
+//            if (waitForCompletion) {
+//                Framework.getService(APIService.class).checkProcessingStatusCompleted(storeId, true);
+//            }
+//
+//            if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
+//                addImageEmbeddings(doc);
+//                doc = session.saveDocument(doc);
+//            }
+//
+//            if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
+//                addTextEmbeddings(doc);
+//                doc = session.saveDocument(doc);
+//            }
+//
+//            if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_PROPERTIES))) {
+//                addPropertiesEmbeddings(doc);
+//                doc = session.saveDocument(doc);
+//            }
+//        } catch (Exception e) {
+//            log.error("Failed to save document: " + doc.getId(), e);
+//        }
 
         return doc;
     }
@@ -382,23 +386,21 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             }
             boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
             if (isDocumentOrMediaFormat) {
-                if ("array".equalsIgnoreCase(type)) {
-                    List<String> selectedDocumentsStoreIds = getSelectedDocumentsStoreIds(doc.getCoreSession(), selectedDocumentIds);
-                    value = selectedDocumentsStoreIds;
-                    if (CollectionUtils.isEmpty(selectedDocumentsStoreIds))
-                        value = List.of("store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH));
-                } else if (StringUtils.isNotEmpty(selectedDocumentId)) {
-                    DocumentModel selectedDocument = doc.getCoreSession().getDocument(new IdRef(selectedDocumentId));
-                    selectedDocument = uploadFileAndSetStoreId(selectedDocument, session, true, true);
-                    value = "store:" + selectedDocument.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
-                } else {
-                    value = "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
-                }
-
-                //If not image type leave media empty
                 Blob blob = getBlob(doc);
-                if ("media".equalsIgnoreCase(format) && !isImage(blob)) {
-                    value = null;
+                if (isImage(blob)) {
+                    try {
+                        String base64 = Base64.getEncoder().encodeToString(blob.getByteArray());
+                        value = "data:" + blob.getMimeType() + ";base64," + base64;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    try (InputStream in = blob.getStream()) {
+                        Tika tika = new Tika();
+                        value = tika.parseToString(in);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
             paramsMap.put(name, value);
@@ -438,18 +440,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             }
         });
         return objectMapper.writeValueAsString(valuesMap);
-    }
-
-    private List<String> getSelectedDocumentsStoreIds(CoreSession coreSession, List<String> selectedDocumentIds) {
-        if (CollectionUtils.isNotEmpty(selectedDocumentIds)) {
-            return selectedDocumentIds
-                    .stream()
-                    .map(docId -> coreSession.getDocument(new IdRef(docId)))
-                    .map(doc -> uploadFileAndSetStoreId(doc, coreSession, false, true))
-                    .map(docWithStoreId -> "store:" + docWithStoreId.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH))
-                    .collect(Collectors.toList());
-        }
-        return null;
     }
 
     //source: "s3://composable-bs-test/my-photo.jpg#eu-north-1",
@@ -691,6 +681,9 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         String bucketSizeStr = (savedSettings.getAiSettings() != null)
                 ? (String) savedSettings.getAiSettings().getOrDefault("directoryBucketSize", DEFAULT_DIRECTORY_BUCKET_SIZE)
                 : DEFAULT_DIRECTORY_BUCKET_SIZE;
+        if (StringUtils.isEmpty(bucketSizeStr)) {
+            return Integer.parseInt(DEFAULT_DIRECTORY_BUCKET_SIZE);
+        }
         return Integer.parseInt(bucketSizeStr);
     }
 

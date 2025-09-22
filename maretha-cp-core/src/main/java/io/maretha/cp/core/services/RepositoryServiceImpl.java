@@ -346,6 +346,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         interactionMap.put(SCHEMA_ENDPOINT, interaction.getEndpoint());
         interactionMap.put(SCHEMA_DESCRIPTION, interaction.getDescription());
         interactionMap.put(SCHEMA_PROMPT, interaction.getPrompt());
+        interactionMap.put(SCHEMA_MODEL, interaction.getModel());
         interactionMap.put(SCHEMA_RESULT_SCHEMA, interaction.getResultSchema());
         interactionMap.put(SCHEMA_NAME, interaction.getName());
         interactionMap.put(SCHEMA_STATUS, interaction.getStatus());
