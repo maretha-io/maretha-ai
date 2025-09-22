@@ -66,7 +66,7 @@ public class RuntInteractionOperation {
             return bulkService.submit(command);
         }
 
-        doc = runInteractionService.uploadFileAndSetStoreId(doc, session, true, false);
+//        doc = runInteractionService.uploadFileAndSetStoreId(doc, session, true, false);
         try {
             return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride, false);
         } catch (Exception e) {

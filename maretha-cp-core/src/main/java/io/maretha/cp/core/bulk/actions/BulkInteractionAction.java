@@ -70,7 +70,7 @@ public class BulkInteractionAction implements StreamProcessorTopology {
                         document.putContextData(DISABLE_BULK_LISTENER, true);
                         document.putContextData(DISABLE_INTERACTIONS_LISTENER, true);
                         logAIAudit(session, document, commandId, "Processing document");
-                        return runInteractionService.uploadFileAndSetStoreId(document, session, false, true);
+                        return document;
                     })
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
@@ -85,7 +85,7 @@ public class BulkInteractionAction implements StreamProcessorTopology {
                 doc.putContextData(DISABLE_BULK_LISTENER, true);
                 doc.putContextData(DISABLE_INTERACTIONS_LISTENER, true);
                 logAIAudit(session, doc, commandId, "Triggering AI interaction: " + interactionId);
-                runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride, true);
+                runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride, false);
             });
         }
     }
