@@ -20,7 +20,6 @@ public class Interaction {
     private String description;
     private String model;
     private String prompt;
-    private String resultSchema;
     private String name;
     private String status;
     private String version;

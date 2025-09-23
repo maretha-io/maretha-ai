@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.Interaction;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tika.Tika;
@@ -31,6 +32,7 @@ import software.amazon.awssdk.services.bedrockruntime.model.ToolUseBlock;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +79,7 @@ public class InteractionServiceImpl implements InteractionService {
     public String invokeModel(DocumentModel doc, Interaction interaction, Map<String, Object> paramsData) {
         var modelId = Framework.getProperty("io.maretha.aws.inferenceProfile") + interaction.getModel();
         var prompt = interaction.getPrompt();
+        var objectMapper = new ObjectMapper();
 
         Blob blob = getBlob(doc);
         Message userMsg;
@@ -104,7 +107,7 @@ public class InteractionServiceImpl implements InteractionService {
                 userMsg = Message.builder()
                         .role("user")
                         .content(ContentBlock.fromText(
-                                "Here is the document text:\n\n" + docText
+                                "<NUXEO_DOCUMENT>:\n\n " + docText + " \n\n </NUXEO_DOCUMENT>"
                         ))
                         .build();
             } catch (Exception e) {
@@ -116,11 +119,27 @@ public class InteractionServiceImpl implements InteractionService {
                 .text(prompt)
                 .build();
 
+        List<Message> userMessages = new ArrayList<>();
+        userMessages.add(userMsg);
+
+        if (MapUtils.isNotEmpty(paramsData)) {
+            Message paramsUserMessage = null;
+            try {
+                paramsUserMessage = Message.builder()
+                        .role("user")
+                        .content(ContentBlock.fromText(objectMapper.writeValueAsString(paramsData)))
+                        .build();
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+            userMessages.add(paramsUserMessage);
+        }
+
         ConverseRequest request = ConverseRequest.builder()
                 .modelId(modelId)
                 .inferenceConfig(InferenceConfiguration.builder().build())
                 .system(systemPrompt)
-                .messages(List.of(userMsg))
+                .messages(userMessages)
                 .build();
 
         ConverseResponse response = client.converse(request);
