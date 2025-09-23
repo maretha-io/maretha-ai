@@ -1,25 +1,40 @@
 package io.maretha.cp.core.services.ai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.Interaction;
-import org.json.JSONObject;
-import org.json.JSONPointer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.tika.Tika;
+import org.nuxeo.ecm.core.api.Blob;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.runtime.api.Framework;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.document.Document;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseRequest;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
+import software.amazon.awssdk.services.bedrockruntime.model.ImageBlock;
+import software.amazon.awssdk.services.bedrockruntime.model.InferenceConfiguration;
 import software.amazon.awssdk.services.bedrockruntime.model.Message;
 import software.amazon.awssdk.services.bedrockruntime.model.Tool;
 import software.amazon.awssdk.services.bedrockruntime.model.ToolConfiguration;
 import software.amazon.awssdk.services.bedrockruntime.model.ToolInputSchema;
 import software.amazon.awssdk.services.bedrockruntime.model.ToolSpecification;
+import software.amazon.awssdk.services.bedrockruntime.model.ToolUseBlock;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+
+import static io.maretha.cp.core.services.RunInteractionServiceImpl.getBlob;
+import static io.maretha.cp.core.services.RunInteractionServiceImpl.isImage;
 
 public class InteractionServiceImpl implements InteractionService {
 
@@ -33,13 +48,53 @@ public class InteractionServiceImpl implements InteractionService {
             .region(Region.of(Framework.getProperty("io.maretha.aws.region")))
             .build();
 
-    public String invokeModel(Interaction interaction, Map<String, Object> paramsData, String resultSchema) {
-        var modelId = interaction.getModel();
-        var prompt = interaction.getPrompt();
+    private final Log log = LogFactory.getLog(InteractionServiceImpl.class);
 
+    private static Document toDocument(JsonNode node) {
+        if (node.isObject()) {
+            var mb = Document.mapBuilder();
+            node.fields().forEachRemaining(e -> mb.putDocument(e.getKey(), toDocument(e.getValue())));
+            return mb.build();
+        } else if (node.isArray()) {
+            var lb = Document.listBuilder();
+            node.forEach(child -> lb.addDocument(toDocument(child)));
+            return lb.build();
+        } else if (node.isTextual()) {
+            return Document.fromString(node.textValue());
+        } else if (node.isNumber()) {
+            return Document.fromNumber(node.decimalValue());
+        } else if (node.isBoolean()) {
+            return Document.fromBoolean(node.booleanValue());
+        } else if (node.isNull()) {
+            return Document.fromNull();
+        } else {
+            return Document.fromString(node.asText());
+        }
+    }
+
+    public String invokeModel(DocumentModel doc, Interaction interaction, Map<String, Object> paramsData, String resultSchema) {
+        var modelId = Framework.getProperty("io.maretha.aws.inferenceProfile") + interaction.getModel();
+        var prompt = interaction.getPrompt();
+        prompt = """
+                You must call the "metadata_extractor" tool to return your answer.
+                Extract metadata from the document and populate the tool input according to the schema.
+                Do not answer in plain text — only call the tool.
+                                
+                Populate ALL required fields in the tool's input JSON using the document provided.
+                If a value is unknown, return null for that field, not an empty object.
+                """;
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode resultSchmeaJsonNode = null;
+        try {
+            resultSchmeaJsonNode = mapper.readTree(resultSchema);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         ToolInputSchema inputSchema = ToolInputSchema.builder()
-                .json(Document.fromString(resultSchema))   // pass schema as String
+                .json(toDocument(resultSchmeaJsonNode))   // pass schema as String
                 .build();
 
         ToolSpecification toolSpec = ToolSpecification.builder()
@@ -52,13 +107,50 @@ public class InteractionServiceImpl implements InteractionService {
                 .tools(List.of(Tool.builder().toolSpec(toolSpec).build()))
                 .build();
 
+        Blob blob = getBlob(doc);
+        Message userMsg;
+
+        if (isImage(blob)) {
+            try {
+                SdkBytes imageBytes = SdkBytes.fromByteArray(blob.getByteArray());
+                ImageBlock imageBlock = ImageBlock.builder()
+                        .format("jpeg")               // "jpeg" or "png"
+                        .source(s -> s.bytes(imageBytes))
+                        .build();
+                ContentBlock contentBlock = ContentBlock.fromImage(imageBlock);
+
+                userMsg = Message.builder()
+                        .role("user")
+                        .content(contentBlock)
+                        .build();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try (InputStream in = blob.getStream()) {
+                Tika tika = new Tika();
+                String docText = tika.parseToString(in);
+                userMsg = Message.builder()
+                        .role("user")
+                        .content(ContentBlock.fromText(
+                                "Here is the document text:\n\n" + docText
+                        ))
+                        .build();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        Message system = Message.builder()
+                .role("user")
+                .content(List.of(ContentBlock.fromText(prompt)))
+                .build();
         ConverseRequest request = ConverseRequest.builder()
                 .modelId(modelId)
+                .inferenceConfig(InferenceConfiguration.builder().build())
                 .messages(List.of(
-                        Message.builder()
-                                .role("user")
-                                .content(List.of(ContentBlock.fromText(prompt)))
-                                .build()
+                        system,
+                        userMsg
                 ))
                 .toolConfig(toolConfig)
                 .build();
@@ -66,38 +158,19 @@ public class InteractionServiceImpl implements InteractionService {
         ConverseResponse response = client.converse(request);
 
         try {
-//            ObjectMapper mapper = new ObjectMapper();
-//
-//            // Wrap the pieces into a proper object
-//            var requestMap = new LinkedHashMap<String, Object>();
-//            requestMap.put("message", prompt);
-//            var responseFormat = new LinkedHashMap<String, Object>();
-//            responseFormat.put("type", "json");
-//            responseFormat.put("json_schema", mapper.readTree(resultSchema));
-//            requestMap.put("response_format", responseFormat);
-//
-//            // Convert to compact or pretty JSON
-//            String requestBodyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestMap);
-//
-//            // Encode and send the request to the Bedrock Runtime.
-//            var response = client.invokeModel(request -> request
-//                    .body(SdkBytes.fromUtf8String(requestBodyJson))
-//                    .modelId(modelId)
-//            );
-
-            var toolUse = response.output()
-                    .message()
-                    .content()
-                    .getFirst()
-                    .toolUse();
-
-            var responseBody = new JSONObject(toolUse.input());
-
-            // Decode the response body.
-//            var responseBody = new JSONObject(response.output().message().content().getFirst().text());
-
-            // Retrieve the generated text from the model's response.
-            return new JSONPointer("/output/message/content/0/toolUse/input").queryFrom(responseBody).toString();
+            var contentBlocks = response.output().message().content();
+            for (ContentBlock block : contentBlocks) {
+                if (block.text() != null) {
+                    log.debug("Text: " + block.text());
+                }
+                if (block.toolUse() != null) {
+                    ToolUseBlock toolUse = block.toolUse();
+                    log.debug("Tool name: " + toolUse.name());
+                    log.debug("Tool input JSON: " + toolUse.input());
+                    return toolUse.input().toString();
+                }
+            }
+            return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

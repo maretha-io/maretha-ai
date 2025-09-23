@@ -9,3 +9,4 @@ cp.upload.action.partitions=12
 io.maretha.aws.accessKeyId=
 io.maretha.aws.secretAccessKey=
 io.maretha.aws.region=us-east-1
+io.maretha.aws.inferenceProfile=
