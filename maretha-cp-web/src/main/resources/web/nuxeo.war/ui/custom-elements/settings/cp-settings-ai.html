@@ -17,81 +17,6 @@
 			<nuxeo-card heading="AI settings">
 				<div class="content">
 
-					<table class="ai-table">
-						<thead>
-						<tr>
-							<th>Name</th>
-							<th>Token</th>
-							<th>Model</th>
-							<th></th>
-						</tr>
-						</thead>
-						<tbody>
-						<template is="dom-repeat" items="{{aiSettings.providers}}" as="provider" index-as="index">
-							<tr>
-								<td>
-									<nuxeo-input
-											value="{{provider.name::input}}"
-											label="Name"
-											type="text"
-											no-label-float
-											on-input="_markAsDirty">
-									</nuxeo-input>
-								</td>
-								<td>
-									<nuxeo-input
-											value="{{provider.token::input}}"
-											label="Token"
-											type="password"
-											no-label-float
-											on-input="_markAsDirty">
-									</nuxeo-input>
-								</td>
-								<td>
-									<nuxeo-input
-											value="{{provider.model::input}}"
-											label="Model"
-											type="text"
-											no-label-float
-											on-input="_markAsDirty">
-									</nuxeo-input>
-								</td>
-								<td>
-									<paper-icon-button
-											icon="icons:delete"
-											on-tap="_removeProvider"
-											data-index$="[[index]]">
-									</paper-icon-button>
-								</td>
-							</tr>
-						</template>
-						</tbody>
-					</table>
-
-					<paper-button noink class="primary" on-tap="_addProvider">
-						Add Provider
-					</paper-button>
-
-					<nuxeo-input role="widget" value="{{aiSettings.apiUrl}}" label="apiUrl" type="text"
-						on-input="_markAsDirty">
-					</nuxeo-input>
-
-					<nuxeo-input role="widget" value="{{aiSettings.uploadUrl}}" label="uploadUrl" type="text"
-						on-input="_markAsDirty">
-					</nuxeo-input>
-
-					<nuxeo-input role="widget" value="{{aiSettings.authToken}}" label="authToken" type="text"
-						on-input="_markAsDirty">
-					</nuxeo-input>
-
-					<nuxeo-input role="widget" value="{{aiSettings.projectId}}" label="projectId" type="text"
-						on-input="_markAsDirty">
-					</nuxeo-input>
-
-					<nuxeo-input role="widget" value="{{aiSettings.environmentId}}" label="environmentId"
-						type="text" on-input="_markAsDirty">
-					</nuxeo-input>
-
 					<nuxeo-input role="widget" value="{{aiSettings.embeddingModel}}" label="embeddingModel"
 						type="text" on-input="_markAsDirty">
 					</nuxeo-input>
@@ -106,17 +31,6 @@
 								 on-input="_markAsDirty">
 					</nuxeo-input>
 
-					<nuxeo-input role="widget" value="{{aiSettings.callbackNotifyUrl}}" label="callbackNotifyUrl" type="text"
-								 on-input="_markAsDirty">
-					</nuxeo-input>
-
-					<nuxeo-input role="widget" value="{{aiSettings.fileTypeId}}" label="fileTypeId" type="text"
-								 on-input="_markAsDirty">
-					</nuxeo-input>
-
-					<nuxeo-input role="widget" value="{{aiSettings.taskQueue}}" label="taskQueue" type="text"
-								 on-input="_markAsDirty">
-					</nuxeo-input>
 				</div>
 			</nuxeo-card>
 

@@ -75,15 +75,6 @@ public class InteractionServiceImpl implements InteractionService {
     public String invokeModel(DocumentModel doc, Interaction interaction, Map<String, Object> paramsData, String resultSchema) {
         var modelId = Framework.getProperty("io.maretha.aws.inferenceProfile") + interaction.getModel();
         var prompt = interaction.getPrompt();
-        prompt = """
-                You must call the "metadata_extractor" tool to return your answer.
-                Extract metadata from the document and populate the tool input according to the schema.
-                Do not answer in plain text — only call the tool.
-                                
-                Populate ALL required fields in the tool's input JSON using the document provided.
-                If a value is unknown, return null for that field, not an empty object.
-                """;
-
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode resultSchmeaJsonNode = null;
