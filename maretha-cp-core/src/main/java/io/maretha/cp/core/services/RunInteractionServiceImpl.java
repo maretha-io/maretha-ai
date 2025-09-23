@@ -82,7 +82,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         Interaction interaction = getInteractionById(savedSettings, interactionId);
-        return Framework.getService(InteractionService.class).invokeModel(doc, interaction, paramsMap, interaction.getResultSchema());
+        return Framework.getService(InteractionService.class).invokeModel(doc, interaction, paramsMap);
     }
 
     private void triggerSaveMetadataRequest(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap, boolean asyncMode) {
@@ -116,9 +116,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 .orElseThrow(() -> new NuxeoException(
                         "Interaction with ID '" + interactionId + "' not found."
                 ));
-        if (StringUtils.isEmpty(interactionById.getEndpoint())) {
-            throw new NuxeoException("Interaction '" + interactionId + "' endpoint is empty");
-        }
         return interactionById;
     }
 
@@ -139,7 +136,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             }
         }
 
-        response = Framework.getService(InteractionService.class).invokeModel(doc, interaction, paramsData, resultSchema);
+        response = Framework.getService(InteractionService.class).invokeModelWithSchema(doc, interaction, paramsData, resultSchema);
         try {
             JsonNode jsonNode = objectMapper.readTree(response);
             validateAndSaveMetadata(jsonNode, doc.getId(), saveMetadataModeOverride);

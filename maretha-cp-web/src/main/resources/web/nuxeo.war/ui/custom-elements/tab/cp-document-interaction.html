@@ -311,8 +311,8 @@
 						else
 						{
 							this.interactionContext[index].content = '';
-
-							this._stream(response.value, index);
+							this.interactionContext[index].content = response.value;
+							this.notifyPath(`interactionContext.${index}.content`);
 						}
 					})
 					.catch((error) =>

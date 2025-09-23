@@ -22,6 +22,7 @@ import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
 import software.amazon.awssdk.services.bedrockruntime.model.ImageBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.InferenceConfiguration;
 import software.amazon.awssdk.services.bedrockruntime.model.Message;
+import software.amazon.awssdk.services.bedrockruntime.model.SystemContentBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.Tool;
 import software.amazon.awssdk.services.bedrockruntime.model.ToolConfiguration;
 import software.amazon.awssdk.services.bedrockruntime.model.ToolInputSchema;
@@ -72,7 +73,74 @@ public class InteractionServiceImpl implements InteractionService {
         }
     }
 
-    public String invokeModel(DocumentModel doc, Interaction interaction, Map<String, Object> paramsData, String resultSchema) {
+    @Override
+    public String invokeModel(DocumentModel doc, Interaction interaction, Map<String, Object> paramsData) {
+        var modelId = Framework.getProperty("io.maretha.aws.inferenceProfile") + interaction.getModel();
+        var prompt = interaction.getPrompt();
+
+        Blob blob = getBlob(doc);
+        Message userMsg;
+
+        if (isImage(blob)) {
+            try {
+                SdkBytes imageBytes = SdkBytes.fromByteArray(blob.getByteArray());
+                ImageBlock imageBlock = ImageBlock.builder()
+                        .format("jpeg") // "jpeg" or "png"
+                        .source(s -> s.bytes(imageBytes))
+                        .build();
+                ContentBlock contentBlock = ContentBlock.fromImage(imageBlock);
+
+                userMsg = Message.builder()
+                        .role("user")
+                        .content(contentBlock)
+                        .build();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try (InputStream in = blob.getStream()) {
+                Tika tika = new Tika();
+                String docText = tika.parseToString(in);
+                userMsg = Message.builder()
+                        .role("user")
+                        .content(ContentBlock.fromText(
+                                "Here is the document text:\n\n" + docText
+                        ))
+                        .build();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        SystemContentBlock systemPrompt = SystemContentBlock.builder()
+                .text(prompt)
+                .build();
+
+        ConverseRequest request = ConverseRequest.builder()
+                .modelId(modelId)
+                .inferenceConfig(InferenceConfiguration.builder().build())
+                .system(systemPrompt)
+                .messages(List.of(userMsg))
+                .build();
+
+        ConverseResponse response = client.converse(request);
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            var contentBlocks = response.output().message().content();
+            for (ContentBlock block : contentBlocks) {
+                if (block.text() != null) {
+                    sb.append(block.text()).append("\n");
+                }
+            }
+            return sb.toString().trim();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String invokeModelWithSchema(DocumentModel doc, Interaction interaction, Map<String, Object> paramsData, String resultSchema) {
         var modelId = Framework.getProperty("io.maretha.aws.inferenceProfile") + interaction.getModel();
         var prompt = interaction.getPrompt();
 
@@ -136,13 +204,16 @@ public class InteractionServiceImpl implements InteractionService {
                 .role("user")
                 .content(List.of(ContentBlock.fromText(prompt)))
                 .build();
+
+        SystemContentBlock systemPrompt = SystemContentBlock.builder()
+                .text(prompt)
+                .build();
+
         ConverseRequest request = ConverseRequest.builder()
                 .modelId(modelId)
                 .inferenceConfig(InferenceConfiguration.builder().build())
-                .messages(List.of(
-                        system,
-                        userMsg
-                ))
+                .system(systemPrompt)
+                .messages(List.of(userMsg))
                 .toolConfig(toolConfig)
                 .build();
 
