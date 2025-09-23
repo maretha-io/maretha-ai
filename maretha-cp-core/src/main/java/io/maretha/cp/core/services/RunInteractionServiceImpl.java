@@ -82,7 +82,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         Interaction interaction = getInteractionById(savedSettings, interactionId);
-        return Framework.getService(InteractionService.class).invokeModel(interaction, paramsMap, interaction.getResultSchema());
+        return Framework.getService(InteractionService.class).invokeModel(doc, interaction, paramsMap, interaction.getResultSchema());
     }
 
     private void triggerSaveMetadataRequest(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap, boolean asyncMode) {
@@ -139,7 +139,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             }
         }
 
-        response = Framework.getService(InteractionService.class).invokeModel(interaction, paramsData, resultSchema);
+        response = Framework.getService(InteractionService.class).invokeModel(doc, interaction, paramsData, resultSchema);
         try {
             JsonNode jsonNode = objectMapper.readTree(response);
             validateAndSaveMetadata(jsonNode, doc.getId(), saveMetadataModeOverride);
@@ -163,7 +163,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
             JsonNode resultNode;
             try {
-                resultNode = jsonNode.get("result").get("result");
+                resultNode = jsonNode.get("result");
             } catch (Exception e) {
                 log.error("Missing json result from API Response", e);
                 throw e;
@@ -359,7 +359,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return Framework.getService(APIService.class).checkProcessingStatusCompleted(storeId, false);
     }
 
-    private Blob getBlob(DocumentModel doc) {
+    public static Blob getBlob(DocumentModel doc) {
         if (doc.hasFacet("Picture")) {
             PictureBlobHolder pictureBlobHolder = new PictureBlobHolder(doc, "picture:views/3/content"); //FullHD
             Blob blob = pictureBlobHolder.getBlob();
@@ -448,7 +448,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return cloudStorageFileShare.getS3FilePath((ManagedBlob) blob);
     }
 
-    private boolean isImage(Blob blob) {
+    public static boolean isImage(Blob blob) {
         String mimeType = blob.getMimeType();
         return mimeType != null && mimeType.startsWith("image/");
     }
