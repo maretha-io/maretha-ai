@@ -72,6 +72,21 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return Framework.getService(RepositoryService.class).getSettingsProperty(MIME_TYPES, "text/plain,application/pdf");
     }
 
+    public static Blob getBlob(DocumentModel doc) {
+        if (doc.hasFacet("Picture")) {
+            PictureBlobHolder pictureBlobHolder = new PictureBlobHolder(doc, "picture:views/3/content"); //FullHD
+            Blob blob = pictureBlobHolder.getBlob();
+            if (blob != null && blob.getLength() > 0 && !blob.getFilename().contains("empty_picture"))
+                return blob;
+        }
+        return (Blob) doc.getPropertyValue(FILE_CONTENT);
+    }
+
+    public static boolean isImage(Blob blob) {
+        String mimeType = blob.getMimeType();
+        return mimeType != null && mimeType.startsWith("image/");
+    }
+
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride, boolean asyncMode) {
         logAIAudit(session, doc, "", "Triggering AI Interaction with id: " + interactionId);
@@ -356,16 +371,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return Framework.getService(APIService.class).checkProcessingStatusCompleted(storeId, false);
     }
 
-    public static Blob getBlob(DocumentModel doc) {
-        if (doc.hasFacet("Picture")) {
-            PictureBlobHolder pictureBlobHolder = new PictureBlobHolder(doc, "picture:views/3/content"); //FullHD
-            Blob blob = pictureBlobHolder.getBlob();
-            if (blob != null && blob.getLength() > 0 && !blob.getFilename().contains("empty_picture"))
-                return blob;
-        }
-        return (Blob) doc.getPropertyValue(FILE_CONTENT);
-    }
-
     private Map<String, Object> buildParameters(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
         Map<String, Object> paramsMap = new HashMap<>();
         parameters.forEach(param -> {
@@ -445,11 +450,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return cloudStorageFileShare.getS3FilePath((ManagedBlob) blob);
     }
 
-    public static boolean isImage(Blob blob) {
-        String mimeType = blob.getMimeType();
-        return mimeType != null && mimeType.startsWith("image/");
-    }
-
     private Map<String, String> getDictionaryValues(CoreSession session, DocumentModel doc, String directoryName) {
         Map<String, String> dictionaryMap = new HashMap<>();
         try {
@@ -505,22 +505,32 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         Arrays.stream(doc.getSchemas()).forEach(schema -> {
             DocTypeWithSchema.Schema schemaSetting = getSchemaSetting(schemaSettings, doc.getType(), schema);
             if (schemaSetting != null) {
-                Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
-                        .filter(DocTypeWithSchema.Schema.Field::isActive)
-                        .filter(field -> (field.isInIsolation() == inIsolation))
-                        .map(schemaField -> {
-                            if (StringUtils.isNotEmpty(schemaField.getDirectoryName())) {
-                                Map<String, String> dictionaryValues = getDictionaryValues(session, doc, schemaField.getDirectoryName());
-                                schemaField.setDirectoryValues(dictionaryValues);
-                            }
-                            return schemaField;
-                        })
-                        .collect(Collectors.toSet());
-                schemaFields.addAll(fields);
+                addSchemaFields(doc, session, inIsolation, schemaSetting, schemaFields);
             }
+            doc.getFacets().forEach(facet -> {
+                DocTypeWithSchema.Schema schemaSettingByFacet = getSchemaSetting(schemaSettings, "Facet_" + facet, schema);
+                if (schemaSettingByFacet != null) {
+                    addSchemaFields(doc, session, inIsolation, schemaSettingByFacet, schemaFields);
+                }
+            });
         });
 
         return schemaFields;
+    }
+
+    private void addSchemaFields(DocumentModel doc, CoreSession session, boolean inIsolation, DocTypeWithSchema.Schema schemaSetting, Set<DocTypeWithSchema.Schema.Field> schemaFields) {
+        Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
+                .filter(DocTypeWithSchema.Schema.Field::isActive)
+                .filter(field -> (field.isInIsolation() == inIsolation))
+                .map(schemaField -> {
+                    if (StringUtils.isNotEmpty(schemaField.getDirectoryName())) {
+                        Map<String, String> dictionaryValues = getDictionaryValues(session, doc, schemaField.getDirectoryName());
+                        schemaField.setDirectoryValues(dictionaryValues);
+                    }
+                    return schemaField;
+                })
+                .collect(Collectors.toSet());
+        schemaFields.addAll(fields);
     }
 
     private DocTypeWithSchema.Schema getSchemaSetting(Map<String, DocTypeWithSchema.Schema> schemaSettings, String docType, String schemaName) {
