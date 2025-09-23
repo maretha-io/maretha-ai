@@ -221,8 +221,8 @@
 						const index = this.chatContext.length - 1;
 
 						this.chatContext[index].content = '';
-
-						this._stream(response.value, index);
+						this.chatContext[index].content = response.value;
+						this.notifyPath(`chatContext.${index}.content`);
 					})
 					.catch((error) =>
 					{
