@@ -223,10 +223,17 @@
 
 			_documentUpdated()
 			{
+				let embeddings = [];
+				const props = this.document?.properties;
+				if (props['interactionresults:embeddingsImage'].length) {
+					embeddings = props['interactionresults:embeddingsImage'];
+				} else if (props['interactionresults:embeddingsText'].length) {
+					embeddings = props['interactionresults:embeddingsText'];
+				}
 				this.set('params', {
 					vectorField: 'similarity',
 					min_score: this.minScore,
-					vectorQuery: this.document.properties['interactionresults:embeddingsImage']
+					vectorQuery: embeddings
 				});
 			},
 

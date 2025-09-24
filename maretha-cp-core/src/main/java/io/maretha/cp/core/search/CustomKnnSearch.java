@@ -4,6 +4,7 @@ import io.maretha.cp.core.models.Settings;
 import io.maretha.cp.core.services.RepositoryService;
 import io.maretha.cp.core.services.ai.EmbeddingsService;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -119,11 +120,16 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
             esSettings = new HashMap<>();
         }
         if ("text".equals(vectorField)) {
-            double[] textVectors = Framework.getService(EmbeddingsService.class).textToEmbedding(vectorQuery);
-            vectorQuery = Arrays.toString(textVectors);
+            if (StringUtils.isNotEmpty(vectorQuery)) {
+                double[] textVectors = Framework.getService(EmbeddingsService.class).textToEmbedding(vectorQuery);
+                vectorQuery = Arrays.toString(textVectors);
+            }
         }
-        FunctionScoreQueryBuilder knnQuery = knnQuery(vectorQuery, minScore, esSettings);
-        combinedQuery = combinedQuery.must(knnQuery);
+
+        if (StringUtils.isNotEmpty(vectorQuery)) {
+            FunctionScoreQueryBuilder knnQuery = knnQuery(vectorQuery, minScore, esSettings);
+            combinedQuery = combinedQuery.must(knnQuery);
+        }
 
         nxQuery = nxQuery.esQuery(combinedQuery)
                 .fetchFromElasticsearch() // Force ES query
