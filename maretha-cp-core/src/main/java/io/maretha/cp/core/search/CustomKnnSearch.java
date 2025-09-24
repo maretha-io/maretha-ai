@@ -1,8 +1,8 @@
 package io.maretha.cp.core.search;
 
 import io.maretha.cp.core.models.Settings;
-import io.maretha.cp.core.services.APIService;
 import io.maretha.cp.core.services.RepositoryService;
+import io.maretha.cp.core.services.ai.EmbeddingsService;
 import org.apache.commons.collections.MapUtils;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -56,7 +56,6 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     private static final String SCORE_MODE = "AVG";
     private static final String BOOST_MODE = "AVG";
     private List<DocumentModel> results;
-    private boolean useVertesiaApiSearch = false;
 
     @Override
     public List<DocumentModel> getCurrentPage() {
@@ -114,20 +113,17 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
 
         combinedQuery = combinedQuery.filter(getCurrentQueryAsEsBuilder());
 
-        if (!useVertesiaApiSearch) {
-            Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
-            Map<String, String> esSettings = savedSettings.getEsSettings();
-            if (MapUtils.isEmpty(esSettings)) {
-                esSettings = new HashMap<>();
-            }
-            if ("text".equals(vectorField)) {
-                APIService apiService = Framework.getService(APIService.class);
-                double[] textVectors = apiService.textToEmbeddings(vectorQuery);
-                vectorQuery = Arrays.toString(textVectors);
-            }
-            FunctionScoreQueryBuilder knnQuery = knnQuery(vectorQuery, minScore, esSettings);
-            combinedQuery = combinedQuery.must(knnQuery);
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+        Map<String, String> esSettings = savedSettings.getEsSettings();
+        if (MapUtils.isEmpty(esSettings)) {
+            esSettings = new HashMap<>();
         }
+        if ("text".equals(vectorField)) {
+            double[] textVectors = Framework.getService(EmbeddingsService.class).textToEmbedding(vectorQuery);
+            vectorQuery = Arrays.toString(textVectors);
+        }
+        FunctionScoreQueryBuilder knnQuery = knnQuery(vectorQuery, minScore, esSettings);
+        combinedQuery = combinedQuery.must(knnQuery);
 
         nxQuery = nxQuery.esQuery(combinedQuery)
                 .fetchFromElasticsearch() // Force ES query

@@ -71,7 +71,7 @@ public class RuntInteractionOperationTest {
         String interactionId = "test-id";
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
-        when(runInteractionService.uploadFileAndSetStoreId(document, session, true, false)).thenReturn(document);
+        when(runInteractionService.addFacetAndEmbeddings(document, session, true, false)).thenReturn(document);
         when(runInteractionService.triggerInteraction(document, session, interactionId, new ArrayList<>(), false, false, false)).thenReturn(mockResponse);
 
         //AND the operation is called
@@ -104,7 +104,7 @@ public class RuntInteractionOperationTest {
         String interactionId = "test-id";
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
-        when(runInteractionService.uploadFileAndSetStoreId(any(), any(), anyBoolean(), anyBoolean())).thenReturn(document);
+        when(runInteractionService.addFacetAndEmbeddings(any(), any(), anyBoolean(), anyBoolean())).thenReturn(document);
         when(apiService.checkProcessingStatusCompleted(any(), anyBoolean())).thenReturn("completed");
         when(apiService.getInteractionResult(interactionId, new HashMap<>(), false)).thenReturn("test");
 
