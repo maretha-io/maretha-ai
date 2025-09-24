@@ -94,6 +94,19 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
     }
 
     @Override
+    public double[] embedPdfSummary(Blob blob) {
+        ApachePdfBoxDocumentParser pdfParser = new ApachePdfBoxDocumentParser();
+        Document document;
+        try {
+            document = pdfParser.parse(blob.getStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String text = document.text();
+        return textToEmbedding(text);
+    }
+
+    @Override
     public double[] textToEmbedding(String inputText) {
         // Set the model ID, e.g., Titan Text Embeddings V2.
         ObjectMapper mapper = new ObjectMapper();

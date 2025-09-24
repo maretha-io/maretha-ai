@@ -10,5 +10,7 @@ public interface EmbeddingsService {
 
     Map<String, double[]> embedPdf(Blob blob);
 
+    double[] embedPdfSummary(Blob blob);
+
     double[] textToEmbedding(String inputText);
 }
