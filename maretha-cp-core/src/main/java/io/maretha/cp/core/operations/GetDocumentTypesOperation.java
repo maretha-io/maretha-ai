@@ -63,7 +63,7 @@ public class GetDocumentTypesOperation {
             }
             return docsAndFacetsWithSchemas;
         }
-        List<String> facets = Arrays.stream(schemaManager.getFacets()).map(Type::getName).sorted().collect(Collectors.toList());
+        List<String> facets = Arrays.stream(schemaManager.getFacets()).map(facet -> "Facet_" + facet.getName()).sorted().collect(Collectors.toList());
         List<String> docTypes = Arrays.stream(schemaManager.getDocumentTypes()).map(Type::getName).sorted().collect(Collectors.toList());
         docTypes.addAll(facets);
         return docTypes;
@@ -132,6 +132,7 @@ public class GetDocumentTypesOperation {
         List<DocTypeWithSchema> docTypes = new ArrayList<>();
         List<CompositeType> facetTypes;
         if (StringUtils.isNotEmpty(facetType)) {
+            facetType = facetType.replace("Facet_", "");
             CompositeType docType = schemaManager.getFacet(facetType);
             facetTypes = List.of(docType);
         } else {
