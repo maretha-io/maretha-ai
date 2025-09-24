@@ -220,11 +220,6 @@ public class InteractionServiceImpl implements InteractionService {
             }
         }
 
-        Message system = Message.builder()
-                .role("user")
-                .content(List.of(ContentBlock.fromText(prompt)))
-                .build();
-
         SystemContentBlock systemPrompt = SystemContentBlock.builder()
                 .text(prompt)
                 .build();
