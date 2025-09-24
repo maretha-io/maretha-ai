@@ -8,9 +8,27 @@
     <xs:element name="storeId" type="xs:string"/>
     <xs:element name="storeDigest" type="xs:string"/>
     <xs:element name="storedDate" type="xs:dateTime"/>
-    <xs:element name="embeddingsText" type="nxs:doubleList"/>
     <xs:element name="embeddingsImage" type="nxs:doubleList"/>
     <xs:element name="embeddingsProperties" type="nxs:doubleList"/>
+    <xs:element name="embeddingsText" type="nxs:EmbeddingList"/>
+
+    <xs:complexType name="Embedding">
+        <xs:sequence>
+            <xs:element name="values" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="item" type="xs:double" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="EmbeddingList">
+        <xs:sequence>
+            <xs:element name="vector" type="nxs:Embedding" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- Definition for a list of interactions -->
     <xs:complexType name="interactionResultList">

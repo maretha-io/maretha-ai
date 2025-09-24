@@ -6,6 +6,7 @@ import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
+import io.maretha.cp.core.services.ai.EmbeddingsService;
 import io.maretha.cp.core.services.ai.InteractionService;
 import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
@@ -13,7 +14,6 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tika.Tika;
 import org.nuxeo.ecm.automation.AutomationService;
 import org.nuxeo.ecm.automation.OperationContext;
 import org.nuxeo.ecm.core.api.Blob;
@@ -29,15 +29,12 @@ import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
 import org.nuxeo.runtime.api.Framework;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -52,11 +49,8 @@ import java.util.stream.Stream;
 
 import static io.maretha.cp.core.callback.VertesiaCallback.VERTESIA_CALLBACK_API_KEY;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
-import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORED_DATE_SCHEMA_PATH;
-import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_DIGEST_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_STORE_ID_SCHEMA_PATH;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_IMAGE;
-import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_PROPERTIES;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TEXT;
 import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
 
@@ -90,6 +84,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride, boolean asyncMode) {
         logAIAudit(session, doc, "", "Triggering AI Interaction with id: " + interactionId);
+        addFacetAndEmbeddings(doc, session, false, false); //todo move to async worker
         Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
         if (saveMetadata) {
             triggerSaveMetadataRequest(doc, session, interactionId, saveMetadataModeOverride, paramsMap, asyncMode);
@@ -303,58 +298,26 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    public DocumentModel uploadFileAndSetStoreId(DocumentModel doc, CoreSession session, boolean waitForCompletion, boolean lowPriority) {
-        log.debug("Uploading file for documentId: " + doc.getId());
-        String storeId = null;
+    public DocumentModel addFacetAndEmbeddings(DocumentModel doc, CoreSession session, boolean waitForCompletion, boolean lowPriority) {
         Blob blob = getBlob(doc);
-        if (doc.hasFacet(RESULTS_FACET)) {
-            storeId = (String) doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
-            String storeDigest = (String) doc.getPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH);
-            if (!blob.getDigest().equalsIgnoreCase(storeDigest)) {
-                storeId = ""; //re-upload file
-            }
-        }
-        if (StringUtils.isEmpty(storeId)) {
+        if (!doc.hasFacet(RESULTS_FACET)) {
             doc.addFacet(RESULTS_FACET);
-            Settings settings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
-            String fileTypeId = (String) settings.getAiSettings().getOrDefault("fileTypeId", "");
-            logAIAudit(session, doc, "", "Sending blob/rendition for AI processing.");
-            if (settings.isAwsS3AccessEnabled()) {
-                String s3Path = getS3Path(blob);
-                storeId = Framework.getService(APIService.class).uploadS3FileToStore(blob, s3Path, fileTypeId, lowPriority);
-            } else {
-                storeId = Framework.getService(APIService.class).uploadFileToStore(blob, fileTypeId, lowPriority);
-            }
-            doc.setPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH, storeId);
-            doc.setPropertyValue(RESULTS_STORE_DIGEST_SCHEMA_PATH, blob.getDigest());
-            doc.setPropertyValue(RESULTS_STORED_DATE_SCHEMA_PATH, new GregorianCalendar());
-
             doc = session.saveDocument(doc);
         }
 
-//        try {
-//            //Retry for uploaded Vertesia document to have status completed
-//            if (waitForCompletion) {
-//                Framework.getService(APIService.class).checkProcessingStatusCompleted(storeId, true);
-//            }
-//
-//            if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
-//                addImageEmbeddings(doc);
-//                doc = session.saveDocument(doc);
-//            }
-//
-//            if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
-//                addTextEmbeddings(doc);
-//                doc = session.saveDocument(doc);
-//            }
-//
-//            if (CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_PROPERTIES))) {
-//                addPropertiesEmbeddings(doc);
-//                doc = session.saveDocument(doc);
-//            }
-//        } catch (Exception e) {
-//            log.error("Failed to save document: " + doc.getId(), e);
-//        }
+        try {
+            if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
+                addImageEmbeddings(doc, blob);
+                doc = session.saveDocument(doc);
+            }
+
+            if ("application/pdf".equalsIgnoreCase(blob.getMimeType()) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
+                addTextEmbeddings(doc, blob);
+                doc = session.saveDocument(doc);
+            }
+        } catch (Exception e) {
+            log.error("Failed to save document: " + doc.getId(), e);
+        }
 
         return doc;
     }
@@ -385,25 +348,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 String additionalContext = getAdditionalContext(session, doc);
                 paramsMap.put(name, additionalContext);
                 return;
-            }
-            boolean isDocumentOrMediaFormat = "document".equalsIgnoreCase(format) || "media".equalsIgnoreCase(format);
-            if (isDocumentOrMediaFormat) {
-                Blob blob = getBlob(doc);
-                if (isImage(blob)) {
-                    try {
-                        String base64 = Base64.getEncoder().encodeToString(blob.getByteArray());
-                        value = "data:" + blob.getMimeType() + ";base64," + base64;
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    try (InputStream in = blob.getStream()) {
-                        Tika tika = new Tika();
-                        value = tika.parseToString(in);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
             }
             paramsMap.put(name, value);
         });
@@ -622,33 +566,35 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    private void addTextEmbeddings(DocumentModel doc) {
+    private void addTextEmbeddings(DocumentModel doc, Blob blob) {
         try {
-            String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-            double[] documentEmbeddings = Framework.getService(APIService.class).getDocumentEmbeddings(storeId, "text");
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
+            Map<String, double[]> documentEmbeddings = Framework.getService(EmbeddingsService.class).embedPdf(blob);
+            List<Map<String, Object>> embeddingList = new ArrayList<>();
+
+            for (double[] vector : documentEmbeddings.values()) {
+                Map<String, Object> embeddingMap = new HashMap<>();
+                List<Double> items = new ArrayList<>();
+                for (double v : vector) {
+                    items.add(Double.valueOf(v));  // ✅ boxed
+                }
+                embeddingMap.put("values", items);
+                embeddingList.add(embeddingMap);
+            }
+
+            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, (Serializable) embeddingList);
         } catch (Exception e) {
             log.error("Failed to save textEmbeddings", e);
         }
     }
 
-    private void addImageEmbeddings(DocumentModel doc) {
+    private void addImageEmbeddings(DocumentModel doc, Blob blob) {
         try {
-            String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-            double[] documentEmbeddings = Framework.getService(APIService.class).getDocumentEmbeddings(storeId, "image");
+            String base64 = Base64.getEncoder().encodeToString(blob.getByteArray());
+//            String imageAsBase64 = "data:" + blob.getMimeType() + ";base64," + base64;
+            double[] documentEmbeddings = Framework.getService(EmbeddingsService.class).embedImage(base64, doc.getTitle(), 1024);
             doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
         } catch (Exception e) {
             log.error("Failed to save imageEmbeddings", e);
-        }
-    }
-
-    private void addPropertiesEmbeddings(DocumentModel doc) {
-        try {
-            String storeId = (String) doc.getPropertyValue("interactionresults:storeId");
-            double[] documentEmbeddings = Framework.getService(APIService.class).getDocumentEmbeddings(storeId, "properties");
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_PROPERTIES, documentEmbeddings);
-        } catch (Exception e) {
-            log.error("Failed to save propertiesEmbeddings", e);
         }
     }
 

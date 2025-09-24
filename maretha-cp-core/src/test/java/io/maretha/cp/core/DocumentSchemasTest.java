@@ -20,6 +20,7 @@ import org.nuxeo.runtime.test.runner.TransactionalFeature;
 import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import static io.maretha.cp.core.services.RepositoryService.SCHEMA_CREATED_AT;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_CREATED_BY;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_DESCRIPTION;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_DOCUMENT_ID;
+import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TEXT;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_ID;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_INTERACTION_ID;
 import static io.maretha.cp.core.services.RepositoryService.SCHEMA_NAME;
@@ -246,6 +248,61 @@ public class DocumentSchemasTest {
         assertEquals("Test Document", createdDoc.getTitle());
         assertEquals("This is a test description", createdDoc.getPropertyValue("dc:description"));
         assertEquals("File", createdDoc.getType());
+    }
+
+    @Test
+    public void testStoreAndRetrieveEmbeddings() {
+        // Create a document with embedding schema
+        DocumentModel doc = session.createDocumentModel("/", "myDoc", "File");
+        doc.addFacet(RESULTS_FACET);
+
+        // Build embeddings list
+        List<Map<String, Object>> embeddingList = new ArrayList<>();
+
+        // Vector 1: [0.1, 0.2, 0.3]
+        embeddingList.add(makeEmbedding(new double[] {0.1, 0.2, 0.3}));
+
+        // Vector 2: [1.5, 2.5]
+        embeddingList.add(makeEmbedding(new double[] {1.5, 2.5}));
+
+        // Set the embeddings property
+        doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, (Serializable) embeddingList);
+
+        // Save the document
+        doc = session.createDocument(doc);
+        session.save();
+
+        // Reload
+        DocumentModel reloaded = session.getDocument(doc.getRef());
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> stored = (List<Map<String, Object>>) reloaded.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT);
+        assertNotNull(stored);
+        assertEquals(2, stored.size());
+
+        // First vector check
+        List<Double> items1 = extractItems(stored.get(0));
+        assertEquals(Arrays.asList(0.1, 0.2, 0.3), items1);
+
+        // Second vector check
+        List<Double> items2 = extractItems(stored.get(1));
+        assertEquals(Arrays.asList(1.5, 2.5), items2);
+    }
+
+    private Map<String, Object> makeEmbedding(double[] vector) {
+        Map<String, Object> embeddingMap = new HashMap<>();
+        List<Double> items = new ArrayList<>();
+        for (double v : vector) {
+            items.add(v);
+        }
+        // "values" should point directly to the list of doubles
+        embeddingMap.put("values", items);
+        return embeddingMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Double> extractItems(Map<String, Object> embedding) {
+        return (List<Double>) embedding.get("values");
     }
 
 }

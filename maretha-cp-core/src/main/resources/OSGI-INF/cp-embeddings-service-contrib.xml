@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.services.ai.EmbeddingsService">
+
+  <documentation>
+    AI Embeddings Service.
+  </documentation>
+
+  <implementation class="io.maretha.cp.core.services.ai.EmbeddingsServiceImpl" />
+
+  <service>
+    <provide interface="io.maretha.cp.core.services.ai.EmbeddingsService" />
+  </service>
+</component>

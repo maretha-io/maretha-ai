@@ -100,7 +100,7 @@ public class RunInteractionServiceImplTest {
         when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.uploadFileAndSetStoreId(document, session, false, true);
+        document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
         runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, true, true);
 
         String jsonPayload = "{\n" +
@@ -152,7 +152,7 @@ public class RunInteractionServiceImplTest {
         when(apiService.getInteractionResultWithResultSchemaAsync(anyString(), anyMap(), anyString(), anyString(), anyString())).thenReturn("apiResponse");
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.uploadFileAndSetStoreId(document, session, false, true);
+        document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
         runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false, true);
 
         String jsonPayload = "{\n" +
@@ -213,7 +213,7 @@ public class RunInteractionServiceImplTest {
         when(apiService.getInteractionResultWithResultSchema(anyString(), anyMap(), anyString(), anyBoolean())).thenReturn(mockResponse);
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.uploadFileAndSetStoreId(document, session, false, true);
+        document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
         runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false, false);
 
 

@@ -3,11 +3,11 @@ package io.maretha.cp.core.services.ai;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
 import io.maretha.cp.core.models.Interaction;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tika.Tika;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.runtime.api.Framework;
@@ -82,7 +82,7 @@ public class InteractionServiceImpl implements InteractionService {
         var objectMapper = new ObjectMapper();
 
         Blob blob = getBlob(doc);
-        Message userMsg;
+        Message userMsg = null;
 
         if (isImage(blob)) {
             try {
@@ -100,14 +100,15 @@ public class InteractionServiceImpl implements InteractionService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        } else {
+        }
+        if ("application/pdf".equalsIgnoreCase(blob.getMimeType())) {
             try (InputStream in = blob.getStream()) {
-                Tika tika = new Tika();
-                String docText = tika.parseToString(in);
+                ApachePdfBoxDocumentParser pdfParser = new ApachePdfBoxDocumentParser();
+                var document = pdfParser.parse(in);
                 userMsg = Message.builder()
                         .role("user")
                         .content(ContentBlock.fromText(
-                                "<NUXEO_DOCUMENT>:\n\n " + docText + " \n\n </NUXEO_DOCUMENT>"
+                                "<NUXEO_DOCUMENT>:\n\n " + document.text() + " \n\n </NUXEO_DOCUMENT>"
                         ))
                         .build();
             } catch (Exception e) {
@@ -206,12 +207,12 @@ public class InteractionServiceImpl implements InteractionService {
             }
         } else {
             try (InputStream in = blob.getStream()) {
-                Tika tika = new Tika();
-                String docText = tika.parseToString(in);
+                ApachePdfBoxDocumentParser pdfParser = new ApachePdfBoxDocumentParser();
+                var document = pdfParser.parse(in);
                 userMsg = Message.builder()
                         .role("user")
                         .content(ContentBlock.fromText(
-                                "Here is the document text:\n\n" + docText
+                                "<NUXEO_DOCUMENT>:\n\n " + document.text() + " \n\n </NUXEO_DOCUMENT>"
                         ))
                         .build();
             } catch (Exception e) {
