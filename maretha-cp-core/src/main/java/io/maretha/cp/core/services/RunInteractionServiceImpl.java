@@ -568,20 +568,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private void addTextEmbeddings(DocumentModel doc, Blob blob) {
         try {
-            Map<String, double[]> documentEmbeddings = Framework.getService(EmbeddingsService.class).embedPdf(blob);
-            List<Map<String, Object>> embeddingList = new ArrayList<>();
-
-            for (double[] vector : documentEmbeddings.values()) {
-                Map<String, Object> embeddingMap = new HashMap<>();
-                List<Double> items = new ArrayList<>();
-                for (double v : vector) {
-                    items.add(Double.valueOf(v));  // ✅ boxed
-                }
-                embeddingMap.put("values", items);
-                embeddingList.add(embeddingMap);
-            }
-
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, (Serializable) embeddingList);
+            double[] documentEmbeddings = Framework.getService(EmbeddingsService.class).embedPdfSummary(blob);
+            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
         } catch (Exception e) {
             log.error("Failed to save textEmbeddings", e);
         }
