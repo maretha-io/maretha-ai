@@ -1,0 +1,452 @@
+{
+  "interactions": [
+    {
+      "id": "1758639814291",
+      "endpoint": null,
+      "description": "",
+      "model": "anthropic.claude-3-sonnet-20240229-v1:0",
+      "prompt": "Chat with this Nuxeo document. \nFormat the answer as HTML",
+      "name": "Chat with document",
+      "status": null,
+      "version": "1",
+      "updatedAt": null,
+      "createdAt": null,
+      "createdBy": null,
+      "parameters": [
+        {
+          "name": "context",
+          "type": "string",
+          "format": "",
+          "description": "",
+          "value": null,
+          "readOnly": true,
+          "enableDocSelection": false,
+          "selectionReadOnly": false,
+          "selectedDocumentIds": [],
+          "selectedDocumentId": null,
+          "isMainDocument": false,
+          "isContextMemoryParameter": true,
+          "isAdditionalContext": false
+        },
+        {
+          "name": "question",
+          "type": "string",
+          "format": "",
+          "description": "",
+          "value": null,
+          "readOnly": false,
+          "enableDocSelection": false,
+          "selectionReadOnly": false,
+          "selectedDocumentIds": [],
+          "selectedDocumentId": null,
+          "isMainDocument": false,
+          "isContextMemoryParameter": false,
+          "isAdditionalContext": false
+        }
+      ],
+      "activeOnDocumentTypes": [
+        "File",
+        "Picture"
+      ],
+      "activeOnFolder": false,
+      "activeOnActionMenu": false,
+      "saveMetadata": false,
+      "mainMetadata": false,
+      "active": true,
+      "chat": true
+    },
+    {
+      "id": "67d966033bbe22f0d50c7c6d",
+      "endpoint": "DynamicMetadata",
+      "description": "Save metadata into Nuxeo.",
+      "model": "anthropic.claude-3-sonnet-20240229-v1:0",
+      "prompt": "I am providing you with the Schema definition for the asset that needs to enriched. Schema is provided in JSON format.\n\nEach field contains the following properties:\n\n- description\n- type\n\nOptionally a field may include a list of valid values found in the property:\n\n - dictionaryValues\n\nThe possible values in the dictionary included as a comma seperated list as ID followed by the value.\n\nHere is an example schema to be populated:\n\n{\n\"nxtag:tags\":{\"description\":\"A list of tags describing the asset to aid in searching and cacegorization\",\"type\":\"array\"},\n\"dc:nature\":{\"description\":\"A category of type of asset\",\"dictionaryValues\":{\"note\":\"papernote\",\"email\":\"electronic message\"},\"type\":\"string\"}\n}\n\nOur goal is to generate the populated schema. Here is an example of the above schema populated:\n\"nxtag:tags\":[\"communication\", \"notes\", \"message\"]\n\"dc:nature\": \"note\"\n\nIMPORTANT RULES:\n\n- Extract metadata from the attached image\n- Format the response as a JSON object as described above with the extracted metadata.\n- If a property called directoryValues exists in the schema for a field you MUST ensure the extracted value matches one of the provided values in the directoryvalues.\n- If there is not a value that matches in the filed type \"directory\", do not provide a value\n \nYou are an AI specialized in extracting metadata from Nuxeo documents. Given a document and its associated schema generate a structured JSON output where:\n\nEach key corresponds to the Nuxeo XPath schema field.\n\nThe extracted metadata is accurate. If you can't identify a proper value for a field, please return null for that field.\nThe JSON output is well-structured and properly formatted.\nReturn the JSON response as valid code object syntax without irrelevant text or characthers like: json \n\nYou must call the \"metadata_extractor\" tool to return your answer.\nExtract metadata from the document and populate the tool input according to the schema.\nDo not answer in plain text — only call the tool.\n                                \nPopulate ALL required fields in the tool's input JSON using the document provided.\nIf a value is unknown, return null for that field, not an empty object.",
+      "name": "Dynamic Metadata",
+      "status": "draft",
+      "version": "2",
+      "updatedAt": null,
+      "createdAt": null,
+      "createdBy": null,
+      "parameters": [
+        {
+          "name": "document",
+          "type": "",
+          "format": "document",
+          "description": "",
+          "value": null,
+          "readOnly": true,
+          "enableDocSelection": false,
+          "selectionReadOnly": false,
+          "selectedDocumentIds": [],
+          "selectedDocumentId": null,
+          "isMainDocument": true,
+          "isContextMemoryParameter": false,
+          "isAdditionalContext": false
+        },
+        {
+          "name": "schema",
+          "type": "string",
+          "format": "textarea",
+          "description": "",
+          "value": null,
+          "readOnly": true,
+          "enableDocSelection": false,
+          "selectionReadOnly": false,
+          "selectedDocumentIds": [],
+          "selectedDocumentId": null,
+          "isMainDocument": false,
+          "isContextMemoryParameter": false,
+          "isAdditionalContext": false
+        },
+        {
+          "name": "media",
+          "type": "",
+          "format": "media",
+          "description": "",
+          "value": null,
+          "readOnly": true,
+          "enableDocSelection": false,
+          "selectionReadOnly": false,
+          "selectedDocumentIds": [],
+          "selectedDocumentId": null,
+          "isMainDocument": true,
+          "isContextMemoryParameter": false,
+          "isAdditionalContext": false
+        },
+        {
+          "name": "additionalContext",
+          "type": "string",
+          "format": "",
+          "description": "",
+          "value": null,
+          "readOnly": true,
+          "enableDocSelection": false,
+          "selectionReadOnly": false,
+          "selectedDocumentIds": [],
+          "selectedDocumentId": null,
+          "isMainDocument": false,
+          "isContextMemoryParameter": false,
+          "isAdditionalContext": true
+        }
+      ],
+      "activeOnDocumentTypes": [
+        "File",
+        "Picture",
+        "Folder",
+        "Collection"
+      ],
+      "activeOnFolder": true,
+      "activeOnActionMenu": true,
+      "saveMetadata": true,
+      "mainMetadata": true,
+      "active": true,
+      "chat": false
+    },
+    {
+      "id": "67b2fd32c77e99dbe236acc1",
+      "endpoint": "DescribeImage",
+      "description": "Describe Image",
+      "model": "anthropic.claude-3-sonnet-20240229-v1:0",
+      "prompt": "Describe this image in max 20 words.",
+      "name": "Describe Image",
+      "status": "draft",
+      "version": "1",
+      "updatedAt": null,
+      "createdAt": null,
+      "createdBy": null,
+      "parameters": [
+        {
+          "name": "doc",
+          "type": "",
+          "format": "media",
+          "description": "",
+          "value": null,
+          "readOnly": true,
+          "enableDocSelection": false,
+          "selectionReadOnly": false,
+          "selectedDocumentIds": [],
+          "selectedDocumentId": null,
+          "isMainDocument": true,
+          "isContextMemoryParameter": false,
+          "isAdditionalContext": false
+        }
+      ],
+      "activeOnDocumentTypes": [
+        "Picture"
+      ],
+      "activeOnFolder": false,
+      "activeOnActionMenu": true,
+      "saveMetadata": false,
+      "mainMetadata": false,
+      "active": true,
+      "chat": false
+    }
+  ],
+  "awsS3AccessEnabled": false,
+  "schemaSettings": {
+    "Picture_dublincore": {
+      "name": "dublincore",
+      "docType": "Picture",
+      "fields": [
+        {
+          "xpath": "dc:description",
+          "description": "This the description dc:description (dublincore) metadata in Nuxeo.\nLimit to maximum 30 words.",
+          "type": "clob",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": "67d966033bbe22f0d50c7c6d",
+          "active": true,
+          "multiValue": false,
+          "inIsolation": true,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:language",
+          "description": "What language is this document?",
+          "type": "string",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": "68828364f2f1af0e97e9c953",
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:coverage",
+          "description": "",
+          "type": "coverage#anonymousType",
+          "directoryName": "l10ncoverage",
+          "directoryValues": null,
+          "interactionId": "68828364f2f1af0e97e9c953",
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:valid",
+          "description": "",
+          "type": "date",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:creator",
+          "description": "",
+          "type": "creator#anonymousType",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:modified",
+          "description": "",
+          "type": "date",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:lastContributor",
+          "description": "",
+          "type": "lastContributor#anonymousType",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:rights",
+          "description": "",
+          "type": "string",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:expired",
+          "description": "",
+          "type": "date",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:format",
+          "description": "",
+          "type": "string",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:created",
+          "description": "",
+          "type": "date",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:title",
+          "description": "",
+          "type": "string",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": true,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:issued",
+          "description": "",
+          "type": "date",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:nature",
+          "description": "",
+          "type": "nature#anonymousType",
+          "directoryName": "nature",
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:subjects",
+          "description": "",
+          "type": "subjectList",
+          "directoryName": "l10nsubjects",
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": true,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:contributors",
+          "description": "",
+          "type": "contributorList",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": true,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:source",
+          "description": "",
+          "type": "string",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        },
+        {
+          "xpath": "dc:publisher",
+          "description": "",
+          "type": "string",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": false,
+          "multiValue": false,
+          "inIsolation": false,
+          "additionalContext": false
+        }
+      ]
+    },
+    "Facet_NXTag_facetedTag": {
+      "name": "facetedTag",
+      "docType": "Facet_NXTag",
+      "fields": [
+        {
+          "xpath": "nxtag:tags",
+          "description": "",
+          "type": "tags",
+          "directoryName": null,
+          "directoryValues": null,
+          "interactionId": null,
+          "active": true,
+          "multiValue": true,
+          "inIsolation": false,
+          "additionalContext": false
+        }
+      ]
+    }
+  },
+  "esSettings": {
+    "BOOST": "1.0",
+    "TEXT_WEIGHT": "1.0",
+    "IMAGE_WEIGHT": "1.0",
+    "SCORE_MODE": "AVG",
+    "BOOST_MODE": "AVG"
+  },
+  "aiSettings": {
+    "apiUrl": "",
+    "uploadUrl": "",
+    "authToken": "",
+    "projectId": "",
+    "environmentId": "",
+    "embeddingModel": "amazon.titan-embed-text-v2:0",
+    "mimeTypes": "",
+    "directoryBucketSize": "100",
+    "callbackNotifyUrl": "",
+    "fileTypeId": "",
+    "taskQueue": "",
+    "providers": [
+    ]
+  },
+  "eventsSettings": [
+  ]
+}
