@@ -1,5 +1,6 @@
 package io.maretha.cp.core.operations;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.Settings;
 import io.maretha.cp.core.services.RepositoryService;
 import org.apache.commons.collections.CollectionUtils;
@@ -9,6 +10,9 @@ import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.runtime.api.Framework;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *
@@ -26,13 +30,22 @@ public class GetSettingsOperation {
     public Settings run() {
         Settings settings = repositoryService.getSavedSettings(session, false);
         if (CollectionUtils.isEmpty(settings.getInteractions())) {
-            addDefaultInteractions();
+            settings = addDefaultInteractions();
         }
         return settings;
     }
 
-    private void addDefaultInteractions() {
-        //TODO load file default_interactions.json
+    private Settings addDefaultInteractions() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try (InputStream inputStream = GetSettingsOperation.class.getResourceAsStream("/interactions/default_settings.json")) {
+            if (inputStream == null) {
+                throw new IllegalArgumentException("File not found in resources");
+            }
+            return objectMapper.readValue(inputStream, Settings.class);
+        } catch (IOException e) {
+            //ignore
+        }
+        return null;
     }
 
 

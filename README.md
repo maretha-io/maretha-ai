@@ -1,33 +1,17 @@
-## Maretha.io + Vertesia.com Integration Add-on
+## Maretha.io AI Integration Add-on
 
-### 1.API Key from Vertesia
-- https://cloud.vertesia.io/settings#keys
-- Create a private secret key with read/execute permissions
-
-### 2.Nuxeo configuration nuxeo.conf
+### 1.Nuxeo configuration nuxeo.conf
 ```
-vertesia.authToken=sk-
-vertesia.apiUrl=https://studio-server-production.api.vertesia.io/
-vertesia.uploadUrl=https://zeno-server-production.api.vertesia.io
-vertesia.projectId=
-vertesia.environmentId=
-vertesia.embeddingModel=amazon.titan-embed-text-v2:0
-vertesia.mimeTypes=text/plain,application/pdf,image/jpeg,image/png,image/webp
+io.maretha.aws.accessKeyId=
+io.maretha.aws.secretAccessKey=
+io.maretha.aws.region=us-east-1
+io.maretha.aws.inferenceProfile=
 
-# dev -> https://studio-server-preview.api.vertesia.io
+//example io.maretha.aws.inferenceProfile=arn:aws:bedrock:us-east-1:641938870165:inference-profile/us.
+The modelId is appendend
 ```
 
-## 3. Create Vertesia Interactions
-### Vertesia Interactions
-![](documentation/images/Vertesia-Interactions.png)
-
-### Vertesia Interaction Prompts
-![](documentation/images/Vertesia-Document-Summary-Interaction.png)
-
-### Vertesia Prompt
-![](documentation/images/Vertesia-Document-Summary-Prompt.png)
-
-## 4. Nuxeo UI Configuration
+## 2. Nuxeo UI Configuration
 
 ### Settings Document
 - Admin Settings Page: http://localhost:8080/nuxeo/ui/#!/maretha-cp-interactions
