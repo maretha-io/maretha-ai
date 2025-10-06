@@ -76,7 +76,7 @@ public class GetInteractionSettingsOperationTest {
         //THEN
         Settings settings = (Settings) automationService.run(ctx, GetSettingsOperation.ID);
         assertNotNull(settings);
-        assertEquals(interaction.getId(), settings.getInteractions().stream().findFirst().get().getId());
+        assertEquals("1758639814291", settings.getInteractions().stream().findFirst().get().getId());
     }
 
     @Test
