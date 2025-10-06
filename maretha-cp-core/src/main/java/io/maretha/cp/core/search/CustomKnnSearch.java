@@ -1,6 +1,7 @@
 package io.maretha.cp.core.search;
 
 import io.maretha.cp.core.models.Settings;
+import io.maretha.cp.core.services.APIService;
 import io.maretha.cp.core.services.RepositoryService;
 import io.maretha.cp.core.services.ai.EmbeddingsService;
 import org.apache.commons.collections.MapUtils;
@@ -51,6 +52,7 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     public static final String TEXT_VECTOR_FIELD = "interactionresults:embeddingsText";
     public static final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
     private static final String BOOST = "1.0";
+    private static final int NUM_CANDIDATES = 1000;
     private static final String K = "10";
     private static final String TEXT_WEIGHT = "1.0";
     private static final String IMAGE_WEIGHT = "1.0";
@@ -123,13 +125,52 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
             if (StringUtils.isNotEmpty(vectorQuery)) {
                 double[] textVectors = Framework.getService(EmbeddingsService.class).textToEmbedding(vectorQuery);
                 vectorQuery = Arrays.toString(textVectors);
+                String vectorJson = Arrays.toString(textVectors);
+
+                String knnJsonQuery = "{\n" +
+                        "  \"function_score\": {\n" +  // Wrap knn inside function_score
+                        "    \"query\": {\n" +
+                        "      \"knn\": {\n" +
+                        "        \"field\": \"" + TEXT_VECTOR_FIELD + "\",\n" +
+                        "        \"query_vector\": " + vectorJson + ",\n" +
+                        "        \"k\": " + K + ",\n" +
+                        "        \"num_candidates\": " + NUM_CANDIDATES + "\n" +
+                        "      }\n" +
+                        "    },\n" +
+                        "    \"min_score\": " + minScore + ",\n" +  // Apply min_score inside function_score
+                        "    \"boost_mode\": \"multiply\" \n" +
+                        "  }\n" +
+                        "}";
+
+                QueryBuilder knnTextQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
+                combinedQuery = combinedQuery.must(knnTextQuery).boost(Float.parseFloat(BOOST));
             }
         }
 
-        if (StringUtils.isNotEmpty(vectorQuery)) {
-            FunctionScoreQueryBuilder knnQuery = knnQuery(vectorQuery, minScore, esSettings);
-            combinedQuery = combinedQuery.must(knnQuery);
+        if (IMAGE_VECTOR_FIELD.equals(vectorField)) {
+            String knnJsonQuery = "{\n" +
+                    "  \"function_score\": {\n" +  // Wrap knn inside function_score
+                    "    \"query\": {\n" +
+                    "      \"knn\": {\n" +
+                    "        \"field\": \"" + IMAGE_VECTOR_FIELD + "\",\n" +
+                    "        \"query_vector\": " + vectorQuery + ",\n" +
+                    "        \"k\": " + K + ",\n" +
+                    "        \"num_candidates\": " + NUM_CANDIDATES + "\n" +
+                    "      }\n" +
+                    "    },\n" +
+                    "    \"min_score\": " + minScore + ",\n" +  // Apply min_score inside function_score
+                    "    \"boost_mode\": \"multiply\" \n" +
+                    "  }\n" +
+                    "}";
+
+            QueryBuilder knnImageQuery = QueryBuilders.wrapperQuery(knnJsonQuery);
+            combinedQuery = combinedQuery.must(knnImageQuery).boost(Float.parseFloat(BOOST));
         }
+
+//        if (StringUtils.isNotEmpty(vectorQuery)) {
+//            FunctionScoreQueryBuilder knnQuery = knnQuery(vectorQuery, minScore, esSettings);
+//            combinedQuery = combinedQuery.must(knnQuery);
+//        }
 
         nxQuery = nxQuery.esQuery(combinedQuery)
                 .fetchFromElasticsearch() // Force ES query

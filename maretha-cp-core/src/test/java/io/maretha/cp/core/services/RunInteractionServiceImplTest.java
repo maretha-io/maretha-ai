@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
+import io.maretha.cp.core.services.ai.EmbeddingsService;
+import io.maretha.cp.core.services.ai.InteractionService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -49,6 +51,8 @@ import static io.maretha.cp.core.services.RunInteractionServiceImpl.CALLBACK_NOT
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyObject;
@@ -73,7 +77,11 @@ public class RunInteractionServiceImplTest {
 
     @Mock
     @RuntimeService
-    APIService apiService;
+    InteractionService apiService;
+
+    @Mock
+    @RuntimeService
+    EmbeddingsService embeddingsService;
 
     @Inject
     RunInteractionService runInteractionService;
@@ -96,21 +104,7 @@ public class RunInteractionServiceImplTest {
 
         Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
 
-        when(apiService.uploadFileToStore(anyObject(), anyString(), anyBoolean())).thenReturn("vertesia-store-id");
-        when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
-
-        List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
-        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, true, true);
-
         String jsonPayload = "{\n" +
-                "          \"event\" : \"workflow_finished\",\n" +
-                "          \"data\" : {\n" +
-                "            \"interaction_run_id\" : \"686d5cf79e02af71b2ec7b32\",\n" +
-                "            \"workflow_id\" : \"generation:ExecuteInteractionWorkflow:DynamicMetadata:jief03ard\",\n" +
-                "            \"workflow_run_id\" : \"0197eb33-271e-7f2d-9dbd-1f0c730619fd\",\n" +
-                "            \"status\" : \"completed\",\n" +
-                "            \"result\" : {\n" +
                 "              \"result\" : {\n" +
                 "                   \"dc:title\":\"Green Bird on Branch.\"," +
                 "                   \"dc:description\":\"A small green bird with speckled breast perched on a tree branch in a lush forest setting.\"," +
@@ -119,14 +113,17 @@ public class RunInteractionServiceImplTest {
                 "                   \"nxtag:tags\":[\"tag-1\", \"tag-2\", \"tag-1\"]," +
                 "                   \"testDoc:eventTypes\":[\"documentCreated\", \"documentSecurityUpdated\"]," +
                 "                   \"dc:subjects\":[\"article\", \"certificate\"]" +
-                "              }\n" +
-                "            }\n" +
                 "          }\n" +
                 "        }";
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(jsonPayload);
-        runInteractionService.validateAndSaveMetadata(jsonNode.get("data"), document.getId(), true);
+        when(apiService.invokeModelWithSchema(any(), any(), anyMap(), anyString())).thenReturn(jsonPayload);
+//        when(apiService.uploadFileToStore(anyObject(), anyString(), anyBoolean())).thenReturn("vertesia-store-id");
+        when(embeddingsService.embedImage(anyString(), anyString(), anyInt())).thenReturn(new double[]{});
+        when(embeddingsService.embedPdfSummary(any())).thenReturn(new double[]{});
+
+        List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
+        document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
+        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, true, true);
 
         DocumentModel updatedDoc = session.getDocument(document.getRef());
         List<String> testStringArray = (List<String>) updatedDoc.getPropertyValue("testDoc:testStringArray");
@@ -146,23 +143,7 @@ public class RunInteractionServiceImplTest {
 
         Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
 
-        //WHEN
-        when(apiService.uploadFileToStore(anyObject(), anyString(), anyBoolean())).thenReturn("vertesia-store-id");
-        when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
-        when(apiService.getInteractionResultWithResultSchemaAsync(anyString(), anyMap(), anyString(), anyString(), anyString())).thenReturn("apiResponse");
-
-        List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
-        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false, true);
-
         String jsonPayload = "{\n" +
-                "          \"event\" : \"workflow_finished\",\n" +
-                "          \"data\" : {\n" +
-                "            \"interaction_run_id\" : \"686d5cf79e02af71b2ec7b32\",\n" +
-                "            \"workflow_id\" : \"generation:ExecuteInteractionWorkflow:DynamicMetadata:jief03ard\",\n" +
-                "            \"workflow_run_id\" : \"0197eb33-271e-7f2d-9dbd-1f0c730619fd\",\n" +
-                "            \"status\" : \"completed\",\n" +
-                "            \"result\" : {\n" +
                 "              \"result\" : {\n" +
                 "                   \"dc:title\":\"Green Bird on Branch.\"," +
                 "                   \"dc:description\":\"A small green bird with speckled breast perched on a tree branch in a lush forest setting.\"," +
@@ -170,14 +151,18 @@ public class RunInteractionServiceImplTest {
                 "                   \"testDoc:testStringArray\":[\"test-111\", \"test-123\"]," +
                 "                   \"nxtag:tags\":[\"tag-1\", \"tag-2\", \"tag-1\"]," +
                 "                   \"dc:subjects\":[\"article\", \"certificate\"]" +
-                "              }\n" +
-                "            }\n" +
-                "          }\n" +
-                "        }";
+                "        }}";
+        //WHEN
+//        when(apiService.uploadFileToStore(anyObject(), anyString(), anyBoolean())).thenReturn("vertesia-store-id");
+        when(embeddingsService.embedImage(anyString(), anyString(), anyInt())).thenReturn(new double[]{});
+        when(apiService.invokeModelWithSchema(any(), any(), anyMap(), anyString())).thenReturn(jsonPayload);
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(jsonPayload);
-        runInteractionService.validateAndSaveMetadata(jsonNode.get("data"), document.getId(), false);
+        List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
+        document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
+        runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false, true);
+
+
+//        runInteractionService.validateAndSaveMetadata(jsonNode.get("data"), document.getId(), false);
 
         //THEN
         DocumentModel updatedDoc = session.getDocument(document.getRef());
@@ -196,7 +181,7 @@ public class RunInteractionServiceImplTest {
 
         Settings settingsDocument = Framework.getService(RepositoryService.class).getSavedSettings(session, false);
 
-        String mockResponse = "{\"result\":{\"result\":" +
+        String mockResponse = "{\"result\":" +
                 "{\"dc:title\":\"Green Bird on Branch\"," +
                 "\"dc:description\":\"A small green bird with speckled breast perched on a tree branch in a lush forest setting.\"," +
                 "\"dc:language\":\"en\"," +
@@ -205,12 +190,14 @@ public class RunInteractionServiceImplTest {
                 "\"testDoc:eventTypes\":[\"documentCreated\", \"documentSecurityUpdated\"]," +
                 "\"dc:subjects\":[\"article\", \"certificate\"]" +
                 "}" +
-                "}}";
+                "}";
 
         //WHEN
-        when(apiService.uploadFileToStore(anyObject(), anyString(), anyBoolean())).thenReturn("vertesia-store-id");
-        when(apiService.getDocumentEmbeddings(anyString(), anyString())).thenReturn(new double[]{});
-        when(apiService.getInteractionResultWithResultSchema(anyString(), anyMap(), anyString(), anyBoolean())).thenReturn(mockResponse);
+//        when(apiService.uploadFileToStore(anyObject(), anyString(), anyBoolean())).thenReturn("vertesia-store-id");
+        when(embeddingsService.embedImage(anyString(), anyString(), anyInt())).thenReturn(new double[]{});
+        when(embeddingsService.embedPdfSummary(any())).thenReturn(new double[]{});
+        when(apiService.invokeModelWithSchema(any(), any(), anyMap(), anyString())).thenReturn(mockResponse);
+        when(apiService.invokeModel(any(), any(), anyMap())).thenReturn(mockResponse);
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
         document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
@@ -246,7 +233,7 @@ public class RunInteractionServiceImplTest {
         DocumentModel doc = session.createDocumentModel("/", "testDocument", "TestDoc");
         doc.setPropertyValue("dc:title", "Test Document");
         doc.setPropertyValue("dc:description", "This is a test description");
-        doc.setPropertyValue(FILE_CONTENT, new StringBlob("Test", "text/plain"));
+        doc.setPropertyValue(FILE_CONTENT, new StringBlob("Test", "application/pdf"));
         doc.addFacet("NXTag");
         doc = session.createDocument(doc);
         session.save();

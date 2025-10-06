@@ -176,12 +176,12 @@
       }
     },
     "interactionresults:embeddingsText": {
-      "type": "knn_vector",
-      "dimension": 1024
+      "type": "dense_vector",
+      "dims": 1024
     },
     "interactionresults:embeddingsImage": {
-      "type": "knn_vector",
-      "dimension": 1024
+      "type": "dense_vector",
+      "dims": 1024
     }
   }
 }
