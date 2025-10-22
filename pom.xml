@@ -8,8 +8,8 @@
   </parent>
 
   <groupId>io.maretha.cp</groupId>
-  <artifactId>maretha-cp-parent</artifactId>
-  <version>1.0.24</version>
+  <artifactId>maretha-ai-parent</artifactId>
+  <version>1.0.25</version>
   <name>Maretha cp parent</name>
   <description>Maretha Nuxeo Add-On AI</description>
   <packaging>pom</packaging>
@@ -22,9 +22,9 @@
   </properties>
 
   <modules>
-    <module>maretha-cp-core</module>
-    <module>maretha-cp-package</module>
-    <module>maretha-cp-web</module>
+    <module>maretha-ai-core</module>
+    <module>maretha-ai-package</module>
+    <module>maretha-ai-web</module>
   </modules>
 
   <scm />
@@ -39,22 +39,22 @@
     <dependencies>
       <dependency>
         <groupId>io.maretha.cp</groupId>
-        <artifactId>maretha-cp-core</artifactId>
+        <artifactId>maretha-ai-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.maretha.cp</groupId>
-        <artifactId>maretha-cp-web</artifactId>
+        <artifactId>maretha-ai-web</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.maretha.cp</groupId>
-        <artifactId>maretha-cp-package</artifactId>
+        <artifactId>maretha-ai-package</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.maretha.cp</groupId>
-        <artifactId>maretha-cp-api</artifactId>
+        <artifactId>maretha-ai-api</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
