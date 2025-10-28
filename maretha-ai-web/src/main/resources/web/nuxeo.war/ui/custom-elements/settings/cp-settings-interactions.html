@@ -141,38 +141,38 @@
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Settings">
 					<div class="config">
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id="enabledButton" checked="{{interaction.active}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="enabledButton-[[ix]]" checked="{{interaction.active}}" on-change="_markAsDirty">
 								Enabled
 							</paper-toggle-button>
-							<paper-tooltip for="enabledButton" position="top">Enable/Disable the Interaction</paper-tooltip>
+							<paper-tooltip for$="enabledButton-[[ix]]" position="top">Enable/Disable the Interaction</paper-tooltip>
 						</div>
 
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id="visibleInActionMenu" checked="{{interaction.activeOnActionMenu}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="visibleInActionMenu-[[ix]]" checked="{{interaction.activeOnActionMenu}}" on-change="_markAsDirty">
 								Visible in Action Menu
 							</paper-toggle-button>
-							<paper-tooltip for="visibleInActionMenu" position="top">Show the interaction to users</paper-tooltip>
+							<paper-tooltip for$="visibleInActionMenu-[[ix]]" position="top">Show the interaction to users</paper-tooltip>
 						</div>
 
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id="activeOnFolder" checked="{{interaction.activeOnFolder}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="activeOnFolder-[[ix]]" checked="{{interaction.activeOnFolder}}" on-change="_markAsDirty">
 								Executable on Folders
 							</paper-toggle-button>
-							<paper-tooltip for="activeOnFolder" position="top">Will run for all the documents in the folder. "Folder" must be added in Activation list of documents</paper-tooltip>
+							<paper-tooltip for$="activeOnFolder-[[ix]]" position="top">Will run for all the documents in the folder. "Folder" must be added in Activation list of documents</paper-tooltip>
 						</div>
 
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id="isChatButton" checked="{{interaction.chat}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="isChatButton-[[ix]]" checked="{{interaction.chat}}" on-change="_markAsDirty">
 								Is Chat
 							</paper-toggle-button>
-							<paper-tooltip for="isChatButton" position="top">There can only be one Chat interaction, this is used by the Chat component in the UI</paper-tooltip>
+							<paper-tooltip for$="isChatButton-[[ix]]" position="top">There can only be one Chat interaction, this is used by the Chat component in the UI</paper-tooltip>
 						</div>
 
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id="saveMetadataButton" checked="{{interaction.saveMetadata}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="saveMetadataButton-[[ix]]" checked="{{interaction.saveMetadata}}" on-change="_markAsDirty">
 								Save Metadata
 							</paper-toggle-button>
-							<paper-tooltip for="saveMetadataButton" position="top">
+							<paper-tooltip for$="saveMetadataButton-[[ix]]" position="top">
 								Enable if you want the result to be saved as document metadata.
 								Instructions must be provided in the prompt to return valid json "result" object.
 								Works with the "Metadata" configuration tab (enable/disable) schema fields + context.
@@ -181,11 +181,11 @@
 						</div>
 
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id="mainMetadataButton" disabled$="[[ !interaction.saveMetadata ]]"
+							<paper-toggle-button id$="mainMetadataButton-[[ix]]" disabled$="[[ !interaction.saveMetadata ]]"
 												 checked="{{interaction.mainMetadata}}" on-change="_markAsDirty">
 								Main Metadata
 							</paper-toggle-button>
-							<paper-tooltip for="mainMetadataButton" position="top">
+							<paper-tooltip for$="mainMetadataButton-[[ix]]" position="top">
 								There can be multiple "Metadata" interactions, but the button "Update/Enhance Metadata" needs to know the main metadata interaction to trigger.
 							</paper-tooltip>
 						</div>
