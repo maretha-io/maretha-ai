@@ -17,19 +17,49 @@
 			<nuxeo-card heading="AI settings">
 				<div class="content">
 
-					<nuxeo-input role="widget" value="{{aiSettings.embeddingModel}}" label="embeddingModel"
-						type="text" on-input="_markAsDirty">
-					</nuxeo-input>
+					<div style="position: relative; display: inline-block;">
+						<nuxeo-input
+								id="embeddingModelInput"
+								role="widget"
+								value="{{aiSettings.embeddingModel}}"
+								label="embeddingModel"
+								type="text"
+								on-input="_markAsDirty">
+						</nuxeo-input>
+						<paper-tooltip for="embeddingModelInput" position="bottom" offset="6">
+							The AI model used for generating text vector embeddings (e.g., amazon.titan-embed-text-v2:0)
+						</paper-tooltip>
+					</div>
 
-					<nuxeo-input role="widget" value="{{aiSettings.mimeTypes}}" label="mimeTypes" type="text"
-						on-input="_markAsDirty">
-					</nuxeo-input>
+					<div style="position: relative; display: inline-block;">
+						<nuxeo-input
+								id="mimeTypesInput"
+								role="widget"
+								value="{{aiSettings.mimeTypes}}"
+								label="mimeTypes"
+								type="text"
+								on-input="_markAsDirty">
+						</nuxeo-input>
+						<paper-tooltip for="mimeTypesInput" position="bottom" offset="6">
+							Comma-separated list of MIME types to include for processing (e.g., text/plain, application/pdf)
+						</paper-tooltip>
+					</div>
 
-					<nuxeo-input role="widget" value="{{aiSettings.directoryBucketSize}}" label="directoryBucketSize" type="number"
-								 min="0"
-								 step="10"
-								 on-input="_markAsDirty">
-					</nuxeo-input>
+					<div style="position: relative; display: inline-block;">
+						<nuxeo-input
+								id="directoryBucketSizeInput"
+								role="widget"
+								value="{{aiSettings.directoryBucketSize}}"
+								label="directoryBucketSize"
+								type="number"
+								min="0"
+								step="10"
+								on-input="_markAsDirty">
+						</nuxeo-input>
+						<paper-tooltip for="directoryBucketSizeInput" position="bottom" offset="6">
+							Defines the number of entries per directory bucket (e.g., 100, used for better results when the vocabulary has too many values for the model context)
+						</paper-tooltip>
+					</div>
 
 				</div>
 			</nuxeo-card>

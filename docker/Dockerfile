@@ -7,7 +7,7 @@ ARG NUXEO_CLID=e629623c-0267-434e-8f95-55b0d8482c9c.1924991940.D+QQaEFIB/Dxwey7C
 RUN echo "JAVA_OPTS=$JAVA_OPTS -XX:InitialRAMPercentage=50 -XX:MaxRAMPercentage=50" >> /etc/nuxeo/conf.d/00-docker.conf
 USER $NUXEO_USER
 
-COPY --chown=900:0 maretha-cp-package/target/maretha-ai-package-1.0.24.zip $NUXEO_HOME/local-packages/maretha-ai-package-1.0.24.zip
+COPY --chown=900:0 maretha-ai-package/target/maretha-ai-package-1.0.26.zip $NUXEO_HOME/local-packages/maretha-ai-package-1.0.26.zip
 COPY --chown=900:0 maretha-angular-webui-package-1.0.0.zip $NUXEO_HOME/local-packages/maretha-angular-webui-package-1.0.0.zip
 COPY --chown=900:0  nuxeo-generative-ai-package-1.0.zip  $NUXEO_HOME/local-packages/nuxeo-generative-ai-package-1.0.zip
 RUN echo ${CLID} $NUXEO_HOME/nxserver/data/instance.clid
@@ -15,7 +15,7 @@ RUN echo ${CLID} $NUXEO_HOME/nxserver/data/instance.clid
 # Install nuxeo-web-ui
 RUN /install-packages.sh --clid ${NUXEO_CLID}  nuxeo-web-ui amazon-s3-online-storage nuxeo-csv
 # Install a local package without its dependencies (`mp-install --nodeps`)
-RUN /install-packages.sh --offline $NUXEO_HOME/local-packages/maretha-ai-package-1.0.24.zip
+RUN /install-packages.sh --offline $NUXEO_HOME/local-packages/maretha-ai-package-1.0.26.zip
 RUN /install-packages.sh --offline $NUXEO_HOME/local-packages/nuxeo-generative-ai-package-1.0.zip
 RUN /install-packages.sh --offline $NUXEO_HOME/local-packages/maretha-angular-webui-package-1.0.0.zip
 RUN rm -rf $NUXEO_HOME/local-packages
