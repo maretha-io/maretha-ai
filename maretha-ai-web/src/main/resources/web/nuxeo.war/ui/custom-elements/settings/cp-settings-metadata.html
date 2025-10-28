@@ -150,12 +150,55 @@
 						<table>
 							<thead>
 							<tr>
-								<th>Xpath</th>
-								<th>Active</th>
-								<th>Context</th>
-								<th>Isolated</th>
-								<th>Interaction</th>
-								<th>Description</th>
+								<th>
+									<div style="position: relative; display: inline-block;">
+										<span id="xpathHeader">Xpath</span>
+										<paper-tooltip for="xpathHeader" position="bottom" offset="6">
+											The document property path (e.g., dc:title, file:content)
+										</paper-tooltip>
+									</div>
+								</th>
+								<th>
+									<div style="position: relative; display: inline-block;">
+										<span id="activeHeader">Active</span>
+										<paper-tooltip for="activeHeader" position="bottom" offset="6">
+											Whether the field is currently active
+										</paper-tooltip>
+									</div>
+								</th>
+								<th>
+									<div style="position: relative; display: inline-block;">
+										<span id="contextHeader">Context</span>
+										<paper-tooltip for="contextHeader" position="bottom" offset="6">
+											Sends the value in the AI prompt as context
+										</paper-tooltip>
+									</div>
+								</th>
+								<th>
+									<div style="position: relative; display: inline-block;">
+										<span id="isolatedHeader">Isolated</span>
+										<paper-tooltip for="isolatedHeader" position="bottom" offset="6">
+											If true, runs the interaction for that field only.
+											Example: big vocabulary or big context
+										</paper-tooltip>
+									</div>
+								</th>
+								<th>
+									<div style="position: relative; display: inline-block;">
+										<span id="interactionHeader">Interaction</span>
+										<paper-tooltip for="interactionHeader" position="bottom" offset="6">
+											In isolation mode it is possible to select a custom metadata interaction
+										</paper-tooltip>
+									</div>
+								</th>
+								<th>
+									<div style="position: relative; display: inline-block;">
+										<span id="descriptionHeader">Description</span>
+										<paper-tooltip for="descriptionHeader" position="bottom" offset="6">
+											A description or instruction will be added in the prompt for that field
+										</paper-tooltip>
+									</div>
+								</th>
 							</tr>
 							</thead>
 
@@ -205,7 +248,7 @@
 
 									<td>
 										<paper-textarea type="[[item.type]]" value="{{item.description}}"
-													 on-input="_markAsDirty">
+														on-input="_markAsDirty">
 										</paper-textarea>
 									</td>
 								</tr>

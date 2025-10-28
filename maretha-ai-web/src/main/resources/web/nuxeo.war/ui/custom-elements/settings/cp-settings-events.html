@@ -170,59 +170,91 @@
 
 		<table>
 			<thead>
-				<tr>
-					<th>Document type</th>
-					<th>Events</th>
-					<th>Interactions</th>
-					<th>Active</th>
-					<th>
-						<div class="new">
-							<paper-icon-button icon="custom-icons:add" on-tap="_newDocTypeEventsInteractions">
-							</paper-icon-button>
+			<tr>
+				<th>
+					<div style="position: relative; display: inline-block;">
+						<span id="docTypeHeader">Document type</span>
+						<paper-tooltip for="docTypeHeader" position="bottom" offset="6">
+							The type of Nuxeo document (e.g., File, Note, Custom type)
+						</paper-tooltip>
+					</div>
+				</th>
 
-							<nuxeo-tooltip>New document type interactions</nuxeo-tooltip>
-						</div>
-					</th>
-				</tr>
+				<th>
+					<div style="position: relative; display: inline-block;">
+						<span id="eventsHeader">Events</span>
+						<paper-tooltip for="eventsHeader" position="bottom" offset="6">
+							The events that trigger this automation.
+						</paper-tooltip>
+					</div>
+				</th>
+
+				<th>
+					<div style="position: relative; display: inline-block;">
+						<span id="interactionsHeader">Interactions</span>
+						<paper-tooltip for="interactionsHeader" position="bottom" offset="6">
+							The interactions should be of type "Metadata" otherwise the result will not be saved, bad example: Chat Interaction
+						</paper-tooltip>
+					</div>
+				</th>
+
+				<th>
+					<div style="position: relative; display: inline-block;">
+						<span id="activeHeader">Active</span>
+						<paper-tooltip for="activeHeader" position="bottom" offset="6">
+							Indicates whether this rule or configuration is currently active
+						</paper-tooltip>
+					</div>
+				</th>
+
+				<th>
+					<div class="new">
+						<paper-icon-button icon="custom-icons:add" on-tap="_newDocTypeEventsInteractions">
+						</paper-icon-button>
+
+						<nuxeo-tooltip>New document type interactions</nuxeo-tooltip>
+					</div>
+				</th>
+			</tr>
 			</thead>
 
 			<tbody>
-				<template is="dom-repeat" items="[[ eventsSettings ]]" as="item" index-as="index">
-					<tr class$="[[ item.invalid ]]">
-						<td>
-							<cp-selectivity data="[[ documentTypes ]]" value="{{item.docType}}"
-								placeholder="Select a document type" on-selection-changed="_validate">
-							</cp-selectivity>
-						</td>
-						<td>
-							<cp-selectivity multiple data="[[ _eventTypes ]]" value="{{item.events}}"
-								placeholder="Choose one or more event types" on-selection-changed="_validate">
-							</cp-selectivity>
-						</td>
-						<td>
-							<cp-selectivity multiple data="[[ _interactionsWithLabels ]]" value="{{item.interactions}}"
-								placeholder="Pick one or more interactions" on-selection-changed="_validate">
-							</cp-selectivity>
-						</td>
-						<td>
-							<paper-toggle-button checked="{{item.active}}" on-change="_markAsDirty">
-							</paper-toggle-button>
-						</td>
-						<td>
-							<paper-menu-button close-on-activate allow-outside-scroll no-animations close-on-activate
-								no-overlap horizontal-align="right" vertical-align="top">
-								<paper-icon-button slot="dropdown-trigger" icon="icons:more-vert">
-								</paper-icon-button>
+			<template is="dom-repeat" items="[[ eventsSettings ]]" as="item" index-as="index">
+				<tr class$="[[ item.invalid ]]">
+					<td>
+						<cp-selectivity data="[[ documentTypes ]]" value="{{item.docType}}"
+										placeholder="Select a document type" on-selection-changed="_validate">
+						</cp-selectivity>
+					</td>
+					<td>
+						<cp-selectivity multiple data="[[ _eventTypes ]]" value="{{item.events}}"
+										placeholder="Choose one or more event types" on-selection-changed="_validate">
+						</cp-selectivity>
+					</td>
+					<td>
+						<cp-selectivity multiple data="[[ _interactionsWithLabels ]]" value="{{item.interactions}}"
+										placeholder="Pick one or more interactions" on-selection-changed="_validate">
+						</cp-selectivity>
+					</td>
+					<td>
+						<paper-toggle-button checked="{{item.active}}" on-change="_markAsDirty">
+						</paper-toggle-button>
+					</td>
+					<td>
+						<paper-menu-button close-on-activate allow-outside-scroll no-animations close-on-activate
+										   no-overlap horizontal-align="right" vertical-align="top">
+							<paper-icon-button slot="dropdown-trigger" icon="icons:more-vert">
+							</paper-icon-button>
 
-								<paper-listbox slot="dropdown-content" attr-for-selected="data-id">
-									<paper-item data-item-index$="[[ index ]]" on-tap="_deleteDocTypeEventSettings">
-										Delete this document type interactions
-									</paper-item>
-								</paper-listbox>
-							</paper-menu-button>
-						</td>
-					</tr>
-				</template>
+							<paper-listbox slot="dropdown-content" attr-for-selected="data-id">
+								<paper-item data-item-index$="[[ index ]]" on-tap="_deleteDocTypeEventSettings">
+									Delete this document type interactions
+								</paper-item>
+							</paper-listbox>
+						</paper-menu-button>
+					</td>
+				</tr>
+			</template>
 			</tbody>
 		</table>
 
