@@ -96,11 +96,11 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
 
         // --- Build KNN logic ---
         if (StringUtils.isNotEmpty(vectorQuery)) {
-            double[] vector = Framework.getService(EmbeddingsService.class).textToEmbedding(vectorQuery);
-            String vectorJson = Arrays.toString(vector);
 
             // Case 1: text search -> search both text + image fields
             if ("text".equalsIgnoreCase(vectorField)) {
+                double[] vector = Framework.getService(EmbeddingsService.class).textToEmbedding(vectorQuery);
+                String vectorJson = Arrays.toString(vector);
                 String knnTextJson = buildKnnFunctionScore(TEXT_VECTOR_FIELD, vectorJson, k, numCandidates);
                 String knnImageJson = buildKnnFunctionScore(IMAGE_VECTOR_FIELD, vectorJson, k, numCandidates);
 
@@ -115,7 +115,7 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
 
                 // Case 2: image or similarity search -> image embeddings only
             } else if ("image".equalsIgnoreCase(vectorField) || "similarity".equalsIgnoreCase(vectorField)) {
-                String knnImageJson = buildKnnFunctionScore(IMAGE_VECTOR_FIELD, vectorJson, k, numCandidates);
+                String knnImageJson = buildKnnFunctionScore(IMAGE_VECTOR_FIELD, vectorQuery, k, numCandidates);
                 QueryBuilder knnImageQuery = QueryBuilders.wrapperQuery(knnImageJson);
                 combinedQuery.must(knnImageQuery).boost(boostValue);
             }
