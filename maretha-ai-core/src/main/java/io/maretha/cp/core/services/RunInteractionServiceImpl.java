@@ -323,7 +323,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private void addImageTextEmbeddings(DocumentModel doc, Blob blob) {
         try {
-            String description = String.valueOf(doc.getProperty("dc:description"));
+            String description = String.valueOf(doc.getPropertyValue("dc:description"));
             double[] vector = Framework.getService(EmbeddingsService.class).textToEmbedding(description);
             doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, vector);
         } catch (Exception e) {
