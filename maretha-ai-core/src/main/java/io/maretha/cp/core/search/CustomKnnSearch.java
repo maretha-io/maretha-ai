@@ -1,11 +1,13 @@
 package io.maretha.cp.core.search;
 
-import io.maretha.cp.core.models.Settings;
-import io.maretha.cp.core.services.RepositoryService;
 import io.maretha.cp.core.services.ai.EmbeddingsService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.nuxeo.ecm.core.api.*;
+import org.nuxeo.ecm.core.api.CoreSession;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.SortInfo;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.platform.query.api.Aggregate;
 import org.nuxeo.ecm.platform.query.api.Bucket;
@@ -18,7 +20,9 @@ import org.nuxeo.elasticsearch.query.NxQueryBuilder;
 import org.nuxeo.runtime.api.Framework;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
-import org.opensearch.index.query.*;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.QueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
 import org.opensearch.search.SearchHit;
 import org.opensearch.search.SearchHits;
 import org.opensearch.search.aggregations.AbstractAggregationBuilder;
@@ -27,13 +31,18 @@ import org.opensearch.search.aggregations.bucket.filter.Filter;
 import org.opensearch.search.builder.SearchSourceBuilder;
 import org.opensearch.search.sort.SortOrder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.nuxeo.ecm.platform.query.api.PageProviderService.NAMED_PARAMETERS;
 
 public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
 
     public static final String RELEVANCE_SCORE = "relevance_score";
-    public static final String TEXT_VECTOR_FIELD  = "interactionresults:embeddingsText";
+    public static final String TEXT_VECTOR_FIELD = "interactionresults:embeddingsText";
     public static final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
 
     private static final String BOOST = "0.5";
@@ -84,11 +93,11 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         BoolQueryBuilder combinedQuery = QueryBuilders.boolQuery();
         combinedQuery.filter(getCurrentQueryAsEsBuilder()); // keep NXQL filters
 
-        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
-        Map<String, String> esSettings = savedSettings.getEsSettings();
-        if (MapUtils.isEmpty(esSettings)) {
-            esSettings = new HashMap<>();
-        }
+//        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+//        Map<String, String> esSettings = savedSettings.getEsSettings();
+//        if (MapUtils.isEmpty(esSettings)) {
+//            esSettings = new HashMap<>();
+//        }
 
         int numCandidates = NUM_CANDIDATES;
         int k = Integer.parseInt(K);
@@ -97,27 +106,27 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         // --- Build KNN logic ---
         if (StringUtils.isNotEmpty(vectorQuery)) {
 
-            // Case 1: text search -> search both text + image fields
+            // Case 1: text search
             if ("text".equalsIgnoreCase(vectorField)) {
                 double[] vector = Framework.getService(EmbeddingsService.class).textToEmbedding(vectorQuery);
                 String vectorJson = Arrays.toString(vector);
                 String knnTextJson = buildKnnFunctionScore(TEXT_VECTOR_FIELD, vectorJson, k, numCandidates);
-                String knnImageJson = buildKnnFunctionScore(IMAGE_VECTOR_FIELD, vectorJson, k, numCandidates);
-
                 QueryBuilder textKnnQuery = QueryBuilders.wrapperQuery(knnTextJson);
-                QueryBuilder imageKnnQuery = QueryBuilders.wrapperQuery(knnImageJson);
-
                 BoolQueryBuilder shouldQuery = QueryBuilders.boolQuery()
-                        .should(textKnnQuery)
-                        .should(imageKnnQuery);
-
+                        .should(textKnnQuery);
                 combinedQuery.must(shouldQuery).boost(boostValue);
 
-                // Case 2: image or similarity search -> image embeddings only
+                // Case 2: image or text search
             } else if ("image".equalsIgnoreCase(vectorField) || "similarity".equalsIgnoreCase(vectorField)) {
                 String knnImageJson = buildKnnFunctionScore(IMAGE_VECTOR_FIELD, vectorQuery, k, numCandidates);
+                String knnTextJson = buildKnnFunctionScore(TEXT_VECTOR_FIELD, vectorQuery, k, numCandidates);
+                QueryBuilder textKnnQuery = QueryBuilders.wrapperQuery(knnTextJson);
+
                 QueryBuilder knnImageQuery = QueryBuilders.wrapperQuery(knnImageJson);
-                combinedQuery.must(knnImageQuery).boost(boostValue);
+                BoolQueryBuilder shouldQuery = QueryBuilders.boolQuery()
+                        .should(knnImageQuery)
+                        .should(textKnnQuery);
+                combinedQuery.must(shouldQuery).boost(boostValue);
             }
         }
 
@@ -183,7 +192,9 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         return result;
     }
 
-    /** Build OpenSearch-style function_score + knn block */
+    /**
+     * Build OpenSearch-style function_score + knn block
+     */
     private String buildKnnFunctionScore(String field, String vectorJson, int k, int numCandidates) {
         return "{\n" +
                 "  \"function_score\": {\n" +
@@ -216,16 +227,5 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
         @SuppressWarnings("unchecked")
         List<Aggregate<Bucket>> ret = (List<Aggregate<Bucket>>) (List<?>) queryBuilder.getAggregates();
         return ret;
-    }
-
-    public QueryBuilder getAggregateFilter(NxQueryBuilder builder) {
-        BoolQueryBuilder ret = QueryBuilders.boolQuery();
-        for (AggregateEsBase<?, ?> agg : builder.getAggregates()) {
-            QueryBuilder filter = agg.getEsFilter();
-            if (filter != null) {
-                ret.must(filter);
-            }
-        }
-        return ret.hasClauses() ? ret : null;
     }
 }
