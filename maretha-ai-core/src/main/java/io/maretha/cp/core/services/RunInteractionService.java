@@ -10,7 +10,7 @@ import java.util.List;
 public interface RunInteractionService {
     String FILE_CONTENT = "file:content";
 
-    DocumentModel addFacetAndEmbeddings(DocumentModel doc, CoreSession session, boolean waitUploadCompletion, boolean lowPriority);
+    DocumentModel addEmbeddings(DocumentModel doc, CoreSession session, boolean waitUploadCompletion, boolean lowPriority);
 
     String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride, boolean asyncMode);
 

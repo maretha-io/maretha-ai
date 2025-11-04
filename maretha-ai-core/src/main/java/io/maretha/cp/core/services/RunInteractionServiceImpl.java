@@ -77,15 +77,20 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     @Override
     public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride, boolean asyncMode) {
         logAIAudit(session, doc, "", "Triggering AI Interaction with id: " + interactionId);
-        addFacetAndEmbeddings(doc, session, false, false); //todo move to async worker
         Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
+        if (!doc.hasFacet(RESULTS_FACET)) {
+            doc.addFacet(RESULTS_FACET);
+        }
         if (saveMetadata) {
             triggerSaveMetadataRequest(doc, session, interactionId, saveMetadataModeOverride, paramsMap, asyncMode);
+            addEmbeddings(doc, session, false, false); //todo move to async worker
             return "Metadata request in progress.";
         }
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         Interaction interaction = getInteractionById(savedSettings, interactionId);
-        return Framework.getService(InteractionService.class).invokeModel(doc, interaction, paramsMap);
+        String response = Framework.getService(InteractionService.class).invokeModel(doc, interaction, paramsMap);
+        addEmbeddings(doc, session, false, false); //todo move to async worker
+        return response;
     }
 
     private void triggerSaveMetadataRequest(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap, boolean asyncMode) {
@@ -291,16 +296,17 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    public DocumentModel addFacetAndEmbeddings(DocumentModel doc, CoreSession session, boolean waitForCompletion, boolean lowPriority) {
+    public DocumentModel addEmbeddings(DocumentModel doc, CoreSession session, boolean waitForCompletion, boolean lowPriority) {
         Blob blob = getBlob(doc);
-        if (!doc.hasFacet(RESULTS_FACET)) {
-            doc.addFacet(RESULTS_FACET);
-            doc = session.saveDocument(doc);
-        }
 
         try {
             if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
                 addImageEmbeddings(doc, blob);
+                doc = session.saveDocument(doc);
+            }
+
+            if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
+                addImageTextEmbeddings(doc, blob);
                 doc = session.saveDocument(doc);
             }
 
@@ -313,6 +319,16 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
 
         return doc;
+    }
+
+    private void addImageTextEmbeddings(DocumentModel doc, Blob blob) {
+        try {
+            String description = String.valueOf(doc.getProperty("dc:description"));
+            double[] vector = Framework.getService(EmbeddingsService.class).textToEmbedding(description);
+            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, vector);
+        } catch (Exception e) {
+            log.error("Failed to add text embeddings", e);
+        }
     }
 
     private Map<String, Object> buildParameters(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {

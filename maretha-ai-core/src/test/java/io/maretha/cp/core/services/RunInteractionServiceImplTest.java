@@ -1,7 +1,6 @@
 package io.maretha.cp.core.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.models.DocTypeWithSchema;
@@ -53,9 +52,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -121,7 +118,7 @@ public class RunInteractionServiceImplTest {
         when(embeddingsService.embedPdfSummary(any())).thenReturn(new double[]{});
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
+        document = runInteractionService.addEmbeddings(document, session, false, true);
         runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, true, true);
 
         DocumentModel updatedDoc = session.getDocument(document.getRef());
@@ -156,7 +153,7 @@ public class RunInteractionServiceImplTest {
         when(apiService.invokeModelWithSchema(any(), any(), anyMap(), anyString())).thenReturn(jsonPayload);
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
+        document = runInteractionService.addEmbeddings(document, session, false, true);
         runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false, true);
 
         //THEN
@@ -194,7 +191,7 @@ public class RunInteractionServiceImplTest {
         when(apiService.invokeModel(any(), any(), anyMap())).thenReturn(mockResponse);
 
         List<InteractionParameter> parameters = settingsDocument.getInteractions().get(0).getParameters();
-        document = runInteractionService.addFacetAndEmbeddings(document, session, false, true);
+        document = runInteractionService.addEmbeddings(document, session, false, true);
         runInteractionService.triggerInteraction(document, session, "67d966033bbe22f0d50c7c6d", parameters, true, false, false);
 
 
