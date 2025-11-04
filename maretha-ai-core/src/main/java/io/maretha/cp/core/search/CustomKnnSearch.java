@@ -36,7 +36,7 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
     public static final String TEXT_VECTOR_FIELD  = "interactionresults:embeddingsText";
     public static final String IMAGE_VECTOR_FIELD = "interactionresults:embeddingsImage";
 
-    private static final String BOOST = "1.0";
+    private static final String BOOST = "0.5";
     private static final int NUM_CANDIDATES = 1000;
     private static final String K = "10";
 

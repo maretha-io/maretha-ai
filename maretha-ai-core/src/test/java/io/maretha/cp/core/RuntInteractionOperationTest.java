@@ -27,7 +27,6 @@ import org.nuxeo.runtime.test.runner.TransactionalFeature;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static io.maretha.cp.core.services.RunInteractionService.FILE_CONTENT;
@@ -66,7 +65,7 @@ public class RuntInteractionOperationTest {
         String interactionId = "test-id";
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
-        when(runInteractionService.addFacetAndEmbeddings(document, session, true, false)).thenReturn(document);
+        when(runInteractionService.addEmbeddings(document, session, true, false)).thenReturn(document);
         when(runInteractionService.triggerInteraction(document, session, interactionId, new ArrayList<>(), false, false, false)).thenReturn(mockResponse);
 
         //AND the operation is called
@@ -99,7 +98,7 @@ public class RuntInteractionOperationTest {
         String interactionId = "test-id";
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
         //WHEN the service is mocked
-        when(runInteractionService.addFacetAndEmbeddings(any(), any(), anyBoolean(), anyBoolean())).thenReturn(document);
+        when(runInteractionService.addEmbeddings(any(), any(), anyBoolean(), anyBoolean())).thenReturn(document);
 
         //AND the operation is called
         OperationContext ctx = new OperationContext(session);
