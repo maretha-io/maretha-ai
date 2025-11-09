@@ -1,0 +1,206 @@
+<!--
+@license
+©2023 Hyland Software, Inc. and its affiliates. All rights reserved. 
+All Hyland product names are registered or unregistered trademarks of Hyland Software, Inc. or its affiliates.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+`nuxeo-file-create-layout`
+@group Nuxeo UI
+@element nuxeo-file-create-layout
+-->
+<dom-module id="nuxeo-file-create-layout">
+  <template>
+    <style include="nuxeo-styles"></style>
+
+    <nuxeo-input
+      role="widget"
+      label="[[i18n('title')]]"
+      name="title"
+      value="{{document.properties.dc:title}}"
+      autofocus
+      required
+    >
+    </nuxeo-input>
+
+    <nuxeo-textarea
+      role="widget"
+      label="[[i18n('label.description')]]"
+      name="description"
+      value="{{document.properties.dc:description}}"
+    >
+    </nuxeo-textarea>
+
+    <nuxeo-dropzone
+      role="widget"
+      label="[[i18n('file.content')]]"
+      name="content"
+      value="{{document.properties.file:content}}"
+    ></nuxeo-dropzone>
+
+    <nuxeo-directory-suggestion
+      role="widget"
+      label="[[i18n('label.dublincore.nature')]]"
+      name="nature"
+      directory-name="nature"
+      value="{{document.properties.dc:nature}}"
+      placeholder="[[i18n('dublincoreEdit.directorySuggestion.placeholder')]]"
+      min-chars="0"
+    >
+    </nuxeo-directory-suggestion>
+
+    <nuxeo-directory-suggestion
+      role="widget"
+      label="[[i18n('label.dublincore.subjects')]]"
+      directory-name="l10nsubjects"
+      name="subjects"
+      value="{{document.properties.dc:subjects}}"
+      multiple="true"
+      dbl10n="true"
+      placeholder="[[i18n('dublincoreEdit.directorySuggestion.placeholder')]]"
+      min-chars="0"
+    >
+    </nuxeo-directory-suggestion>
+
+    <nuxeo-directory-suggestion
+      role="widget"
+      label="[[i18n('label.dublincore.coverage')]]"
+      directory-name="l10ncoverage"
+      name="coverage"
+      value="{{document.properties.dc:coverage}}"
+      dbl10n="true"
+      placeholder="[[i18n('dublincoreEdit.directorySuggestion.placeholder')]]"
+      min-chars="0"
+    >
+    </nuxeo-directory-suggestion>
+
+    <nuxeo-date-picker
+      role="widget"
+      label="[[i18n('label.dublincore.expire')]]"
+      name="expired"
+      value="{{document.properties.dc:expired}}"
+      aria-label$="[[i18n('label.dublincore.expire')]]"
+    >
+    </nuxeo-date-picker>
+
+    <!-- AI Schema Fields -->
+    <template is="dom-if" if="[[hasSchema(document, 'ai')]]">
+      <nuxeo-input
+        role="widget"
+        label="Alt Text"
+        name="altText"
+        value="{{document.properties.ai:altText}}"
+      >
+      </nuxeo-input>
+
+      <nuxeo-input
+        role="widget"
+        label="Brand"
+        name="brand"
+        value="{{document.properties.ai:brand}}"
+      >
+      </nuxeo-input>
+
+      <nuxeo-textarea
+        role="widget"
+        label="SEO"
+        name="seo"
+        value="{{document.properties.ai:seo}}"
+      >
+      </nuxeo-textarea>
+
+      <nuxeo-textarea
+        role="widget"
+        label="Restrictions"
+        name="restrictions"
+        value="{{document.properties.ai:restrictions}}"
+      >
+      </nuxeo-textarea>
+
+      <nuxeo-textarea
+        role="widget"
+        label="Elements Detected"
+        name="elementsDetected"
+        value="{{document.properties.ai:elementsDetected}}"
+      >
+      </nuxeo-textarea>
+
+      <nuxeo-textarea
+        role="widget"
+        label="Smart Crops"
+        name="smartCrops"
+        value="{{document.properties.ai:smartCrops}}"
+      >
+      </nuxeo-textarea>
+
+      <nuxeo-directory-suggestion
+        role="widget"
+        label="Classification"
+        name="classification"
+        directory-name="classification"
+        value="{{document.properties.ai:classification}}"
+        multiple="true"
+        placeholder="Select classification"
+        min-chars="0"
+      >
+      </nuxeo-directory-suggestion>
+
+      <nuxeo-textarea
+        role="widget"
+        label="Safety Text"
+        name="safetyText"
+        value="{{document.properties.ai:safetyText}}"
+      >
+      </nuxeo-textarea>
+
+      <nuxeo-directory-suggestion
+        role="widget"
+        label="Safety"
+        name="safety"
+        directory-name="safetyCategories"
+        value="{{document.properties.ai:safety}}"
+        multiple="true"
+        placeholder="Select safety categories"
+        min-chars="0"
+      >
+      </nuxeo-directory-suggestion>
+
+      <nuxeo-directory-suggestion
+        role="widget"
+        label="Image Scene"
+        name="imageScene"
+        directory-name="imageScenes"
+        value="{{document.properties.ai:imageScene}}"
+        multiple="true"
+        placeholder="Select image scenes"
+        min-chars="0"
+      >
+      </nuxeo-directory-suggestion>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'nuxeo-file-create-layout',
+      behaviors: [Nuxeo.LayoutBehavior],
+      properties: {
+        /**
+         * @doctype File
+         */
+        document: Object,
+      },
+    });
+  </script>
+</dom-module>
