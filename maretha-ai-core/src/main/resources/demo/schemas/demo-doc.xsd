@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<xs:schema targetNamespace="http://www.nuxeo.core/ecm/schemas/ai/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:ref="http://www.nuxeo.org/ecm/schemas/core/external-references/"
+           xmlns:nxs="http://www.nuxeo.core/ecm/schemas/ai/">
+
+    <xs:element name="altText" type="xs:string"/>
+    <xs:element name="brand" type="xs:string"/>
+    <xs:element name="seo" type="xs:string"/>
+    <xs:element name="restrictions" type="xs:string"/>
+    <xs:element name="elementsDetected" type="nxs:stringList"/>
+    <xs:element name="smartCrops" type="nxs:stringList"/>
+    <xs:element name="classification">
+        <xs:simpleType>
+            <xs:list>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string" ref:resolver="directoryResolver" ref:directory="classification">
+                        <xs:maxLength value="100"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:list>
+        </xs:simpleType>
+    </xs:element>
+    <xs:element name="safetyText" type="xs:string"/>
+    <xs:element name="safety">
+        <xs:simpleType>
+            <xs:list>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string" ref:resolver="directoryResolver" ref:directory="safetyCategories">
+                        <xs:maxLength value="100"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:list>
+        </xs:simpleType>
+    </xs:element>
+
+    <xs:element name="imageScene">
+        <xs:simpleType>
+            <xs:list>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string" ref:resolver="directoryResolver" ref:directory="imageScenes">
+                        <xs:maxLength value="100"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:list>
+        </xs:simpleType>
+    </xs:element>
+
+    <xs:complexType name="stringList">
+        <xs:sequence>
+            <xs:element name="item" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="doubleList">
+        <xs:sequence>
+            <xs:element name="item" type="xs:double" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

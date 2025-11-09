@@ -1,0 +1,10 @@
+id,label,obsolete,ordering
+"NSFW","NSFW","0","0"
+"weapons","weapons","0","1"
+"dangerous","dangerous","0","2"
+"alcohol","alcohol","0","3"
+"drugs","drugs","0","4"
+"hate","hate","0","5"
+"political","political","0","6"
+
+

@@ -1,0 +1,21 @@
+<component name="io.maretha.ai.demo.directories">
+    <extension target="org.nuxeo.ecm.directory.GenericDirectory" point="directories">
+
+        <directory name="imageScenes" extends="template-vocabulary">
+            <createTablePolicy>on_missing_columns</createTablePolicy>
+            <dataFile>demo/vocabularies/imageScenes.csv</dataFile>
+        </directory>
+
+        <directory name="safetyCategories" extends="template-vocabulary">
+            <createTablePolicy>on_missing_columns</createTablePolicy>
+            <dataFile>demo/vocabularies/safetyCategories.csv</dataFile>
+        </directory>
+
+        <directory name="classification" extends="template-vocabulary">
+            <createTablePolicy>on_missing_columns</createTablePolicy>
+            <dataFile>demo/vocabularies/classification.csv</dataFile>
+        </directory>
+
+    </extension>
+
+</component>
