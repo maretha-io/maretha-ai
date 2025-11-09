@@ -1,0 +1,10 @@
+id,label,obsolete,ordering
+"outdoor","outdoor","0","0"
+"studio","studio","0","1"
+"lifestyle","lifestyle","0","2"
+"catalog","catalog","0","3"
+"night","night","0","4"
+"day","day","0","5"
+"indoor","indoor","0","6"
+
+
