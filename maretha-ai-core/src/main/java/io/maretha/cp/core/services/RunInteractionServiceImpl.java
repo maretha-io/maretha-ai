@@ -173,17 +173,26 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 log.error("Missing json result from API Response", e);
                 throw e;
             }
+            if (null == resultNode) {
+                log.debug(jsonNode);
+                throw new NuxeoException("ResultNode is null, cannot save metadata.");
+            }
+
             resultNode.fields().forEachRemaining(field -> {
                 String key = field.getKey();
                 JsonNode valueNode = field.getValue();
-                Optional<DocTypeWithSchema.Schema.Field> optionalField = schemasFields.stream()
-                        .filter(schemaField -> schemaField.getXpath().equalsIgnoreCase(key)).findFirst();
-                if (optionalField.isEmpty()) {
-                    log.warn("Metadata save skip on not declared xpath: " + key);
+                if (null == valueNode || valueNode.isNull()) {
+                    log.warn("Metadata save skip for null value: " + key);
                     return;
                 }
                 if (StringUtils.isEmpty(valueNode.asText()) && valueNode.isEmpty()) {
                     log.warn("Metadata save skip on empty value for xpath: " + key);
+                    return;
+                }
+                Optional<DocTypeWithSchema.Schema.Field> optionalField = schemasFields.stream()
+                        .filter(schemaField -> schemaField.getXpath().equalsIgnoreCase(key)).findFirst();
+                if (optionalField.isEmpty()) {
+                    log.warn("Metadata save skip on not declared xpath: " + key);
                     return;
                 }
                 try {

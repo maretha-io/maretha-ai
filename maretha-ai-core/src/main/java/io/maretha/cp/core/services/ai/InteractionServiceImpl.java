@@ -41,6 +41,13 @@ import static io.maretha.cp.core.services.RunInteractionServiceImpl.isImage;
 
 public class InteractionServiceImpl implements InteractionService {
 
+    private static final String METADATA_EXTRACTOR_TOOL_PROMPT = "" +
+            "Use the tool \"metadata_extractor\" to return your answer.\n" +
+            "Extract metadata from the document and populate the tool input according to the schema.\n" +
+            "\n" +
+            "Populate ALL required fields in the tool's input JSON using the document provided.\n" +
+            "If a value is unknown, do not return it.";
+
     private final BedrockRuntimeClient client = BedrockRuntimeClient.builder()
             .credentialsProvider(
                     StaticCredentialsProvider.create(
@@ -165,15 +172,16 @@ public class InteractionServiceImpl implements InteractionService {
         var prompt = interaction.getPrompt();
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode resultSchmeaJsonNode = null;
+        JsonNode resultSchemaJsonNode = null;
         try {
-            resultSchmeaJsonNode = mapper.readTree(resultSchema);
+            resultSchemaJsonNode = mapper.readTree(resultSchema);
+            log.debug("ResultSchema: " + resultSchema);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
 
         ToolInputSchema inputSchema = ToolInputSchema.builder()
-                .json(toDocument(resultSchmeaJsonNode))   // pass schema as String
+                .json(toDocument(resultSchemaJsonNode))   // pass schema as String
                 .build();
 
         ToolSpecification toolSpec = ToolSpecification.builder()
@@ -221,7 +229,7 @@ public class InteractionServiceImpl implements InteractionService {
         }
 
         SystemContentBlock systemPrompt = SystemContentBlock.builder()
-                .text(prompt)
+                .text(METADATA_EXTRACTOR_TOOL_PROMPT + " Prompt: " + prompt)
                 .build();
 
         ConverseRequest request = ConverseRequest.builder()
