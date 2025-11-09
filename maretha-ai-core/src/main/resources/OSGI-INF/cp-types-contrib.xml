@@ -26,6 +26,7 @@
 
         <facet name="InteractionResultsFacet">
             <schema name="interactionResults" />
+            <schema name="ai" />
         </facet>
     </extension>
 
