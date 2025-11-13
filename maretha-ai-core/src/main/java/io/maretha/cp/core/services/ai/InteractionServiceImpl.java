@@ -197,6 +197,22 @@ public class InteractionServiceImpl implements InteractionService {
         Blob blob = getBlob(doc);
         Message userMsg;
 
+        List<Message> userMessages = new ArrayList<>();
+
+        if (MapUtils.isNotEmpty(paramsData)) {
+            Message paramsUserMessage = null;
+            try {
+                paramsUserMessage = Message.builder()
+                        .role("user")
+                        .content(ContentBlock.fromText(mapper.writeValueAsString(paramsData)))
+                        .build();
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+            log.debug("Params user message: " + paramsUserMessage);
+            userMessages.add(paramsUserMessage);
+        }
+
         if (isImage(blob)) {
             try {
                 SdkBytes imageBytes = SdkBytes.fromByteArray(blob.getByteArray());
@@ -210,6 +226,7 @@ public class InteractionServiceImpl implements InteractionService {
                         .role("user")
                         .content(contentBlock)
                         .build();
+                userMessages.add(userMsg);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -223,6 +240,7 @@ public class InteractionServiceImpl implements InteractionService {
                                 "<NUXEO_DOCUMENT>:\n\n " + document.text() + " \n\n </NUXEO_DOCUMENT>"
                         ))
                         .build();
+                userMessages.add(userMsg);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -236,7 +254,7 @@ public class InteractionServiceImpl implements InteractionService {
                 .modelId(modelId)
                 .inferenceConfig(InferenceConfiguration.builder().build())
                 .system(systemPrompt)
-                .messages(List.of(userMsg))
+                .messages(userMessages)
                 .toolConfig(toolConfig)
                 .build();
 
