@@ -351,7 +351,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             String selectedDocumentId = param.getSelectedDocumentId();
 
             if (param.isAdditionalContext()) {
-                String additionalContext = getAdditionalContext(session, doc);
+                Map<String, String> additionalContext = getAdditionalContext(session, doc);
                 paramsMap.put(name, additionalContext);
                 return;
             }
@@ -361,12 +361,12 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     @SneakyThrows
-    private String getAdditionalContext(CoreSession session, DocumentModel doc) {
+    private Map<String, String> getAdditionalContext(CoreSession session, DocumentModel doc) {
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
         if (MapUtils.isEmpty(schemaSettings)) {
             log.error("SchemaSettings is empty");
-            return "";
+            return Map.of();
         }
 
         Set<DocTypeWithSchema.Schema.Field> schemaFields = new HashSet<>();
@@ -379,6 +379,15 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                         .collect(Collectors.toSet());
                 schemaFields.addAll(fields);
             }
+            doc.getFacets().forEach(facet -> {
+                DocTypeWithSchema.Schema schemaSettingByFacet = getSchemaSetting(schemaSettings, "Facet_" + facet, schema);
+                if (schemaSettingByFacet != null) {
+                    Set<DocTypeWithSchema.Schema.Field> fields = schemaSettingByFacet.getFields().stream()
+                            .filter(DocTypeWithSchema.Schema.Field::isAdditionalContext)
+                            .collect(Collectors.toSet());
+                    schemaFields.addAll(fields);
+                }
+            });
         });
 
         Map<String, String> valuesMap = new HashMap<>();
@@ -391,7 +400,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             } catch (Exception ignored) {
             }
         });
-        return objectMapper.writeValueAsString(valuesMap);
+        return valuesMap;
     }
 
     //source: "s3://composable-bs-test/my-photo.jpg#eu-north-1",
