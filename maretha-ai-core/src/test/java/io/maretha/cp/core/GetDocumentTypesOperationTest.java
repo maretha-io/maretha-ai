@@ -43,7 +43,7 @@ public class GetDocumentTypesOperationTest {
         OperationContext ctx = new OperationContext(session);
         List<String> documentTypes = (List<String>) automationService.run(ctx, GetDocumentTypesOperation.ID);
         assertNotNull(documentTypes);
-        int expectedSize = 41;
+        int expectedSize = 39;
         assertEquals(expectedSize, documentTypes.size());
         assertTrue(documentTypes.containsAll(List.of(RESULTS_DOCUMENT_NAME, SETTINGS_DOCUMENT_NAME)));
     }
