@@ -76,22 +76,22 @@ limitations under the License.
       </div>
 
       <div role="widget" hidden$="[[!document.properties.ai:brand]]">
-        <label>Brand</label>
+        <label>Brands Detected</label>
         <div name="brand">[[document.properties.ai:brand]]</div>
       </div>
 
       <div role="widget" hidden$="[[!document.properties.ai:seo]]">
-        <label>SEO</label>
+        <label>SEO Optimization Keywords</label>
         <div name="seo" class="multiline">[[document.properties.ai:seo]]</div>
       </div>
 
       <div role="widget" hidden$="[[!document.properties.ai:restrictions]]">
-        <label>Restrictions</label>
+        <label>Rights/Legal Restrictions</label>
         <div name="restrictions" class="multiline">[[document.properties.ai:restrictions]]</div>
       </div>
 
       <div role="widget" hidden$="[[!document.properties.ai:elementsDetected]]">
-        <label>Elements Detected</label>
+        <label>Semantic Elements</label>
         <div name="elementsDetected" class="multiline">[[document.properties.ai:elementsDetected]]</div>
       </div>
 
@@ -101,46 +101,45 @@ limitations under the License.
       </div>
 
       <nuxeo-directory-suggestion
-        role="widget"
-        label="Classification"
-        directory-name="classification"
-        name="classification"
-        value="{{document.properties.ai:classification}}"
-        hidden$="[[!document.properties.ai:classification.length]]"
-        multiple="true"
-        readonly
+              role="widget"
+              label="Document Classification"
+              directory-name="classification"
+              name="classification"
+              value="{{document.properties.ai:classification}}"
+              hidden$="[[!document.properties.ai:classification.length]]"
+              multiple="true"
+              readonly
+      >
+      </nuxeo-directory-suggestion>
+
+      <nuxeo-directory-suggestion
+              role="widget"
+              label="Brand Safety"
+              directory-name="safetyCategories"
+              name="safety"
+              value="{{document.properties.ai:safety}}"
+              hidden$="[[!document.properties.ai:safety.length]]"
+              multiple="true"
+              readonly
       >
       </nuxeo-directory-suggestion>
 
       <div role="widget" hidden$="[[!document.properties.ai:safetyText]]">
-        <label>Safety Text</label>
+        <label>Brand Safety Detail</label>
         <div name="safetyText" class="multiline">[[document.properties.ai:safetyText]]</div>
       </div>
 
       <nuxeo-directory-suggestion
-        role="widget"
-        label="Safety"
-        directory-name="safetyCategories"
-        name="safety"
-        value="{{document.properties.ai:safety}}"
-        hidden$="[[!document.properties.ai:safety.length]]"
-        multiple="true"
-        readonly
+              role="widget"
+              label="Shot Type"
+              directory-name="imageScenes"
+              name="imageScene"
+              value="{{document.properties.ai:imageScene}}"
+              hidden$="[[!document.properties.ai:imageScene.length]]"
+              multiple="true"
+              readonly
       >
       </nuxeo-directory-suggestion>
-
-      <nuxeo-directory-suggestion
-        role="widget"
-        label="Image Scene"
-        directory-name="imageScenes"
-        name="imageScene"
-        value="{{document.properties.ai:imageScene}}"
-        hidden$="[[!document.properties.ai:imageScene.length]]"
-        multiple="true"
-        readonly
-      >
-      </nuxeo-directory-suggestion>
-    </template>
 
     <nuxeo-document-attachments role="widget" document="[[document]]"></nuxeo-document-attachments>
   </template>
