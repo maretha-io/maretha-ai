@@ -55,6 +55,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     public static final String CALLBACK_NOTIFY_URL = "callbackNotifyUrl";
     private static final String DEFAULT_DIRECTORY_BUCKET_SIZE = "100";
+    private static final String FACET_PREFIX = "Facet_";
     private static final String FILES_SCHEMA = "files";
     private static final String FILE_SCHEMA = "file";
     private static final String FILE_CONTENTS = "files:files";
@@ -405,7 +406,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             }
 
             doc.getFacets().forEach(facet -> {
-                DocTypeWithSchema.Schema schemaSettingByFacet = getSchemaSetting(schemaSettings, "Facet_" + facet,
+                DocTypeWithSchema.Schema schemaSettingByFacet = getSchemaSetting(schemaSettings, FACET_PREFIX + facet,
                         schema);
                 if (schemaSettingByFacet != null) {
                     Set<DocTypeWithSchema.Schema.Field> fields = schemaSettingByFacet.getFields().stream()
@@ -607,7 +608,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 addSchemaFields(doc, session, inIsolation, schemaSetting, schemaFields);
             }
             doc.getFacets().forEach(facet -> {
-                DocTypeWithSchema.Schema schemaSettingByFacet = getSchemaSetting(schemaSettings, "Facet_" + facet,
+                DocTypeWithSchema.Schema schemaSettingByFacet = getSchemaSetting(schemaSettings, FACET_PREFIX + facet,
                         schema);
                 if (schemaSettingByFacet != null) {
                     addSchemaFields(doc, session, inIsolation, schemaSettingByFacet, schemaFields);
