@@ -53,15 +53,16 @@ public class InteractionServiceImpl implements InteractionService {
                     StaticCredentialsProvider.create(
                             AwsBasicCredentials.create(
                                     Framework.getProperty("io.maretha.aws.accessKeyId"),
-                                    Framework.getProperty("io.maretha.aws.secretAccessKey"))
-                    ))
+                                    Framework.getProperty("io.maretha.aws.secretAccessKey"))))
             .region(Region.of(Framework.getProperty("io.maretha.aws.region")))
             .build();
 
-    private final Log log = LogFactory.getLog(InteractionServiceImpl.class);
+    private static final Log log = LogFactory.getLog(InteractionServiceImpl.class);
 
     private static Document toDocument(JsonNode node) {
-        if (node.isObject()) {
+        if (node.isObject())
+
+        {
             var mb = Document.mapBuilder();
             node.fields().forEachRemaining(e -> mb.putDocument(e.getKey(), toDocument(e.getValue())));
             return mb.build();
@@ -86,62 +87,13 @@ public class InteractionServiceImpl implements InteractionService {
     public String invokeModel(DocumentModel doc, Interaction interaction, Map<String, Object> paramsData) {
         var modelId = Framework.getProperty("io.maretha.aws.inferenceProfile") + interaction.getModel();
         var prompt = interaction.getPrompt();
-        var objectMapper = new ObjectMapper();
 
-        Blob blob = getBlob(doc);
-        Message userMsg = null;
-
-        if (isImage(blob)) {
-            try {
-                SdkBytes imageBytes = SdkBytes.fromByteArray(blob.getByteArray());
-                ImageBlock imageBlock = ImageBlock.builder()
-                        .format("jpeg") // "jpeg" or "png"
-                        .source(s -> s.bytes(imageBytes))
-                        .build();
-                ContentBlock contentBlock = ContentBlock.fromImage(imageBlock);
-
-                userMsg = Message.builder()
-                        .role("user")
-                        .content(contentBlock)
-                        .build();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if ("application/pdf".equalsIgnoreCase(blob.getMimeType())) {
-            try (InputStream in = blob.getStream()) {
-                ApachePdfBoxDocumentParser pdfParser = new ApachePdfBoxDocumentParser();
-                var document = pdfParser.parse(in);
-                userMsg = Message.builder()
-                        .role("user")
-                        .content(ContentBlock.fromText(
-                                "<NUXEO_DOCUMENT>:\n\n " + document.text() + " \n\n </NUXEO_DOCUMENT>"
-                        ))
-                        .build();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+        List<Message> userMessages = new ArrayList<>();
+        processParamsAndBlobs(doc, paramsData, userMessages);
 
         SystemContentBlock systemPrompt = SystemContentBlock.builder()
                 .text(prompt)
                 .build();
-
-        List<Message> userMessages = new ArrayList<>();
-        userMessages.add(userMsg);
-
-        if (MapUtils.isNotEmpty(paramsData)) {
-            Message paramsUserMessage = null;
-            try {
-                paramsUserMessage = Message.builder()
-                        .role("user")
-                        .content(ContentBlock.fromText(objectMapper.writeValueAsString(paramsData)))
-                        .build();
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-            userMessages.add(paramsUserMessage);
-        }
 
         ConverseRequest request = ConverseRequest.builder()
                 .modelId(modelId)
@@ -167,7 +119,8 @@ public class InteractionServiceImpl implements InteractionService {
     }
 
     @Override
-    public String invokeModelWithSchema(DocumentModel doc, Interaction interaction, Map<String, Object> paramsData, String resultSchema) {
+    public String invokeModelWithSchema(DocumentModel doc, Interaction interaction, Map<String, Object> paramsData,
+            String resultSchema) {
         var modelId = Framework.getProperty("io.maretha.aws.inferenceProfile") + interaction.getModel();
         var prompt = interaction.getPrompt();
 
@@ -181,7 +134,7 @@ public class InteractionServiceImpl implements InteractionService {
         }
 
         ToolInputSchema inputSchema = ToolInputSchema.builder()
-                .json(toDocument(resultSchemaJsonNode))   // pass schema as String
+                .json(toDocument(resultSchemaJsonNode)) // pass schema as String
                 .build();
 
         ToolSpecification toolSpec = ToolSpecification.builder()
@@ -194,57 +147,8 @@ public class InteractionServiceImpl implements InteractionService {
                 .tools(List.of(Tool.builder().toolSpec(toolSpec).build()))
                 .build();
 
-        Blob blob = getBlob(doc);
-        Message userMsg;
-
         List<Message> userMessages = new ArrayList<>();
-
-        if (MapUtils.isNotEmpty(paramsData)) {
-            Message paramsUserMessage = null;
-            try {
-                paramsUserMessage = Message.builder()
-                        .role("user")
-                        .content(ContentBlock.fromText(mapper.writeValueAsString(paramsData)))
-                        .build();
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-            log.debug("Params user message: " + paramsUserMessage);
-            userMessages.add(paramsUserMessage);
-        }
-
-        if (isImage(blob)) {
-            try {
-                SdkBytes imageBytes = SdkBytes.fromByteArray(blob.getByteArray());
-                ImageBlock imageBlock = ImageBlock.builder()
-                        .format("jpeg")               // "jpeg" or "png"
-                        .source(s -> s.bytes(imageBytes))
-                        .build();
-                ContentBlock contentBlock = ContentBlock.fromImage(imageBlock);
-
-                userMsg = Message.builder()
-                        .role("user")
-                        .content(contentBlock)
-                        .build();
-                userMessages.add(userMsg);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            try (InputStream in = blob.getStream()) {
-                ApachePdfBoxDocumentParser pdfParser = new ApachePdfBoxDocumentParser();
-                var document = pdfParser.parse(in);
-                userMsg = Message.builder()
-                        .role("user")
-                        .content(ContentBlock.fromText(
-                                "<NUXEO_DOCUMENT>:\n\n " + document.text() + " \n\n </NUXEO_DOCUMENT>"
-                        ))
-                        .build();
-                userMessages.add(userMsg);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+        processParamsAndBlobs(doc, paramsData, userMessages);
 
         SystemContentBlock systemPrompt = SystemContentBlock.builder()
                 .text(METADATA_EXTRACTOR_TOOL_PROMPT + " Prompt: " + prompt)
@@ -276,6 +180,86 @@ public class InteractionServiceImpl implements InteractionService {
             return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    static void processParamsAndBlobs(DocumentModel doc, Map<String, Object> paramsData, List<Message> userMessages) {
+        Blob mainBlob = getBlob(doc);
+        // Add main document blob if present
+        if (mainBlob != null) {
+            addBlobContentToMessages(mainBlob, userMessages);
+        }
+
+        // Process paramsData
+        if (MapUtils.isNotEmpty(paramsData)) {
+            for (Map.Entry<String, Object> entry : paramsData.entrySet()) {
+                Object value = entry.getValue();
+
+                if (value instanceof Blob) {
+                    addBlobContentToMessages((Blob) value, userMessages);
+                    entry.setValue("[Content attached as " + ((Blob) value).getFilename() + "]");
+                } else if (value instanceof List) {
+                    List<?> list = (List<?>) value;
+                    if (!list.isEmpty() && list.get(0) instanceof Blob) {
+                        for (Object item : list) {
+                            if (item instanceof Blob) {
+                                addBlobContentToMessages((Blob) item, userMessages);
+                            }
+                        }
+                        entry.setValue("[Values list of " + list.size() + " Blobs attached]");
+                    }
+                }
+            }
+
+            // After processing Blobs, serialize the paramsData
+            try {
+                Message paramsUserMessage = Message.builder()
+                        .role("user")
+                        .content(ContentBlock.fromText(new ObjectMapper().writeValueAsString(paramsData)))
+                        .build();
+                userMessages.add(paramsUserMessage);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static void addBlobContentToMessages(Blob blob, List<Message> userMessages) {
+        if (blob == null)
+            return;
+
+        if (isImage(blob)) {
+            try {
+                SdkBytes imageBytes = SdkBytes.fromByteArray(blob.getByteArray());
+                ImageBlock imageBlock = ImageBlock.builder()
+                        .format("jpeg") // "jpeg" or "png" - Bedrock requires specific formats, assuming jpeg for now or
+                                        // extracting extension
+                        .source(s -> s.bytes(imageBytes))
+                        .build();
+                ContentBlock contentBlock = ContentBlock.fromImage(imageBlock);
+
+                Message userMsg = Message.builder()
+                        .role("user")
+                        .content(contentBlock)
+                        .build();
+                userMessages.add(userMsg);
+            } catch (IOException e) {
+                log.error("Failed to read image blob", e);
+            }
+        } else if ("application/pdf".equalsIgnoreCase(blob.getMimeType())) {
+            try (InputStream in = blob.getStream()) {
+                ApachePdfBoxDocumentParser pdfParser = new ApachePdfBoxDocumentParser();
+                var document = pdfParser.parse(in);
+                Message userMsg = Message.builder()
+                        .role("user")
+                        .content(ContentBlock.fromText(
+                                "<DOCUMENT name=\"" + blob.getFilename() + "\">:\n" + document.text()
+                                        + " \n</DOCUMENT>"))
+                        .build();
+                userMessages.add(userMsg);
+            } catch (Exception e) {
+                log.error("Failed to parse PDF blob", e);
+            }
         }
     }
 }
