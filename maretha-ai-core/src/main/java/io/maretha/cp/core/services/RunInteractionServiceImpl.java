@@ -8,10 +8,9 @@ import io.maretha.cp.core.models.DocTypeWithSchema.Schema.Field;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
-import io.maretha.cp.core.services.ai.EmbeddingsService;
+
 import io.maretha.cp.core.services.ai.InteractionService;
-import io.maretha.cp.core.services.utils.BlobUtils;
-import io.maretha.cp.core.services.utils.NuxeoDocResolverUtils;
+
 import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -24,37 +23,32 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentRef;
+
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
-import org.nuxeo.ecm.core.api.validation.DocumentValidationService;
-import org.nuxeo.ecm.core.blob.ManagedBlob;
-import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
+
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
-import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_IMAGE;
-import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TEXT;
+
 import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
@@ -69,18 +63,11 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public static Blob getBlob(DocumentModel doc) {
-        if (doc.hasFacet("Picture")) {
-            PictureBlobHolder pictureBlobHolder = new PictureBlobHolder(doc, "picture:views/3/content"); // FullHD
-            Blob blob = pictureBlobHolder.getBlob();
-            if (blob != null && blob.getLength() > 0 && !blob.getFilename().contains("empty_picture"))
-                return blob;
-        }
-        return (Blob) doc.getPropertyValue(FILE_CONTENT);
+        return io.maretha.cp.core.services.helper.BlobExtractor.getFileContent(doc);
     }
 
     public static boolean isImage(Blob blob) {
-        String mimeType = blob.getMimeType();
-        return mimeType != null && mimeType.startsWith("image/");
+        return io.maretha.cp.core.services.helper.BlobExtractor.isImage(blob);
     }
 
     @Override
@@ -114,9 +101,11 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
         Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true);
         schemasFieldsInIsolation.forEach(schemaField -> {
-            Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription> directoryValues = schemaField.getDirectoryValues();
+            Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription> directoryValues = schemaField
+                    .getDirectoryValues();
             if (MapUtils.isNotEmpty(directoryValues) && directoryValues.size() > bucketSize) {
-                List<Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription>> partitionedMap = partitionMap(directoryValues, bucketSize);
+                List<Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription>> partitionedMap = partitionMap(
+                        directoryValues, bucketSize);
                 partitionedMap.forEach(partition -> {
                     schemaField.setDirectoryValues(partition);
                     sendInteractionRequest(interactionId, paramsMap, Set.of(schemaField), saveMetadataModeOverride, doc,
@@ -193,233 +182,17 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 .concat(schemaFieldsNotInIsolation.stream(), schemaFieldsInIsolation.stream())
                 .collect(Collectors.toSet());
 
-        try {
-            DocumentValidationService validationService = Framework.getService(DocumentValidationService.class);
-            JsonNode resultNode;
-            try {
-                resultNode = jsonNode.get("result");
-            } catch (Exception e) {
-                log.error("Missing json result from API Response", e);
-                throw e;
-            }
-            if (null == resultNode) {
-                log.debug(jsonNode);
-                throw new NuxeoException("ResultNode is null, cannot save metadata.");
-            }
-
-            resultNode.fields().forEachRemaining(field -> {
-                String key = field.getKey();
-                JsonNode valueNode = field.getValue();
-                if (null == valueNode || valueNode.isNull()) {
-                    log.warn("Metadata save skip for null value: " + key);
-                    return;
-                }
-                if (StringUtils.isEmpty(valueNode.asText()) && valueNode.isEmpty()) {
-                    log.warn("Metadata save skip on empty value for xpath: " + key);
-                    return;
-                }
-                Optional<DocTypeWithSchema.Schema.Field> optionalField = schemasFields.stream()
-                        .filter(schemaField -> schemaField.getXpath().equalsIgnoreCase(key)).findFirst();
-                if (optionalField.isEmpty()) {
-                    log.warn("Metadata save skip on not declared xpath: " + key);
-                    return;
-                }
-                try {
-                    Serializable propertyValue = doc.getPropertyValue(key);
-                    if ("nxtag:tags".equalsIgnoreCase(key)) {
-                        log.debug("Adding nxtag:tags for documentId: " + doc.getId());
-                        List<String> newTags = new ArrayList<>();
-                        valueNode.forEach(element -> newTags.add(element.asText()));
-                        appendTags(doc, newTags);
-                        logAIAudit(session, doc, "", "Saved AI metadata nxtag:tags : " + newTags);
-                        return;
-                    }
-                    if (optionalField.get().isMultiValue() && valueNode.isArray()) {
-                        Set<String> values = new LinkedHashSet<>();
-                        valueNode.forEach(element -> values.add(element.asText()));
-
-                        if (saveMetadataModeOverride) {
-                            updateMetadataFieldArray(doc, validationService, key, values);
-                        } else {
-                            appendMetadataFieldArray(doc, validationService, key, values);
-                        }
-
-                        logAIAudit(session, doc, "", "Saved AI metadata " + key + " : " + values);
-                        return;
-                    }
-                    if (isNullOrEmpty(propertyValue) || saveMetadataModeOverride) {
-                        saveMetadataField(doc, validationService, key, valueNode.asText());
-                        logAIAudit(session, doc, "", "Saved AI metadata " + key + " : " + valueNode.asText());
-                    }
-                } catch (Exception ex) {
-                    log.error("Failed to set metadata for " + key + ":" + valueNode.toPrettyString(), ex);
-                }
-            });
-            session.saveDocument(doc);
-        } catch (Exception e) {
-            log.error("Could not save document metadata", e);
-            throw new RuntimeException("Failed to save document metadata: " + e.getMessage());
-        }
-    }
-
-    private void appendTags(DocumentModel doc, List<String> newTags) {
-        if (CollectionUtils.isNotEmpty(newTags)) {
-            if (!doc.hasFacet("NXTag")) {
-                doc.addFacet("NXTag");
-            }
-            List<Map<String, String>> existingTags = (List<Map<String, String>>) doc.getPropertyValue("nxtag:tags");
-            List<Map<String, String>> tagsList = new ArrayList<>(existingTags);
-
-            // Build a Set of existing labels for fast lookup
-            Set<String> existingLabels = tagsList.stream()
-                    .map(tagMap -> tagMap.get("label"))
-                    .collect(Collectors.toSet());
-
-            // Add new tags only if their label is not already present
-            for (String tagLabel : newTags) {
-                if (!existingLabels.contains(tagLabel)) {
-                    tagsList.add(Map.of("label", tagLabel, "username", "system"));
-                    existingLabels.add(tagLabel); // keep the set updated
-                }
-            }
-
-            if (CollectionUtils.isNotEmpty(tagsList)) {
-                doc.setPropertyValue("nxtag:tags", (Serializable) tagsList);
-                log.debug("Updated nxtag:tags for documentId: " + doc.getId() + " new tags:" + tagsList);
-            }
-        }
-    }
-
-    private void saveMetadataField(DocumentModel doc, DocumentValidationService validationService, String key,
-            Serializable value) {
-        if (!validationService.validate(key, value).hasError()) {
-            doc.setPropertyValue(key, value);
-            log.debug(String.format("Saved metadata key: %s value: %s", key, formatValue(value)));
-        } else {
-            log.error(String.format("Failed to save metadata key: %s value: %s", key, formatValue(value)));
-        }
-    }
-
-    private void updateMetadataFieldArray(DocumentModel doc, DocumentValidationService validationService, String key,
-            Set<String> newValues) {
-        if (newValues == null || newValues.isEmpty()) {
-            log.error(String.format("Skip save metadata for key: %s on empty value: %s", key,
-                    formatValue((Serializable) newValues)));
-            return;
-        }
-
-        // Overwrite existing values with new values
-        ArrayList<String> result = new ArrayList<>(newValues);
-
-        if (!validationService.validate(key, result).hasError()) {
-            doc.setPropertyValue(key, result);
-            log.debug(String.format("Saved metadata key: %s value: %s", key, formatValue(result)));
-        } else {
-            log.error(String.format("Failed to save metadata key: %s value: %s", key, formatValue(result)));
-        }
-    }
-
-    private void appendMetadataFieldArray(DocumentModel doc, DocumentValidationService validationService, String key,
-            Set<String> newValues) {
-        if (newValues == null || newValues.isEmpty()) {
-            log.error(String.format("Skip save metadata for key: %s on empty value: %s", key,
-                    formatValue((Serializable) newValues)));
-            return;
-        }
-
-        Object value = doc.getPropertyValue(key);
-        ArrayList<String> existingValues;
-
-        if (value instanceof String[]) {
-            String[] valuesArray = (String[]) value;
-            existingValues = new ArrayList<>(Arrays.asList(valuesArray));
-        } else if (value instanceof ArrayList) {
-            existingValues = (ArrayList<String>) value;
-        } else {
-            existingValues = new ArrayList<>(); // fallback if null or unexpected type
-        }
-
-        // Use LinkedHashSet to preserve order: new first, then existing (if not
-        // duplicated)
-        LinkedHashSet<String> combined = new LinkedHashSet<>();
-        combined.addAll(newValues);
-        combined.addAll(existingValues);
-
-        ArrayList<String> result = new ArrayList<>(combined);
-
-        if (!validationService.validate(key, result).hasError()) {
-            doc.setPropertyValue(key, result);
-            log.debug(String.format("Saved metadata key: %s value: %s", key, formatValue(result)));
-        } else {
-            log.error(String.format("Failed to save metadata key: %s value: %s", key, formatValue(result)));
-        }
-    }
-
-    private String formatValue(Serializable value) {
-        if (value instanceof String[]) {
-            return Arrays.toString((String[]) value);
-        } else {
-            return String.valueOf(value);
-        }
+        // Delegate to helper class
+        io.maretha.cp.core.services.helper.MetadataOperations.validateAndSaveMetadata(
+                jsonNode, docId, saveMetadataModeOverride, schemasFields);
     }
 
     @Override
     public DocumentModel addEmbeddings(DocumentModel doc, CoreSession session, boolean waitForCompletion,
             boolean lowPriority) {
         Blob blob = getBlob(doc);
-
-        try {
-            if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_IMAGE))) {
-                addImageEmbeddings(doc, blob);
-                doc = session.saveDocument(doc);
-            }
-
-            if (isImage(blob) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
-                addImageTextEmbeddings(doc, blob);
-                doc = session.saveDocument(doc);
-            }
-
-            if ("application/pdf".equalsIgnoreCase(blob.getMimeType())
-                    && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
-                addTextEmbeddings(doc, blob);
-                doc = session.saveDocument(doc);
-            }
-        } catch (Exception e) {
-            log.error("Failed to save document: " + doc.getId(), e);
-        }
-
-        return doc;
-    }
-
-    private void addImageTextEmbeddings(DocumentModel doc, Blob blob) {
-        try {
-            String description = (String) doc.getPropertyValue("dc:description");
-            double[] vector = Framework.getService(EmbeddingsService.class).textToEmbedding(description);
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, vector);
-        } catch (Exception e) {
-            log.error("Failed to add text embeddings", e);
-        }
-    }
-
-    private void addTextEmbeddings(DocumentModel doc, Blob blob) {
-        try {
-            double[] documentEmbeddings = Framework.getService(EmbeddingsService.class).embedPdfSummary(blob);
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
-        } catch (Exception e) {
-            log.error("Failed to save textEmbeddings", e);
-        }
-    }
-
-    private void addImageEmbeddings(DocumentModel doc, Blob blob) {
-        try {
-            String base64 = Base64.getEncoder().encodeToString(blob.getByteArray());
-            // String imageAsBase64 = "data:" + blob.getMimeType() + ";base64," + base64;
-            double[] documentEmbeddings = Framework.getService(EmbeddingsService.class).embedImage(base64,
-                    doc.getTitle(), 1024);
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
-        } catch (Exception e) {
-            log.error("Failed to save imageEmbeddings", e);
-        }
+        return io.maretha.cp.core.services.helper.EmbeddingsHelper.addEmbeddings(
+                doc, session, blob, waitForCompletion, lowPriority);
     }
 
     private Map<String, Object> buildParameters(DocumentModel doc, CoreSession session,
@@ -500,43 +273,18 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     private List<DocumentModel> getRelatedDocuments(CoreSession session, DocumentModel doc) {
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
+
         if (MapUtils.isEmpty(schemaSettings)) {
             log.error("SchemaSettings is empty");
             return Collections.emptyList();
         }
 
-        Set<DocTypeWithSchema.Schema.Field> schemaFields = getSchemaFields(doc, schemaSettings);
-
-        List<DocumentModel> allRelatedDocuments = new ArrayList<>();
-        schemaFields.forEach(field -> {
-            String xpath = field.getXpath();
-            try {
-                if (NuxeoDocResolverUtils.isDocumentReference(doc, xpath)) {
-                    List<DocumentModel> relatedDocumentModels = NuxeoDocResolverUtils.resolveDocumentReferences(session,
-                            doc, xpath);
-                    allRelatedDocuments.addAll(relatedDocumentModels);
-                }
-            } catch (Exception ignored) {
-            }
-        });
-        return allRelatedDocuments;
+        return io.maretha.cp.core.services.helper.DocumentContextBuilder.getRelatedDocuments(
+                session, doc, this::getSchemaFields, schemaSettings);
     }
 
     private List<DocumentModel> getAllParentDocuments(CoreSession session, DocumentModel doc) {
-        List<DocumentModel> parents = new ArrayList<>();
-
-        DocumentRef parentRef = doc.getParentRef();
-        while (parentRef != null) {
-            DocumentModel parentDoc = session.getDocument(parentRef);
-            if ("00000000-0000-0000-0000-000000000000".equalsIgnoreCase(parentDoc.getId())
-                    || "/".equals(parentDoc.getPathAsString())) {
-                break;
-            }
-            parents.add(parentDoc);
-            parentRef = parentDoc.getParentRef();
-        }
-
-        return parents;
+        return io.maretha.cp.core.services.helper.DocumentContextBuilder.getAllParentDocuments(session, doc);
     }
 
     private Map<String, Blob> addParentDocuments(CoreSession session, List<DocumentModel> allParentDocuments) {
@@ -671,101 +419,16 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     @SneakyThrows
     private Map<String, Object> getAdditionalContext(CoreSession session, DocumentModel doc) {
-        return getAdditionalContext(session, doc, 0, new HashSet<>());
-    }
-
-    @SneakyThrows
-    private Map<String, Object> getAdditionalContext(CoreSession session, DocumentModel doc,
-                                                      int depth, Set<String> visitedDocIds) {
-        final int MAX_DEPTH = 5;
-        if (depth >= MAX_DEPTH) {
-            log.warn("Max recursion depth reached for document: " + doc.getId());
-            return new HashMap<>();
-        }
-
-        if (visitedDocIds.contains(doc.getId())) {
-            log.debug("Document already visited, skipping: " + doc.getId());
-            return new HashMap<>();
-        }
-        visitedDocIds.add(doc.getId());
-
-        Set<Field> schemaFields = getMetadataSettingsSchemaFields(doc, session);
-        Map<String, Object> valuesMap = new HashMap<>();
-
-        schemaFields.forEach(field -> {
-            String xpath = field.getXpath();
-            try {
-                // For related documents get relevant context recursively
-                if (NuxeoDocResolverUtils.isDocumentReference(doc, xpath)) {
-                    Map<String, Object> relatedDocContext = new HashMap<>();
-                    List<DocumentModel> documentModels = NuxeoDocResolverUtils.resolveDocumentReferences(session, doc, xpath);
-                    documentModels.forEach(relatedDoc -> {
-                        // RECURSIVE CALL with depth tracking and cycle detection
-                        Map<String, Object> context = getAdditionalContext(session, relatedDoc, depth + 1, visitedDocIds);
-                        if (context != null && !context.isEmpty()) {
-                            relatedDocContext.put(relatedDoc.getId(), context);
-                        }
-                    });
-                    valuesMap.put(xpath, relatedDocContext);
-                } else {
-                    Serializable propertyValue = doc.getPropertyValue(xpath);
-                    valuesMap.put(xpath, propertyValue);
-                }
-            } catch (Exception e) {
-                log.debug("Failed to process field: " + xpath, e);
-            }
-        });
-        return valuesMap;
+        return io.maretha.cp.core.services.helper.DocumentContextBuilder.buildContext(
+                session, doc, this::getMetadataSettingsSchemaFields);
     }
 
     private Map<String, Blob> getAttachmentsMap(DocumentModel doc) {
-        List<Blob> attachments = getAttachmentBlobs(doc);
-        Blob docBlob = getBlob(doc);
-        if (null != docBlob) {
-            attachments.add(docBlob);
-        }
-
-        Map<String, Blob> attachementsMap = new HashMap<>();
-        // In maretha-cp, this uploads to store and maps ID -> Blob.
-        // Here we just map Digest/Unique -> Blob?
-        // Or Filename -> Blob?
-        attachments.forEach(blob -> {
-            if (blob != null) {
-                attachementsMap.put(blob.getDigest() != null ? blob.getDigest() : blob.getFilename(), blob);
-            }
-        });
-        return attachementsMap;
+        return io.maretha.cp.core.services.helper.BlobExtractor.getAttachmentsMap(doc);
     }
 
     private List<Blob> getAttachmentBlobs(DocumentModel doc) {
-        try {
-            if (!doc.hasSchema(FILES_SCHEMA)) {
-                return Collections.emptyList();
-            }
-            List<Blob> blobs = new ArrayList<>();
-            ArrayList<Map> attachments = (ArrayList<Map>) doc.getPropertyValue(FILE_CONTENTS);
-
-            if (CollectionUtils.isNotEmpty(attachments)) {
-                for (Map attachment : attachments) {
-                    Blob blob = (Blob) attachment.get(FILE_SCHEMA);
-                    blobs.add(blob);
-                }
-            }
-            return blobs;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    // Kept from maretha-ai
-    private boolean isNullOrEmpty(Serializable propertyValue) {
-        if (propertyValue instanceof String) {
-            return StringUtils.isEmpty((CharSequence) propertyValue);
-        }
-        if (propertyValue instanceof List) {
-            return CollectionUtils.isEmpty((Collection) propertyValue);
-        }
-        return Objects.isNull(propertyValue);
+        return io.maretha.cp.core.services.helper.BlobExtractor.getAttachments(doc);
     }
 
     private Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription> getDictionaryValues(CoreSession session,
