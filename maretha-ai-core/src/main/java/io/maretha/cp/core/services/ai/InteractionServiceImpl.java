@@ -184,8 +184,8 @@ public class InteractionServiceImpl implements InteractionService {
     }
 
     static void processParamsAndBlobs(DocumentModel doc, Map<String, Object> paramsData, List<Message> userMessages) {
-        Blob mainBlob = getBlob(doc);
         // Add main document blob if present
+        Blob mainBlob = getBlob(doc);
         if (mainBlob != null) {
             addBlobContentToMessages(mainBlob, userMessages);
         }
@@ -193,51 +193,62 @@ public class InteractionServiceImpl implements InteractionService {
         // Process paramsData
         if (MapUtils.isNotEmpty(paramsData)) {
             for (Map.Entry<String, Object> entry : paramsData.entrySet()) {
-                Object value = entry.getValue();
-
-                if (value instanceof Blob) {
-                    addBlobContentToMessages((Blob) value, userMessages);
-                    entry.setValue("[Content attached as " + ((Blob) value).getFilename() + "]");
-                } else if (value instanceof List) {
-                    List<?> list = (List<?>) value;
-                    if (!list.isEmpty() && list.get(0) instanceof Blob) {
-                        for (Object item : list) {
-                            if (item instanceof Blob) {
-                                addBlobContentToMessages((Blob) item, userMessages);
-                            }
-                        }
-                        entry.setValue("[Values list of " + list.size() + " Blobs attached]");
-                    }
-                } else if (value instanceof Map) {
-                    // Handle Map<String, Blob> (e.g., parent/related document attachments)
-                    Map<?, ?> map = (Map<?, ?>) value;
-                    if (!map.isEmpty()) {
-                        // Check if map contains Blobs
-                        Object firstValue = map.values().iterator().next();
-                        if (firstValue instanceof Blob) {
-                            int blobCount = 0;
-                            for (Object mapValue : map.values()) {
-                                if (mapValue instanceof Blob) {
-                                    addBlobContentToMessages((Blob) mapValue, userMessages);
-                                    blobCount++;
-                                }
-                            }
-                            entry.setValue("[Map of " + blobCount + " Blobs attached]");
-                        }
-                    }
+                String placeholder = extractAndProcessBlobs(entry.getValue(), userMessages);
+                if (placeholder != null) {
+                    entry.setValue(placeholder);
                 }
             }
 
-            // After processing Blobs, serialize the paramsData
-            try {
-                Message paramsUserMessage = Message.builder()
-                        .role("user")
-                        .content(ContentBlock.fromText(new ObjectMapper().writeValueAsString(paramsData)))
-                        .build();
-                userMessages.add(paramsUserMessage);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+            // Serialize the paramsData with placeholders
+            serializeParamsAsMessage(paramsData, userMessages);
+        }
+    }
+
+    /**
+     * Extracts blobs from a value (Blob, List, or Map) and adds them to messages.
+     * Returns a placeholder string if blobs were found, null otherwise.
+     */
+    private static String extractAndProcessBlobs(Object value, List<Message> userMessages) {
+        if (value instanceof Blob) {
+            Blob blob = (Blob) value;
+            addBlobContentToMessages(blob, userMessages);
+            return "[Content attached as " + blob.getFilename() + "]";
+        }
+
+        if (value instanceof List) {
+            List<?> list = (List<?>) value;
+            if (!list.isEmpty() && list.get(0) instanceof Blob) {
+                list.stream()
+                        .filter(item -> item instanceof Blob)
+                        .forEach(item -> addBlobContentToMessages((Blob) item, userMessages));
+                return "[Values list of " + list.size() + " Blobs attached]";
             }
+        }
+
+        if (value instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            if (!map.isEmpty() && map.values().iterator().next() instanceof Blob) {
+                int blobCount = (int) map.values().stream()
+                        .filter(item -> item instanceof Blob)
+                        .peek(item -> addBlobContentToMessages((Blob) item, userMessages))
+                        .count();
+                return "[Map of " + blobCount + " Blobs attached]";
+            }
+        }
+
+        return null;
+    }
+
+    private static void serializeParamsAsMessage(Map<String, Object> paramsData, List<Message> userMessages) {
+        try {
+            String jsonParams = new ObjectMapper().writeValueAsString(paramsData);
+            Message paramsMessage = Message.builder()
+                    .role("user")
+                    .content(ContentBlock.fromText(jsonParams))
+                    .build();
+            userMessages.add(paramsMessage);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
