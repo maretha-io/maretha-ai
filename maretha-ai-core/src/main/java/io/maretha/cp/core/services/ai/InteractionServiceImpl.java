@@ -208,6 +208,23 @@ public class InteractionServiceImpl implements InteractionService {
                         }
                         entry.setValue("[Values list of " + list.size() + " Blobs attached]");
                     }
+                } else if (value instanceof Map) {
+                    // Handle Map<String, Blob> (e.g., parent/related document attachments)
+                    Map<?, ?> map = (Map<?, ?>) value;
+                    if (!map.isEmpty()) {
+                        // Check if map contains Blobs
+                        Object firstValue = map.values().iterator().next();
+                        if (firstValue instanceof Blob) {
+                            int blobCount = 0;
+                            for (Object mapValue : map.values()) {
+                                if (mapValue instanceof Blob) {
+                                    addBlobContentToMessages((Blob) mapValue, userMessages);
+                                    blobCount++;
+                                }
+                            }
+                            entry.setValue("[Map of " + blobCount + " Blobs attached]");
+                        }
+                    }
                 }
             }
 
