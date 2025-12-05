@@ -34,4 +34,7 @@ public class Interaction {
     private boolean activeOnActionMenu;
     private boolean saveMetadata;
     private boolean mainMetadata;
+    private boolean sendParentsContext;
+    private boolean sendAttachments;
+    private boolean requiresUserInput;
 }

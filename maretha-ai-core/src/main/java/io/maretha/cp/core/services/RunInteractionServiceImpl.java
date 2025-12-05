@@ -2,12 +2,16 @@ package io.maretha.cp.core.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.maretha.cp.core.models.DocOrMediaType;
 import io.maretha.cp.core.models.DocTypeWithSchema;
+import io.maretha.cp.core.models.DocTypeWithSchema.Schema.Field;
 import io.maretha.cp.core.models.Interaction;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.models.Settings;
 import io.maretha.cp.core.services.ai.EmbeddingsService;
 import io.maretha.cp.core.services.ai.InteractionService;
+import io.maretha.cp.core.services.utils.BlobUtils;
+import io.maretha.cp.core.services.utils.NuxeoDocResolverUtils;
 import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -20,6 +24,7 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
@@ -56,12 +61,16 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     public static final String CALLBACK_NOTIFY_URL = "callbackNotifyUrl";
     private static final String DEFAULT_DIRECTORY_BUCKET_SIZE = "100";
+    private static final String FILES_SCHEMA = "files";
+    private static final String FILE_SCHEMA = "file";
+    private static final String FILE_CONTENTS = "files:files";
+
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public static Blob getBlob(DocumentModel doc) {
         if (doc.hasFacet("Picture")) {
-            PictureBlobHolder pictureBlobHolder = new PictureBlobHolder(doc, "picture:views/3/content"); //FullHD
+            PictureBlobHolder pictureBlobHolder = new PictureBlobHolder(doc, "picture:views/3/content"); // FullHD
             Blob blob = pictureBlobHolder.getBlob();
             if (blob != null && blob.getLength() > 0 && !blob.getFilename().contains("empty_picture"))
                 return blob;
@@ -75,45 +84,54 @@ public class RunInteractionServiceImpl implements RunInteractionService {
     }
 
     @Override
-    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId, List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride, boolean asyncMode) {
+    public String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId,
+            List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride,
+            boolean asyncMode) {
         logAIAudit(session, doc, "", "Triggering AI Interaction with id: " + interactionId);
-        Map<String, Object> paramsMap = buildParameters(doc, session, parameters);
+
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+        Interaction interaction = getInteractionById(savedSettings, interactionId);
+
+        Map<String, Object> paramsMap = buildParameters(doc, session, parameters, interaction);
         if (!doc.hasFacet(RESULTS_FACET)) {
             doc.addFacet(RESULTS_FACET);
         }
         if (saveMetadata) {
             triggerSaveMetadataRequest(doc, session, interactionId, saveMetadataModeOverride, paramsMap, asyncMode);
-            addEmbeddings(doc, session, false, false); //todo move to async worker
+            addEmbeddings(doc, session, false, false); // todo move to async worker
             return "Metadata request in progress.";
         }
-        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
-        Interaction interaction = getInteractionById(savedSettings, interactionId);
+
         String response = Framework.getService(InteractionService.class).invokeModel(doc, interaction, paramsMap);
-        addEmbeddings(doc, session, false, false); //todo move to async worker
+        addEmbeddings(doc, session, false, false); // todo move to async worker
         return response;
     }
 
-    private void triggerSaveMetadataRequest(DocumentModel doc, CoreSession session, String interactionId, boolean saveMetadataModeOverride, Map<String, Object> paramsMap, boolean asyncMode) {
+    private void triggerSaveMetadataRequest(DocumentModel doc, CoreSession session, String interactionId,
+            boolean saveMetadataModeOverride, Map<String, Object> paramsMap, boolean asyncMode) {
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         int bucketSize = getBucketSize(savedSettings);
 
         Set<DocTypeWithSchema.Schema.Field> schemasFieldsInIsolation = getSchemaFields(doc, session, true);
         schemasFieldsInIsolation.forEach(schemaField -> {
-            Map<String, String> directoryValues = schemaField.getDirectoryValues();
+            Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription> directoryValues = schemaField.getDirectoryValues();
             if (MapUtils.isNotEmpty(directoryValues) && directoryValues.size() > bucketSize) {
-                List<Map<String, String>> partitionedMap = partitionMap(directoryValues, bucketSize);
+                List<Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription>> partitionedMap = partitionMap(directoryValues, bucketSize);
                 partitionedMap.forEach(partition -> {
                     schemaField.setDirectoryValues(partition);
-                    sendInteractionRequest(interactionId, paramsMap, Set.of(schemaField), saveMetadataModeOverride, doc, savedSettings, asyncMode);
+                    sendInteractionRequest(interactionId, paramsMap, Set.of(schemaField), saveMetadataModeOverride, doc,
+                            savedSettings, asyncMode);
                 });
             } else {
-                sendInteractionRequest(interactionId, paramsMap, Set.of(schemaField), saveMetadataModeOverride, doc, savedSettings, asyncMode);
+                sendInteractionRequest(interactionId, paramsMap, Set.of(schemaField), saveMetadataModeOverride, doc,
+                        savedSettings, asyncMode);
             }
         });
 
         Set<DocTypeWithSchema.Schema.Field> schemaFieldsNotInIsolation = getSchemaFields(doc, session, false);
         if (CollectionUtils.isNotEmpty(schemaFieldsNotInIsolation)) {
-            sendInteractionRequest(interactionId, paramsMap, schemaFieldsNotInIsolation, saveMetadataModeOverride, doc, savedSettings, asyncMode);
+            sendInteractionRequest(interactionId, paramsMap, schemaFieldsNotInIsolation, saveMetadataModeOverride, doc,
+                    savedSettings, asyncMode);
         }
     }
 
@@ -122,12 +140,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 .filter(interaction -> interaction.getId().equalsIgnoreCase(interactionId))
                 .findFirst()
                 .orElseThrow(() -> new NuxeoException(
-                        "Interaction with ID '" + interactionId + "' not found."
-                ));
+                        "Interaction with ID '" + interactionId + "' not found."));
         return interactionById;
     }
 
-    private void sendInteractionRequest(String interactionId, Map<String, Object> paramsMap, Set<DocTypeWithSchema.Schema.Field> schemaFields, boolean saveMetadataModeOverride, DocumentModel doc, Settings savedSettings, boolean asyncMode) {
+    private void sendInteractionRequest(String interactionId, Map<String, Object> paramsMap,
+            Set<DocTypeWithSchema.Schema.Field> schemaFields, boolean saveMetadataModeOverride, DocumentModel doc,
+            Settings savedSettings, boolean asyncMode) {
         Interaction interaction = getInteractionById(savedSettings, interactionId);
         String resultSchema = getResultSchema(schemaFields);
         String response;
@@ -139,12 +158,21 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             if (schemaField.isInIsolation()) {
                 String customInteractionId = schemaField.getInteractionId();
                 if (StringUtils.isNotEmpty(customInteractionId)) {
-                    interaction = getInteractionById(savedSettings, customInteractionId);
+                    Interaction customInteraction = getInteractionById(savedSettings, customInteractionId);
+
+                    // Skip if main metadata interaction and custom interaction requires user input
+                    if (interaction.isMainMetadata() && customInteraction.isRequiresUserInput()) {
+                        log.info("Skipping interaction " + customInteractionId + " - requires user input");
+                        return;
+                    }
+
+                    interaction = customInteraction;
                 }
             }
         }
 
-        response = Framework.getService(InteractionService.class).invokeModelWithSchema(doc, interaction, paramsData, resultSchema);
+        response = Framework.getService(InteractionService.class).invokeModelWithSchema(doc, interaction, paramsData,
+                resultSchema);
         try {
             JsonNode jsonNode = objectMapper.readTree(response);
             validateAndSaveMetadata(jsonNode, doc.getId(), saveMetadataModeOverride);
@@ -161,7 +189,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
         Set<DocTypeWithSchema.Schema.Field> schemaFieldsNotInIsolation = getSchemaFields(doc, session, false);
         Set<DocTypeWithSchema.Schema.Field> schemaFieldsInIsolation = getSchemaFields(doc, session, true);
-        Set<DocTypeWithSchema.Schema.Field> schemasFields = Stream.concat(schemaFieldsNotInIsolation.stream(), schemaFieldsInIsolation.stream())
+        Set<DocTypeWithSchema.Schema.Field> schemasFields = Stream
+                .concat(schemaFieldsNotInIsolation.stream(), schemaFieldsInIsolation.stream())
                 .collect(Collectors.toSet());
 
         try {
@@ -208,7 +237,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                     if (optionalField.get().isMultiValue() && valueNode.isArray()) {
                         Set<String> values = new LinkedHashSet<>();
                         valueNode.forEach(element -> values.add(element.asText()));
-                        appendMetadataFieldArray(doc, validationService, key, values);
+
+                        if (saveMetadataModeOverride) {
+                            updateMetadataFieldArray(doc, validationService, key, values);
+                        } else {
+                            appendMetadataFieldArray(doc, validationService, key, values);
+                        }
+
                         logAIAudit(session, doc, "", "Saved AI metadata " + key + " : " + values);
                         return;
                     }
@@ -244,7 +279,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             for (String tagLabel : newTags) {
                 if (!existingLabels.contains(tagLabel)) {
                     tagsList.add(Map.of("label", tagLabel, "username", "system"));
-                    existingLabels.add(tagLabel);  // keep the set updated
+                    existingLabels.add(tagLabel); // keep the set updated
                 }
             }
 
@@ -255,7 +290,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    private void saveMetadataField(DocumentModel doc, DocumentValidationService validationService, String key, Serializable value) {
+    private void saveMetadataField(DocumentModel doc, DocumentValidationService validationService, String key,
+            Serializable value) {
         if (!validationService.validate(key, value).hasError()) {
             doc.setPropertyValue(key, value);
             log.debug(String.format("Saved metadata key: %s value: %s", key, formatValue(value)));
@@ -264,9 +300,30 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    private void appendMetadataFieldArray(DocumentModel doc, DocumentValidationService validationService, String key, Set<String> newValues) {
+    private void updateMetadataFieldArray(DocumentModel doc, DocumentValidationService validationService, String key,
+            Set<String> newValues) {
         if (newValues == null || newValues.isEmpty()) {
-            log.error(String.format("Skip save metadata for key: %s on empty value: %s", key, formatValue((Serializable) newValues)));
+            log.error(String.format("Skip save metadata for key: %s on empty value: %s", key,
+                    formatValue((Serializable) newValues)));
+            return;
+        }
+
+        // Overwrite existing values with new values
+        ArrayList<String> result = new ArrayList<>(newValues);
+
+        if (!validationService.validate(key, result).hasError()) {
+            doc.setPropertyValue(key, result);
+            log.debug(String.format("Saved metadata key: %s value: %s", key, formatValue(result)));
+        } else {
+            log.error(String.format("Failed to save metadata key: %s value: %s", key, formatValue(result)));
+        }
+    }
+
+    private void appendMetadataFieldArray(DocumentModel doc, DocumentValidationService validationService, String key,
+            Set<String> newValues) {
+        if (newValues == null || newValues.isEmpty()) {
+            log.error(String.format("Skip save metadata for key: %s on empty value: %s", key,
+                    formatValue((Serializable) newValues)));
             return;
         }
 
@@ -282,7 +339,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
             existingValues = new ArrayList<>(); // fallback if null or unexpected type
         }
 
-        // Use LinkedHashSet to preserve order: new first, then existing (if not duplicated)
+        // Use LinkedHashSet to preserve order: new first, then existing (if not
+        // duplicated)
         LinkedHashSet<String> combined = new LinkedHashSet<>();
         combined.addAll(newValues);
         combined.addAll(existingValues);
@@ -305,7 +363,9 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    public DocumentModel addEmbeddings(DocumentModel doc, CoreSession session, boolean waitForCompletion, boolean lowPriority) {
+    @Override
+    public DocumentModel addEmbeddings(DocumentModel doc, CoreSession session, boolean waitForCompletion,
+            boolean lowPriority) {
         Blob blob = getBlob(doc);
 
         try {
@@ -319,7 +379,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 doc = session.saveDocument(doc);
             }
 
-            if ("application/pdf".equalsIgnoreCase(blob.getMimeType()) && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
+            if ("application/pdf".equalsIgnoreCase(blob.getMimeType())
+                    && CollectionUtils.isEmpty((Collection) doc.getPropertyValue(SCHEMA_EMBEDDINGS_TEXT))) {
                 addTextEmbeddings(doc, blob);
                 doc = session.saveDocument(doc);
             }
@@ -340,77 +401,376 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    private Map<String, Object> buildParameters(DocumentModel doc, CoreSession session, List<InteractionParameter> parameters) {
-        Map<String, Object> paramsMap = new HashMap<>();
-        parameters.forEach(param -> {
-            String name = param.getName();
-            Object value = param.getValue();
-            String type = param.getType();
-            String format = param.getFormat();
-            List<String> selectedDocumentIds = param.getSelectedDocumentIds();
-            String selectedDocumentId = param.getSelectedDocumentId();
+    private void addTextEmbeddings(DocumentModel doc, Blob blob) {
+        try {
+            double[] documentEmbeddings = Framework.getService(EmbeddingsService.class).embedPdfSummary(blob);
+            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
+        } catch (Exception e) {
+            log.error("Failed to save textEmbeddings", e);
+        }
+    }
 
-            if (param.isAdditionalContext()) {
-                Map<String, String> additionalContext = getAdditionalContext(session, doc);
-                paramsMap.put(name, additionalContext);
-                return;
-            }
-            paramsMap.put(name, value);
-        });
+    private void addImageEmbeddings(DocumentModel doc, Blob blob) {
+        try {
+            String base64 = Base64.getEncoder().encodeToString(blob.getByteArray());
+            // String imageAsBase64 = "data:" + blob.getMimeType() + ";base64," + base64;
+            double[] documentEmbeddings = Framework.getService(EmbeddingsService.class).embedImage(base64,
+                    doc.getTitle(), 1024);
+            doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
+        } catch (Exception e) {
+            log.error("Failed to save imageEmbeddings", e);
+        }
+    }
+
+    private Map<String, Object> buildParameters(DocumentModel doc, CoreSession session,
+            List<InteractionParameter> parameters, Interaction interaction) {
+        Map<String, Object> paramsMap = new HashMap<>();
+        List<DocumentModel> relatedDocuments = getRelatedDocuments(session, doc);
+
+        Map<String, Blob> attachments = new HashMap<>();
+        if (interaction.isSendAttachments()) {
+            attachments = getAttachmentsMap(doc);
+        }
+
+        if (interaction.isSendParentsContext()) {
+            List<DocumentModel> allParentDocuments = getAllParentDocuments(session, doc);
+            Map<String, Blob> parentDocuments = addParentDocuments(session, allParentDocuments);
+            attachments.putAll(parentDocuments);
+        }
+
+        final Map<String, Blob> finalAttachments = attachments;
+        parameters.forEach(param -> processParameter(doc, session, interaction, relatedDocuments, finalAttachments,
+                paramsMap, param));
+
+        // Populate additional binary content if necessary?
+        // We might want to pass 'attachments' to paramMap if not already?
+        // Or processParameter handles it.
         return paramsMap;
     }
 
-    @SneakyThrows
-    private Map<String, String> getAdditionalContext(CoreSession session, DocumentModel doc) {
+    private void processParameter(DocumentModel doc, CoreSession session, Interaction interaction,
+            List<DocumentModel> relatedDocuments, Map<String, Blob> attachments,
+            Map<String, Object> paramsMap, InteractionParameter param) {
+        String name = param.getName();
+        Object value = param.getValue();
+        String type = param.getType();
+        String format = param.getFormat();
+        String selectedDocumentId = param.getSelectedDocumentId();
+
+        if (DocOrMediaType.DOCUMENT.getTypeName().equals(format)) {
+            value = getDocumentOrMediaValue(doc, session, param, type, relatedDocuments, selectedDocumentId,
+                    DocOrMediaType.DOCUMENT, attachments);
+        }
+        if (DocOrMediaType.MEDIA.getTypeName().equalsIgnoreCase(format)) {
+            value = getDocumentOrMediaValue(doc, session, param, type, relatedDocuments, selectedDocumentId,
+                    DocOrMediaType.MEDIA, attachments);
+        }
+
+        if (param.isAdditionalContext()) {
+            Map<String, Object> additionalContext = getAdditionalContext(session, doc);
+
+            if (interaction.isSendParentsContext()) {
+                List<DocumentModel> allParentDocuments = getAllParentDocuments(session, doc);
+                if (CollectionUtils.isNotEmpty(allParentDocuments)) {
+                    allParentDocuments.forEach(parentDoc -> {
+                        Map<String, Object> parentContext = getAdditionalContext(session, parentDoc);
+                        if (parentContext != null && !parentContext.isEmpty()) {
+                            additionalContext.put(parentDoc.getId(), parentContext);
+                        }
+                    });
+                    additionalContext.put("documentPath", doc.getPathAsString());
+                }
+            }
+
+            if (param.getType().equalsIgnoreCase("string")) {
+                try {
+                    String valueAsString = objectMapper.writeValueAsString(additionalContext);
+                    paramsMap.put(name, valueAsString);
+                } catch (Exception ignore) {
+                }
+            } else {
+                paramsMap.put(name, additionalContext);
+            }
+            return;
+        }
+
+        paramsMap.put(name, value);
+    }
+
+    private List<DocumentModel> getRelatedDocuments(CoreSession session, DocumentModel doc) {
         Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
         Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
         if (MapUtils.isEmpty(schemaSettings)) {
             log.error("SchemaSettings is empty");
-            return Map.of();
+            return Collections.emptyList();
         }
 
+        Set<DocTypeWithSchema.Schema.Field> schemaFields = getSchemaFields(doc, schemaSettings);
+
+        List<DocumentModel> allRelatedDocuments = new ArrayList<>();
+        schemaFields.forEach(field -> {
+            String xpath = field.getXpath();
+            try {
+                if (NuxeoDocResolverUtils.isDocumentReference(doc, xpath)) {
+                    List<DocumentModel> relatedDocumentModels = NuxeoDocResolverUtils.resolveDocumentReferences(session,
+                            doc, xpath);
+                    allRelatedDocuments.addAll(relatedDocumentModels);
+                }
+            } catch (Exception ignored) {
+            }
+        });
+        return allRelatedDocuments;
+    }
+
+    private List<DocumentModel> getAllParentDocuments(CoreSession session, DocumentModel doc) {
+        List<DocumentModel> parents = new ArrayList<>();
+
+        DocumentRef parentRef = doc.getParentRef();
+        while (parentRef != null) {
+            DocumentModel parentDoc = session.getDocument(parentRef);
+            if ("00000000-0000-0000-0000-000000000000".equalsIgnoreCase(parentDoc.getId())
+                    || "/".equals(parentDoc.getPathAsString())) {
+                break;
+            }
+            parents.add(parentDoc);
+            parentRef = parentDoc.getParentRef();
+        }
+
+        return parents;
+    }
+
+    private Map<String, Blob> addParentDocuments(CoreSession session, List<DocumentModel> allParentDocuments) {
+        Map<String, Blob> attachments = new HashMap<>();
+        allParentDocuments.forEach(parentDoc -> {
+            Set<Field> schemaFields = getMetadataSettingsSchemaFields(parentDoc, session);
+
+            boolean parentHasFiles = schemaFields.stream()
+                    .filter(DocTypeWithSchema.Schema.Field::isAdditionalContext)
+                    .anyMatch(field -> {
+                        return field.getXpath().equalsIgnoreCase(FILE_SCHEMA)
+                                || field.getXpath().equalsIgnoreCase(FILES_SCHEMA);
+                    });
+            if (parentHasFiles) {
+                Map<String, Blob> parentAttachments = getAttachmentsMap(parentDoc);
+                if (MapUtils.isNotEmpty(parentAttachments)) {
+                    attachments.putAll(parentAttachments);
+                }
+            }
+        });
+        return attachments;
+    }
+
+    private Object getDocumentOrMediaValue(DocumentModel doc, CoreSession session, InteractionParameter param,
+            String type,
+            List<DocumentModel> relatedDocuments, String selectedDocumentId, DocOrMediaType docOrMediaType,
+            Map<String, Blob> attachments) {
+        Object value;
+        Set<String> relatedDocumentIds = relatedDocuments.stream().map(DocumentModel::getId)
+                .collect(Collectors.toSet());
+        if ("array".equalsIgnoreCase(type)) {
+            Set<String> selectedDocumentIds = new HashSet<>(relatedDocumentIds);
+            selectedDocumentIds.addAll(param.getSelectedDocumentIds());
+            value = getSelectedDocumentsContent(doc, selectedDocumentIds, docOrMediaType.getTypeName(),
+                    attachments);
+        } else if (StringUtils.isNotEmpty(selectedDocumentId)) {
+            DocumentModel selectedDocument = doc.getCoreSession().getDocument(new IdRef(selectedDocumentId));
+            // selectedDocument = uploadFilesAndSetStoreIds(selectedDocument, session, true,
+            // true);
+            // value = "store:" +
+            // selectedDocument.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
+            // Changing to pass Blob for direct processing:
+            value = getBlob(selectedDocument);
+        } else {
+            // value = "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
+            value = getBlob(doc);
+        }
+        Blob blob = getBlob(doc);
+        if (blob != null && !isImage(blob) && !isImage(blob) && docOrMediaType.equals(DocOrMediaType.MEDIA)) { // check
+                                                                                                               // isImage
+                                                                                                               // for
+                                                                                                               // media?
+            // Logic from maretha-cp:
+            // if (blob != null && !isImage(blob) && !isVideo(blob) &&
+            // docOrMediaType.equals(DocOrMediaType.MEDIA))
+            // value = "";
+            // I'm skipping video check for now
+        }
+        return value;
+    }
+
+    private List<Blob> getSelectedDocumentsContent(DocumentModel documentModel, Set<String> selectedDocumentIds,
+            String docOrMediaType, Map<String, Blob> attachments) {
+        CoreSession coreSession = documentModel.getCoreSession();
+        List<Blob> blobs = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(selectedDocumentIds)) {
+            selectedDocumentIds.stream().map(docId -> coreSession.getDocument(new IdRef(docId))).filter(doc -> {
+                if (!doc.hasSchema(FILE_SCHEMA)) {
+                    return false;
+                }
+                Blob blob = (Blob) doc.getPropertyValue(FILE_CONTENT);
+                if (blob == null) {
+                    return false;
+                }
+                if (docOrMediaType.equals("media") && isImage(blob)) {
+                    return true;
+                }
+                return docOrMediaType.equals("document") && !isImage(blob);
+            }).map(RunInteractionServiceImpl::getBlob)
+                    .forEach(blobs::add);
+        }
+        if (documentModel.hasSchema(FILES_SCHEMA)) {
+            attachments.entrySet().stream().filter(entry -> {
+                Blob blob = entry.getValue();
+                if (blob == null) {
+                    return false;
+                }
+                if (docOrMediaType.equals("media") && isImage(blob)) {
+                    return true;
+                }
+                return docOrMediaType.equals("document") && !isImage(blob);
+            }).map(Map.Entry::getValue).forEach(blobs::add);
+        }
+        return blobs;
+    }
+
+    private Set<Field> getMetadataSettingsSchemaFields(DocumentModel doc, CoreSession session) {
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+        Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
+        if (MapUtils.isEmpty(schemaSettings)) {
+            log.error("SchemaSettings is empty");
+            return Set.of();
+        }
+
+        return getSchemaFields(doc, schemaSettings);
+    }
+
+    private Set<DocTypeWithSchema.Schema.Field> getSchemaFields(DocumentModel doc,
+            Map<String, DocTypeWithSchema.Schema> schemaSettings) {
         Set<DocTypeWithSchema.Schema.Field> schemaFields = new HashSet<>();
 
         Arrays.stream(doc.getSchemas()).forEach(schema -> {
             DocTypeWithSchema.Schema schemaSetting = getSchemaSetting(schemaSettings, doc.getType(), schema);
             if (schemaSetting != null) {
                 Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
-                        .filter(DocTypeWithSchema.Schema.Field::isAdditionalContext)
-                        .collect(Collectors.toSet());
+                        .filter(DocTypeWithSchema.Schema.Field::isAdditionalContext).collect(Collectors.toSet());
                 schemaFields.addAll(fields);
             }
+
             doc.getFacets().forEach(facet -> {
-                DocTypeWithSchema.Schema schemaSettingByFacet = getSchemaSetting(schemaSettings, "Facet_" + facet, schema);
+                DocTypeWithSchema.Schema schemaSettingByFacet = getSchemaSetting(schemaSettings, "Facet_" + facet,
+                        schema);
                 if (schemaSettingByFacet != null) {
                     Set<DocTypeWithSchema.Schema.Field> fields = schemaSettingByFacet.getFields().stream()
-                            .filter(DocTypeWithSchema.Schema.Field::isAdditionalContext)
-                            .collect(Collectors.toSet());
+                            .filter(DocTypeWithSchema.Schema.Field::isAdditionalContext).collect(Collectors.toSet());
                     schemaFields.addAll(fields);
                 }
             });
         });
+        return schemaFields;
+    }
 
-        Map<String, String> valuesMap = new HashMap<>();
+    @SneakyThrows
+    private Map<String, Object> getAdditionalContext(CoreSession session, DocumentModel doc) {
+        return getAdditionalContext(session, doc, 0, new HashSet<>());
+    }
+
+    @SneakyThrows
+    private Map<String, Object> getAdditionalContext(CoreSession session, DocumentModel doc,
+                                                      int depth, Set<String> visitedDocIds) {
+        final int MAX_DEPTH = 5;
+        if (depth >= MAX_DEPTH) {
+            log.warn("Max recursion depth reached for document: " + doc.getId());
+            return new HashMap<>();
+        }
+
+        if (visitedDocIds.contains(doc.getId())) {
+            log.debug("Document already visited, skipping: " + doc.getId());
+            return new HashMap<>();
+        }
+        visitedDocIds.add(doc.getId());
+
+        Set<Field> schemaFields = getMetadataSettingsSchemaFields(doc, session);
+        Map<String, Object> valuesMap = new HashMap<>();
+
         schemaFields.forEach(field -> {
             String xpath = field.getXpath();
             try {
-                Serializable propertyValue = doc.getPropertyValue(xpath);
-                String value = objectMapper.writeValueAsString(propertyValue);
-                valuesMap.put(xpath, value);
-            } catch (Exception ignored) {
+                // For related documents get relevant context recursively
+                if (NuxeoDocResolverUtils.isDocumentReference(doc, xpath)) {
+                    Map<String, Object> relatedDocContext = new HashMap<>();
+                    List<DocumentModel> documentModels = NuxeoDocResolverUtils.resolveDocumentReferences(session, doc, xpath);
+                    documentModels.forEach(relatedDoc -> {
+                        // RECURSIVE CALL with depth tracking and cycle detection
+                        Map<String, Object> context = getAdditionalContext(session, relatedDoc, depth + 1, visitedDocIds);
+                        if (context != null && !context.isEmpty()) {
+                            relatedDocContext.put(relatedDoc.getId(), context);
+                        }
+                    });
+                    valuesMap.put(xpath, relatedDocContext);
+                } else {
+                    Serializable propertyValue = doc.getPropertyValue(xpath);
+                    valuesMap.put(xpath, propertyValue);
+                }
+            } catch (Exception e) {
+                log.debug("Failed to process field: " + xpath, e);
             }
         });
         return valuesMap;
     }
 
-    //source: "s3://composable-bs-test/my-photo.jpg#eu-north-1",
-    private String getS3Path(Blob blob) {
-        CloudStorageFileShare cloudStorageFileShare = Framework.getService(CloudStorageFileShare.class);
-        return cloudStorageFileShare.getS3FilePath((ManagedBlob) blob);
+    private Map<String, Blob> getAttachmentsMap(DocumentModel doc) {
+        List<Blob> attachments = getAttachmentBlobs(doc);
+        Blob docBlob = getBlob(doc);
+        if (null != docBlob) {
+            attachments.add(docBlob);
+        }
+
+        Map<String, Blob> attachementsMap = new HashMap<>();
+        // In maretha-cp, this uploads to store and maps ID -> Blob.
+        // Here we just map Digest/Unique -> Blob?
+        // Or Filename -> Blob?
+        attachments.forEach(blob -> {
+            if (blob != null) {
+                attachementsMap.put(blob.getDigest() != null ? blob.getDigest() : blob.getFilename(), blob);
+            }
+        });
+        return attachementsMap;
     }
 
-    private Map<String, String> getDictionaryValues(CoreSession session, DocumentModel doc, String directoryName) {
-        Map<String, String> dictionaryMap = new HashMap<>();
+    private List<Blob> getAttachmentBlobs(DocumentModel doc) {
+        try {
+            if (!doc.hasSchema(FILES_SCHEMA)) {
+                return Collections.emptyList();
+            }
+            List<Blob> blobs = new ArrayList<>();
+            ArrayList<Map> attachments = (ArrayList<Map>) doc.getPropertyValue(FILE_CONTENTS);
+
+            if (CollectionUtils.isNotEmpty(attachments)) {
+                for (Map attachment : attachments) {
+                    Blob blob = (Blob) attachment.get(FILE_SCHEMA);
+                    blobs.add(blob);
+                }
+            }
+            return blobs;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // Kept from maretha-ai
+    private boolean isNullOrEmpty(Serializable propertyValue) {
+        if (propertyValue instanceof String) {
+            return StringUtils.isEmpty((CharSequence) propertyValue);
+        }
+        if (propertyValue instanceof List) {
+            return CollectionUtils.isEmpty((Collection) propertyValue);
+        }
+        return Objects.isNull(propertyValue);
+    }
+
+    private Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription> getDictionaryValues(CoreSession session,
+            DocumentModel doc, String directoryName) {
+        Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription> dictionaryMap = new HashMap<>();
         try {
             Map<String, Serializable> params = new HashMap<>();
             params.put("directoryName", directoryName);
@@ -421,10 +781,11 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                     params.put("prodline", prodlineId);
                 }
             } catch (PropertyNotFoundException propertyNotFoundException) {
-                //ignore
+                // ignore
             }
             OperationContext ctx = new OperationContext(session);
-            Blob directoriesJsonBlob = (Blob) Framework.getService(AutomationService.class).run(ctx, "Directory.SuggestEntries", params);
+            Blob directoriesJsonBlob = (Blob) Framework.getService(AutomationService.class).run(ctx,
+                    "Directory.SuggestEntries", params);
 
             if (directoriesJsonBlob == null) {
                 log.warn("No suggestions returned for directory: " + directoryName);
@@ -438,11 +799,19 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
             // Iterate array
             for (JsonNode node : root) {
-                boolean isObsolete = node.has("obsolete") &&
-                        (node.get("obsolete").asLong(0) > 0 || node.get("obsolete").asBoolean(false));
+                boolean isObsolete = node.has("obsolete")
+                        && (node.get("obsolete").asLong(0) > 0 || node.get("obsolete").asBoolean(false));
 
                 if (!isObsolete && node.hasNonNull("id") && node.hasNonNull("label")) {
-                    dictionaryMap.put(node.get("id").asText(), node.get("label").asText());
+                    String id = node.get("id").asText();
+                    String label = node.get("label").asText();
+                    String description = null;
+                    if (node.hasNonNull("description")) {
+                        description = node.get("description").asText();
+                    }
+                    DocTypeWithSchema.Schema.DictionaryWithDescription dict = new DocTypeWithSchema.Schema.DictionaryWithDescription(
+                            label, description);
+                    dictionaryMap.put(id, dict);
                 }
             }
         } catch (Exception e) {
@@ -451,48 +820,23 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return dictionaryMap;
     }
 
-    private Set<DocTypeWithSchema.Schema.Field> getSchemaFields(DocumentModel doc, CoreSession session, boolean inIsolation) {
-        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
-        Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
-        if (MapUtils.isEmpty(schemaSettings)) {
-            log.error("SchemaSettings is empty");
-            return Collections.emptySet();
-        }
-
-        Set<DocTypeWithSchema.Schema.Field> schemaFields = new HashSet<>();
-
-        Arrays.stream(doc.getSchemas()).forEach(schema -> {
-            DocTypeWithSchema.Schema schemaSetting = getSchemaSetting(schemaSettings, doc.getType(), schema);
-            if (schemaSetting != null) {
-                addSchemaFields(doc, session, inIsolation, schemaSetting, schemaFields);
-            }
-            doc.getFacets().forEach(facet -> {
-                DocTypeWithSchema.Schema schemaSettingByFacet = getSchemaSetting(schemaSettings, "Facet_" + facet, schema);
-                if (schemaSettingByFacet != null) {
-                    addSchemaFields(doc, session, inIsolation, schemaSettingByFacet, schemaFields);
-                }
-            });
-        });
-
-        return schemaFields;
-    }
-
-    private void addSchemaFields(DocumentModel doc, CoreSession session, boolean inIsolation, DocTypeWithSchema.Schema schemaSetting, Set<DocTypeWithSchema.Schema.Field> schemaFields) {
+    private void addSchemaFields(DocumentModel doc, CoreSession session, boolean inIsolation,
+            DocTypeWithSchema.Schema schemaSetting, Set<DocTypeWithSchema.Schema.Field> schemaFields) {
         Set<DocTypeWithSchema.Schema.Field> fields = schemaSetting.getFields().stream()
                 .filter(DocTypeWithSchema.Schema.Field::isActive)
-                .filter(field -> (field.isInIsolation() == inIsolation))
-                .map(schemaField -> {
+                .filter(field -> (field.isInIsolation() == inIsolation)).map(schemaField -> {
                     if (StringUtils.isNotEmpty(schemaField.getDirectoryName())) {
-                        Map<String, String> dictionaryValues = getDictionaryValues(session, doc, schemaField.getDirectoryName());
+                        Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription> dictionaryValues = getDictionaryValues(
+                                session, doc, schemaField.getDirectoryName());
                         schemaField.setDirectoryValues(dictionaryValues);
                     }
                     return schemaField;
-                })
-                .collect(Collectors.toSet());
+                }).collect(Collectors.toSet());
         schemaFields.addAll(fields);
     }
 
-    private DocTypeWithSchema.Schema getSchemaSetting(Map<String, DocTypeWithSchema.Schema> schemaSettings, String docType, String schemaName) {
+    private DocTypeWithSchema.Schema getSchemaSetting(Map<String, DocTypeWithSchema.Schema> schemaSettings,
+            String docType, String schemaName) {
         String docTypeSchemaKey = docType + "_" + schemaName;
         if (schemaSettings.containsKey(docTypeSchemaKey)) {
             log.debug("Schema settings by docTye + schemaName : " + docTypeSchemaKey);
@@ -505,7 +849,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return null;
     }
 
-    private Map<String, Object> addSchemasAndDictionariesToParams(Map<String, Object> schemaFieldsMap, Map<String, Object> parameters) {
+    private Map<String, Object> addSchemasAndDictionariesToParams(Map<String, Object> schemaFieldsMap,
+            Map<String, Object> parameters) {
         try {
             parameters.put("schema", objectMapper.writeValueAsString(schemaFieldsMap));
         } catch (Exception e) {
@@ -537,7 +882,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
         for (DocTypeWithSchema.Schema.Field field : schemasFields) {
             Map<String, Object> fieldSchema = new HashMap<>();
-            Map<String, String> directoryValues = field.getDirectoryValues();
+            Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription> directoryValues = field
+                    .getDirectoryValues();
             if (field.isMultiValue()) {
                 fieldSchema.put("type", "array");
                 Map<String, Object> itemsMap = new HashMap<>();
@@ -581,34 +927,32 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
     }
 
-    private void addTextEmbeddings(DocumentModel doc, Blob blob) {
-        try {
-            double[] documentEmbeddings = Framework.getService(EmbeddingsService.class).embedPdfSummary(blob);
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
-        } catch (Exception e) {
-            log.error("Failed to save textEmbeddings", e);
+    private Set<DocTypeWithSchema.Schema.Field> getSchemaFields(DocumentModel doc, CoreSession session,
+            boolean inIsolation) {
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(session, true);
+        Map<String, DocTypeWithSchema.Schema> schemaSettings = savedSettings.getSchemaSettings();
+        if (MapUtils.isEmpty(schemaSettings)) {
+            log.error("SchemaSettings is empty");
+            return Collections.emptySet();
         }
-    }
 
-    private void addImageEmbeddings(DocumentModel doc, Blob blob) {
-        try {
-            String base64 = Base64.getEncoder().encodeToString(blob.getByteArray());
-//            String imageAsBase64 = "data:" + blob.getMimeType() + ";base64," + base64;
-            double[] documentEmbeddings = Framework.getService(EmbeddingsService.class).embedImage(base64, doc.getTitle(), 1024);
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
-        } catch (Exception e) {
-            log.error("Failed to save imageEmbeddings", e);
-        }
-    }
+        Set<DocTypeWithSchema.Schema.Field> schemaFields = new HashSet<>();
 
-    private boolean isNullOrEmpty(Serializable propertyValue) {
-        if (propertyValue instanceof String) {
-            return StringUtils.isEmpty((CharSequence) propertyValue);
-        }
-        if (propertyValue instanceof List) {
-            return CollectionUtils.isEmpty((Collection) propertyValue);
-        }
-        return Objects.isNull(propertyValue);
+        Arrays.stream(doc.getSchemas()).forEach(schema -> {
+            DocTypeWithSchema.Schema schemaSetting = getSchemaSetting(schemaSettings, doc.getType(), schema);
+            if (schemaSetting != null) {
+                addSchemaFields(doc, session, inIsolation, schemaSetting, schemaFields);
+            }
+            doc.getFacets().forEach(facet -> {
+                DocTypeWithSchema.Schema schemaSettingByFacet = getSchemaSetting(schemaSettings, "Facet_" + facet,
+                        schema);
+                if (schemaSettingByFacet != null) {
+                    addSchemaFields(doc, session, inIsolation, schemaSettingByFacet, schemaFields);
+                }
+            });
+        });
+
+        return schemaFields;
     }
 
     private <K, V> List<Map<K, V>> partitionMap(Map<K, V> originalMap, int bucketSize) {
@@ -635,12 +979,22 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private int getBucketSize(Settings savedSettings) {
         String bucketSizeStr = (savedSettings.getAiSettings() != null)
-                ? (String) savedSettings.getAiSettings().getOrDefault("directoryBucketSize", DEFAULT_DIRECTORY_BUCKET_SIZE)
+                ? (String) savedSettings.getAiSettings().getOrDefault("directoryBucketSize",
+                        DEFAULT_DIRECTORY_BUCKET_SIZE)
                 : DEFAULT_DIRECTORY_BUCKET_SIZE;
         if (StringUtils.isEmpty(bucketSizeStr)) {
             return Integer.parseInt(DEFAULT_DIRECTORY_BUCKET_SIZE);
         }
         return Integer.parseInt(bucketSizeStr);
+    }
+
+    @Override
+    public DocumentModel uploadFilesAndSetStoreIds(DocumentModel doc, CoreSession session, boolean waitForCompletion,
+            boolean lowPriority) {
+        // Implementation for interface compliance, but we don't use 'Store' in
+        // maretha-ai.
+        // We can just return doc, or perform addEmbeddings?
+        return addEmbeddings(doc, session, waitForCompletion, lowPriority);
     }
 
 }
