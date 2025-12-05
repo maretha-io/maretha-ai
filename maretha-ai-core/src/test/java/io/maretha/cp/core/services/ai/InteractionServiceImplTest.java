@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -231,5 +232,171 @@ public class InteractionServiceImplTest {
                     }
                 });
         assertTrue("Should contain params message with regular data and blob placeholder", hasParamsMessage);
+    }
+
+    @Test
+    public void testParentAndRelatedDocumentsWithFiles() throws Exception {
+        // GIVEN - Simulate scenario where paramsData contains attachments from parent
+        // and related docs
+        Map<String, Object> paramsData = new HashMap<>();
+
+        // Simulate parent document with file:content (PDF)
+        String parentPdfContent = "%PDF-1.4\n" +
+                "1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n" +
+                "2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj\n" +
+                "3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n"
+                +
+                "4 0 obj<</Length 50>>stream\n" +
+                "BT /F1 12 Tf 100 700 Td (Parent Document) Tj ET\n" +
+                "endstream endobj\n" +
+                "5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\n" +
+                "xref\n0 6\n0000000000 65535 f\n0000000009 00000 n\n0000000058 00000 n\n0000000115 00000 n\n" +
+                "0000000255 00000 n\n0000000357 00000 n\ntrailer<</Size 6/Root 1 0 R>>\nstartxref\n431\n%%EOF";
+
+        Blob parentFileContent = new StringBlob(parentPdfContent, "application/pdf");
+        parentFileContent.setFilename("parent-contract.pdf");
+        paramsData.put("parent_file_content", parentFileContent);
+
+        // Simulate parent document with files:files (images)
+        byte[] parentImage1 = new byte[] {
+                (byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0x00, 0x10, 0x4A, 0x46,
+                0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
+                (byte) 0xFF, (byte) 0xD9
+        };
+        Blob parentAttachment1 = new org.nuxeo.ecm.core.api.impl.blob.ByteArrayBlob(parentImage1, "image/jpeg");
+        parentAttachment1.setFilename("parent-photo1.jpg");
+
+        byte[] parentImage2 = new byte[] {
+                (byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0x00, 0x10, 0x4A, 0x46,
+                0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
+                (byte) 0xFF, (byte) 0xD9
+        };
+        Blob parentAttachment2 = new org.nuxeo.ecm.core.api.impl.blob.ByteArrayBlob(parentImage2, "image/png");
+        parentAttachment2.setFilename("parent-photo2.png");
+
+        List<Blob> parentFiles = new ArrayList<>();
+        parentFiles.add(parentAttachment1);
+        parentFiles.add(parentAttachment2);
+        paramsData.put("parent_files", parentFiles);
+
+        // Simulate related document with file:content (another PDF)
+        String relatedPdfContent = "%PDF-1.4\n" +
+                "1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n" +
+                "2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj\n" +
+                "3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n"
+                +
+                "4 0 obj<</Length 51>>stream\n" +
+                "BT /F1 12 Tf 100 700 Td (Related Document) Tj ET\n" +
+                "endstream endobj\n" +
+                "5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\n" +
+                "xref\n0 6\n0000000000 65535 f\n0000000009 00000 n\n0000000058 00000 n\n0000000115 00000 n\n" +
+                "0000000255 00000 n\n0000000358 00000 n\ntrailer<</Size 6/Root 1 0 R>>\nstartxref\n432\n%%EOF";
+
+        Blob relatedFileContent = new StringBlob(relatedPdfContent, "application/pdf");
+        relatedFileContent.setFilename("related-invoice.pdf");
+        paramsData.put("related_file_content", relatedFileContent);
+
+        // Simulate related document with files:files (mix of PDF and image)
+        String relatedAttachmentPdf = "%PDF-1.4\n" +
+                "1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n" +
+                "2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj\n" +
+                "3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n"
+                +
+                "4 0 obj<</Length 53>>stream\n" +
+                "BT /F1 12 Tf 100 700 Td (Attachment Document) Tj ET\n" +
+                "endstream endobj\n" +
+                "5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\n" +
+                "xref\n0 6\n0000000000 65535 f\n0000000009 00000 n\n0000000058 00000 n\n0000000115 00000 n\n" +
+                "0000000255 00000 n\n0000000360 00000 n\ntrailer<</Size 6/Root 1 0 R>>\nstartxref\n434\n%%EOF";
+
+        Blob relatedAttachPdf = new StringBlob(relatedAttachmentPdf, "application/pdf");
+        relatedAttachPdf.setFilename("related-attachment.pdf");
+
+        byte[] relatedImage = new byte[] {
+                (byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0x00, 0x10, 0x4A, 0x46,
+                0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
+                (byte) 0xFF, (byte) 0xD9
+        };
+        Blob relatedAttachImage = new org.nuxeo.ecm.core.api.impl.blob.ByteArrayBlob(relatedImage, "image/jpeg");
+        relatedAttachImage.setFilename("related-diagram.jpg");
+
+        Map<String, Blob> relatedAttachments = new HashMap<>();
+        relatedAttachments.put("attach1", relatedAttachPdf);
+        relatedAttachments.put("attach2", relatedAttachImage);
+        paramsData.put("related_attachments", relatedAttachments);
+
+        // Add regular params to ensure they're preserved
+        paramsData.put("context", "Document hierarchy traversal");
+        paramsData.put("depth", 2);
+
+        List<Message> userMessages = new ArrayList<>();
+        when(doc.getPropertyValue("files:files")).thenReturn(null);
+
+        // WHEN
+        InteractionServiceImpl.processParamsAndBlobs(doc, paramsData, userMessages);
+
+        // THEN
+        // Should have multiple messages:
+        // 1. Parent PDF (file:content) - text message
+        // 2. Parent images (files:files) - 2 image messages
+        // 3. Related PDF (file:content) - text message
+        // 4. Related attachment PDF - text message
+        // 5. Related attachment image - image message
+        // 6. Params JSON with placeholders
+        assertTrue("Should have multiple messages", userMessages.size() >= 7);
+
+        // Count PDF text messages (should be 3: parent PDF + related PDF + related
+        // attachment PDF)
+        long pdfMessageCount = userMessages.stream()
+                .filter(msg -> {
+                    try {
+                        String text = msg.content().get(0).text();
+                        return text != null && text.contains("<DOCUMENT name=\"") && text.contains(".pdf\">");
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .count();
+        assertTrue("Should have 3 PDF text messages", pdfMessageCount >= 3);
+
+        // Count image messages (should be 3: 2 from parent files:files + 1 from related
+        // attachments)
+        long imageMessageCount = userMessages.stream()
+                .filter(msg -> {
+                    try {
+                        return msg.content().get(0).image() != null;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .count();
+        assertTrue("Should have 3 image messages", imageMessageCount >= 3);
+
+        // Verify params JSON contains regular params and all placeholders
+        boolean hasCompleteParamsMessage = userMessages.stream()
+                .anyMatch(msg -> {
+                    try {
+                        String text = msg.content().get(0).text();
+                        return text.contains("Document hierarchy traversal") &&
+                                text.contains("[Content attached as parent-contract.pdf]") &&
+                                text.contains("[Values list of 2 Blobs attached]") && // parent_files list
+                                text.contains("[Content attached as related-invoice.pdf]");
+                    } catch (Exception e) {
+                        return false;
+                    }
+                });
+        assertTrue("Should contain params message with all data and placeholders", hasCompleteParamsMessage);
+
+        // Verify individual blob placeholders
+        assertTrue("Parent file:content replaced with placeholder",
+                paramsData.get("parent_file_content").toString().contains("parent-contract.pdf"));
+        assertTrue("Parent files:files replaced with placeholder",
+                paramsData.get("parent_files").toString().contains("Values list of"));
+        assertTrue("Related file:content replaced with placeholder",
+                paramsData.get("related_file_content").toString().contains("related-invoice.pdf"));
+
+        // Verify regular params preserved
+        assertEquals("context param preserved", "Document hierarchy traversal", paramsData.get("context"));
+        assertEquals("depth param preserved", 2, paramsData.get("depth"));
     }
 }
