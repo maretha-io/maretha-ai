@@ -95,6 +95,9 @@ public class InteractionServiceImpl implements InteractionService {
                 .text(prompt)
                 .build();
 
+        // Log the entire prompt being sent to the AI
+        BedrockPromptLogger.logPrompt(log, modelId, prompt, userMessages);
+
         ConverseRequest request = ConverseRequest.builder()
                 .modelId(modelId)
                 .inferenceConfig(InferenceConfiguration.builder().build())
@@ -150,9 +153,14 @@ public class InteractionServiceImpl implements InteractionService {
         List<Message> userMessages = new ArrayList<>();
         processParamsAndBlobs(doc, paramsData, userMessages);
 
+        String fullSystemPrompt = METADATA_EXTRACTOR_TOOL_PROMPT + " Prompt: " + prompt;
         SystemContentBlock systemPrompt = SystemContentBlock.builder()
-                .text(METADATA_EXTRACTOR_TOOL_PROMPT + " Prompt: " + prompt)
+                .text(fullSystemPrompt)
                 .build();
+
+        // Log the entire prompt being sent to the AI
+        BedrockPromptLogger.logPromptWithSchema(log, modelId, fullSystemPrompt, "metadata_extractor", resultSchema,
+                userMessages);
 
         ConverseRequest request = ConverseRequest.builder()
                 .modelId(modelId)
