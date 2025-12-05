@@ -81,7 +81,8 @@ public class RepositoryServiceImpl implements RepositoryService {
     }
 
     @Override
-    public List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
+    public List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType,
+            boolean isFolder) {
         return getSavedSettings(session, true).getInteractions()
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
@@ -90,28 +91,32 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .filter(interaction -> !interaction.isChat())
                 .filter(interaction -> !interaction.isSaveMetadata())
                 .filter(interaction -> {
-                    if (isFolder) return interaction.isActiveOnFolder();
+                    if (isFolder)
+                        return interaction.isActiveOnFolder();
                     return true;
                 })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Interaction> getActiveChatInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
+    public List<Interaction> getActiveChatInteractionsForDocumentType(CoreSession session, String documentType,
+            boolean isFolder) {
         return getSavedSettings(session, true).getInteractions()
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
                 .filter(Interaction::isActive)
                 .filter(Interaction::isChat)
                 .filter(interaction -> {
-                    if (isFolder) return interaction.isActiveOnFolder();
+                    if (isFolder)
+                        return interaction.isActiveOnFolder();
                     return true;
                 })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Interaction> getActiveMetadataInteractionsForDocumentType(CoreSession session, String documentType, boolean isFolder) {
+    public List<Interaction> getActiveMetadataInteractionsForDocumentType(CoreSession session, String documentType,
+            boolean isFolder) {
         return getSavedSettings(session, true).getInteractions()
                 .stream()
                 .filter(cpInteraction -> cpInteraction.getActiveOnDocumentTypes().contains(documentType))
@@ -119,14 +124,16 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .filter(Interaction::isSaveMetadata)
                 .filter(Interaction::isMainMetadata)
                 .filter(interaction -> {
-                    if (isFolder) return interaction.isActiveOnFolder();
+                    if (isFolder)
+                        return interaction.isActiveOnFolder();
                     return true;
                 })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Settings saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration) {
+    public Settings saveInteractionSettings(CoreSession session, List<ObjectNode> interactions,
+            Map<String, Object> configuration) {
         DocumentModel cpSettingsDoc;
         Optional<DocumentModel> existingSettingsDocument = getExistingSettingsDocument(session);
 
@@ -163,7 +170,8 @@ public class RepositoryServiceImpl implements RepositoryService {
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> aiSettings = (Map<String, Object>) configuration.get(SaveInteractionSettingsOperation.AI_SETTINGS);
+        Map<String, Object> aiSettings = (Map<String, Object>) configuration
+                .get(SaveInteractionSettingsOperation.AI_SETTINGS);
         if (!Objects.isNull(aiSettings)) {
             updateAISettings(aiSettings, cpSettingsDoc);
         }
@@ -236,11 +244,13 @@ public class RepositoryServiceImpl implements RepositoryService {
     }
 
     @Override
-    public DocumentModel saveInteractionResponseAsMetadata(DocumentModel doc, CoreSession session, List<ObjectNode> interactions) {
+    public DocumentModel saveInteractionResponseAsMetadata(DocumentModel doc, CoreSession session,
+            List<ObjectNode> interactions) {
         if (!doc.hasFacet(RESULTS_FACET)) {
             doc.addFacet(RESULTS_FACET);
         }
-        List<HashMap<String, Object>> existingInteractions = (List<HashMap<String, Object>>) doc.getPropertyValue(RESULTS_SCHEMA_PATH);
+        List<HashMap<String, Object>> existingInteractions = (List<HashMap<String, Object>>) doc
+                .getPropertyValue(RESULTS_SCHEMA_PATH);
         if (CollectionUtils.isEmpty(existingInteractions)) {
             existingInteractions = new ArrayList<>();
         }
@@ -254,7 +264,8 @@ public class RepositoryServiceImpl implements RepositoryService {
     }
 
     @Override
-    public DocumentModel saveInteractionResponseAsDocument(DocumentModel doc, CoreSession session, List<ObjectNode> interactions) {
+    public DocumentModel saveInteractionResponseAsDocument(DocumentModel doc, CoreSession session,
+            List<ObjectNode> interactions) {
         String folderPath = "/" + RESULTS_DOCUMENT_NAME;
         boolean folderExists = session.exists(new PathRef(folderPath));
         if (!folderExists) {
@@ -282,7 +293,9 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Override
     public Optional<DocumentModel> getExistingSettingsDocument(CoreSession session) {
-        String query = String.format("SELECT * FROM %s WHERE ecm:isProxy = 0 AND ecm:isVersion = 0 AND ecm:isTrashed = 0", SETTINGS_DOCUMENT_TYPE);
+        String query = String.format(
+                "SELECT * FROM %s WHERE ecm:isProxy = 0 AND ecm:isVersion = 0 AND ecm:isTrashed = 0",
+                SETTINGS_DOCUMENT_TYPE);
         DocumentModelList documents = session.query(query);
         return documents.stream().findFirst();
     }
@@ -333,10 +346,14 @@ public class RepositoryServiceImpl implements RepositoryService {
         interactionMap.put(SCHEMA_STATUS, interaction.getStatus());
         interactionMap.put(SCHEMA_VERSION, interaction.getVersion());
         interactionMap.put(SCHEMA_ACTIVE_ON_DOCUMENTS, interaction.getActiveOnDocumentTypes());
-        interactionMap.put(SCHEMA_UPDATED_AT, interaction.getUpdatedAt()); //TODO update all at the same time or send isolated interactions?
+        interactionMap.put(SCHEMA_UPDATED_AT, interaction.getUpdatedAt()); // TODO update all at the same time or send
+                                                                           // isolated interactions?
         interactionMap.put(SCHEMA_ACTIVE, interaction.isActive());
         interactionMap.put(SCHEMA_ACTIVE_ON_FOLDER, interaction.isActiveOnFolder());
         interactionMap.put(SCHEMA_ACTIVE_ON_ACTION_MENU, interaction.isActiveOnActionMenu());
+        interactionMap.put(SCHEMA_SEND_ATTACHMENTS, interaction.isSendAttachments());
+        interactionMap.put(SCHEMA_SEND_PARENTS_CONTEXT, interaction.isSendParentsContext());
+        interactionMap.put(SCHEMA_REQUIRES_USER_INPUT, interaction.isRequiresUserInput());
         interactionMap.put(SCHEMA_IS_CHAT, interaction.isChat());
         interactionMap.put(SCHEMA_IS_SAVE_METADATA, interaction.isSaveMetadata());
         interactionMap.put(SCHEMA_IS_MAIN_METADATA, interaction.isMainMetadata());
@@ -345,7 +362,8 @@ public class RepositoryServiceImpl implements RepositoryService {
     }
 
     private List<Map<String, Object>> convertParameters(List<InteractionParameter> parameters) {
-        if (CollectionUtils.isEmpty(parameters)) return Collections.emptyList();
+        if (CollectionUtils.isEmpty(parameters))
+            return Collections.emptyList();
         return parameters.stream().map(param -> {
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put(PARAMETER_SCHEMA_NAME, param.getName());
