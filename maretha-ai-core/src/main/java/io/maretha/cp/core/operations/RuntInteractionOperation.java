@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.maretha.cp.core.bulk.actions.BulkInteractionAction;
 import io.maretha.cp.core.models.InteractionParameter;
 import io.maretha.cp.core.services.RunInteractionService;
-import io.maretha.cp.core.services.RunInteractionServiceImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.automation.core.Constants;
