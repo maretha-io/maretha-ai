@@ -41,17 +41,9 @@ limitations under the License.
       <div name="nature">[[formatDirectory(document.properties.dc:nature)]]</div>
     </div>
 
-    <nuxeo-directory-suggestion
-      role="widget"
-      label="[[i18n('label.dublincore.subjects')]]"
-      directory-name="l10nsubjects"
-      name="subjects"
-      value="{{document.properties.dc:subjects}}"
-      hidden$="[[!document.properties.dc:subjects.length]]"
-      multiple="true"
-      dbl10n="true"
-      readonly
-    >
+    <nuxeo-directory-suggestion role="widget" label="[[i18n('label.dublincore.subjects')]]"
+      directory-name="l10nsubjects" name="subjects" value="{{document.properties.dc:subjects}}"
+      hidden$="[[!document.properties.dc:subjects.length]]" multiple="true" dbl10n="true" readonly>
     </nuxeo-directory-suggestion>
 
     <div role="widget" hidden$="[[!document.properties.dc:coverage]]">
@@ -61,11 +53,8 @@ limitations under the License.
 
     <div role="widget" hidden$="[[!document.properties.dc:expired]]">
       <label>[[i18n('label.dublincore.expire')]]</label>
-      <nuxeo-date
-        name="expired"
-        aria-label$="[[i18n('label.dublincore.expire')]]"
-        datetime="[[document.properties.dc:expired]]"
-      ></nuxeo-date>
+      <nuxeo-date name="expired" aria-label$="[[i18n('label.dublincore.expire')]]"
+        datetime="[[document.properties.dc:expired]]"></nuxeo-date>
     </div>
 
     <!-- AI Schema Fields -->
@@ -100,28 +89,14 @@ limitations under the License.
         <div name="smartCrops" class="multiline">[[document.properties.ai:smartCrops]]</div>
       </div>
 
-      <nuxeo-directory-suggestion
-              role="widget"
-              label="Document Classification"
-              directory-name="classification"
-              name="classification"
-              value="{{document.properties.ai:classification}}"
-              hidden$="[[!document.properties.ai:classification.length]]"
-              multiple="true"
-              readonly
-      >
+      <nuxeo-directory-suggestion role="widget" label="Document Classification" directory-name="classification"
+        name="classification" value="{{document.properties.ai:classification}}"
+        hidden$="[[!document.properties.ai:classification.length]]" multiple="true" readonly>
       </nuxeo-directory-suggestion>
 
-      <nuxeo-directory-suggestion
-              role="widget"
-              label="Brand Safety"
-              directory-name="safetyCategories"
-              name="safety"
-              value="{{document.properties.ai:safety}}"
-              hidden$="[[!document.properties.ai:safety.length]]"
-              multiple="true"
-              readonly
-      >
+      <nuxeo-directory-suggestion role="widget" label="Brand Safety" directory-name="safetyCategories" name="safety"
+        value="{{document.properties.ai:safety}}" hidden$="[[!document.properties.ai:safety.length]]" multiple="true"
+        readonly>
       </nuxeo-directory-suggestion>
 
       <div role="widget" hidden$="[[!document.properties.ai:safetyText]]">
@@ -129,17 +104,11 @@ limitations under the License.
         <div name="safetyText" class="multiline">[[document.properties.ai:safetyText]]</div>
       </div>
 
-      <nuxeo-directory-suggestion
-              role="widget"
-              label="Shot Type"
-              directory-name="imageScenes"
-              name="imageScene"
-              value="{{document.properties.ai:imageScene}}"
-              hidden$="[[!document.properties.ai:imageScene.length]]"
-              multiple="true"
-              readonly
-      >
+      <nuxeo-directory-suggestion role="widget" label="Shot Type" directory-name="imageScenes" name="imageScene"
+        value="{{document.properties.ai:imageScene}}" hidden$="[[!document.properties.ai:imageScene.length]]"
+        multiple="true" readonly>
       </nuxeo-directory-suggestion>
+    </template>
 
     <nuxeo-document-attachments role="widget" document="[[document]]"></nuxeo-document-attachments>
   </template>
