@@ -1027,4 +1027,54 @@ public class RunInteractionServiceImplTest {
                 assertTrue("Document should have testDoc schema", document.hasSchema("testDoc"));
         }
 
+        @Test
+        public void shouldCreateSchemaFieldsFromFacets() throws JsonProcessingException {
+                // 1. Create a document with a specific facet "NXTag" (which has schema "nxtag")
+                DocumentModel document = session.createDocumentModel("/", "testFacetDoc", "TestDoc");
+                document.setPropertyValue("dc:title", "Facet Test Document");
+                document.addFacet("NXTag"); // Adds "nxtag" schema
+                document = session.createDocument(document);
+                session.save();
+
+                assertTrue("Document should have NXTag facet", document.hasFacet("NXTag"));
+                assertTrue("Document should have facetedTag schema", document.hasSchema("facetedTag"));
+
+                List<ObjectNode> interactions = new ArrayList<>();
+                Map<String, Object> configurationMap = new HashMap<>();
+
+                String interactionJson = "{\n" +
+                                "    \"activeOnDocumentTypes\": [\"TestDoc\"],\n" +
+                                "    \"active\": true,\n" +
+                                "    \"saveMetadata\": true,\n" +
+                                "    \"id\": \"test-facet-id\",\n" +
+                                "    \"parameters\": []\n" +
+                                "}";
+                ObjectNode objectNode = (ObjectNode) objectMapper.readTree(interactionJson);
+                interactions.add(objectNode);
+
+                // Configure schema for the facet
+                DocTypeWithSchema.Schema.Field tagField = createField(true,
+                                "nxtag:tags", "tagList", true, true, null);
+
+                // This verifies that "Facet_NXTag_facetedTag" lookup works using the constant
+                addSchemaConfiguration(configurationMap, interactions, "Facet_NXTag_facetedTag", List.of(tagField));
+
+                // 3. Mock API response
+                String mockResponse = "{\"result\":{\"nxtag:tags\":[\"facet-tag-1\", \"facet-tag-2\"]}}";
+                when(apiService.invokeModelWithSchema(any(), any(), anyMap(), anyString())).thenReturn(mockResponse);
+
+                // 4. Trigger interaction
+                List<InteractionParameter> parameters = new ArrayList<>();
+                runInteractionService.triggerInteraction(document, session, "test-facet-id",
+                                parameters, true, false, false);
+
+                // 5. Verify the facet field was updated
+                DocumentModel updatedDoc = session.getDocument(document.getRef());
+                List<Map<String, String>> tags = (List<Map<String, String>>) updatedDoc.getPropertyValue("nxtag:tags");
+
+                assertNotNull("Tags should not be null", tags);
+                assertEquals(2, tags.size());
+                assertEquals("facet-tag-1", tags.get(0).get("label"));
+        }
+
 }
