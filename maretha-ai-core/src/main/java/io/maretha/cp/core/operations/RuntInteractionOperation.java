@@ -49,7 +49,8 @@ public class RuntInteractionOperation {
         List<InteractionParameter> parameters = objectMapper
                 .convertValue(data, objectMapper.getTypeFactory().constructCollectionType(List.class, InteractionParameter.class));
 
-        if (doc.isFolder()) {
+        // Only use bulk action mode when saveMetadata is true for folders/collections
+        if (saveMetadata && doc.isFolder()) {
             String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:ancestorId = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0 AND ecm:isVersion = 0 " +
                     " AND file:content IS NOT NULL", doc.getId());
             BulkCommand command = getBulkCommand(nxqlQuery);
@@ -57,7 +58,7 @@ public class RuntInteractionOperation {
             return bulkService.submit(command);
         }
 
-        if (doc.hasFacet("Collection")) {
+        if (saveMetadata && doc.hasFacet("Collection")) {
             String nxqlQuery = String.format("SELECT * FROM Document WHERE collectionMember:collectionIds = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0 AND ecm:isVersion = 0 " +
                     " AND file:content IS NOT NULL", doc.getId());
             BulkCommand command = getBulkCommand(nxqlQuery);
@@ -65,7 +66,7 @@ public class RuntInteractionOperation {
             return bulkService.submit(command);
         }
 
-//        doc = runInteractionService.uploadFileAndSetStoreId(doc, session, true, false);
+        // By default, run the interaction directly and return the response
         try {
             return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride, false);
         } catch (Exception e) {
