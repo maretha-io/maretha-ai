@@ -32,6 +32,8 @@ import java.util.List;
 import static io.maretha.cp.core.services.RunInteractionService.FILE_CONTENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.when;
@@ -97,6 +99,7 @@ public class RuntInteractionOperationTest {
         List<ObjectNode> data = new ArrayList<>();
         String interactionId = "test-id";
         String mockResponse = mapper.convertValue("{\"response\": \"test\"}", String.class);
+        when(runInteractionService.triggerInteraction(any(), any(), anyString(), anyList(), anyBoolean(), anyBoolean(), anyBoolean())).thenReturn(mockResponse);
         //WHEN the service is mocked
         when(runInteractionService.addEmbeddings(any(), any(), anyBoolean(), anyBoolean())).thenReturn(document);
 
