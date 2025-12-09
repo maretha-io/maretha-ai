@@ -2,7 +2,6 @@ package io.maretha.cp.core.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.maretha.cp.core.models.DocOrMediaType;
 import io.maretha.cp.core.models.DocTypeWithSchema;
 import io.maretha.cp.core.models.DocTypeWithSchema.Schema.Field;
 import io.maretha.cp.core.models.Interaction;
@@ -222,17 +221,13 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         String name = param.getName();
         Object value = param.getValue();
         String type = param.getType();
-        String format = param.getFormat();
+        // String format = param.getFormat();
         String selectedDocumentId = param.getSelectedDocumentId();
         List<String> selectedDocumentIds = param.getSelectedDocumentIds();
 
-        if (DocOrMediaType.DOCUMENT.getTypeName().equals(format)) {
+        if (StringUtils.isEmpty(type) || type.equalsIgnoreCase("document")) {
             value = getDocumentOrMediaValue(doc, type, relatedDocuments, selectedDocumentId, selectedDocumentIds,
-                    DocOrMediaType.DOCUMENT, attachments);
-        }
-        if (DocOrMediaType.MEDIA.getTypeName().equalsIgnoreCase(format)) {
-            value = getDocumentOrMediaValue(doc, type, relatedDocuments, selectedDocumentId, selectedDocumentIds,
-                    DocOrMediaType.MEDIA, attachments);
+                    attachments);
         }
 
         if (param.isAdditionalContext()) {
@@ -304,7 +299,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private Object getDocumentOrMediaValue(DocumentModel doc,
             String type,
-            List<DocumentModel> relatedDocuments, String selectedDocumentId, List<String> paramSelectedDocumentIds, DocOrMediaType docOrMediaType,
+            List<DocumentModel> relatedDocuments, String selectedDocumentId, List<String> paramSelectedDocumentIds,
             Map<String, Blob> attachments) {
         Object value;
         Set<String> relatedDocumentIds = relatedDocuments.stream().map(DocumentModel::getId)
@@ -312,25 +307,18 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         if ("array".equalsIgnoreCase(type)) {
             Set<String> selectedDocuments = new HashSet<>(relatedDocumentIds);
             selectedDocuments.addAll(paramSelectedDocumentIds);
-            value = getSelectedDocumentsContent(doc, selectedDocuments, docOrMediaType.getTypeName(), attachments);
+            value = getSelectedDocumentsContent(doc, selectedDocuments, attachments);
         } else if (StringUtils.isNotEmpty(selectedDocumentId)) {
             DocumentModel selectedDocument = doc.getCoreSession().getDocument(new IdRef(selectedDocumentId));
             value = getBlob(selectedDocument);
         } else {
             value = getBlob(doc);
         }
-        Blob blob = getBlob(doc);
-        if (blob != null && !isImage(blob) && docOrMediaType.equals(DocOrMediaType.MEDIA)) {
-            value = "";
-        }
-        if (blob != null && isImage(blob) && docOrMediaType.equals(DocOrMediaType.DOCUMENT)) {
-            value = "";
-        }
         return value;
     }
 
     private List<Blob> getSelectedDocumentsContent(DocumentModel documentModel, Set<String> selectedDocumentIds,
-            String docOrMediaType, Map<String, Blob> attachments) {
+            Map<String, Blob> attachments) {
         CoreSession coreSession = documentModel.getCoreSession();
         List<Blob> blobs = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(selectedDocumentIds)) {
@@ -342,10 +330,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 if (blob == null) {
                     return false;
                 }
-                if (docOrMediaType.equals("media") && isImage(blob)) {
-                    return true;
-                }
-                return docOrMediaType.equals("document") && !isImage(blob);
+                return true;
             }).map(RunInteractionServiceImpl::getBlob)
                     .forEach(blobs::add);
         }
@@ -355,10 +340,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
                 if (blob == null) {
                     return false;
                 }
-                if (docOrMediaType.equals("media") && isImage(blob)) {
-                    return true;
-                }
-                return docOrMediaType.equals("document") && !isImage(blob);
+                return true;
             }).map(Map.Entry::getValue).forEach(blobs::add);
         }
         return blobs;
@@ -408,10 +390,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
     private Map<String, Blob> getAttachmentsMap(DocumentModel doc) {
         return io.maretha.cp.core.services.helper.BlobExtractor.getAttachmentsMap(doc);
-    }
-
-    private List<Blob> getAttachmentBlobs(DocumentModel doc) {
-        return io.maretha.cp.core.services.helper.BlobExtractor.getAttachments(doc);
     }
 
     private Map<String, DocTypeWithSchema.Schema.DictionaryWithDescription> getDictionaryValues(CoreSession session,
@@ -633,6 +611,5 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
         return Integer.parseInt(bucketSizeStr);
     }
-
 
 }
