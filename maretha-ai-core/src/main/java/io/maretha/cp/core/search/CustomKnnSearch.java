@@ -1,6 +1,7 @@
 package io.maretha.cp.core.search;
 
 import io.maretha.cp.core.services.ai.EmbeddingsService;
+import io.maretha.cp.core.services.helper.EmbeddingsHelper;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -108,7 +109,7 @@ public class CustomKnnSearch extends ElasticSearchNxqlPageProvider {
 
             // Case 1: text search
             if ("text".equalsIgnoreCase(vectorField)) {
-                double[] vector = Framework.getService(EmbeddingsService.class).textToEmbedding(vectorQuery);
+                double[] vector = Framework.getService(EmbeddingsService.class).textToEmbedding(vectorQuery, EmbeddingsHelper.DEFAULT_EMBEDDING_DIMENSIONS);
                 String vectorJson = Arrays.toString(vector);
                 String knnTextJson = buildKnnFunctionScore(TEXT_VECTOR_FIELD, vectorJson, k, numCandidates);
                 QueryBuilder textKnnQuery = QueryBuilders.wrapperQuery(knnTextJson);

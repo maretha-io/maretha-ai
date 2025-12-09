@@ -5,6 +5,7 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
+import io.maretha.cp.core.services.helper.EmbeddingsHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -86,7 +87,7 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
         List<TextSegment> segments = splitter.split(document);
 
         for (TextSegment segment : segments) {
-            double[] embeddings = textToEmbedding(segment.text());
+            double[] embeddings = textToEmbedding(segment.text(), EmbeddingsHelper.DEFAULT_EMBEDDING_DIMENSIONS);
             textEmbeddingsMap.put(segment.text(), embeddings);
         }
 
@@ -103,11 +104,11 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
             throw new RuntimeException(e);
         }
         String text = document.text();
-        return textToEmbedding(text);
+        return textToEmbedding(text, EmbeddingsHelper.DEFAULT_EMBEDDING_DIMENSIONS);
     }
 
     @Override
-    public double[] textToEmbedding(String inputText) {
+    public double[] textToEmbedding(String inputText, Integer outputEmbeddingLength) {
         // Set the model ID, e.g., Titan Text Embeddings V2.
         ObjectMapper mapper = new ObjectMapper();
 
@@ -118,6 +119,11 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
             // Build payload as a Map -> Jackson makes valid JSON
             Map<String, Object> payload = new HashMap<>();
             payload.put("inputText", safeText);
+
+            if (outputEmbeddingLength != null) {
+                payload.put("dimensions", outputEmbeddingLength);
+            }
+            payload.put("normalize", true);
 
             // Convert to JSON
             String json = mapper.writeValueAsString(payload);

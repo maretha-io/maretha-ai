@@ -22,6 +22,8 @@ import static io.maretha.cp.core.services.RepositoryService.SCHEMA_EMBEDDINGS_TE
 @Log4j2
 public class EmbeddingsHelper {
 
+    public static final int DEFAULT_EMBEDDING_DIMENSIONS = 1024;
+
     private EmbeddingsHelper() {
         // Utility class, prevent instantiation
     }
@@ -72,8 +74,10 @@ public class EmbeddingsHelper {
     private static void addImageTextEmbeddings(DocumentModel doc, Blob blob) {
         try {
             String description = (String) doc.getPropertyValue("dc:description");
-            double[] vector = Framework.getService(EmbeddingsService.class).textToEmbedding(description);
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, vector);
+            double[] vector = Framework.getService(EmbeddingsService.class).textToEmbedding(description, DEFAULT_EMBEDDING_DIMENSIONS);
+            if (isValidEmbeddingSize(vector, "text embeddings from image description")) {
+                doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, vector);
+            }
         } catch (Exception e) {
             log.error("Failed to add text embeddings", e);
         }
@@ -85,7 +89,9 @@ public class EmbeddingsHelper {
     private static void addTextEmbeddings(DocumentModel doc, Blob blob) {
         try {
             double[] documentEmbeddings = Framework.getService(EmbeddingsService.class).embedPdfSummary(blob);
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
+            if (isValidEmbeddingSize(documentEmbeddings, "text embeddings from PDF")) {
+                doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, documentEmbeddings);
+            }
         } catch (Exception e) {
             log.error("Failed to save textEmbeddings", e);
         }
@@ -98,8 +104,10 @@ public class EmbeddingsHelper {
         try {
             String base64 = Base64.getEncoder().encodeToString(blob.getByteArray());
             double[] documentEmbeddings = Framework.getService(EmbeddingsService.class)
-                    .embedImage(base64, doc.getTitle(), 1024);
-            doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
+                    .embedImage(base64, doc.getTitle(), DEFAULT_EMBEDDING_DIMENSIONS);
+            if (isValidEmbeddingSize(documentEmbeddings, "image embeddings")) {
+                doc.setPropertyValue(SCHEMA_EMBEDDINGS_IMAGE, documentEmbeddings);
+            }
         } catch (Exception e) {
             log.error("Failed to save imageEmbeddings", e);
         }
@@ -110,5 +118,21 @@ public class EmbeddingsHelper {
      */
     private static boolean isEmpty(DocumentModel doc, String schema) {
         return CollectionUtils.isEmpty((Collection) doc.getPropertyValue(schema));
+    }
+
+    /**
+     * Validates that embeddings have the expected size of 1024.
+     *
+     * @param embeddings The embedding vector to validate
+     * @param type       Description of the embedding type for logging
+     * @return true if valid, false otherwise
+     */
+    private static boolean isValidEmbeddingSize(double[] embeddings, String type) {
+        if (embeddings == null || embeddings.length != DEFAULT_EMBEDDING_DIMENSIONS) {
+            log.warn("Invalid embedding size for {}: expected {}, got {}. Skipping.",
+                    type, DEFAULT_EMBEDDING_DIMENSIONS, embeddings == null ? "null" : embeddings.length);
+            return false;
+        }
+        return true;
     }
 }

@@ -1,6 +1,7 @@
 package io.maretha.cp.core;
 
 import io.maretha.cp.core.services.ai.EmbeddingsService;
+import io.maretha.cp.core.services.helper.EmbeddingsHelper;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class CacheTest {
         KeyValueStore cache = keyValueService.getKeyValueStore(EMBEDDINGS_KV);
         cache.put("test", Arrays.toString(cachedResponse));
 
-        double[] response = apiService.textToEmbedding("test");
+        double[] response = apiService.textToEmbedding("test", EmbeddingsHelper.DEFAULT_EMBEDDING_DIMENSIONS);
         Assert.assertEquals(Arrays.toString(cachedResponse), Arrays.toString(response));
     }
 }
