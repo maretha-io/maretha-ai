@@ -78,7 +78,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         Interaction interaction = getInteractionById(savedSettings, interactionId);
 
         Map<String, Object> paramsMap = buildParameters(doc, session, parameters, interaction);
-        if (!doc.hasFacet(RESULTS_FACET)) {
+        if (!doc.isFolder() && !doc.hasFacet(RESULTS_FACET)) {
             doc.addFacet(RESULTS_FACET);
         }
         if (saveMetadata) {
@@ -88,7 +88,9 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         }
 
         String response = Framework.getService(InteractionService.class).invokeModel(doc, interaction, paramsMap);
-        addEmbeddings(doc, session, false, false); // todo move to async worker
+        if(!doc.isFolder()) {
+            addEmbeddings(doc, session, false, false); // todo move to async worker
+        }
         return response;
     }
 
@@ -198,6 +200,12 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         Map<String, Object> paramsMap = new HashMap<>();
         List<DocumentModel> relatedDocuments = getRelatedDocuments(session, doc);
 
+        // If doc is a folder, add all child documents with file content
+        if (doc.isFolder()) {
+            List<DocumentModel> childDocuments = getChildDocumentsWithContent(session, doc);
+            relatedDocuments.addAll(childDocuments);
+        }
+
         Map<String, Blob> attachments = new HashMap<>();
         if (interaction.isSendAttachments()) {
             attachments = getAttachmentsMap(doc);
@@ -225,7 +233,7 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         String selectedDocumentId = param.getSelectedDocumentId();
         List<String> selectedDocumentIds = param.getSelectedDocumentIds();
 
-        if (StringUtils.isEmpty(type) || type.equalsIgnoreCase("document")) {
+        if (StringUtils.isEmpty(type) || type.equalsIgnoreCase("array")) {
             value = getDocumentOrMediaValue(doc, type, relatedDocuments, selectedDocumentId, selectedDocumentIds,
                     attachments);
         }
@@ -272,6 +280,15 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
         return io.maretha.cp.core.services.helper.DocumentContextBuilder.getRelatedDocuments(
                 session, doc, this::getSchemaFields, schemaSettings);
+    }
+
+    private List<DocumentModel> getChildDocumentsWithContent(CoreSession session, DocumentModel doc) {
+        String query = String.format(
+                "SELECT * FROM Document WHERE ecm:ancestorId = '%s' " +
+                "AND ecm:isTrashed = 0 AND ecm:isProxy = 0 AND ecm:isVersion = 0 " +
+                "AND file:content IS NOT NULL",
+                doc.getId());
+        return session.query(query).stream().collect(Collectors.toList());
     }
 
     private List<DocumentModel> getAllParentDocuments(CoreSession session, DocumentModel doc) {
