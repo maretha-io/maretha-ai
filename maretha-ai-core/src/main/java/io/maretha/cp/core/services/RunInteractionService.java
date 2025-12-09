@@ -13,9 +13,6 @@ public interface RunInteractionService {
     DocumentModel addEmbeddings(DocumentModel doc, CoreSession session, boolean waitUploadCompletion,
             boolean lowPriority);
 
-    DocumentModel uploadFilesAndSetStoreIds(DocumentModel doc, CoreSession session, boolean waitForCompletion,
-            boolean lowPriority);
-
     String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId,
             List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride,
             boolean asyncMode);

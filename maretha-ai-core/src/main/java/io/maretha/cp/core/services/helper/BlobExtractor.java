@@ -15,10 +15,10 @@ import java.util.*;
 public class BlobExtractor {
 
     // Schema constants
-    private static final String FILE_CONTENT = "file:content";
-    private static final String FILES_SCHEMA = "files";
-    private static final String FILE_SCHEMA = "file";
-    private static final String FILE_CONTENTS = "files:files";
+    public static final String FILE_CONTENT = "file:content";
+    public static final String FILES_SCHEMA = "files";
+    public static final String FILE_SCHEMA = "file";
+    public static final String FILE_CONTENTS = "files:files";
 
     private BlobExtractor() {
         // Utility class, prevent instantiation
