@@ -32,6 +32,10 @@ public class BlobExtractor {
      * @return Main content blob, or null if not present
      */
     public static Blob getFileContent(DocumentModel doc) {
+        // Check if document has file schema before accessing file:content
+        if (!doc.hasSchema(FILE_SCHEMA)) {
+            return null;
+        }
         if (doc.hasFacet("Picture")) {
             PictureBlobHolder pictureBlobHolder = new PictureBlobHolder(doc, "picture:views/3/content"); // FullHD
             Blob blob = pictureBlobHolder.getBlob();
@@ -103,6 +107,9 @@ public class BlobExtractor {
      * @return true if image MIME type, false otherwise
      */
     public static boolean isImage(Blob blob) {
+        if( blob == null) {
+            return false;
+        }
         return blob.getMimeType() != null && blob.getMimeType().startsWith("image/");
     }
 }
