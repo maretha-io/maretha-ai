@@ -47,18 +47,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.maretha.cp.core.operations.GetDocumentTypesOperation.FACET_PREFIX;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
 
+import static io.maretha.cp.core.services.helper.BlobExtractor.FILE_SCHEMA;
 import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
+import static org.nuxeo.ecm.platform.rendition.Constants.FILES_SCHEMA;
 
 public class RunInteractionServiceImpl implements RunInteractionService {
 
-    public static final String CALLBACK_NOTIFY_URL = "callbackNotifyUrl";
     private static final String DEFAULT_DIRECTORY_BUCKET_SIZE = "100";
-    private static final String FACET_PREFIX = "Facet_";
-    private static final String FILES_SCHEMA = "files";
-    private static final String FILE_SCHEMA = "file";
-    private static final String FILE_CONTENTS = "files:files";
 
     private final Log log = LogFactory.getLog(RunInteractionServiceImpl.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -215,10 +213,6 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         final Map<String, Blob> finalAttachments = attachments;
         parameters.forEach(param -> processParameter(doc, session, interaction, relatedDocuments, finalAttachments,
                 paramsMap, param));
-
-        // Populate additional binary content if necessary?
-        // We might want to pass 'attachments' to paramMap if not already?
-        // Or processParameter handles it.
         return paramsMap;
     }
 
@@ -230,13 +224,14 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         String type = param.getType();
         String format = param.getFormat();
         String selectedDocumentId = param.getSelectedDocumentId();
+        List<String> selectedDocumentIds = param.getSelectedDocumentIds();
 
         if (DocOrMediaType.DOCUMENT.getTypeName().equals(format)) {
-            value = getDocumentOrMediaValue(doc, session, param, type, relatedDocuments, selectedDocumentId,
+            value = getDocumentOrMediaValue(doc, type, relatedDocuments, selectedDocumentId, selectedDocumentIds,
                     DocOrMediaType.DOCUMENT, attachments);
         }
         if (DocOrMediaType.MEDIA.getTypeName().equalsIgnoreCase(format)) {
-            value = getDocumentOrMediaValue(doc, session, param, type, relatedDocuments, selectedDocumentId,
+            value = getDocumentOrMediaValue(doc, type, relatedDocuments, selectedDocumentId, selectedDocumentIds,
                     DocOrMediaType.MEDIA, attachments);
         }
 
@@ -295,10 +290,8 @@ public class RunInteractionServiceImpl implements RunInteractionService {
 
             boolean parentHasFiles = schemaFields.stream()
                     .filter(DocTypeWithSchema.Schema.Field::isAdditionalContext)
-                    .anyMatch(field -> {
-                        return field.getXpath().equalsIgnoreCase(FILE_SCHEMA)
-                                || field.getXpath().equalsIgnoreCase(FILES_SCHEMA);
-                    });
+                    .anyMatch(field -> field.getXpath().equalsIgnoreCase(FILE_SCHEMA)
+                            || field.getXpath().equalsIgnoreCase(FILES_SCHEMA));
             if (parentHasFiles) {
                 Map<String, Blob> parentAttachments = getAttachmentsMap(parentDoc);
                 if (MapUtils.isNotEmpty(parentAttachments)) {
@@ -309,40 +302,29 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return attachments;
     }
 
-    private Object getDocumentOrMediaValue(DocumentModel doc, CoreSession session, InteractionParameter param,
+    private Object getDocumentOrMediaValue(DocumentModel doc,
             String type,
-            List<DocumentModel> relatedDocuments, String selectedDocumentId, DocOrMediaType docOrMediaType,
+            List<DocumentModel> relatedDocuments, String selectedDocumentId, List<String> paramSelectedDocumentIds, DocOrMediaType docOrMediaType,
             Map<String, Blob> attachments) {
         Object value;
         Set<String> relatedDocumentIds = relatedDocuments.stream().map(DocumentModel::getId)
                 .collect(Collectors.toSet());
         if ("array".equalsIgnoreCase(type)) {
-            Set<String> selectedDocumentIds = new HashSet<>(relatedDocumentIds);
-            selectedDocumentIds.addAll(param.getSelectedDocumentIds());
-            value = getSelectedDocumentsContent(doc, selectedDocumentIds, docOrMediaType.getTypeName(),
-                    attachments);
+            Set<String> selectedDocuments = new HashSet<>(relatedDocumentIds);
+            selectedDocuments.addAll(paramSelectedDocumentIds);
+            value = getSelectedDocumentsContent(doc, selectedDocuments, docOrMediaType.getTypeName(), attachments);
         } else if (StringUtils.isNotEmpty(selectedDocumentId)) {
             DocumentModel selectedDocument = doc.getCoreSession().getDocument(new IdRef(selectedDocumentId));
-            // selectedDocument = uploadFilesAndSetStoreIds(selectedDocument, session, true,
-            // true);
-            // value = "store:" +
-            // selectedDocument.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
-            // Changing to pass Blob for direct processing:
             value = getBlob(selectedDocument);
         } else {
-            // value = "store:" + doc.getPropertyValue(RESULTS_STORE_ID_SCHEMA_PATH);
             value = getBlob(doc);
         }
         Blob blob = getBlob(doc);
-        if (blob != null && !isImage(blob) && !isImage(blob) && docOrMediaType.equals(DocOrMediaType.MEDIA)) { // check
-                                                                                                               // isImage
-                                                                                                               // for
-                                                                                                               // media?
-            // Logic from maretha-cp:
-            // if (blob != null && !isImage(blob) && !isVideo(blob) &&
-            // docOrMediaType.equals(DocOrMediaType.MEDIA))
-            // value = "";
-            // I'm skipping video check for now
+        if (blob != null && !isImage(blob) && docOrMediaType.equals(DocOrMediaType.MEDIA)) {
+            value = "";
+        }
+        if (blob != null && isImage(blob) && docOrMediaType.equals(DocOrMediaType.DOCUMENT)) {
+            value = "";
         }
         return value;
     }
@@ -652,13 +634,5 @@ public class RunInteractionServiceImpl implements RunInteractionService {
         return Integer.parseInt(bucketSizeStr);
     }
 
-    @Override
-    public DocumentModel uploadFilesAndSetStoreIds(DocumentModel doc, CoreSession session, boolean waitForCompletion,
-            boolean lowPriority) {
-        // Implementation for interface compliance, but we don't use 'Store' in
-        // maretha-ai.
-        // We can just return doc, or perform addEmbeddings?
-        return addEmbeddings(doc, session, waitForCompletion, lowPriority);
-    }
 
 }

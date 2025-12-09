@@ -45,9 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.SCHEMA_SETTINGS;
-import static io.maretha.cp.core.operations.SaveInteractionSettingsOperation.AI_SETTINGS;
 import static io.maretha.cp.core.services.RunInteractionService.FILE_CONTENT;
-import static io.maretha.cp.core.services.RunInteractionServiceImpl.CALLBACK_NOTIFY_URL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -422,8 +420,6 @@ public class RunInteractionServiceImplTest {
                 // specific schema settings for TestDoc
                 addSchemaConfiguration(configurationMap, interactions, "TestDoc_facetedTag", List.of(tagField_1));
 
-                // add callbackNotifyUrl
-                configurationMap.put(AI_SETTINGS, Map.of(CALLBACK_NOTIFY_URL, "callbackNotifyUrl"));
                 Framework.getService(RepositoryService.class).saveInteractionSettings(session, interactions,
                                 configurationMap);
                 txFeature.nextTransaction();
@@ -978,18 +974,6 @@ public class RunInteractionServiceImplTest {
                 when(embeddingsService.embedPdfSummary(any())).thenReturn(new double[] { 4.0, 5.0, 6.0 });
 
                 DocumentModel result = runInteractionService.addEmbeddings(document, session, false, false);
-
-                assertNotNull("Result should not be null", result);
-        }
-
-        @Test
-        public void testUploadFilesAndSetStoreIds() {
-                DocumentModel document = createDocument();
-
-                when(embeddingsService.embedImage(anyString(), anyString(), anyInt())).thenReturn(new double[] {});
-                when(embeddingsService.embedPdfSummary(any())).thenReturn(new double[] {});
-
-                DocumentModel result = runInteractionService.uploadFilesAndSetStoreIds(document, session, false, false);
 
                 assertNotNull("Result should not be null", result);
         }
