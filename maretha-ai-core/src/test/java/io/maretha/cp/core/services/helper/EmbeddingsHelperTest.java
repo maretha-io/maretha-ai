@@ -57,7 +57,7 @@ public class EmbeddingsHelperTest {
         double[] mockImageEmbeddings = new double[] { 0.1, 0.2, 0.3 };
         double[] mockTextEmbeddings = new double[] { 0.4, 0.5, 0.6 };
         when(embeddingsService.embedImage(anyString(), anyString(), anyInt())).thenReturn(mockImageEmbeddings);
-        when(embeddingsService.textToEmbedding(anyString())).thenReturn(mockTextEmbeddings);
+        when(embeddingsService.textToEmbedding(anyString(), any())).thenReturn(mockTextEmbeddings);
 
         // Act
         DocumentModel result = EmbeddingsHelper.addEmbeddings(doc, session, imageBlob, false, false);
