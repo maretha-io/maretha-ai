@@ -131,7 +131,7 @@
 						vertical-align="top">
 						<paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
 							<template is="dom-repeat" items="[[interactions]]">
-								<paper-item>[[item.name]] - [[item.description]]</paper-item>
+								<paper-item>[[item.name]]</paper-item>
 							</template>
 						</paper-listbox>
 					</paper-dropdown-menu>
@@ -268,8 +268,8 @@
 			_loadData()
 			{
 				this._getInteractions();
-				this._executeDocumentsReadyQuery();
-				this._executeTotalDocumentsQuery();
+				//this._executeDocumentsReadyQuery();
+				//this._executeTotalDocumentsQuery();
 			},
 
 			_getInteractions()
@@ -388,7 +388,7 @@
 
 			_interactionResponseObserver(obs)
 			{
-				this._executeDocumentsReadyQuery();
+				//this._executeDocumentsReadyQuery();
 			},
 
 			// Compute the selected value based on the selected index
