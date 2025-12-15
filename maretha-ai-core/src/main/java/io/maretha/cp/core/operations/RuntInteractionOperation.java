@@ -71,7 +71,7 @@ public class RuntInteractionOperation {
             return runInteractionService.triggerInteraction(doc, session, interactionId, parameters, saveMetadata, saveMetadataModeOverride, false);
         } catch (Exception e) {
             log.error("Failed to run interaction:" + interactionId, e);
-            return e.getMessage();
+            return e.getCause().getMessage() + ":" + e.getMessage();
         }
     }
 
