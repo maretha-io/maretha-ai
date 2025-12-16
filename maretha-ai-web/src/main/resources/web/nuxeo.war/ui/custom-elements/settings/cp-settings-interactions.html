@@ -116,9 +116,15 @@
 									active="[[ interaction.active ]]" status="[[ interaction.status ]]" version="[[ interaction.version ]]"
 									is-dirty="[[ _isDirty(interaction._dirty, changesSaved) ]]" show-stats>
 
+				<nuxeo-card role="widget" class="nuxeo-card" heading="General">
+					<paper-input label="Interaction Name" value="{{interaction.name}}" required on-input="_markAsDirty">
+					</paper-input>
+					<paper-textarea label="Description" value="{{interaction.description}}" on-input="_markAsDirty">
+					</paper-textarea>
+				</nuxeo-card>
+
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Prompt">
-					<paper-textarea type="text" value="{{interaction.prompt}}"
-									on-input="_markAsDirty">
+					<paper-textarea type="text" value="{{interaction.prompt}}" on-input="_markAsDirty">
 					</paper-textarea>
 				</nuxeo-card>
 
@@ -133,43 +139,51 @@
 				<nuxeo-card role="widget" class="nuxeo-card" heading="AI Model">
 					<nuxeo-selectivity class="selectivity-container" min-chars="0" data="[[modelChoices]]"
 									   value="{{interaction.model}}" required data-ix$="[[ ix ]]"
-									   on-value-changed="_activeDocumentsChanged" stay-open-on-select
-									   label="AI model"
+									   on-value-changed="_activeDocumentsChanged" stay-open-on-select label="AI model"
 									   placeholder="Select the AI model"></nuxeo-selectivity>
 				</nuxeo-card>
 
 				<nuxeo-card role="widget" class="nuxeo-card" heading="Settings">
 					<div class="config">
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id$="enabledButton-[[ix]]" checked="{{interaction.active}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="enabledButton-[[ix]]" checked="{{interaction.active}}"
+												 on-change="_markAsDirty">
 								Enabled
 							</paper-toggle-button>
-							<paper-tooltip for$="enabledButton-[[ix]]" position="top">Enable/Disable the Interaction</paper-tooltip>
+							<paper-tooltip for$="enabledButton-[[ix]]" position="top">Enable/Disable the
+								Interaction</paper-tooltip>
 						</div>
 
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id$="visibleInActionMenu-[[ix]]" checked="{{interaction.activeOnActionMenu}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="visibleInActionMenu-[[ix]]"
+												 checked="{{interaction.activeOnActionMenu}}" on-change="_markAsDirty">
 								Visible in Action Menu
 							</paper-toggle-button>
-							<paper-tooltip for$="visibleInActionMenu-[[ix]]" position="top">Show the interaction to users</paper-tooltip>
+							<paper-tooltip for$="visibleInActionMenu-[[ix]]" position="top">Show the interaction to
+								users</paper-tooltip>
 						</div>
 
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id$="activeOnFolder-[[ix]]" checked="{{interaction.activeOnFolder}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="activeOnFolder-[[ix]]" checked="{{interaction.activeOnFolder}}"
+												 on-change="_markAsDirty">
 								Executable on Folders
 							</paper-toggle-button>
-							<paper-tooltip for$="activeOnFolder-[[ix]]" position="top">Will run for all the documents in the folder. "Folder" must be added in Activation list of documents</paper-tooltip>
+							<paper-tooltip for$="activeOnFolder-[[ix]]" position="top">Will run for all the documents in
+								the folder. "Folder" must be added in Activation list of documents</paper-tooltip>
 						</div>
 
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id$="isChatButton-[[ix]]" checked="{{interaction.chat}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="isChatButton-[[ix]]" checked="{{interaction.chat}}"
+												 on-change="_markAsDirty">
 								Is Chat
 							</paper-toggle-button>
-							<paper-tooltip for$="isChatButton-[[ix]]" position="top">There can only be one Chat interaction, this is used by the Chat component in the UI</paper-tooltip>
+							<paper-tooltip for$="isChatButton-[[ix]]" position="top">There can only be one Chat
+								interaction, this is used by the Chat component in the UI</paper-tooltip>
 						</div>
 
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id$="saveMetadataButton-[[ix]]" checked="{{interaction.saveMetadata}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="saveMetadataButton-[[ix]]" checked="{{interaction.saveMetadata}}"
+												 on-change="_markAsDirty">
 								Save Metadata
 							</paper-toggle-button>
 							<paper-tooltip for$="saveMetadataButton-[[ix]]" position="top">
@@ -181,17 +195,148 @@
 						</div>
 
 						<div style="position: relative; display: inline-block;">
-							<paper-toggle-button id$="mainMetadataButton-[[ix]]" disabled$="[[ !interaction.saveMetadata ]]"
-												 checked="{{interaction.mainMetadata}}" on-change="_markAsDirty">
+							<paper-toggle-button id$="mainMetadataButton-[[ix]]"
+												 disabled$="[[ !interaction.saveMetadata ]]" checked="{{interaction.mainMetadata}}"
+												 on-change="_markAsDirty">
 								Main Metadata
 							</paper-toggle-button>
 							<paper-tooltip for$="mainMetadataButton-[[ix]]" position="top">
-								There can be multiple "Metadata" interactions, but the button "Update/Enhance Metadata" needs to know the main metadata interaction to trigger.
+								There can be multiple "Metadata" interactions, but the button "Update/Enhance Metadata"
+								needs to know the main metadata interaction to trigger.
 							</paper-tooltip>
+						</div>
+
+						<div style="position: relative; display: inline-block;">
+							<paper-toggle-button id$="sendParentsContextButton-[[ix]]"
+												 checked="{{interaction.sendParentsContext}}" on-change="_markAsDirty">
+								Send Parents Context
+							</paper-toggle-button>
+							<paper-tooltip for$="sendParentsContextButton-[[ix]]" position="top">Include parent
+								documents in the context</paper-tooltip>
+						</div>
+
+						<div style="position: relative; display: inline-block;">
+							<paper-toggle-button id$="sendAttachmentsButton-[[ix]]"
+												 checked="{{interaction.sendAttachments}}" on-change="_markAsDirty">
+								Send Attachments
+							</paper-toggle-button>
+							<paper-tooltip for$="sendAttachmentsButton-[[ix]]" position="top">Include document
+								attachments in the context</paper-tooltip>
+						</div>
+
+						<div style="position: relative; display: inline-block;">
+							<paper-toggle-button id$="requiresUserInputButton-[[ix]]"
+												 checked="{{interaction.requiresUserInput}}" on-change="_markAsDirty">
+								Requires User Input
+							</paper-toggle-button>
+							<paper-tooltip for$="requiresUserInputButton-[[ix]]" position="top">If enabled, the
+								interaction will pause for user input</paper-tooltip>
 						</div>
 					</div>
 					</div>
 
+				</nuxeo-card>
+
+				<nuxeo-card role="widget" class="nuxeo-card" heading="Parameters">
+					<template is="dom-if" if="[[ interaction.parameters.length ]]">
+						<table>
+							<thead>
+							<tr>
+								<th>Name</th>
+								<th>Type</th>
+								<th>Description</th>
+								<th>Default value</th>
+								<th>Read-only</th>
+								<th>Additional context</th>
+								<th>Chat Context</th>
+								<th>Enable selection</th>
+								<th>Selected document(s)</th>
+								<th>Read-only selection</th>
+								<th>Actions</th>
+							</tr>
+							</thead>
+							<tbody>
+							<template is="dom-repeat" items="[[ interaction.parameters ]]" as="param" index-as="px">
+								<tr>
+									<td>
+										<paper-input no-label-float value="{{param.name}}" data-ix$="[[ ix ]]"
+													 on-input="_markAsDirty"></paper-input>
+									</td>
+									<td>
+										<nuxeo-selectivity class="selectivity-container" min-chars="0"
+														   data="[[parameterTypes]]" value="{{param.type}}" data-ix$="[[ ix ]]"
+														   on-value-changed="_markAsDirty" no-label-float></nuxeo-selectivity>
+									</td>
+									<td>
+										<paper-input no-label-float value="{{param.description}}" data-ix$="[[ ix ]]"
+													 on-input="_markAsDirty"></paper-input>
+									</td>
+									<td>
+										<paper-input no-label-float type="[[ param.type ]]" value="{{ param.value }}"
+													 on-input="_markAsDirty" data-px$="[[ px ]]">
+										</paper-input>
+									</td>
+									<td>
+										<paper-checkbox checked="{{ param.readOnly }}" data-px$="[[ px ]]"
+														on-change="_markAsDirty" />
+									</td>
+									<td>
+										<paper-checkbox checked="{{ param.isAdditionalContext }}"
+														data-px$="[[ px ]]" on-change="_markAsDirty" />
+									</td>
+									<td>
+										<template is="dom-if" if="[[ interaction.chat ]]" restamp>
+											<paper-checkbox checked="{{ param.isContextMemoryParameter }}"
+															on-change="_markAsDirty" data-px$="[[ px ]]" />
+										</template>
+
+										<template is="dom-if" if="[[ !interaction.chat ]]" restamp>
+											<div class="na">N/A</div>
+										</template>
+									</td>
+									<td>
+										<paper-checkbox checked="{{ param.enableDocSelection }}"
+														on-change="_enableDocSelectionChanged" data-px$="[[ px ]]" />
+									</td>
+									<td on-click="_setSelectedParameterIndex" data-px$="[[ px ]]">
+										<template is="dom-if" if="[[ param.enableDocSelection ]]" restamp>
+												<nuxeo-document-suggestion value="{{param.selectedDocumentIds}}"
+																		   multiple stay-open-on-select min-chars="0"
+																		   on-value-changed="_markAsDirty"
+																		   role="widget">
+												</nuxeo-document-suggestion>
+										</template>
+
+										<template is="dom-if" if="[[ !param.enableDocSelection ]]" restamp>
+											<span class="na">N/A</span>
+										</template>
+									</td>
+									<td>
+										<template is="dom-if" if="[[ param.enableDocSelection ]]" restamp>
+											<paper-checkbox checked="[[ param.selectionReadOnly ]]"
+															on-change="_markAsDirty" />
+										</template>
+
+										<template is="dom-if" if="[[ !param.enableDocSelection ]]" restamp>
+											<div class="na">N/A</div>
+										</template>
+									</td>
+									<td>
+										<paper-icon-button icon="icons:delete" on-tap="_deleteParameter"
+														   data-ix$="[[ ix ]]" data-px$="[[ px ]]"
+														   aria-label="Delete parameter"></paper-icon-button>
+									</td>
+								</tr>
+							</template>
+							</tbody>
+						</table>
+					</template>
+					<div style="margin-top: 1rem;">
+						<paper-button raised on-tap="_addParameter" data-ix$="[[ ix ]]" class="primary">
+							<iron-icon icon="icons:add"></iron-icon>
+							Add Parameter
+						</paper-button>
+					</div>
 				</nuxeo-card>
 
 				<div class="delete-interaction">
@@ -235,13 +380,23 @@
 					notify: true
 				},
 				modelChoices: {
-				  type: Array,
-				  value: [
-				  		{'id': 'cohere.command-r-v1:0', 'text': 'cohere.command-r-v1:0'},
-				  		{'id': 'anthropic.claude-3-sonnet-20240229-v1:0', 'text': 'anthropic.claude-3-sonnet-20240229-v1:0'},
-				  		{'id': 'anthropic.claude-3-5-sonnet-20241022-v2:0', 'text': 'anthropic.claude-3-5-sonnet-20241022-v2:0'},
-				  		{'id': 'anthropic.claude-3-7-sonnet-20250219-v1:0', 'text': 'anthropic.claude-3-7-sonnet-20250219-v1:0'}
-				  		]
+					type: Array,
+					value: [
+						{ 'id': 'cohere.command-r-v1:0', 'text': 'cohere.command-r-v1:0' },
+						{ 'id': 'anthropic.claude-3-sonnet-20240229-v1:0', 'text': 'anthropic.claude-3-sonnet-20240229-v1:0' },
+						{ 'id': 'anthropic.claude-3-5-sonnet-20241022-v2:0', 'text': 'anthropic.claude-3-5-sonnet-20241022-v2:0' },
+						{ 'id': 'anthropic.claude-3-7-sonnet-20250219-v1:0', 'text': 'anthropic.claude-3-7-sonnet-20250219-v1:0' }
+					]
+				},
+				parameterTypes: {
+					type: Array,
+					value: [
+						{ 'id': 'string', 'text': 'string' },
+						{ 'id': 'number', 'text': 'number' },
+						{ 'id': 'boolean', 'text': 'boolean' },
+						{ 'id': 'array', 'text': 'array' },
+						{ 'id': 'object', 'text': 'object' }
+					]
 				},
 				changesSaved: {
 					type: Boolean,
@@ -254,31 +409,23 @@
 				newInteractionName: {
 					type: String,
 					value: ''
-			  	},
+				},
 			},
 
 			observers: [
 				'_markAsDirty(_selectedItem, _selectedItems.splices)'
 			],
 
-			_hasDefaultValue(format)
-			{
-				return format !== 'media' && format !== 'document';
-			},
-
-			_selectedItemsChanged(e)
-			{
+			_selectedItemsChanged(e) {
 				console.log('_selectedItemsChanged', e);
 			},
 
-			_setSelectedParameterIndex(e)
-			{
+			_setSelectedParameterIndex(e) {
 				this.set('_selectedInteractionIndex', e.target.dataset.ix);
 				this.set('_selectedParameterIndex', e.target.dataset.px);
 			},
 
-			_deleteInteraction(e)
-			{
+			_deleteInteraction(e) {
 				const interaction = e.model.__data.interaction;
 
 				if (!confirm(`Are you sure you want to remove this interaction: ${interaction.name}?`))
@@ -289,64 +436,101 @@
 				this.fire('mark-as-dirty', { interactions: this.interactions });
 			},
 
-			_isDocArrayType(param)
-			{
-				return param.type === 'array' && param.format === 'document';
+			_isDocArrayType(param) {
+				return param.type === 'array';
 			},
 
-			_isDocType(param)
-			{
-				return param.format === 'document';
-			},
-
-			_activeDocumentsChanged(e)
-			{
+			_activeDocumentsChanged(e) {
 				this.set(`interactions.${(e.target.dataset.ix | 0)}._dirty`, true);
 
 				this.fire('mark-as-dirty', { interactions: this.interactions });
 			},
 
-			_markAsDirty(e)
-			{
+			_markAsDirty(e) {
 				this.set(`interactions.${e && e.model ? e.model.__data.ix : this._selectedInteractionIndex}._dirty`, true);
 
 				this.fire('mark-as-dirty', { interactions: this.interactions });
 			},
 
-			_isDirty(interactionDirty)
-			{
+			_isDirty(interactionDirty) {
 				return interactionDirty && !this.changesSaved;
 			},
 
-			_enableDocSelectionChanged(e)
-			{
+			_enableDocSelectionChanged(e) {
 				this._markAsDirty(e);
 
-				// Force Polymer to re-evaluate the second column's dom-if
-				this.notifyPath(`interactions.${e.model.__data.ix}.parameters.${e.target.dataset.index}.enableDocSelection`);
+				// Force Polymer to re-evaluate the dependent columns
+				const ix = e.model.__data.ix;
+				const px = e.target.dataset.px;
+				this.notifyPath(`interactions.${ix}.parameters.${px}.enableDocSelection`);
 			},
 
 			_addInteraction() {
-			  if (!this.newInteractionName) {
-				this.notify({ message: 'Please enter a name for the interaction' });
-				return;
-			  }
+				if (!this.newInteractionName) {
+					this.notify({ message: 'Please enter a name for the interaction' });
+					return;
+				}
 
-			  const newInteraction = {
-				id: Date.now(), // simple unique id
-				name: this.newInteractionName,
-				description: '',
-				prompt: '',
-				active: false,
-				activeOnDocumentTypes: [],
-				model: '',
-				version: 1,
-				_dirty: true
-			  };
+				const newInteraction = {
+					id: Date.now(), // simple unique id
+					name: this.newInteractionName,
+					description: '',
+					prompt: '',
+					active: false,
+					activeOnDocumentTypes: [],
+					parameters: [],
+					model: '',
+					version: 1,
+					_dirty: true
+				};
 
-			  this.push('interactions', newInteraction);
-			  this.set('newInteractionName', ''); // reset input
-			  this.fire('mark-as-dirty', { interactions: this.interactions });
+				this.push('interactions', newInteraction);
+				this.set('newInteractionName', ''); // reset input
+				this.fire('mark-as-dirty', { interactions: this.interactions });
+			},
+
+			_addParameter(e) {
+				const ix = e.target.dataset.ix;
+				const interaction = this.interactions[ix];
+
+				if (!interaction.parameters) {
+					this.set(`interactions.${ix}.parameters`, []);
+				}
+
+				const newParameter = {
+					name: '',
+					type: 'string',
+					format: 'text',
+					description: '',
+					value: '',
+					readOnly: false,
+					enableDocSelection: false,
+					isMainDocument: false,
+					selectionReadOnly: false,
+					isContextMemoryParameter: false,
+					isAdditionalContext: false,
+					selectedDocumentIds: [],
+					selectedDocumentId: ''
+				};
+
+				this.push(`interactions.${ix}.parameters`, newParameter);
+				this.set(`interactions.${ix}._dirty`, true);
+				this.fire('mark-as-dirty', { interactions: this.interactions });
+			},
+
+			_deleteParameter(e) {
+				const ix = e.target.dataset.ix;
+				const px = e.target.dataset.px;
+				const interaction = this.interactions[ix];
+				const param = interaction.parameters[px];
+
+				if (!confirm(`Are you sure you want to remove the parameter: ${param.name || 'unnamed'}?`)) {
+					return;
+				}
+
+				this.splice(`interactions.${ix}.parameters`, px, 1);
+				this.set(`interactions.${ix}._dirty`, true);
+				this.fire('mark-as-dirty', { interactions: this.interactions });
 			}
 
 		})

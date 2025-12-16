@@ -53,6 +53,9 @@ public interface RepositoryService {
     String SCHEMA_ACTIVE = "active";
     String SCHEMA_ACTIVE_ON_FOLDER = "activeOnFolder";
     String SCHEMA_ACTIVE_ON_ACTION_MENU = "activeOnActionMenu";
+    String SCHEMA_SEND_ATTACHMENTS = "sendAttachments";
+    String SCHEMA_SEND_PARENTS_CONTEXT = "sendParentsContext";
+    String SCHEMA_REQUIRES_USER_INPUT = "requiresUserInput";
     String SCHEMA_IS_CHAT = "chat";
     String SCHEMA_IS_SAVE_METADATA = "saveMetadata";
     String SCHEMA_IS_MAIN_METADATA = "mainMetadata";
@@ -78,13 +81,17 @@ public interface RepositoryService {
 
     List<Interaction> getActiveInteractionsForDocumentType(CoreSession session, String documentType, boolean folder);
 
-    List<Interaction> getActiveChatInteractionsForDocumentType(CoreSession session, String documentType, boolean folder);
+    List<Interaction> getActiveChatInteractionsForDocumentType(CoreSession session, String documentType,
+            boolean folder);
 
-    Settings saveInteractionSettings(CoreSession session, List<ObjectNode> interactions, Map<String, Object> configuration);
+    Settings saveInteractionSettings(CoreSession session, List<ObjectNode> interactions,
+            Map<String, Object> configuration);
 
-    DocumentModel saveInteractionResponseAsMetadata(DocumentModel doc, CoreSession session, List<ObjectNode> interactions);
+    DocumentModel saveInteractionResponseAsMetadata(DocumentModel doc, CoreSession session,
+            List<ObjectNode> interactions);
 
-    DocumentModel saveInteractionResponseAsDocument(DocumentModel doc, CoreSession session, List<ObjectNode> interactions) throws OperationException;
+    DocumentModel saveInteractionResponseAsDocument(DocumentModel doc, CoreSession session,
+            List<ObjectNode> interactions) throws OperationException;
 
     Optional<DocumentModel> getExistingSettingsDocument(CoreSession session);
 

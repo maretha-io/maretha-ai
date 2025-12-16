@@ -12,5 +12,5 @@ public interface EmbeddingsService {
 
     double[] embedPdfSummary(Blob blob);
 
-    double[] textToEmbedding(String inputText);
+    double[] textToEmbedding(String inputText, Integer outputEmbeddingLength);
 }

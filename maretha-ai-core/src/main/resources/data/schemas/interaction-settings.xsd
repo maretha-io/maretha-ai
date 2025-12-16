@@ -35,6 +35,9 @@
             <xs:element name="chat" type="xs:boolean"/>
             <xs:element name="saveMetadata" type="xs:boolean"/>
             <xs:element name="mainMetadata" type="xs:boolean"/>
+            <xs:element name="sendParentsContext" type="xs:boolean"/>
+            <xs:element name="sendAttachments" type="xs:boolean"/>
+            <xs:element name="requiresUserInput" type="xs:boolean"/>
             <xs:element name="parameters" type="nxs:interactionParameterList"/>
             <xs:element name="prompt" type="xs:string"/>
         </xs:sequence>

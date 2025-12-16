@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 public class GetDocumentTypesOperation {
 
     public static final String ID = "GetDocumentTypesOperation";
+    public static final String FACET_PREFIX = "Facet_";
     private final Log log = LogFactory.getLog(GetDocumentTypesOperation.class);
     private final RepositoryService cpLocalSettingsService = Framework.getService(RepositoryService.class);
     @Param(name = "withSchemas", required = false)
@@ -55,21 +56,26 @@ public class GetDocumentTypesOperation {
             Settings settings = cpLocalSettingsService.getSavedSettings(session, true);
             List<DocTypeWithSchema> docsAndFacetsWithSchemas = new ArrayList<>();
             if (schemaManager.getDocumentType(documentType) != null) {
-                List<DocTypeWithSchema> docTypesWithSchemaDetails = getDocTypesWithSchemaDetails(schemaManager, documentType, settings.getSchemaSettings());
+                List<DocTypeWithSchema> docTypesWithSchemaDetails = getDocTypesWithSchemaDetails(schemaManager,
+                        documentType, settings.getSchemaSettings());
                 docsAndFacetsWithSchemas.addAll(docTypesWithSchemaDetails);
             } else {
-                List<DocTypeWithSchema> facetsWithSchemaDetails = getFacetsWithSchemaDetails(schemaManager, documentType, settings.getSchemaSettings());
+                List<DocTypeWithSchema> facetsWithSchemaDetails = getFacetsWithSchemaDetails(schemaManager,
+                        documentType, settings.getSchemaSettings());
                 docsAndFacetsWithSchemas.addAll(facetsWithSchemaDetails);
             }
             return docsAndFacetsWithSchemas;
         }
-        List<String> facets = Arrays.stream(schemaManager.getFacets()).map(facet -> "Facet_" + facet.getName()).sorted().collect(Collectors.toList());
-        List<String> docTypes = Arrays.stream(schemaManager.getDocumentTypes()).map(Type::getName).sorted().collect(Collectors.toList());
+        List<String> facets = Arrays.stream(schemaManager.getFacets()).map(facet -> FACET_PREFIX + facet.getName())
+                .sorted().collect(Collectors.toList());
+        List<String> docTypes = Arrays.stream(schemaManager.getDocumentTypes()).map(Type::getName).sorted()
+                .collect(Collectors.toList());
         docTypes.addAll(facets);
         return docTypes;
     }
 
-    private List<DocTypeWithSchema> getDocTypesWithSchemaDetails(SchemaManager schemaManager, String documentType, Map<String, DocTypeWithSchema.Schema> schemaSettings) {
+    private List<DocTypeWithSchema> getDocTypesWithSchemaDetails(SchemaManager schemaManager, String documentType,
+            Map<String, DocTypeWithSchema.Schema> schemaSettings) {
         List<DocTypeWithSchema> docTypes = new ArrayList<>();
         List<DocumentType> documentTypes;
         if (StringUtils.isNotEmpty(documentType)) {
@@ -89,12 +95,12 @@ public class GetDocumentTypesOperation {
                 String docTypeSchemaKey = docType.getName() + "_" + schemaName;
                 if (MapUtils.isNotEmpty(schemaSettings)) {
                     if (schemaSettings.containsKey(docTypeSchemaKey)) {
-                        //add existing saved schema settings by docType + schema
+                        // add existing saved schema settings by docType + schema
                         docTypeWithSchema.getSchemas().add(schemaSettings.get(docTypeSchemaKey));
                         return;
                     }
                     if (schemaSettings.containsKey(schemaName)) {
-                        //add existing saved schema settings
+                        // add existing saved schema settings
                         docTypeWithSchema.getSchemas().add(schemaSettings.get(schemaName));
                         return;
                     }
@@ -128,11 +134,12 @@ public class GetDocumentTypesOperation {
         return docTypes;
     }
 
-    private List<DocTypeWithSchema> getFacetsWithSchemaDetails(SchemaManager schemaManager, String facetType, Map<String, DocTypeWithSchema.Schema> schemaSettings) {
+    private List<DocTypeWithSchema> getFacetsWithSchemaDetails(SchemaManager schemaManager, String facetType,
+            Map<String, DocTypeWithSchema.Schema> schemaSettings) {
         List<DocTypeWithSchema> docTypes = new ArrayList<>();
         List<CompositeType> facetTypes;
         if (StringUtils.isNotEmpty(facetType)) {
-            facetType = facetType.replace("Facet_", "");
+            facetType = facetType.replace(FACET_PREFIX, "");
             CompositeType docType = schemaManager.getFacet(facetType);
             facetTypes = List.of(docType);
         } else {
@@ -140,21 +147,21 @@ public class GetDocumentTypesOperation {
         }
         facetTypes.stream().sorted().forEach(facet -> {
             DocTypeWithSchema docTypeWithSchema = new DocTypeWithSchema();
-            docTypeWithSchema.setName("Facet_" + facet.getName());
+            docTypeWithSchema.setName(FACET_PREFIX + facet.getName());
             docTypes.add(docTypeWithSchema);
             Collection<Schema> schemas = facet.getSchemas();
 
             schemas.forEach(schema -> {
                 String schemaName = schema.getName();
-                String docTypeSchemaKey = "Facet_" + facet.getName() + "_" + schemaName;
+                String docTypeSchemaKey = FACET_PREFIX + facet.getName() + "_" + schemaName;
                 if (MapUtils.isNotEmpty(schemaSettings)) {
                     if (schemaSettings.containsKey(docTypeSchemaKey)) {
-                        //add existing saved schema settings by facet + schema
+                        // add existing saved schema settings by facet + schema
                         docTypeWithSchema.getSchemas().add(schemaSettings.get(docTypeSchemaKey));
                         return;
                     }
                     if (schemaSettings.containsKey(schemaName)) {
-                        //add existing saved schema settings
+                        // add existing saved schema settings
                         docTypeWithSchema.getSchemas().add(schemaSettings.get(schemaName));
                         return;
                     }

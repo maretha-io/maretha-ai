@@ -8,6 +8,7 @@
     <xs:element name="testDate" type="xs:dateTime"/>
     <xs:element name="testDoubleArray" type="nxs:doubleList"/>
     <xs:element name="testStringArray" type="nxs:stringList"/>
+    <xs:element name="testDocRef" type="xs:string" ref:resolver="documentResolver" ref:store="id"/>
 
     <xs:element name="eventTypes">
         <xs:simpleType>

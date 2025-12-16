@@ -71,6 +71,38 @@
 				padding-top: .5rem;
 			}
 
+			.parameters-section {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+				margin-top: 1rem;
+				width: 100%;
+			}
+
+			.parameter-row {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				flex-wrap: wrap;
+			}
+
+			.parameter-label {
+				font-weight: 500;
+				color: var(--nuxeo-button-primary);
+				min-width: 120px;
+			}
+
+			.parameter-row paper-input {
+				flex: 1;
+				min-width: 200px;
+				--paper-input-container_-_padding: 0;
+			}
+
+			.parameter-row nuxeo-document-suggestion {
+				flex: 1;
+				min-width: 250px;
+			}
+
 			.chat-response {
 				flex-grow: 1;
 				background-color: color-mix(in srgb, var(--nuxeo-button-primary) 8%, #FFF 100%);
@@ -99,46 +131,36 @@
 						vertical-align="top">
 						<paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
 							<template is="dom-repeat" items="[[interactions]]">
-								<paper-item>[[item.name]] - [[item.description]]</paper-item>
+								<paper-item>[[item.name]]</paper-item>
 							</template>
 						</paper-listbox>
 					</paper-dropdown-menu>
 
-					<template is="dom-repeat" items="[[selectedInteraction.parameters]]">
-						<paper-input role="widget" value="{{item.value}}" label="[[item.name]]"
-							hidden="[[item.readOnly]]" readonly="[[item.readOnly]]" type="[[item.type]]">
-						</paper-input>
+					<div class="parameters-section">
+						<template is="dom-repeat" items="[[selectedInteraction.parameters]]">
+							<div class="parameter-row">
+								<span class="parameter-label">[[item.name]]:</span>
 
-						<template is="dom-if" if="[[item.description]]">
-							<paper-input role="widget" value="[[item.description]]" label="Description" disabled
-								type="text">
-							</paper-input>
-						</template>
-
-						<template is="dom-if" if="[[item.isMainDocument]]">
-							<paper-input role="widget" value="[[document.properties.file:content.name]]"
-								label="Main document" disabled type="text">
-							</paper-input>
-						</template>
-
-						<template is="dom-if" if="[[item.enableDocSelection]]">
-							<div>
-								<template is="dom-if" if="[[_isDocArrayType(item)]]">
-									<nuxeo-document-suggestion value="{{item.selectedDocumentIds}}"
-										label="Selected Documents" readonly="[[item.selectionReadOnly]]" multiple
-										min-chars="0" name="selectedDocs" role="widget">
-									</nuxeo-document-suggestion>
+								<template is="dom-if" if="[[item.value]]">
+									<template is="dom-if" if="[[!item.readOnly]]">
+										<paper-input role="widget" value="{{item.value}}" no-label-float
+											readonly="[[item.readOnly]]" type="[[item.type]]">
+										</paper-input>
+									</template>
 								</template>
 
-								<template is="dom-if" if="[[!_isDocArrayType(item)]]">
-									<nuxeo-document-suggestion value="{{item.selectedDocumentId}}"
-										label="Selected Document" readonly="[[item.selectionReadOnly]]" min-chars="0"
-										name="selectedDoc" role="widget">
-									</nuxeo-document-suggestion>
+
+								<template is="dom-if" if="[[item.enableDocSelection]]">
+									<template is="dom-if" if="[[item.selectedDocumentIds]]">
+										<nuxeo-document-suggestion value="{{item.selectedDocumentIds}}"
+											label="" readonly="[[item.selectionReadOnly]]" multiple
+											min-chars="0" name="selectedDocs" role="widget">
+										</nuxeo-document-suggestion>
+									</template>
 								</template>
 							</div>
 						</template>
-					</template>
+					</div>
 
 				</div>
 
@@ -246,8 +268,8 @@
 			_loadData()
 			{
 				this._getInteractions();
-				this._executeDocumentsReadyQuery();
-				this._executeTotalDocumentsQuery();
+				//this._executeDocumentsReadyQuery();
+				//this._executeTotalDocumentsQuery();
 			},
 
 			_getInteractions()
@@ -366,7 +388,7 @@
 
 			_interactionResponseObserver(obs)
 			{
-				this._executeDocumentsReadyQuery();
+				//this._executeDocumentsReadyQuery();
 			},
 
 			// Compute the selected value based on the selected index
