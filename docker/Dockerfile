@@ -9,6 +9,7 @@ USER $NUXEO_USER
 
 COPY --chown=900:0 maretha-ai-package/target/maretha-ai-package-1.0.27.zip $NUXEO_HOME/local-packages/maretha-ai-package-1.0.27.zip
 COPY --chown=900:0 maretha-angular-webui-package-3.20.0.zip $NUXEO_HOME/local-packages/maretha-angular-webui-package-3.20.0.zip
+COPY --chown=900:0 maretha-ai-tagging-package-1.0.0-SNAPSHOT.zip $NUXEO_HOME/local-packages/maretha-ai-tagging-package-1.0.0-SNAPSHOT.zip
 RUN echo ${CLID} $NUXEO_HOME/nxserver/data/instance.clid
 
 # Install nuxeo-web-ui
@@ -16,4 +17,5 @@ RUN /install-packages.sh --clid ${NUXEO_CLID}  nuxeo-web-ui amazon-s3-online-sto
 # Install a local package without its dependencies (`mp-install --nodeps`)
 RUN /install-packages.sh --offline $NUXEO_HOME/local-packages/maretha-ai-package-1.0.27.zip
 RUN /install-packages.sh --offline $NUXEO_HOME/local-packages/maretha-angular-webui-package-3.20.0.zip
+RUN /install-packages.sh --offline $NUXEO_HOME/local-packages/maretha-ai-tagging-package-1.0.0-SNAPSHOT.zip
 RUN rm -rf $NUXEO_HOME/local-packages
