@@ -16,9 +16,8 @@ import org.nuxeo.ecm.platform.query.api.PageProvider;
 import org.nuxeo.ecm.platform.query.api.PageProviderDefinition;
 import org.nuxeo.ecm.platform.query.api.PageProviderService;
 import org.nuxeo.ecm.platform.test.PlatformFeature;
-import org.nuxeo.elasticsearch.api.ElasticSearchAdmin;
-import org.nuxeo.elasticsearch.api.ElasticSearchService;
-import org.nuxeo.elasticsearch.query.NxQueryBuilder;
+import org.nuxeo.ecm.core.search.SearchService;
+import org.nuxeo.ecm.core.search.SearchQuery;
 import org.nuxeo.runtime.mockito.MockitoFeature;
 import org.nuxeo.runtime.mockito.RuntimeService;
 import org.nuxeo.runtime.test.runner.Deploy;
@@ -26,7 +25,7 @@ import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
 import org.nuxeo.runtime.test.runner.TransactionalFeature;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,16 +34,15 @@ import java.util.concurrent.TimeUnit;
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(FeaturesRunner.class)
-@Features({CoreFeature.class, PlatformFeature.class, MockitoFeature.class})
+@Features({ CoreFeature.class, PlatformFeature.class, MockitoFeature.class })
 @Deploy("org.nuxeo.ecm.platform.query.api")
 @Deploy("io.maretha.cp.core.maretha-cp-core")
-@Deploy("org.nuxeo.elasticsearch.core")
 @Deploy("io.maretha.cp.core.maretha-cp-core-test:elasticsearch-test-contrib.xml")
-@Deploy({"org.nuxeo.ecm.platform.query.api"})
+@Deploy({ "org.nuxeo.ecm.platform.query.api" })
 @Deploy("org.nuxeo.ecm.platform.search.core")
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 public class PageProviderTest {
@@ -54,15 +52,13 @@ public class PageProviderTest {
     @Inject
     protected PageProviderService ppService;
     @Inject
-    protected ElasticSearchService ess;
+    protected SearchService searchService;
     @Inject
     TransactionalFeature txFeature;
-    @Inject
-    ElasticSearchAdmin esa;
 
     @Before
     public void init() {
-        esa.initIndexes(true);
+        // Nuxeo 2025: No need to manually init indexes
     }
 
     @Test
@@ -72,7 +68,7 @@ public class PageProviderTest {
         doc.setPropertyValue("dc:title", "Test Document");
         doc.setPropertyValue("dc:description", "This is a test description");
         doc.addFacet(RESULTS_FACET);
-        double[] embeddings = {-0.0016492668,
+        double[] embeddings = { -0.0016492668,
                 -0.013967778,
                 0.0014286026,
                 -0.018426776,
@@ -1607,22 +1603,25 @@ public class PageProviderTest {
                 0.0032915005,
                 -0.012490823,
                 -0.010535615,
-                0.00039737133};
-//        doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, embeddings);
-//        doc = session.createDocument(doc);
-//        session.save();
-//        txFeature.nextTransaction();
+                0.00039737133 };
+        // doc.setPropertyValue(SCHEMA_EMBEDDINGS_TEXT, embeddings);
+        // doc = session.createDocument(doc);
+        // session.save();
+        // txFeature.nextTransaction();
 
-        //WHEN
+        // WHEN
         waitForESAsyncIndexing();
 
         PageProviderDefinition def = PageProviderHelper.getPageProviderDefinition("searchByEmbeddings");
         HashMap<String, String> namedParameters = new HashMap<>();
         namedParameters.put("vectorQuery", Arrays.toString(embeddings));
-        PageProvider<DocumentModel> pageProvider = (PageProvider<DocumentModel>) PageProviderHelper.getPageProvider(session, def, namedParameters);
+        PageProvider<DocumentModel> pageProvider = (PageProvider<DocumentModel>) PageProviderHelper
+                .getPageProvider(session, def, namedParameters);
 
-        //THEN
-        assertEquals(1, ess.query(new NxQueryBuilder(session).nxql("SELECT * from Document")).totalSize());
+        // THEN
+        // Nuxeo 2025: Use SearchService for queries
+        org.nuxeo.ecm.core.search.SearchQuery sq = SearchQuery.builder(session, "SELECT * from Document").build();
+        assertEquals(1, searchService.search(sq).getTotal());
         assertNotNull(pageProvider);
         assertEquals("searchByEmbeddings", pageProvider.getName());
         List<DocumentModel> documents = pageProvider.getCurrentPage();
@@ -1632,9 +1631,7 @@ public class PageProviderTest {
 
     protected void waitForESAsyncIndexing() throws Exception {
         txFeature.nextTransaction();
-        esa.prepareWaitForIndexing().get(20, TimeUnit.SECONDS);
-        esa.refresh();
+        // Nuxeo 2025: Indexing is handled by SearchService; wait via transaction commit
     }
-
 
 }

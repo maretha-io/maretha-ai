@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.opensearch.knn.hint" version="1.0">
+  <extension target="org.nuxeo.ecm.core.search.client.opensearch2" point="hint">
+    <hint name="knn" class="io.maretha.cp.core.search.KnnOpenSearchHintQueryBuilder"/>
+  </extension>
+</component>

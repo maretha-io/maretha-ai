@@ -2,7 +2,9 @@ package io.maretha.cp.core.services.ai;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.data.document.Document;
-import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
 import io.maretha.cp.core.services.helper.EmbeddingsHelper;
@@ -32,8 +34,7 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
                     StaticCredentialsProvider.create(
                             AwsBasicCredentials.create(
                                     Framework.getProperty("io.maretha.aws.accessKeyId"),
-                                    Framework.getProperty("io.maretha.aws.secretAccessKey"))
-                    ))
+                                    Framework.getProperty("io.maretha.aws.secretAccessKey"))))
             .region(Region.of(Framework.getProperty("io.maretha.aws.region")))
             .build();
     private final Log log = LogFactory.getLog(EmbeddingsServiceImpl.class);
@@ -57,8 +58,7 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
 
         var response = client.invokeModel(r -> r
                 .modelId(AMAZON_TITAN_EMBED_IMAGE_V_1)
-                .body(SdkBytes.fromUtf8String(nativeRequest))
-        );
+                .body(SdkBytes.fromUtf8String(nativeRequest)));
         String bodyStr = response.body().asUtf8String();
         JSONObject respJson = new JSONObject(bodyStr);
         JSONArray arr = respJson.getJSONArray("embedding");
@@ -73,10 +73,12 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
 
     @Override
     public Map<String, double[]> embedPdf(Blob blob) {
-        ApachePdfBoxDocumentParser pdfParser = new ApachePdfBoxDocumentParser();
         Document document;
-        try {
-            document = pdfParser.parse(blob.getStream());
+        try (java.io.InputStream in = blob.getStream();
+                PDDocument pdfDoc = Loader.loadPDF(in.readAllBytes())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            String text = stripper.getText(pdfDoc);
+            document = Document.from(text);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -96,14 +98,14 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
 
     @Override
     public double[] embedPdfSummary(Blob blob) {
-        ApachePdfBoxDocumentParser pdfParser = new ApachePdfBoxDocumentParser();
-        Document document;
-        try {
-            document = pdfParser.parse(blob.getStream());
+        String text;
+        try (java.io.InputStream in = blob.getStream();
+                PDDocument pdfDoc = Loader.loadPDF(in.readAllBytes())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            text = stripper.getText(pdfDoc);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String text = document.text();
         return textToEmbedding(text, EmbeddingsHelper.DEFAULT_EMBEDDING_DIMENSIONS);
     }
 
@@ -130,8 +132,7 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
             // Encode and send the request to the Bedrock Runtime.
             var response = client.invokeModel(request -> request
                     .body(SdkBytes.fromUtf8String(json))
-                    .modelId(AMAZON_TITAN_EMBED_TEXT_V_2_0)
-            );
+                    .modelId(AMAZON_TITAN_EMBED_TEXT_V_2_0));
 
             // Decode the response body.
             JSONObject responseBody = new JSONObject(response.body().asUtf8String());

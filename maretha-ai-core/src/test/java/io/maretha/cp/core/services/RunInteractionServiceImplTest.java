@@ -37,7 +37,7 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 import org.nuxeo.runtime.test.runner.RuntimeFeature;
 import org.nuxeo.runtime.test.runner.TransactionalFeature;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,22 +51,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(FeaturesRunner.class)
-@Features({ AutomationFeature.class, RuntimeFeature.class, PlatformFeature.class, MockitoFeature.class,
-                AuditFeature.class, DirectoryFeature.class })
+@Features({ AuditFeature.class, AutomationFeature.class, RuntimeFeature.class, PlatformFeature.class,
+                MockitoFeature.class,
+                DirectoryFeature.class })
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 @Deploy("io.maretha.cp.core.maretha-cp-core")
 @Deploy("org.nuxeo.ecm.platform.tag")
 @Deploy("io.maretha.cp.core.maretha-cp-core-test:OSGI-INF/cp-test-doc-schema-contrib-test.xml")
 @Deploy("io.maretha.cp.core.maretha-cp-core-test:OSGI-INF/cp-test-directories-contrib.xml")
-@Deploy({
-                "org.nuxeo.ecm.platform.audit",
-                "org.nuxeo.ecm.platform.audit.api"
-})
 public class RunInteractionServiceImplTest {
 
         @Inject

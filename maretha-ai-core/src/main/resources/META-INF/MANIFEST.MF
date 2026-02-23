@@ -23,3 +23,4 @@ Nuxeo-Component: OSGI-INF/cp-operations-contrib.xml,
  OSGI-INF/demo-config-contrib.xml,
  OSGI-INF/demo/demo-schemas.xml,
  OSGI-INF/demo/demo-vocabularies.xml,
+ OSGI-INF/opensearch-knn-hint-contrib.xml

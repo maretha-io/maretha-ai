@@ -1,7 +1,5 @@
 package io.maretha.cp.core.services;
 
-import com.amazonaws.HttpMethod;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.blob.s3.S3BlobProvider;
@@ -12,12 +10,14 @@ import org.nuxeo.ecm.core.blob.BlobManager;
 import org.nuxeo.ecm.core.blob.BlobProvider;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.runtime.api.Framework;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import static org.nuxeo.ecm.core.blob.KeyStrategy.VER_SEP;
 
@@ -46,29 +46,35 @@ public class CloudStorageFileShareS3Impl implements CloudStorageFileShare {
         }
         S3BlobStoreConfiguration config = ((S3BlobProvider) s3BlobProvider).config;
         String bucketName = config.bucketName;
-        String regionName = config.amazonS3.getRegionName();
         String bucketPrefix = config.bucketPrefix;
         String filename = blob.getDigest();
-        //s3://aspera-dev-bucket/binaries/9f5c558a5c3860573bdafa3ddf312af4
-        return "s3://" + bucketName + "/" + bucketPrefix + filename + "#" + regionName;
+        // s3://aspera-dev-bucket/binaries/9f5c558a5c3860573bdafa3ddf312af4
+        return "s3://" + bucketName + "/" + bucketPrefix + filename;
     }
 
     private URI getURIS3(S3BlobProvider s3BlobProvider, String bucketKey, Blob blob) throws URISyntaxException {
         // split version id if part of file key
         String[] parts = bucketKey.split(String.valueOf(VER_SEP));
         bucketKey = s3BlobProvider.config.bucketPrefix + parts[0];
-        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(s3BlobProvider.config.bucketName,
-                bucketKey, HttpMethod.GET);
-        if (parts.length > 1) {
-            request.setVersionId(parts[1]);
-        }
-        Date expiration = new Date();
-        expiration.setTime(expiration.getTime() + TimeUnit.MILLISECONDS.convert(EXPIRATION_HOURS, TimeUnit.HOURS));
-        request.addRequestParameter("response-content-type", blob.getMimeType());
-        request.addRequestParameter("response-content-disposition", String.format("attachment; filename=\"%s\"", blob.getFilename()));
-        request.setExpiration(expiration);
-        URL url = s3BlobProvider.config.amazonS3.generatePresignedUrl(request);
-        return url.toURI();
-    }
 
+        GetObjectRequest.Builder getObjectBuilder = GetObjectRequest.builder()
+                .bucket(s3BlobProvider.config.bucketName)
+                .key(bucketKey)
+                .responseContentType(blob.getMimeType())
+                .responseContentDisposition(String.format("attachment; filename=\"%s\"", blob.getFilename()));
+
+        if (parts.length > 1) {
+            getObjectBuilder.versionId(parts[1]);
+        }
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofHours(EXPIRATION_HOURS))
+                .getObjectRequest(getObjectBuilder.build())
+                .build();
+
+        try (S3Presigner presigner = S3Presigner.create()) {
+            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+            return presignedRequest.url().toURI();
+        }
+    }
 }

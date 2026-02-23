@@ -1,0 +1,6 @@
+{
+    "index": {
+        "knn": true,
+        "knn.algo_param.ef_search": 100
+    }
+}

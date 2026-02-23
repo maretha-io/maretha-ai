@@ -1,0 +1,41 @@
+{
+  "dynamic_templates": [
+    {
+      "ecm_binarytext": {
+        "path_match": "ecm:binarytext.*",
+        "mapping": {
+          "type": "text",
+          "analyzer": "fulltext"
+        }
+      }
+    }
+  ],
+  "properties": {
+    "interactionresults:embeddingsText": {
+      "type": "knn_vector",
+      "dimension": 1024,
+      "method": {
+        "name": "hnsw",
+        "space_type": "cosinesimil",
+        "engine": "nmslib",
+        "parameters": {
+          "ef_construction": 512,
+          "m": 16
+        }
+      }
+    },
+    "interactionresults:embeddingsImage": {
+      "type": "knn_vector",
+      "dimension": 1024,
+      "method": {
+        "name": "hnsw",
+        "space_type": "cosinesimil",
+        "engine": "nmslib",
+        "parameters": {
+          "ef_construction": 512,
+          "m": 16
+        }
+      }
+    }
+  }
+}

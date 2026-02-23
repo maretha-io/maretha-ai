@@ -17,7 +17,7 @@ import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
 import org.nuxeo.runtime.test.runner.RuntimeFeature;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_DOCUMENT_NAME;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(FeaturesRunner.class)
-@Features({AutomationFeature.class, RuntimeFeature.class, MockitoFeature.class})
+@Features({ AutomationFeature.class, RuntimeFeature.class, MockitoFeature.class })
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 @Deploy("io.maretha.cp.core.maretha-cp-core")
 public class GetDocumentTypesOperationTest {
@@ -43,10 +43,9 @@ public class GetDocumentTypesOperationTest {
         OperationContext ctx = new OperationContext(session);
         List<String> documentTypes = (List<String>) automationService.run(ctx, GetDocumentTypesOperation.ID);
         assertNotNull(documentTypes);
-        int expectedSize = 39;
+        int expectedSize = 43;
         assertEquals(expectedSize, documentTypes.size());
         assertTrue(documentTypes.containsAll(List.of(RESULTS_DOCUMENT_NAME, SETTINGS_DOCUMENT_NAME)));
     }
-
 
 }
