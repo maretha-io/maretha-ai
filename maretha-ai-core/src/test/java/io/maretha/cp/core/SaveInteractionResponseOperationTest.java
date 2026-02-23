@@ -26,7 +26,7 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 import org.nuxeo.runtime.test.runner.RuntimeFeature;
 import org.nuxeo.runtime.test.runner.TransactionalFeature;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
 import static io.maretha.cp.core.services.RepositoryService.RESULTS_SCHEMA_PATH;

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>maretha-ai-parent</artifactId>
         <groupId>io.maretha.cp</groupId>
-        <version>1.0.27</version>
+        <version>1.0.28</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,8 +14,8 @@
     <description>WEB module</description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

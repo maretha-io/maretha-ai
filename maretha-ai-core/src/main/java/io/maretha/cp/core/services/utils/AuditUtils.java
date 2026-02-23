@@ -5,9 +5,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.audit.api.LogEntry;
 import org.nuxeo.ecm.platform.audit.api.AuditLogger;
-import org.nuxeo.ecm.platform.audit.api.LogEntry;
-import org.nuxeo.ecm.platform.audit.impl.LogEntryImpl;
 import org.nuxeo.runtime.api.Framework;
 
 import java.util.Date;
@@ -23,16 +22,15 @@ public class AuditUtils {
             comment = comment + ". bulkCommandId: " + commandId;
         }
 
-        LogEntry entry = new LogEntryImpl();
-        entry.setEventId("AI");
-        entry.setCategory(AUDIT_LOG_EVENT_CATEGORY);
-        entry.setDocUUID(doc.getId());
-        entry.setDocPath(doc.getPathAsString());
-        entry.setDocType(doc.getType());
-        entry.setPrincipalName(session.getPrincipal().getName());
-        entry.setRepositoryId(session.getRepositoryName());
-        entry.setComment(comment);
-        entry.setEventDate(new Date());
+        LogEntry entry = LogEntry.builder("AI", new Date())
+                .category(AUDIT_LOG_EVENT_CATEGORY)
+                .docUUID(doc.getId())
+                .docPath(doc.getPathAsString())
+                .docType(doc.getType())
+                .principalName(session.getPrincipal().getName())
+                .repositoryId(session.getRepositoryName())
+                .comment(comment)
+                .build();
 
         getAuditLogger().addLogEntries(List.of(entry));
     }

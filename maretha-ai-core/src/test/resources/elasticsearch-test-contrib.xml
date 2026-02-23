@@ -1,23 +1,8 @@
 <?xml version="1.0"?>
 <component name="org.nuxeo.elasticsearch.test.contrib">
 
-    <extension point="elasticSearchEmbeddedServer" target="org.nuxeo.elasticsearch.ElasticSearchComponent">
-        <!--    <elasticSearchEmbeddedServer clusterName="nuxeoTestCluster" httpEnabled="true" httpPort="9333" nodeName="nuxeoTestNode">-->
-        <!--    </elasticSearchEmbeddedServer>-->
-    </extension>
-
-    <extension point="elasticSearchClient" target="org.nuxeo.elasticsearch.ElasticSearchComponent">
-
-        <elasticSearchClient class="org.nuxeo.elasticsearch.client.ESRestClientFactory">
-            <option name="addressList">localhost:9200</option>
-        </elasticSearchClient>
-
-    </extension>
-
-    <extension point="elasticSearchIndex" target="org.nuxeo.elasticsearch.ElasticSearchComponent">
-        <elasticSearchIndex name="nxutest" type="doc" repository="test">
-
-        </elasticSearchIndex>
-    </extension>
+    <!-- Nuxeo 2025: Search service extension points replace ElasticSearchComponent -->
+    <!-- The embedded OpenSearch server is now configured via nuxeo-runtime-opensearch1-embed -->
+    <!-- Test configuration is handled by the SearchService test infrastructure -->
 
 </component>

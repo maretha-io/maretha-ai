@@ -3,7 +3,9 @@ package io.maretha.cp.core.services.ai;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import io.maretha.cp.core.models.Interaction;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
@@ -283,13 +285,14 @@ public class InteractionServiceImpl implements InteractionService {
                 log.error("Failed to read image blob", e);
             }
         } else if ("application/pdf".equalsIgnoreCase(blob.getMimeType())) {
-            try (InputStream in = blob.getStream()) {
-                ApachePdfBoxDocumentParser pdfParser = new ApachePdfBoxDocumentParser();
-                var document = pdfParser.parse(in);
+            try (InputStream in = blob.getStream();
+                    PDDocument pdfDoc = Loader.loadPDF(in.readAllBytes())) {
+                PDFTextStripper stripper = new PDFTextStripper();
+                String text = stripper.getText(pdfDoc);
                 Message userMsg = Message.builder()
                         .role("user")
                         .content(ContentBlock.fromText(
-                                "<DOCUMENT name=\"" + blob.getFilename() + "\">:\n" + document.text()
+                                "<DOCUMENT name=\"" + blob.getFilename() + "\">:\n" + text
                                         + " \n</DOCUMENT>"))
                         .build();
                 userMessages.add(userMsg);
