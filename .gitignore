@@ -31,3 +31,5 @@ bin/
 *~gen
 nashorn_code_cache
 /maretha-cp/
+
+maretha-ai-tagging-package-*.zip
