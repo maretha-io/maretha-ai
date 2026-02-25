@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<component name="io.maretha.cp.core.services.ai.BedrockClientProvider">
+
+    <documentation>
+        Provides a shared, lazily-initialized AWS Bedrock Runtime client.
+    </documentation>
+
+    <implementation class="io.maretha.cp.core.services.ai.BedrockClientProviderImpl" />
+
+    <service>
+        <provide interface="io.maretha.cp.core.services.ai.BedrockClientProvider" />
+    </service>
+</component>

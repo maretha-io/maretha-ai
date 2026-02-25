@@ -16,7 +16,7 @@ import org.nuxeo.ecm.core.event.EventBundle;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.PostCommitEventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
-import org.nuxeo.ecm.platform.audit.api.AuditLogger;
+
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.Serializable;
@@ -32,19 +32,18 @@ import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
 public class BulkEventListener implements PostCommitEventListener {
     public static final String DISABLE_BULK_LISTENER = "disableInteractionListener";
     public static final String BULK_INTERACTIONS_EVENT = "bulkInteractionsEvent";
-    private final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
     private final Log log = LogFactory.getLog(BulkEventListener.class);
-    private final AuditLogger auditLogger = Framework.getService(AuditLogger.class);
 
     @Override
     public void handleEvent(EventBundle events) {
+        RepositoryService repositoryService = Framework.getService(RepositoryService.class);
         Settings savedSettings = repositoryService.getSavedSettings(null, true);
         List<EventWithInteraction> eventsSettings = savedSettings.getEventsSettings();
         if (CollectionUtils.isEmpty(eventsSettings)) {
             log.error(SETTINGS_DOCUMENT_TYPE + " - eventsSettings is empty.");
             return;
         }
-        //TODO Collect all docIds by event and interaction to trigger
+        // TODO Collect all docIds by event and interaction to trigger
         events.forEach(ev -> handleEvent(ev, savedSettings));
     }
 
@@ -74,14 +73,18 @@ public class BulkEventListener implements PostCommitEventListener {
         eventsWithInteractions.forEach(ev -> {
             List<String> interactions = ev.getInteractions();
             interactions.forEach(interactionId -> {
-                String nxqlQuery = String.format("SELECT * FROM Document WHERE ecm:uuid = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0 AND ecm:isVersion = 0 " +
-                        " AND file:content IS NOT NULL", doc.getId());
+                String nxqlQuery = String.format(
+                        "SELECT * FROM Document WHERE ecm:uuid = '%s' AND ecm:isTrashed = 0 AND ecm:isProxy = 0 AND ecm:isVersion = 0 "
+                                +
+                                " AND file:content IS NOT NULL",
+                        doc.getId());
                 Optional<Interaction> optionalInteraction = savedSettings.getInteractions().stream()
                         .filter(interaction -> interaction.getId().equals(interactionId)).findFirst();
                 if (optionalInteraction.isPresent()) {
                     doc.putContextData(DISABLE_BULK_LISTENER, true);
                     Interaction interaction = optionalInteraction.get();
-                    BulkCommand.Builder builder = new BulkCommand.Builder(BulkInteractionAction.ACTION_NAME, nxqlQuery, "system")
+                    BulkCommand.Builder builder = new BulkCommand.Builder(BulkInteractionAction.ACTION_NAME, nxqlQuery,
+                            "system")
                             .param("interactionId", interactionId)
                             .param("parameters", (Serializable) interaction.getParameters())
                             .param("saveMetadata", interaction.isSaveMetadata())
@@ -91,7 +94,8 @@ public class BulkEventListener implements PostCommitEventListener {
                     String commandId = bulkService.submit(command);
                     log.debug("InteractionEventListener-> running interaction: " + interaction.getId());
                     log.debug("InteractionEventListener created commandId: " + commandId);
-                    logAIAudit(ctx.getCoreSession(), doc, commandId, "AI Interaction triggered by event: " + originalEventName);
+                    logAIAudit(ctx.getCoreSession(), doc, commandId,
+                            "AI Interaction triggered by event: " + originalEventName);
                 }
             });
         });

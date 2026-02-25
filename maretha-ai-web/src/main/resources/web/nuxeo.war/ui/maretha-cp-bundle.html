@@ -1,65 +1,80 @@
-<link rel="import" href="configuration-behaviour.html">
-<link rel="import" href="custom-elements/settings/cp-settings.html">
-<link rel="import" href="cp-custom-icons.html">
-<link rel="import" href="custom-elements/cp-selectivity.html">
-<link rel="import" href="custom-elements/cp-collapsible-content.html">
-<link rel="import" href="custom-elements/tab/cp-ai-tab.html">
-<link rel="import" href="custom-elements/tab/cp-similar-documents-tab.html">
-<link rel="import" href="custom-elements/actions/cp-document-get-metadata.html">
+<!-- =====================================================================
+  Maretha Angular UI bundle.
+  This file:
+  1. Loads the Angular Elements bundle (built from maretha-ng/ sub-project)
+  2. Declares Nuxeo Web UI slot contributions using the Angular custom elements
+  ===================================================================== -->
 
+<!-- Load the compiled Angular Elements bundle -->
+<script type="module" src="ng/main.js"></script>
+
+<!-- ========== PAGES slot: AI Settings administration page ========== -->
 <nuxeo-slot-content name="maretha-cp-interactions" slot="PAGES" order="100">
     <template>
-        <nuxeo-filter user="[[user]]" expression="user && user.isAdministrator">
+        <nuxeo-filter user="[[user]]" expression="user &amp;&amp; user.isAdministrator">
             <template>
-                <cp-settings name="maretha-cp-interactions" user="[[user]]"></cp-settings>
+                <maretha-settings name="maretha-cp-interactions"></maretha-settings>
             </template>
         </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 
+<!-- ========== ADMINISTRATION_MENU slot: AI Settings link ========== -->
 <nuxeo-slot-content name="maretha-cp" slot="ADMINISTRATION_MENU">
     <template>
-        <nuxeo-filter user="[[user]]" expression="user && user.isAdministrator">
+        <nuxeo-filter user="[[user]]" expression="user &amp;&amp; user.isAdministrator">
             <template>
                 <nuxeo-menu-item name="maretha-cp" label="AI Settings"
-                                 route="page:maretha-cp-interactions"></nuxeo-menu-item>
+                    route="page:maretha-cp-interactions"></nuxeo-menu-item>
             </template>
         </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 
+<!-- ========== DOCUMENT_ACTIONS slot: Get Metadata action ========== -->
 <nuxeo-slot-content name="documentMetadata" slot="DOCUMENT_ACTIONS" order="0">
     <template>
-        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-METADATA&quot;))" user="[[user]]">
+        <nuxeo-filter document="[[document]]"
+            expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-METADATA&quot;))"
+            user="[[user]]">
             <template>
+                <!-- Still using Polymer action button as a lightweight trigger; no complex logic here -->
                 <cp-document-get-metadata document="[[document]]"></cp-document-get-metadata>
             </template>
         </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 
-<!-- Contribution of element 'nuxeo-menu-icon' for slot 'DRAWER_ITEMS' -->
+<!-- ========== DRAWER_ITEMS slot: AI Search icon ========== -->
 <nuxeo-slot-content name="Find" slot="DRAWER_ITEMS" order="1">
     <template>
-        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-SEARCH&quot;))" user="[[user]]">
+        <nuxeo-filter document="[[document]]"
+            expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-SEARCH&quot;))"
+            user="[[user]]">
             <template>
                 <nuxeo-menu-icon name="find" label="AI search" icon="custom-icons:ai-search"></nuxeo-menu-icon>
             </template>
         </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
-<!-- Contribution of element 'nuxeo-search-form' for slot 'DRAWER_PAGES' -->
+
+<!-- ========== DRAWER_PAGES slot: AI Embedding Search form ========== -->
 <nuxeo-slot-content name="Find" slot="DRAWER_PAGES">
     <template>
-        <nuxeo-filter document="[[document]]" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-SEARCH&quot;))" user="[[user]]">
+        <nuxeo-filter document="[[document]]"
+            expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-SEARCH&quot;))"
+            user="[[user]]">
             <template>
-                <nuxeo-search-form provider="searchByEmbeddings" auto="true" enrichers="thumbnail, permissions, highlight, relevance_score" schemas="dublincore" search-name="embedding-search" name="find"></nuxeo-search-form>
+                <nuxeo-search-form provider="searchByEmbeddings" auto="true"
+                    enrichers="thumbnail, permissions, highlight, relevance_score" schemas="dublincore"
+                    search-name="embedding-search" name="find">
+                </nuxeo-search-form>
             </template>
         </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 
-
+<!-- ========== DOCUMENT_VIEWS_ITEMS slot: AI Tab label ========== -->
 <nuxeo-slot-content name="AiTab" slot="DOCUMENT_VIEWS_ITEMS" order="10">
     <template>
         <nuxeo-filter document="[[document]]">
@@ -70,45 +85,81 @@
     </template>
 </nuxeo-slot-content>
 
+<!-- ========== DOCUMENT_VIEWS_PAGES slot: AI Tab page (Angular) ========== -->
 <nuxeo-slot-content name="AiTab" slot="DOCUMENT_VIEWS_PAGES">
     <template>
         <nuxeo-filter document="[[document]]">
             <template>
-                <cp-ai-tab document="[[document]]" user="[[user]]" name="AiTab"></cp-ai-tab>
+                <div name="AiTab" style="padding: 1rem;">
+                    <!-- Angular document-chat custom element -->
+                    <nuxeo-filter document="[[document]]" user="[[user]]"
+                        expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-CHAT&quot;))">
+                        <template>
+                            <maretha-document-chat id="ng-chat-[[document.uid]]"></maretha-document-chat>
+                        </template>
+                    </nuxeo-filter>
+
+                    <!-- Angular document-interaction custom element -->
+                    <nuxeo-filter document="[[document]]" user="[[user]]"
+                        expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-INTERACTION&quot;))">
+                        <template>
+                            <maretha-document-interaction
+                                id="ng-interaction-[[document.uid]]"></maretha-document-interaction>
+                        </template>
+                    </nuxeo-filter>
+                </div>
             </template>
         </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
 
-<nuxeo-slot-content name="SimilarDocumentsTab" slot="DOCUMENT_VIEWS_ITEMS" order="11">
-    <template>
-        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-SEARCH&quot;))" user="[[user]]">
-            <template>
-                <nuxeo-page-item name="SimilarDocumentsTab" label="More Like This"></nuxeo-page-item>
-            </template>
-        </nuxeo-filter>
-    </template>
-</nuxeo-slot-content>
-<!-- Contribution of element 'cp-similar-documents-tab' for slot 'DOCUMENT_VIEWS_PAGES' -->
-<nuxeo-slot-content name="SimilarDocumentsTab" slot="DOCUMENT_VIEWS_PAGES">
-    <template>
-        <nuxeo-filter document="[[document]]" facet="InteractionResultsFacet" expression="(this.isMember(user, &quot;administrators&quot;) || this.isMember(user, &quot;AI-SEARCH&quot;))" user="[[user]]">
-            <template>
-                <cp-similar-documents-tab document="[[document]]" name="SimilarDocumentsTab"></cp-similar-documents-tab>
-            </template>
-        </nuxeo-filter>
-    </template>
-</nuxeo-slot-content>
-
+<!-- ========== Bridge script: pass Polymer document context to Angular elements ========== -->
 <script>
-	(function () 
-	{
-		const styleSheet = new CSSStyleSheet();
-		styleSheet.replaceSync(`nuxeo-document-create-button.maretha-cp-interactions { display: none !important }`);
+    /**
+     * Polymer data binding doesn't propagate into Angular Shadow DOM elements.
+     * This bridge listens for Nuxeo document-changed events and sets properties
+     * on the Angular custom elements so they receive document context.
+     */
+    (function () {
+        function waitForElements(callback, retries) {
+            if (retries === undefined) retries = 20;
+            const app = document.body.querySelector('nuxeo-app');
+            if (!app) {
+                if (retries > 0) setTimeout(() => waitForElements(callback, retries - 1), 500);
+                return;
+            }
+            callback(app);
+        }
 
-		document.body.querySelector('nuxeo-app').shadowRoot.adoptedStyleSheets = [
-			...document.body.querySelector('nuxeo-app').shadowRoot.adoptedStyleSheets,
-			styleSheet
-		];
-	})();
+        waitForElements(function (app) {
+            app.addEventListener('document-changed', function (e) {
+                const doc = e.detail && (e.detail.value || e.detail);
+                if (!doc) return;
+                const targets = [
+                    'maretha-document-chat',
+                    'maretha-document-interaction',
+                    'maretha-similar-documents'
+                ];
+                targets.forEach(function (tag) {
+                    document.querySelectorAll(tag).forEach(function (el) {
+                        el.document = doc;
+                    });
+                });
+            });
+
+            // Hide Nuxeo floating buttons (create + search FAB) on the Maretha settings page
+            const styleSheet = new CSSStyleSheet();
+            styleSheet.replaceSync([
+                'nuxeo-document-create-button.maretha-cp-interactions { display: none !important }',
+                'nuxeo-suggester-button.maretha-cp-interactions { display: none !important }',
+                '.search-fab.maretha-cp-interactions { display: none !important }',
+                '#searchButton.maretha-cp-interactions { display: none !important }'
+            ].join('\n'));
+            app.shadowRoot.adoptedStyleSheets = [...app.shadowRoot.adoptedStyleSheets, styleSheet];
+        });
+    })();
 </script>
+
+<!-- Keep the Polymer action button dependency for now (it uses Nuxeo automation directly) -->
+<link rel="import" href="custom-elements/actions/cp-document-get-metadata.html">
+<link rel="import" href="cp-custom-icons.html">
