@@ -14,10 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.runtime.api.Framework;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 
 import java.io.IOException;
@@ -29,15 +26,11 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
 
     private static final String AMAZON_TITAN_EMBED_TEXT_V_2_0 = "amazon.titan-embed-text-v2:0";
     private static final String AMAZON_TITAN_EMBED_IMAGE_V_1 = "amazon.titan-embed-image-v1";
-    private final BedrockRuntimeClient client = BedrockRuntimeClient.builder()
-            .credentialsProvider(
-                    StaticCredentialsProvider.create(
-                            AwsBasicCredentials.create(
-                                    Framework.getProperty("io.maretha.aws.accessKeyId"),
-                                    Framework.getProperty("io.maretha.aws.secretAccessKey"))))
-            .region(Region.of(Framework.getProperty("io.maretha.aws.region")))
-            .build();
     private final Log log = LogFactory.getLog(EmbeddingsServiceImpl.class);
+
+    private BedrockRuntimeClient getClient() {
+        return Framework.getService(BedrockClientProvider.class).getClient();
+    }
 
     @Override
     public double[] embedImage(String base64Image, String optionalCaption, Integer outputEmbeddingLength) {
@@ -56,7 +49,7 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
 
         String nativeRequest = req.toString();
 
-        var response = client.invokeModel(r -> r
+        var response = getClient().invokeModel(r -> r
                 .modelId(AMAZON_TITAN_EMBED_IMAGE_V_1)
                 .body(SdkBytes.fromUtf8String(nativeRequest)));
         String bodyStr = response.body().asUtf8String();
@@ -130,7 +123,7 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
             // Convert to JSON
             String json = mapper.writeValueAsString(payload);
             // Encode and send the request to the Bedrock Runtime.
-            var response = client.invokeModel(request -> request
+            var response = getClient().invokeModel(request -> request
                     .body(SdkBytes.fromUtf8String(json))
                     .modelId(AMAZON_TITAN_EMBED_TEXT_V_2_0));
 

@@ -13,11 +13,8 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.runtime.api.Framework;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.document.Document;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseRequest;
@@ -50,16 +47,11 @@ public class InteractionServiceImpl implements InteractionService {
             "Populate ALL required fields in the tool's input JSON using the document provided.\n" +
             "If a value is unknown, do not return it.";
 
-    private final BedrockRuntimeClient client = BedrockRuntimeClient.builder()
-            .credentialsProvider(
-                    StaticCredentialsProvider.create(
-                            AwsBasicCredentials.create(
-                                    Framework.getProperty("io.maretha.aws.accessKeyId"),
-                                    Framework.getProperty("io.maretha.aws.secretAccessKey"))))
-            .region(Region.of(Framework.getProperty("io.maretha.aws.region")))
-            .build();
-
     private static final Log log = LogFactory.getLog(InteractionServiceImpl.class);
+
+    private BedrockRuntimeClient getClient() {
+        return Framework.getService(BedrockClientProvider.class).getClient();
+    }
 
     private static Document toDocument(JsonNode node) {
         if (node.isObject())
@@ -107,7 +99,7 @@ public class InteractionServiceImpl implements InteractionService {
                 .messages(userMessages)
                 .build();
 
-        ConverseResponse response = client.converse(request);
+        ConverseResponse response = getClient().converse(request);
         StringBuilder sb = new StringBuilder();
 
         try {
@@ -172,7 +164,7 @@ public class InteractionServiceImpl implements InteractionService {
                 .toolConfig(toolConfig)
                 .build();
 
-        ConverseResponse response = client.converse(request);
+        ConverseResponse response = getClient().converse(request);
 
         try {
             var contentBlocks = response.output().message().content();

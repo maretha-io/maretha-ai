@@ -5,7 +5,7 @@
     <parent>
         <artifactId>maretha-ai-parent</artifactId>
         <groupId>io.maretha.cp</groupId>
-        <version>1.0.28</version>
+        <version>1.0.28-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,6 +17,59 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Set to true to skip Angular build (e.g. in CI when pre-built) -->
+        <skip.angular.build>false</skip.angular.build>
     </properties>
+
+    <build>
+        <plugins>
+            <!--
+                Phase 1: Install npm dependencies for the Angular sub-project
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>npm-install</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skip.angular.build}</skip>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>install</argument>
+                                <argument>--legacy-peer-deps</argument>
+                            </arguments>
+                            <workingDirectory>${project.basedir}/maretha-ng</workingDirectory>
+                        </configuration>
+                    </execution>
+                    <!--
+                        Phase 2: Build Angular Elements bundle, outputs directly into
+                        src/main/resources/web/nuxeo.war/ui/ng/
+                    -->
+                    <execution>
+                        <id>ng-build</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skip.angular.build}</skip>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>run</argument>
+                                <argument>build:elements</argument>
+                            </arguments>
+                            <workingDirectory>${project.basedir}/maretha-ng</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

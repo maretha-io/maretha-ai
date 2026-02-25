@@ -32,5 +32,9 @@ bin/
 nashorn_code_cache
 /maretha-cp/
 
+3rdpartylicenses.txt
+
+.vscode
+
 maretha-ai-tagging-package-*.zip
 maretha-ai-tagging-package-*-SNAPSHOT.zip
