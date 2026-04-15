@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.ecm.core.search.client.opensearch3" version="1.0">
+
+  <implementation class="org.nuxeo.ecm.core.search.client.opensearch3.OpenSearchSearchClientFactory" />
+
+  <service>
+    <provide interface="org.nuxeo.ecm.core.search.client.opensearch3.OpenSearchSearchClientFactory" />
+  </service>
+
+  <extension-point name="searchClient">
+    <object class="org.nuxeo.ecm.core.search.client.opensearch3.OpenSearchSearchClientDescriptor" />
+  </extension-point>
+
+  <extension-point name="hint">
+    <documentation>
+      Extension point used to define the NXQL hints which enables the use of OpenSearch operators.
+      Must implement the OpenSearchHintQueryBuilder interface.
+
+      @see https://doc.nuxeo.com/nxdoc/nxql/#elasticsearch-nxql-hints to have the available ES hints.
+
+    </documentation>
+    <object class="org.nuxeo.ecm.core.search.client.opensearch3.OpenSearchHintDescriptor" />
+  </extension-point>
+
+</component>

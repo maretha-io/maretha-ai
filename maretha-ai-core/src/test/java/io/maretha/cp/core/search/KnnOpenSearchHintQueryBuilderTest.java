@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.opensearch.client.opensearch._types.query_dsl.KnnQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
@@ -28,13 +30,13 @@ public class KnnOpenSearchHintQueryBuilderTest {
         assertEquals(Integer.valueOf(10), knn.k());
         assertEquals(Float.valueOf(0.5f), knn.minScore());
 
-        float[] vector = knn.vector();
-        assertEquals(5, vector.length);
-        assertEquals(0.1f, vector[0], 0.001f);
-        assertEquals(0.2f, vector[1], 0.001f);
-        assertEquals(0.3f, vector[2], 0.001f);
-        assertEquals(0.4f, vector[3], 0.001f);
-        assertEquals(0.5f, vector[4], 0.001f);
+        List<Float> vector = knn.vector();
+        assertEquals(5, vector.size());
+        assertEquals(0.1f, vector.get(0), 0.001f);
+        assertEquals(0.2f, vector.get(1), 0.001f);
+        assertEquals(0.3f, vector.get(2), 0.001f);
+        assertEquals(0.4f, vector.get(3), 0.001f);
+        assertEquals(0.5f, vector.get(4), 0.001f);
     }
 
     @Test
@@ -48,10 +50,10 @@ public class KnnOpenSearchHintQueryBuilderTest {
         assertEquals("interactionresults:embeddingsImage", knn.field());
         assertEquals(Integer.valueOf(20), knn.k());
         assertEquals(Float.valueOf(0.8f), knn.minScore());
-        assertEquals(3, knn.vector().length);
-        assertEquals(1.0f, knn.vector()[0], 0.001f);
-        assertEquals(-1.0f, knn.vector()[1], 0.001f);
-        assertEquals(0.0f, knn.vector()[2], 0.001f);
+        assertEquals(3, knn.vector().size());
+        assertEquals(1.0f, knn.vector().get(0), 0.001f);
+        assertEquals(-1.0f, knn.vector().get(1), 0.001f);
+        assertEquals(0.0f, knn.vector().get(2), 0.001f);
     }
 
     @Test
@@ -67,7 +69,7 @@ public class KnnOpenSearchHintQueryBuilderTest {
 
         Query query = result.build();
         KnnQuery knn = query.knn();
-        assertEquals(1024, knn.vector().length);
+        assertEquals(1024, knn.vector().size());
         assertEquals(Integer.valueOf(5), knn.k());
         assertEquals(Float.valueOf(0.4f), knn.minScore());
     }
@@ -78,10 +80,10 @@ public class KnnOpenSearchHintQueryBuilderTest {
         Query.Builder result = builder.make(null, "field", value);
 
         KnnQuery knn = result.build().knn();
-        assertEquals(-0.5f, knn.vector()[0], 0.001f);
-        assertEquals(0.7f, knn.vector()[1], 0.001f);
-        assertEquals(-0.3f, knn.vector()[2], 0.001f);
-        assertEquals(0.1f, knn.vector()[3], 0.001f);
+        assertEquals(-0.5f, knn.vector().get(0), 0.001f);
+        assertEquals(0.7f, knn.vector().get(1), 0.001f);
+        assertEquals(-0.3f, knn.vector().get(2), 0.001f);
+        assertEquals(0.1f, knn.vector().get(3), 0.001f);
     }
 
     @Test

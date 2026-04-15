@@ -23,6 +23,7 @@
 
   <modules>
     <module>maretha-ai-core</module>
+    <module>nuxeo-search-client-opensearch3</module>
     <module>maretha-ai-package</module>
     <module>maretha-ai-web</module>
   </modules>

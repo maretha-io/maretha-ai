@@ -1,0 +1,11 @@
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Manifest-Version: 1.0
+Bundle-Vendor: io.maretha.cp
+Bundle-Version: 1.0.0
+Bundle-Name: nuxeo-search-client-opensearch3
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: io.maretha.cp.nuxeo-search-client-opensearch3;singleton=true
+Nuxeo-Component: OSGI-INF/opensearch-search-client-factory-service.xml,
+ OSGI-INF/opensearch-search-client-factory-contrib.xml,
+ OSGI-INF/opensearch-search-client-hint-contrib.xml

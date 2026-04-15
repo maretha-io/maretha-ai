@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <component name="io.maretha.cp.core.opensearch.knn.hint" version="1.0">
-  <extension target="org.nuxeo.ecm.core.search.client.opensearch2" point="hint">
+  <extension target="org.nuxeo.ecm.core.search.client.opensearch3" point="hint">
     <hint name="knn" class="io.maretha.cp.core.search.KnnOpenSearchHintQueryBuilder"/>
+    <hint name="neural" class="io.maretha.cp.core.search.NeuralOpenSearchHintQueryBuilder"/>
+    <hint name="hybrid" class="io.maretha.cp.core.search.HybridOpenSearchHintQueryBuilder"/>
   </extension>
 </component>

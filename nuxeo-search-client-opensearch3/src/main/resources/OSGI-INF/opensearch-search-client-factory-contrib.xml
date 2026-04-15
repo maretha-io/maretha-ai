@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.ecm.core.search.client.opensearch3.factory.contrib" version="1.0">
+  <extension target="org.nuxeo.ecm.core.search" point="searchClient">
+    <searchClient name="opensearch" factory="org.nuxeo.ecm.core.search.client.opensearch3.OpenSearchSearchClientFactory" />
+  </extension>
+</component>

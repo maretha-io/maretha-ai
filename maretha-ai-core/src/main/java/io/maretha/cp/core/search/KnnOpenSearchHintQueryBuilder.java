@@ -3,9 +3,12 @@ package io.maretha.cp.core.search;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.query.sql.model.EsHint;
-import org.nuxeo.ecm.core.search.client.opensearch2.OpenSearchHintQueryBuilder;
+import org.nuxeo.ecm.core.search.client.opensearch3.OpenSearchHintQueryBuilder;
 import org.opensearch.client.opensearch._types.query_dsl.KnnQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * OpenSearch hint query builder for kNN vector similarity search.
@@ -44,13 +47,13 @@ public class KnnOpenSearchHintQueryBuilder implements OpenSearchHintQueryBuilder
         int k = Integer.parseInt(parts[0].trim());
         float minScore = Float.parseFloat(parts[1].trim());
         String[] vectorParts = parts[2].split(",");
-        float[] vector = new float[vectorParts.length];
+        List<Float> vector = new ArrayList<>(vectorParts.length);
         for (int i = 0; i < vectorParts.length; i++) {
-            vector[i] = Float.parseFloat(vectorParts[i].trim());
+            vector.add(Float.parseFloat(vectorParts[i].trim()));
         }
 
         log.debug(String.format("Building kNN query: field=%s, k=%d, minScore=%.2f, vectorDim=%d",
-                fieldName, k, minScore, vector.length));
+                fieldName, k, minScore, vector.size()));
 
         KnnQuery knnQuery = KnnQuery.of(q -> q
                 .field(fieldName)
