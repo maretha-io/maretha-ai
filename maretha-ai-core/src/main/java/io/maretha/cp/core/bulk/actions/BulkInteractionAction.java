@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static io.maretha.cp.core.events.BulkEventListener.DISABLE_BULK_LISTENER;
 import static io.maretha.cp.core.events.InteractionsEventListener.DISABLE_INTERACTIONS_LISTENER;
+import static io.maretha.cp.core.services.RepositoryService.RESULTS_FACET;
 import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
 import static org.nuxeo.ecm.core.bulk.BulkServiceImpl.STATUS_STREAM;
 import static org.nuxeo.lib.stream.computation.AbstractComputation.INPUT_1;
@@ -69,6 +70,9 @@ public class BulkInteractionAction implements StreamProcessorTopology {
                         DocumentModel document = session.getDocument(new IdRef(docId));
                         document.putContextData(DISABLE_BULK_LISTENER, true);
                         document.putContextData(DISABLE_INTERACTIONS_LISTENER, true);
+                        if (!document.isFolder() && !document.hasFacet(RESULTS_FACET)) {
+                            document.addFacet(RESULTS_FACET);
+                        }
                         logAIAudit(session, document, commandId, "Processing document");
                         return document;
                     })
