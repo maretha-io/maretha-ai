@@ -21,6 +21,7 @@ import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseRequest;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
 import software.amazon.awssdk.services.bedrockruntime.model.ImageBlock;
+import software.amazon.awssdk.services.bedrockruntime.model.ImageFormat;
 import software.amazon.awssdk.services.bedrockruntime.model.InferenceConfiguration;
 import software.amazon.awssdk.services.bedrockruntime.model.Message;
 import software.amazon.awssdk.services.bedrockruntime.model.SystemContentBlock;
@@ -267,9 +268,10 @@ public class InteractionServiceImpl implements InteractionService {
         if (isImage(blob)) {
             try {
                 SdkBytes imageBytes = SdkBytes.fromByteArray(blob.getByteArray());
+                String mimeType = blob.getMimeType();
+                String subtype = mimeType.substring(mimeType.indexOf('/') + 1).replace("jpg", "jpeg");
                 ImageBlock imageBlock = ImageBlock.builder()
-                        .format("jpeg") // "jpeg" or "png" - Bedrock requires specific formats, assuming jpeg for now or
-                                        // extracting extension
+                        .format(ImageFormat.fromValue(subtype))
                         .source(s -> s.bytes(imageBytes))
                         .build();
                 ContentBlock contentBlock = ContentBlock.fromImage(imageBlock);
