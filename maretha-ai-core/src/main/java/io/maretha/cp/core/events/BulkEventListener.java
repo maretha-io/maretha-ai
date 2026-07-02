@@ -16,7 +16,6 @@ import org.nuxeo.ecm.core.event.EventBundle;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.PostCommitEventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
-import org.nuxeo.ecm.platform.audit.api.AuditLogger;
 import org.nuxeo.runtime.api.Framework;
 
 import java.io.Serializable;
@@ -32,13 +31,13 @@ import static io.maretha.cp.core.services.utils.AuditUtils.logAIAudit;
 public class BulkEventListener implements PostCommitEventListener {
     public static final String DISABLE_BULK_LISTENER = "disableInteractionListener";
     public static final String BULK_INTERACTIONS_EVENT = "bulkInteractionsEvent";
-    private final RepositoryService repositoryService = Framework.getService(RepositoryService.class);
+    // no Framework.getService in field initializers: listeners are instantiated during
+    // startup, before services are available, and the failed lookup aborts boot in strict mode
     private final Log log = LogFactory.getLog(BulkEventListener.class);
-    private final AuditLogger auditLogger = Framework.getService(AuditLogger.class);
 
     @Override
     public void handleEvent(EventBundle events) {
-        Settings savedSettings = repositoryService.getSavedSettings(null, true);
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(null, true);
         List<EventWithInteraction> eventsSettings = savedSettings.getEventsSettings();
         if (CollectionUtils.isEmpty(eventsSettings)) {
             log.error(SETTINGS_DOCUMENT_TYPE + " - eventsSettings is empty.");
