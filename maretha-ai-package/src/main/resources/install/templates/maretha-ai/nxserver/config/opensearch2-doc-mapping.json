@@ -49,6 +49,9 @@
     "ecm:acl": {
       "type": "keyword"
     },
+    "ecm:ancestorId": {
+      "type": "keyword"
+    },
     "ecm:binarytext": {
       "type": "text",
       "analyzer": "fulltext",
@@ -93,6 +96,14 @@
     },
     "ecm:hasLegalHold": {
       "type": "boolean"
+    },
+    "collection:documentIds": {
+      "type": "keyword",
+      "ignore_above": 256
+    },
+    "collectionMember:collectionIds": {
+      "type": "keyword",
+      "ignore_above": 256
     },
     "common:icon": {
       "index": false,
@@ -176,12 +187,22 @@
       }
     },
     "interactionresults:embeddingsText": {
-      "type": "dense_vector",
-      "dims": 1024
+      "type": "knn_vector",
+      "dimension": 1024,
+      "method": {
+        "name": "hnsw",
+        "space_type": "cosinesimil",
+        "engine": "lucene"
+      }
     },
     "interactionresults:embeddingsImage": {
-      "type": "dense_vector",
-      "dims": 1024
+      "type": "knn_vector",
+      "dimension": 1024,
+      "method": {
+        "name": "hnsw",
+        "space_type": "cosinesimil",
+        "engine": "lucene"
+      }
     }
   }
 }
