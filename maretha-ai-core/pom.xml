@@ -29,11 +29,10 @@
       <version>1.7.1</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/bedrock -->
+    <!-- version managed by the awssdk BOM import in the parent (matches the lab image) -->
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>bedrockruntime</artifactId>
-      <version>2.33.10</version>
     </dependency>
 
     <!-- LangChain4j core -->
@@ -101,9 +100,12 @@
       <artifactId>nuxeo-platform-audit-core</artifactId>
     </dependency>
 
+    <!-- provided: the lab image ships these (2025.20-SNAPSHOT) in the S3 layer;
+         bundling our own copies would duplicate bundles/SDK jars at other versions -->
     <dependency>
       <groupId>org.nuxeo.ecm.core</groupId>
       <artifactId>nuxeo-core-binarymanager-s3</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
