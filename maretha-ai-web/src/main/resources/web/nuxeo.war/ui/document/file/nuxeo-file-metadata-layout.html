@@ -1,0 +1,128 @@
+<!--
+@license
+©2023 Hyland Software, Inc. and its affiliates. All rights reserved. 
+All Hyland product names are registered or unregistered trademarks of Hyland Software, Inc. or its affiliates.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+`nuxeo-file-metadata-layout`
+@group Nuxeo UI
+@element nuxeo-file-metadata-layout
+-->
+
+<dom-module id="nuxeo-file-metadata-layout">
+  <template>
+    <style include="nuxeo-styles"></style>
+
+    <div role="widget">
+      <label>[[i18n('label.dublincore.title')]]</label>
+      <div name="title">[[document.properties.dc:title]]</div>
+    </div>
+
+    <div role="widget" hidden$="[[!document.properties.dc:description]]">
+      <label>[[i18n('label.dublincore.description')]]</label>
+      <div name="description" class="multiline">[[document.properties.dc:description]]</div>
+    </div>
+
+    <div role="widget" hidden$="[[!document.properties.dc:nature]]">
+      <label>[[i18n('label.dublincore.nature')]]</label>
+      <div name="nature">[[formatDirectory(document.properties.dc:nature)]]</div>
+    </div>
+
+    <nuxeo-directory-suggestion role="widget" label="[[i18n('label.dublincore.subjects')]]"
+      directory-name="l10nsubjects" name="subjects" value="{{document.properties.dc:subjects}}"
+      hidden$="[[!document.properties.dc:subjects.length]]" multiple="true" dbl10n="true" readonly>
+    </nuxeo-directory-suggestion>
+
+    <div role="widget" hidden$="[[!document.properties.dc:coverage]]">
+      <label>[[i18n('label.dublincore.coverage')]]</label>
+      <div name="coverage">[[formatDirectory(document.properties.dc:coverage)]]</div>
+    </div>
+
+    <div role="widget" hidden$="[[!document.properties.dc:expired]]">
+      <label>[[i18n('label.dublincore.expire')]]</label>
+      <nuxeo-date name="expired" aria-label$="[[i18n('label.dublincore.expire')]]"
+        datetime="[[document.properties.dc:expired]]"></nuxeo-date>
+    </div>
+
+    <!-- AI Schema Fields -->
+    <template is="dom-if" if="[[hasSchema(document, 'ai')]]">
+      <div role="widget" hidden$="[[!document.properties.ai:altText]]">
+        <label>Alt Text</label>
+        <div name="altText">[[document.properties.ai:altText]]</div>
+      </div>
+
+      <div role="widget" hidden$="[[!document.properties.ai:brand]]">
+        <label>Brands Detected</label>
+        <div name="brand">[[document.properties.ai:brand]]</div>
+      </div>
+
+      <div role="widget" hidden$="[[!document.properties.ai:seo]]">
+        <label>SEO Optimization Keywords</label>
+        <div name="seo" class="multiline">[[document.properties.ai:seo]]</div>
+      </div>
+
+      <div role="widget" hidden$="[[!document.properties.ai:restrictions]]">
+        <label>Rights/Legal Restrictions</label>
+        <div name="restrictions" class="multiline">[[document.properties.ai:restrictions]]</div>
+      </div>
+
+      <div role="widget" hidden$="[[!document.properties.ai:elementsDetected]]">
+        <label>Semantic Elements</label>
+        <div name="elementsDetected" class="multiline">[[document.properties.ai:elementsDetected]]</div>
+      </div>
+
+      <div role="widget" hidden$="[[!document.properties.ai:smartCrops]]">
+        <label>Smart Crops</label>
+        <div name="smartCrops" class="multiline">[[document.properties.ai:smartCrops]]</div>
+      </div>
+
+      <nuxeo-directory-suggestion role="widget" label="Document Classification" directory-name="classification"
+        name="classification" value="{{document.properties.ai:classification}}"
+        hidden$="[[!document.properties.ai:classification.length]]" multiple="true" readonly>
+      </nuxeo-directory-suggestion>
+
+      <nuxeo-directory-suggestion role="widget" label="Brand Safety" directory-name="safetyCategories" name="safety"
+        value="{{document.properties.ai:safety}}" hidden$="[[!document.properties.ai:safety.length]]" multiple="true"
+        readonly>
+      </nuxeo-directory-suggestion>
+
+      <div role="widget" hidden$="[[!document.properties.ai:safetyText]]">
+        <label>Brand Safety Detail</label>
+        <div name="safetyText" class="multiline">[[document.properties.ai:safetyText]]</div>
+      </div>
+
+      <nuxeo-directory-suggestion role="widget" label="Shot Type" directory-name="imageScenes" name="imageScene"
+        value="{{document.properties.ai:imageScene}}" hidden$="[[!document.properties.ai:imageScene.length]]"
+        multiple="true" readonly>
+      </nuxeo-directory-suggestion>
+    </template>
+
+    <nuxeo-document-attachments role="widget" document="[[document]]"></nuxeo-document-attachments>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'nuxeo-file-metadata-layout',
+      behaviors: [Nuxeo.LayoutBehavior],
+      properties: {
+        /**
+         * @doctype File
+         */
+        document: Object,
+      },
+    });
+  </script>
+</dom-module>

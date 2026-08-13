@@ -1,0 +1,22 @@
+package io.maretha.cp.core.services;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import io.maretha.cp.core.models.InteractionParameter;
+import org.nuxeo.ecm.core.api.CoreSession;
+import org.nuxeo.ecm.core.api.DocumentModel;
+
+import java.util.List;
+
+public interface RunInteractionService {
+    String FILE_CONTENT = "file:content";
+
+    DocumentModel addEmbeddings(DocumentModel doc, CoreSession session, boolean waitUploadCompletion,
+            boolean lowPriority);
+
+    String triggerInteraction(DocumentModel doc, CoreSession session, String interactionId,
+            List<InteractionParameter> parameters, boolean saveMetadata, boolean saveMetadataModeOverride,
+            boolean asyncMode);
+
+    void validateAndSaveMetadata(JsonNode response, String docId, boolean saveMetadataModeOverride);
+
+}

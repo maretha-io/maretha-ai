@@ -1,0 +1,444 @@
+<link rel="import" href="./cp-format-chat-json-response.html">
+
+<dom-module id="cp-document-interaction">
+	<template>
+		<style include="nuxeo-action-button-styles">
+			::-webkit-scrollbar {
+				height: 7px;
+				width: 7px;
+				background: #edeeef;
+				box-shadow: none;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #cdcdcd;
+				box-shadow: none;
+			}
+
+			:host {
+				display: block;
+				--paper-input-container-label_-_color: #999;
+				--paper-input-container_-_padding: 0;
+				--paper-button_-_padding: 0;
+			}
+
+			.chat {
+				display: flex;
+				flex-direction: column;
+				border: 1px solid;
+				border-color: rgba(58, 85, 17, .3);
+				border-color: color-mix(in srgb, var(--nuxeo-button-primary) 5%, #000 18%);
+				box-shadow: 0 0 3.5rem -2rem inset color-mix(in srgb, var(--nuxeo-button-primary) 50%, #000 50%);
+				padding: 1rem;
+				gap: 2rem;
+				overflow: hidden;
+				max-height: 459px;
+				border-radius: .325rem;
+				margin: .5rem 0;
+			}
+
+			.question {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				margin: 0 0 0 1rem;
+			}
+
+			@media screen and (min-width: 1400px) {
+				.question {
+					padding: 0 max(20%, 200px);
+				}
+			}
+
+			.input {
+				flex-grow: 1;
+				display: flex;
+				gap: 1rem;
+				flex-wrap: wrap;
+			}
+
+			.input paper-input,
+			.input paper-dropdown-menu,
+			.input p {
+				flex: 1 0 calc(50% - 1rem);
+			}
+
+			.input p {
+				color: #999;
+				font-size: 1.125rem;
+				border-bottom: 1px solid;
+				margin: 1rem 0 0;
+				padding-top: .5rem;
+			}
+
+			.parameters-section {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+				margin-top: 1rem;
+				width: 100%;
+			}
+
+			.parameter-row {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				flex-wrap: wrap;
+			}
+
+			.parameter-label {
+				font-weight: 500;
+				color: var(--nuxeo-button-primary);
+				min-width: 120px;
+			}
+
+			.parameter-row paper-input {
+				flex: 1;
+				min-width: 200px;
+				--paper-input-container_-_padding: 0;
+			}
+
+			.parameter-row nuxeo-document-suggestion {
+				flex: 1;
+				min-width: 250px;
+			}
+
+			.chat-response {
+				flex-grow: 1;
+				background-color: color-mix(in srgb, var(--nuxeo-button-primary) 8%, #FFF 100%);
+				box-shadow: 0 1rem 1.5rem -2.25rem;
+				overflow: auto;
+			}
+
+			paper-icon-button {
+				width: 3.5rem;
+				height: 3.5rem;
+				padding: .25rem;
+				color: var(--nuxeo-button-primary);
+			}
+		</style>
+
+		<div class="chat">
+			<div class="chat-response">
+				<cp-format-chat-json-response messages="[[interactionContext]]" document="[[document]]"
+					chat-interaction="[[selectedInteraction]]" loading="[[loading]]">
+				</cp-format-chat-json-response>
+			</div>
+
+			<div class="question">
+				<div class="input">
+					<paper-dropdown-menu label="Select AI Interaction" no-overlap no-animations horizontal-align="right"
+						vertical-align="top">
+						<paper-listbox slot="dropdown-content" selected="{{selectedIndex}}">
+							<template is="dom-repeat" items="[[interactions]]">
+								<paper-item>[[item.name]]</paper-item>
+							</template>
+						</paper-listbox>
+					</paper-dropdown-menu>
+
+					<div class="parameters-section">
+						<template is="dom-repeat" items="[[selectedInteraction.parameters]]">
+							<div class="parameter-row">
+								<span class="parameter-label">[[item.name]]:</span>
+
+								<template is="dom-if" if="[[item.value]]">
+									<template is="dom-if" if="[[!item.readOnly]]">
+										<paper-input role="widget" value="{{item.value}}" no-label-float
+											readonly="[[item.readOnly]]" type="[[item.type]]">
+										</paper-input>
+									</template>
+								</template>
+
+
+								<template is="dom-if" if="[[item.enableDocSelection]]">
+									<template is="dom-if" if="[[item.selectedDocumentIds]]">
+										<nuxeo-document-suggestion value="{{item.selectedDocumentIds}}"
+											label="" readonly="[[item.selectionReadOnly]]" multiple
+											min-chars="0" name="selectedDocs" role="widget">
+										</nuxeo-document-suggestion>
+									</template>
+								</template>
+							</div>
+						</template>
+					</div>
+
+				</div>
+
+				<div>
+					<paper-icon-button icon="custom-icons:ai-interact" on-tap="_interactWithDocument">
+					</paper-icon-button>
+					<nuxeo-tooltip>Run interaction</nuxeo-tooltip>
+				</div>
+			</div>
+		</div>
+
+		<nuxeo-operation id="getSettingsOperation" op="GetInteractionsForDocumentOperation" input="[[document]]">
+		</nuxeo-operation>
+
+		<nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]">
+		</nuxeo-operation>
+
+		<nuxeo-operation id="nxqlQueryOp" op="Document.Query" headers='{"Content-Type": "application/json"}'>
+		</nuxeo-operation>
+
+		<nuxeo-operation id="totalDocumentsQueryOp" op="Document.Query" headers='{"Content-Type": "application/json"}'>
+		</nuxeo-operation>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'cp-document-interaction',
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+			properties: {
+				document: {
+					type: Object,
+					observer: '_documentObserver'
+				},
+
+				interactions: {
+					type: Array,
+					value: [],
+					observer: '_interactionsObserver',
+					notify: true
+				},
+
+				selectedInteraction: {
+					type: Object,
+					computed: '_computeSelectedValue(selectedIndex, interactions)'
+				},
+
+				interactionContext: {
+					type: Array,
+					value: []
+				},
+
+				interactionResponse: {
+					type: String,
+					observer: '_interactionResponseObserver',
+				},
+
+				loading: {
+					type: Boolean,
+					value: false
+				},
+
+				relatedDocuments: {
+					type: Array,
+					observer: '_relatedDocumentsObserver',
+				},
+
+				// Holds the selected index from the dropdown
+				selectedIndex: {
+					type: Number,
+					value: -1,
+				},
+
+				debugging: {
+					type: Boolean,
+					value: false
+				},
+
+				documentsReady: {
+					type: Number,
+					value: 0
+				},
+
+				totalDocuments: {
+					type: Number,
+					value: 0
+				}
+
+			},
+
+			_resetData()
+			{
+				this.set('interactions', []);
+				this.set('selectedIndex', null);
+				this.set('selectedInteraction', null);
+				this.set('interactionResponse', null);
+				this.set('interactionContext', []);
+			},
+
+			_documentObserver(doc)
+			{
+				this._resetData();
+				this._loadData();
+			},
+
+			_loadData()
+			{
+				this._getInteractions();
+				//this._executeDocumentsReadyQuery();
+				//this._executeTotalDocumentsQuery();
+			},
+
+			_getInteractions()
+			{
+				const operation = this.$.getSettingsOperation;
+
+				operation.params = {};
+
+				operation.execute()
+					.then((response) =>
+					{
+						this.set('interactions', response.value);
+					})
+					.catch((error) =>
+					{
+						console.error('Error triggering operation:', error);
+					});
+			},
+
+			_interactWithDocument()
+			{
+				if (!this.selectedInteraction)
+					return;
+
+				this.set('interactionResponse', '');
+
+				this.set('interactionContext', [{
+					role: 'user',
+					date: new Date(),
+					content: this.selectedInteraction.description
+				}]);
+
+				this.push('interactionContext', {
+					role: 'assistant',
+					date: new Date(),
+					content: 'Waiting for AI response...'
+				});
+
+				const operation = this.$.runInteractionOperation;
+
+				operation.params = {
+					interactionId: this.selectedInteraction.id,
+					data: this.selectedInteraction.parameters,
+					saveMetadata: this.selectedInteraction.saveMetadata
+				};
+
+				this.set('loading', true);
+
+				operation.execute()
+					.then((response) =>
+					{
+						const index = this.interactionContext.length - 1;
+
+						if (this.selectedInteraction.saveMetadata)
+						{
+							this.set('interactionResponse', response.value);
+
+							this.interactionContext[index].content = response.value;
+							this.notifyPath(`interactionContext.${index}.content`);
+						}
+						else
+						{
+							this.interactionContext[index].content = '';
+							this.interactionContext[index].content = response.value;
+							this.notifyPath(`interactionContext.${index}.content`);
+						}
+					})
+					.catch((error) =>
+					{
+						console.error('Error triggering operation:', error);
+						this.fire('notify', { message: error });
+					});
+			},
+
+			_stream(url, index)
+			{
+				const eventSource = new EventSource(url);
+
+				eventSource.onmessage = (event) =>
+				{
+					this.interactionContext[index].content += event.data.slice(1, -1);
+					this.notifyPath(`interactionContext.${index}.content`);
+				};
+
+				eventSource.onerror = (event) =>
+				{
+					this.interactionContext[index].content = 'Failed to get response. Please try again.';
+					this.notifyPath(`interactionContext.${index}.content`);
+
+					this.set('loading', false);
+				}
+
+				eventSource.addEventListener('close', (event) =>
+				{
+					this.set('interactionResponse', this.interactionContext[index].content);
+
+					const closeObject = JSON.parse(event.data);
+
+					if (closeObject.error)
+					{
+						this.interactionContext[index].content = closeObject.error.message;
+						this.notifyPath(`interactionContext.${index}.content`);
+					}
+
+					eventSource.close();
+
+					this.set('loading', false);
+				});
+			},
+
+			_interactionsObserver(obs)
+			{
+				if (this.interactions)
+					this.set('selectedIndex', 0);
+			},
+
+			_interactionResponseObserver(obs)
+			{
+				//this._executeDocumentsReadyQuery();
+			},
+
+			// Compute the selected value based on the selected index
+			_computeSelectedValue(selectedIndex, jsonData)
+			{
+				if (selectedIndex >= 0 && jsonData && jsonData[selectedIndex])
+					return jsonData[selectedIndex];
+
+				return '';
+			},
+
+			_executeDocumentsReadyQuery()
+			{
+				if (!this.document)
+					return;
+
+				const op = this.$.nxqlQueryOp;
+
+				op.params = {
+					query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND interactionresults:storeDigest IS NOT NULL AND ecm:mixinType = 'InteractionResultsFacet' AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
+				};
+
+				op.execute()
+					.then((response) =>
+					{
+						this.set('documentsReady', response.entries.length);
+					});
+			},
+
+			_executeTotalDocumentsQuery()
+			{
+				if (!this.document)
+					return;
+
+				const op = this.$.totalDocumentsQueryOp;
+				op.params = {
+					query: "SELECT * FROM Document WHERE (ecm:ancestorId = '" + this.document.uid + "' OR ecm:uuid = '" + this.document.uid + "') AND file:content IS NOT NULL AND ecm:isTrashed = 0 AND ecm:isProxy = 0"
+				};
+
+				op.execute()
+					.then((response) =>
+					{
+						this.set('totalDocuments', response.entries.length);
+					});
+			},
+
+			_isDocArrayType(param)
+			{
+				return param.type === 'array' && param.format === 'document';
+			}
+		});
+	</script>
+</dom-module>

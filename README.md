@@ -11,20 +11,10 @@ io.maretha.aws.inferenceProfile=
 The modelId is appendend
 ```
 
-## 2. Nuxeo UI Configuration
-
-### Settings Document
-- Admin Settings Page: http://localhost:8080/nuxeo/ui/#!/maretha-cp-interactions
-- Settings Document: http://localhost:8080/nuxeo/ui/#!/browse/InteractionSettings
-
-### Interactions Configuration
-![](documentation/images/AI-Interaction-Settings.png)
-
-### Interaction Parameters Configuration
-![](documentation/images/AI-Interaction-Settings-Configuration.png)
-
-### Interaction Response
-![](documentation/images/AI-Document-Summary-Response.png)
+## 2. Start elasticsearch
+```
+docker run -p 9200:9200 -e "discovery.type=single-node" -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+```
 
 
 ## Nuxeo documentation

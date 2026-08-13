@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<xs:schema targetNamespace="http://www.nuxeo.core/ecm/schemas/interactionSettings/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:nxs="http://www.nuxeo.core/ecm/schemas/interactionSettings/">
+
+    <!-- Root element definition for interactions -->
+    <xs:element name="interactions" type="nxs:interactionList"/>
+    <!--S3 Path access enabled-->
+    <xs:element name="awsS3AccessEnabled" type="xs:boolean"/>
+    <!--Schema Settings for saving metadata-->
+    <xs:element name="schemaSettings" type="xs:string"/>
+    <!--Elasticsearch/OpenSearch query settings-->
+    <xs:element name="esSettings" type="xs:string"/>
+    <!--ai settings-->
+    <xs:element name="aiSettings" type="xs:string"/>
+    <!-- DocType events settings with interactions mapping-->
+    <xs:element name="eventsSettings" type="xs:string"/>
+
+    <!-- Definition for the interactions complex type -->
+    <xs:complexType name="interactionType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:string"/>
+            <xs:element name="endpoint" type="xs:string"/>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="model" type="xs:string"/>
+            <xs:element name="status" type="xs:string"/>
+            <xs:element name="version" type="xs:string"/>
+            <xs:element name="updatedAt" type="xs:dateTime"/>
+            <xs:element name="activeOnDocumentTypes" type="nxs:stringList"/>
+            <xs:element name="activeOnMimeTypes" type="xs:string"/>
+            <xs:element name="active" type="xs:boolean"/>
+            <xs:element name="activeOnActionMenu" type="xs:boolean"/>
+            <xs:element name="activeOnFolder" type="xs:boolean"/>
+            <xs:element name="chat" type="xs:boolean"/>
+            <xs:element name="saveMetadata" type="xs:boolean"/>
+            <xs:element name="mainMetadata" type="xs:boolean"/>
+            <xs:element name="sendParentsContext" type="xs:boolean"/>
+            <xs:element name="sendAttachments" type="xs:boolean"/>
+            <xs:element name="requiresUserInput" type="xs:boolean"/>
+            <xs:element name="parameters" type="nxs:interactionParameterList"/>
+            <xs:element name="prompt" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Definition for a list of strings -->
+    <xs:complexType name="stringList">
+        <xs:sequence>
+            <xs:element name="item" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Definition for a list of interactions -->
+    <xs:complexType name="interactionList">
+        <xs:sequence>
+            <xs:element name="interaction" type="nxs:interactionType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="interactionParameterList">
+        <xs:sequence>
+            <xs:element name="parameter" type="nxs:interactionParameter" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="interactionParameter">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="type" type="xs:string"/>
+            <xs:element name="format" type="xs:string"/>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="value" type="xs:string"/>
+            <xs:element name="readOnly" type="xs:boolean"/>
+            <xs:element name="enableDocSelection" type="xs:boolean"/>
+            <xs:element name="isMainDocument" type="xs:boolean"/>
+            <xs:element name="selectionReadOnly" type="xs:boolean"/>
+            <xs:element name="isContextMemoryParameter" type="xs:boolean"/>
+            <xs:element name="isAdditionalContext" type="xs:boolean"/>
+            <xs:element name="selectedDocumentIds" type="nxs:stringList"/>
+            <xs:element name="selectedDocumentId" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,49 @@
+<dom-module id="nuxeo-ai-create-layout">
+    <template>
+        <style>
+            *[role=widget] {
+              padding: 5px;
+            }
+        </style>
+        <div class="row">
+            <div class="col-sm-12">
+                <nuxeo-input role="widget" value="{{document.properties.dc:title}}" label="Title" type="text"
+                             name="title"></nuxeo-input>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <nuxeo-input role="widget" value="{{document.properties.dc:description}}" label="Comments" type="text"
+                             name="description"></nuxeo-input>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div role="widget">
+                    <label id="contentField">Content</label>
+                    <nuxeo-dropzone value="{{document.properties.file:content}}" aria-labelledby="contentField"
+                                    message="Upload a file" required="true" name="content"></nuxeo-dropzone>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+          is: 'nuxeo-ai-create-layout',
+          behaviors: [Nuxeo.LayoutBehavior],
+          properties: {
+
+            /**
+             * @doctype ai
+             */
+            document: {
+              type: Object,
+            },
+
+          }
+        });
+    </script>
+</dom-module>

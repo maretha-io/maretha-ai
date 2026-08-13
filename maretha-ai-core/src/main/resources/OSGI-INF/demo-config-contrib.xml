@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- Platform overrides
+see https://doc.nuxeo.com/nxdoc/how-to-contribute-to-an-extension/#overriding-the-nuxeo-default-configurations -->
+
+<component name="io.maretha.cp.core.ConfigurationServiceOverride">
+    <!-- Increase the maximum width of the document name (path segement) using this contribution
+    Note: mongo index key size limit has to be less than 1024 bytes. That means the full ecm:path value needs to be less than 1024 bytes,
+    so the path segment length value has to allow space for the max expected folder name and the nanosecond digits.
+    -->
+    <require>org.nuxeo.ecm.core.api.properties</require>
+    <extension target="org.nuxeo.runtime.ConfigurationService" point="configuration">
+        <!-- out of the box default is 24 -->
+        <property name="nuxeo.path.segment.maxsize">128</property>
+    </extension>
+
+</component>

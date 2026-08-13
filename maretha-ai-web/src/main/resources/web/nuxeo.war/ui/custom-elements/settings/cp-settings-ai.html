@@ -1,0 +1,137 @@
+<dom-module id="cp-settings-ai">
+	<template>
+		<style include="nuxeo-styles">
+			.content {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			paper-toggle-button {
+				cursor: pointer;
+			}
+		</style>
+
+		<div id="main slot">
+
+			<nuxeo-card heading="AI settings">
+				<div class="content">
+
+					<div style="position: relative; display: inline-block;">
+						<nuxeo-input
+								id="embeddingModelInput"
+								role="widget"
+								value="{{aiSettings.embeddingModel}}"
+								label="embeddingModel"
+								type="text"
+								on-input="_markAsDirty">
+						</nuxeo-input>
+						<paper-tooltip for="embeddingModelInput" position="bottom" offset="6">
+							The AI model used for generating text vector embeddings (e.g., amazon.titan-embed-text-v2:0)
+						</paper-tooltip>
+					</div>
+
+					<div style="position: relative; display: inline-block;">
+						<nuxeo-input
+								id="mimeTypesInput"
+								role="widget"
+								value="{{aiSettings.mimeTypes}}"
+								label="mimeTypes"
+								type="text"
+								on-input="_markAsDirty">
+						</nuxeo-input>
+						<paper-tooltip for="mimeTypesInput" position="bottom" offset="6">
+							Comma-separated list of MIME types to include for processing (e.g., text/plain, application/pdf)
+						</paper-tooltip>
+					</div>
+
+					<div style="position: relative; display: inline-block;">
+						<nuxeo-input
+								id="directoryBucketSizeInput"
+								role="widget"
+								value="{{aiSettings.directoryBucketSize}}"
+								label="directoryBucketSize"
+								type="number"
+								min="0"
+								step="10"
+								on-input="_markAsDirty">
+						</nuxeo-input>
+						<paper-tooltip for="directoryBucketSizeInput" position="bottom" offset="6">
+							Defines the number of entries per directory bucket (e.g., 100, used for better results when the vocabulary has too many values for the model context)
+						</paper-tooltip>
+					</div>
+
+				</div>
+			</nuxeo-card>
+
+			<nuxeo-card>
+				<h3>Elasticsearch Query Settings</h3>
+				<paper-toast id="toast"></paper-toast>
+
+				<div class="content">
+
+					<nuxeo-input role="widget" value="{{esSettings.BOOST}}"
+								 label="BOOST" type="text"
+								 placeholder="" on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.TEXT_WEIGHT}}"
+								 label="TEXT_WEIGHT" type="text"
+								 placeholder=""  on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.IMAGE_WEIGHT}}"
+								 label="IMAGE_WEIGHT" type="text"
+								 placeholder=""  on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.SCORE_MODE}}"
+								 label="SCORE_MODE" type="text"
+								 placeholder=""  on-change="_markAsDirty"></nuxeo-input>
+					<nuxeo-input role="widget" value="{{esSettings.BOOST_MODE}}"
+								 label="BOOST_MODE" type="text"
+								 placeholder="" on-change="_markAsDirty"></nuxeo-input>
+
+				</div>
+			</nuxeo-card>
+		</div>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'cp-settings-ai',
+			behaviors: [Nuxeo.LayoutBehavior, Nuxeo.ConfigurationBehaviour],
+			properties: {
+				aiSettings: {
+					type: Object,
+					value: {}
+				},
+
+				esSettings: {
+					type: Object,
+					value: {}
+				},
+
+				awsS3AccessEnabled: Boolean
+			},
+
+			_saveAws()
+			{
+				this.fire('mark-as-dirty', { awsS3AccessEnabled: this.awsS3AccessEnabled });
+			},
+
+			_markAsDirty()
+			{
+				this.fire('mark-as-dirty', { aiSettings: this.aiSettings, esSettings: this.esSettings });
+			},
+
+			_addProvider() {
+			  if (!this.aiSettings.providers) {
+				this.set('aiSettings.providers', []);
+			  }
+			  this.push('aiSettings.providers', { name: '', token: '', model: '' });
+			  this._markAsDirty();
+			},
+
+			_removeProvider(e) {
+			  const index = e.model.index;
+			  this.splice('aiSettings.providers', index, 1);
+			  this._markAsDirty();
+			}
+		});
+	</script>
+</dom-module>
