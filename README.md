@@ -1,5 +1,7 @@
 ## Maretha.io AI Integration Add-on
 
+Both Polymer and Angular Web UI implementations belong to [`maretha-ai-web`](maretha-ai-web/README.md). The Angular SDK library lives in [`maretha-ai-web/angular`](maretha-ai-web/angular/README.md).
+
 ### 1.Nuxeo configuration nuxeo.conf
 ```
 io.maretha.aws.accessKeyId=

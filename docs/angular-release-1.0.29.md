@@ -12,7 +12,7 @@ credentials into either checkout. From the add-on checkout, assemble both
 releases with:
 
 ```sh
-node scripts/angular/assemble-host.mjs \
+node maretha-ai-web/angular/scripts/assemble-host.mjs \
   /path/to/maretha-angular-webui /tmp/maretha-cp-1.0.29-assembly
 ```
 
@@ -38,7 +38,7 @@ To inspect and prepare the image context afterward:
 mvn -B verify
 shasum -a 256 maretha-ai-package/target/maretha-ai-package-1.0.29.zip
 unzip -p maretha-ai-package/target/maretha-ai-package-1.0.29.zip package.xml
-bash scripts/angular/prepare-demo-context.sh \
+bash maretha-ai-web/angular/scripts/prepare-demo-context.sh \
   maretha-ai-package/target/maretha-ai-package-1.0.29.zip \
   /tmp/maretha-cp-1.0.29-assembly/host/nuxeo/package/target/maretha-angular-webui-package-3.21.3.zip \
   /tmp/maretha-ai-1.0.29-context

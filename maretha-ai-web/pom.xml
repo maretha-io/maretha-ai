@@ -27,7 +27,7 @@
             <!-- The extension remains owned and distributed by this add-on.
                  The assembled host compiles it through the public SDK. -->
             <resource>
-                <directory>../angular/dist</directory>
+                <directory>angular/dist</directory>
                 <targetPath>META-INF/maretha/angular</targetPath>
                 <excludes>
                     <exclude>**/*.map</exclude>
