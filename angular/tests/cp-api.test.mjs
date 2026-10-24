@@ -4,7 +4,7 @@ import { afterEach, beforeEach, test } from 'node:test';
 import { PendingTasks, createEnvironmentInjector, signal } from '@angular/core';
 import { provideHttpClient, withNoXsrfProtection } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { WebUiAppState, DocumentLayoutRegistry, DocumentFieldExtensionRegistry, ExtensionRegistry, documentLayoutContext } from '@maretha/webui-sdk';
+import { WebUiAppState, DocumentLayoutRegistry, DocumentFieldExtensionRegistry, ExtensionRegistry, documentLayoutContext, resolveDocumentViews } from '@maretha/webui-sdk';
 import { firstValueFrom } from 'rxjs';
 import { CpApiService, CP_LAYOUT_SOURCES, cpHasAiSchema, provideCpDocumentLayouts, provideCpWebUi, unwrapCpResponse } from '../dist/fesm2022/maretha-cp-webui.mjs';
 
@@ -128,5 +128,29 @@ test('public provider registers group gates and adds AI fields only to attached 
     assert.equal(attached.find(field => field.property === 'ai:classification').directoryName, 'classification');
     assert.equal(attached.find(field => field.property === 'ai:safety').directoryName, 'safetyCategories');
     assert.equal(attached.find(field => field.property === 'ai:imageScene').directoryName, 'imageScenes');
+  } finally { registryInjector.destroy(); }
+});
+
+test('native administration, document tabs and drawer hosts accept complete CP pairs', () => {
+  const registryInjector = createEnvironmentInjector([ExtensionRegistry, DocumentLayoutRegistry, provideCpWebUi()], null);
+  try {
+    const registry = registryInjector.get(ExtensionRegistry);
+    const user = { id: 'admin', displayName: 'Administrator', isAdministrator: true, groups: ['administrators'] };
+    const base = { document: { uid: 'one', type: 'File', facets: ['InteractionResultsFacet'] }, noEdit: false, user };
+    const administration = resolveDocumentViews(registry, { ...base, features: { retention: false } }, { items: 'ADMINISTRATION_MENU', pages: 'ADMINISTRATION_PAGES' });
+    assert.deepEqual(administration.views.map(view => view.viewId), ['maretha-cp-interactions']);
+    assert.deepEqual(administration.diagnostics, []);
+    assert.equal(administration.views[0].item.inputs.label, 'AI Settings');
+    const documentViews = resolveDocumentViews(registry, base);
+    assert.deepEqual(documentViews.views.map(view => view.viewId), ['AiTab', 'SimilarDocumentsTab']);
+    assert.deepEqual(documentViews.diagnostics, []);
+    const drawer = resolveDocumentViews(registry, { ...base, locale: 'en-US', route: '/page/embedding-search', activeKey: 'find', opened: true,
+      open() {}, close() {}, navigate() {}, recentDocuments: [], collections: [], clipboard: [], tasks: {}, taskCount: 0, clearHistory() {}, clearClipboard() {},
+    }, { items: 'DRAWER_ITEMS', pages: 'DRAWER_PAGES' });
+    assert.deepEqual(drawer.views.map(view => view.viewId), ['find']);
+    assert.deepEqual(drawer.diagnostics, []);
+    const denied = resolveDocumentViews(registry, { ...base, user: { ...user, isAdministrator: false, groups: [] }, features: { retention: false } }, { items: 'ADMINISTRATION_MENU', pages: 'ADMINISTRATION_PAGES' });
+    assert.deepEqual(denied.views, []);
+    assert.deepEqual(denied.diagnostics, []);
   } finally { registryInjector.destroy(); }
 });

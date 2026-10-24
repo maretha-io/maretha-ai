@@ -6,6 +6,7 @@ USER 900
 COPY --chown=900:0 maretha-ai-package-1.0.29.zip /tmp/maretha-ai-package-1.0.29.zip
 COPY --chown=900:0 maretha-angular-webui-package-3.21.3.zip /tmp/maretha-angular-webui-package-3.21.3.zip
 RUN set -eu; \
+    export NUXEO_CONF=/opt/nuxeo/server/bin/nuxeo.conf; \
     test ! -f /opt/nuxeo/server/configured; \
     cp /opt/nuxeo/server/bin/nuxeo.conf /tmp/maretha-ai-original.conf; \
     printf '\norg.nuxeo.connect.server.reachable=false\n' >> /opt/nuxeo/server/bin/nuxeo.conf; \

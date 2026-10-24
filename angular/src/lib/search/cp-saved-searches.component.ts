@@ -4,6 +4,7 @@ import { SAVED_SEARCH_GATEWAY, WebUiAppState, type SavedSearchDefinition } from 
 
 @Component({
   selector: 'cp-saved-searches', standalone: true, imports: [FormsModule],
+  styleUrls: ['./cp-search-controls.css'],
   template: `
     <label for="cp-saved-search">Search Filters</label>
     <select id="cp-saved-search" [ngModel]="selectedId()" (ngModelChange)="select($event)" [disabled]="busy()">
