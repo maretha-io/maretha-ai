@@ -37,6 +37,7 @@ export class CpSearchItemComponent { readonly context = input.required<DrawerCon
 
 @Component({
   selector: 'cp-search-drawer', standalone: true, imports: [FormsModule, RouterLink, CpSavedSearchesComponent],
+  styleUrls: ['./cp-search-controls.css'],
   template: `<h2>AI search</h2>
     <cp-saved-searches [params]="savedParams" (selected)="applySaved($event)" />
     <button class="queue-switch" type="button" (click)="toggleQueue()" [attr.aria-label]="queue() ? 'Switch to Filters View' : 'Switch to Queue View'">{{ queue() ? 'Switch to Filters View' : 'Switch to Queue View' }}</button>
@@ -148,6 +149,7 @@ export class CpSearchPageComponent {
 
 @Component({
   selector: 'cp-similar-documents', standalone: true, imports: [forwardRef(() => CpEmbeddingResultsComponent)],
+  styleUrls: ['./cp-search-controls.css'],
   template: `<label class="confidence">Confidence value <output>{{ minScore() }}</output>
       <input type="range" min="0" max="1" step="0.1" [value]="minScore()" (change)="minScore.set(+$any($event.target).value)" />
     </label><cp-embedding-results [criteria]="criteria()" [sourceDocument]="document()" />`,
@@ -165,6 +167,7 @@ export class CpSimilarDocumentsComponent {
 
 @Component({
   selector: 'cp-embedding-results', standalone: true,
+  styleUrls: ['./cp-search-controls.css'],
   imports: [FormsModule, RouterLink, DatePipe, ResultsProjectionComponent, ResultsProjectionTemplateDirective, WebUiSlotComponent],
   template: `
     <div class="tools">

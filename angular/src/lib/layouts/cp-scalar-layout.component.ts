@@ -21,13 +21,13 @@ import { CP_DUBLINCORE_FIELDS } from './cp-layout-fields';
         </div>
       }
       @if (relatedError()) { <p role="status">{{ relatedError() }}</p> }
-      <nx-schema-layout [layout]="layout" [documentId]="documentId" [parentId]="parentId"
+      <nx-schema-layout [class.readonly-metadata]="layoutContext.mode === 'metadata'" [layout]="layout" [documentId]="documentId" [parentId]="parentId"
         [name]="name" [mode]="layoutContext.mode" [noEdit]="layoutContext.noEdit"
         (valueChanged)="rename($event)" (saved)="saved($event)" />
-      @if (host) { <button type="button" (click)="host.cancel()">{{ layoutContext.mode === 'metadata' ? 'Close' : 'Cancel' }}</button> }
+      @if (host) { <button type="button" (click)="cancel()">{{ layoutContext.mode === 'metadata' ? 'Close' : 'Cancel' }}</button> }
     }
   `,
-  styles: `:host{display:block;padding:16px}.related{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}button{padding:8px 16px;margin-top:12px}`,
+  styles: `nx-schema-layout.readonly-metadata{white-space:pre-wrap}:host{display:block;padding:16px}.related{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}button{padding:8px 16px;margin-top:12px}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CpScalarLayoutComponent implements OnChanges, OnDestroy, GuardedView {
@@ -42,6 +42,7 @@ export class CpScalarLayoutComponent implements OnChanges, OnDestroy, GuardedVie
   documentId?: string;
   parentId?: string;
   name = '';
+  private disposed = false;
 
   ngOnChanges(): void {
     this.relatedRequest?.unsubscribe();
@@ -61,7 +62,17 @@ export class CpScalarLayoutComponent implements OnChanges, OnDestroy, GuardedVie
         { property: 'dc:title', label: 'Title' },
         { property: 'dc:description', label: 'Comments' },
         { property: 'file:content', label: 'Content', required: true },
-      ] : CP_DUBLINCORE_FIELDS,
+      ] : context.mode === 'metadata' ? CP_DUBLINCORE_FIELDS
+        .filter(field => {
+          const value = document?.properties?.[field.property];
+          return field.property === 'dc:title' || (Array.isArray(value) ? value.length > 0 : !!value);
+        })
+        .map(field => {
+          // Metadata is plain text; the textarea belongs only to the edit form.
+          if (field.widget !== 'cp-textarea') return field;
+          const { widget, ...readonlyField } = field;
+          return readonlyField;
+        }) : CP_DUBLINCORE_FIELDS,
     };
     if (context.mode === 'metadata') {
       const relatedId = document?.properties?.['interactionresults:interactions']?.[0]?.documentId;
@@ -76,7 +87,13 @@ export class CpScalarLayoutComponent implements OnChanges, OnDestroy, GuardedVie
     if (this.layoutContext?.mode === 'create') this.name = String(values['dc:title'] || '').replace(/[/\\]/g, '-').trim();
   }
   saved(document: LayoutDocument): void { this.host?.complete([document]); }
+  async cancel(): Promise<void> {
+    const context = this.layoutContext;
+    try {
+      if (await this.canDeactivate() && !this.disposed && context === this.layoutContext) this.host?.cancel();
+    } catch { /* Keep the draft open when its departure guard cannot resolve. */ }
+  }
   canDeactivate(): boolean | Promise<boolean> { return this.editor()?.canDeactivate() ?? true; }
   hasPendingChanges(): boolean { return this.editor()?.hasPendingChanges() ?? false; }
-  ngOnDestroy(): void { this.relatedRequest?.unsubscribe(); }
+  ngOnDestroy(): void { this.disposed = true; this.relatedRequest?.unsubscribe(); }
 }

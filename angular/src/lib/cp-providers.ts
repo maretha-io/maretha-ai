@@ -1,9 +1,8 @@
-import { Component, ChangeDetectionStrategy, input, makeEnvironmentProviders } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, ChangeDetectionStrategy, computed, inject, input, makeEnvironmentProviders, viewChild } from '@angular/core';
 import {
-  ADMINISTRATION_MENU_SLOT, DOCUMENT_ACTIONS_SLOT, DRAWER_ITEMS_SLOT, DRAWER_PAGES_SLOT,
-  defineContribution, defineDocumentView, definePage, provideWebUiExtensions, provideDocumentFieldExtensions, provideDocumentLayoutWidget,
-  type AdministrationContext,
+  ADMINISTRATION_MENU_SLOT, ADMINISTRATION_PAGES_SLOT, DOCUMENT_ACTIONS_SLOT, DRAWER_ITEMS_SLOT, DRAWER_PAGES_SLOT,
+  WebUiAppState, defineContribution, defineDocumentView, definePairedView, definePage, provideWebUiExtensions, provideDocumentFieldExtensions, provideDocumentLayoutWidget,
+  type AdministrationContext, type GuardedView, type PageContext, type ViewDeparture,
 } from '@maretha/webui-sdk';
 import { CpAiTabComponent } from './interactions/cp-ai-tab.component';
 import { CpMetadataActionComponent } from './interactions/cp-metadata-action.component';
@@ -15,14 +14,24 @@ import { CP_AI_FIELDS } from './layouts/cp-layout-fields';
 import { CpTextareaWidgetComponent } from './layouts/cp-textarea-widget.component';
 
 @Component({
-  selector: 'cp-settings-menu',
+  selector: 'cp-settings-administration-page',
   standalone: true,
-  imports: [RouterLink],
-  template: '<a [routerLink]="[\'/page\', \'maretha-cp-interactions\']">AI Settings</a>',
-  styles: ':host{display:block}a{display:block;padding:12px 20px;color:inherit;text-decoration:none}',
+  imports: [CpSettingsComponent],
+  template: '<cp-settings [context]="pageContext()" />',
+  styles: ':host{display:flex;flex:1;min-width:0;min-height:0}cp-settings{flex:1;min-width:0}',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CpSettingsMenuComponent { readonly context = input.required<AdministrationContext>(); }
+export class CpSettingsAdministrationPageComponent implements GuardedView {
+  readonly context = input.required<AdministrationContext>();
+  private readonly app = inject(WebUiAppState);
+  private readonly settings = viewChild(CpSettingsComponent);
+  readonly pageContext = computed<PageContext>(() => ({
+    ...this.context(), pageId: 'maretha-cp-interactions', params: {}, query: this.app.query(),
+    locale: this.app.locale(), route: this.app.route(),
+  }));
+  canDeactivate(departure: ViewDeparture): boolean | Promise<boolean> { return this.settings()?.canDeactivate(departure) ?? true; }
+  hasPendingChanges(): boolean { return this.settings()?.hasPendingChanges() ?? false; }
+}
 
 /** CP-owned assembly. The application's bridge calls only this public entry point. */
 export function provideCpWebUi() {
@@ -36,8 +45,11 @@ export function provideCpWebUi() {
       contributions: [
         definePage({ id: 'io.maretha.cp.page.settings', pageId: 'maretha-cp-interactions',
           component: CpSettingsComponent, retain: true, when: context => context.user?.isAdministrator === true }),
-        defineContribution(ADMINISTRATION_MENU_SLOT, { id: 'io.maretha.cp.administration.settings',
-          component: CpSettingsMenuComponent, order: 100, when: context => context.user?.isAdministrator === true }),
+        ...definePairedView({ items: ADMINISTRATION_MENU_SLOT, pages: ADMINISTRATION_PAGES_SLOT }, {
+          id: 'io.maretha.cp.administration.settings', viewId: 'maretha-cp-interactions', label: 'AI Settings',
+          component: CpSettingsAdministrationPageComponent, order: 100, retain: true,
+          when: context => context.user?.isAdministrator === true,
+        }),
         defineContribution(DOCUMENT_ACTIONS_SLOT, { id: 'io.maretha.cp.document-actions.metadata',
           component: CpMetadataActionComponent, order: 0,
           when: context => !!context.document && cpHasGroup(context.user, 'AI-METADATA') }),
