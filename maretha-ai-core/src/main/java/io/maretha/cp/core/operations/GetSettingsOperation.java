@@ -3,7 +3,6 @@ package io.maretha.cp.core.operations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.maretha.cp.core.models.Settings;
 import io.maretha.cp.core.services.RepositoryService;
-import org.apache.commons.collections.CollectionUtils;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
@@ -28,11 +27,12 @@ public class GetSettingsOperation {
 
     @OperationMethod
     public Settings run() {
-        Settings settings = repositoryService.getSavedSettings(session, false);
-        if (CollectionUtils.isEmpty(settings.getInteractions())) {
-            settings = addDefaultInteractions();
+        // Defaults are for first use only. A persisted empty list is an intentional
+        // configuration and must not resurrect deleted interactions on reload.
+        if (repositoryService.getExistingSettingsDocument(session).isEmpty()) {
+            return addDefaultInteractions();
         }
-        return settings;
+        return repositoryService.getSavedSettings(session, false);
     }
 
     private Settings addDefaultInteractions() {

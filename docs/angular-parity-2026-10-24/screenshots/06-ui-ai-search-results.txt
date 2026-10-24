@@ -1,0 +1,76 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=367_0 RootWebArea "app.title.search.embedding-search - Search - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/search/embedding-search"
+  uid=368_0 banner
+    uid=368_1 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=368_3 button "Quick Search" expandable
+  uid=368_4 complementary
+    uid=368_5 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=368_6 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=368_7 listbox "Drawer" orientation="vertical"
+      uid=368_8 option "AI search" selected
+        uid=368_9 button "AI search" expandable expanded
+      uid=368_10 generic
+      uid=368_11 option "Browse"
+        uid=368_12 button "Browse" expandable
+      uid=368_13 option "Recently Viewed"
+        uid=368_14 button "Recently Viewed" expandable
+      uid=368_15 option "Search"
+        uid=368_16 button "Search" expandable
+      uid=368_17 option "Expired"
+        uid=368_18 button "Expired" expandable
+      uid=368_19 option "Assets"
+        uid=368_20 button "Assets" expandable
+      uid=368_21 option "Tasks"
+        uid=368_22 button "Tasks" expandable
+      uid=368_23 option "MSA Work Queue"
+        uid=368_24 button "MSA Work Queue" expandable
+      uid=368_25 option "Favorites"
+        uid=368_26 button "Favorites" expandable
+      uid=368_27 option "Collections"
+        uid=368_28 button "Collections" expandable
+      uid=368_29 option "Personal Space"
+        uid=368_30 button "Personal Space" expandable
+      uid=368_31 option "Clipboard"
+        uid=368_32 button "Clipboard" expandable
+      uid=368_33 option "Trash"
+        uid=368_34 button "Trash" expandable
+      uid=368_35 generic
+      uid=368_36 option "Administration"
+        uid=368_37 button "Administration" expandable
+      uid=368_38 option "User Settings"
+        uid=368_39 button "User Settings" expandable
+    uid=376_0 "Search Filters"
+    uid=376_1 generic
+      uid=376_2 combobox "Search Filters" autocomplete="list" expandable haspopup="listbox"
+      uid=376_3 "Select a saved search"
+    uid=376_4 button "Switch to Queue View"
+    uid=376_5 "What are you looking for?"
+    uid=376_6 group "What are you looking for?"
+      uid=376_7 searchbox "What are you looking for?" focusable focused value="bird"
+    uid=376_8 "Confidence value"
+    uid=376_9 generic
+      "0.8"
+    uid=376_10 "Full Text"
+    uid=376_11 group "Full Text"
+      uid=376_12 searchbox "Full Text"
+    uid=376_13 button "Reset"
+    uid=369_17 button "Collapse the side navigation panel" expandable expanded
+    uid=369_18 separator "Resize the side navigation panel. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." orientation="vertical" value="350" valuemax="720" valuemin="350" valuetext=""
+  uid=368_40 main
+    uid=377_0 "Search Results"
+    uid=377_1 button "Save As"
+    uid=377_2 navigation
+    uid=377_3 button "Export CSV"
+    uid=377_4 button "Switch to Grid View" disableable disabled
+    uid=377_5 button "Switch to Table View"
+    uid=377_6 "Sort by"
+    uid=377_7 generic "Sort by"
+      uid=377_8 button "Sort by" haspopup="listbox" value="Relevance"
+    uid=377_9 button "Reverse sort order"
+    uid=377_10 generic live="polite" relevant="additions text"
+      uid=377_11 "No documents match the search criteria."
+  uid=377_12 button
+  uid=377_13 tooltip
+  uid=368_175 status atomic live="polite" relevant="additions text"
+  uid=368_176 generic live="polite" relevant="additions text"

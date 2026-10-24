@@ -1,0 +1,19 @@
+# Build on the image captured from the live Deployment immediately before rollout.
+# This preserves all unrelated marketplace packages, Studio bundles and Web UI files.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+USER 900
+COPY --chown=900:0 maretha-ai-package-1.0.29.zip /tmp/maretha-ai-package-1.0.29.zip
+COPY --chown=900:0 maretha-angular-webui-package-3.21.3.zip /tmp/maretha-angular-webui-package-3.21.3.zip
+RUN set -eu; \
+    test ! -f /opt/nuxeo/server/configured; \
+    cp /opt/nuxeo/server/bin/nuxeo.conf /tmp/maretha-ai-original.conf; \
+    printf '\norg.nuxeo.connect.server.reachable=false\n' >> /opt/nuxeo/server/bin/nuxeo.conf; \
+    /opt/nuxeo/server/bin/nuxeoctl mp-uninstall --accept yes --nodeps maretha-ai maretha-angular-webui; \
+    /install-packages.sh --offline /tmp/maretha-ai-package-1.0.29.zip /tmp/maretha-angular-webui-package-3.21.3.zip; \
+    mv /tmp/maretha-ai-original.conf /opt/nuxeo/server/bin/nuxeo.conf; \
+    rm /tmp/maretha-ai-package-1.0.29.zip /tmp/maretha-angular-webui-package-3.21.3.zip; \
+    test -f /opt/nuxeo/server/nxserver/bundles/maretha-ai-web-1.0.29.jar; \
+    test -f /opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-ui-3.21.3.jar; \
+    test ! -f /opt/nuxeo/server/nxserver/bundles/maretha-ai-web-1.0.28.jar; \
+    test ! -f /opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-ui-3.21.2-SNAPSHOT.jar
