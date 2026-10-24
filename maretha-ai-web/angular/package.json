@@ -1,0 +1,37 @@
+{
+  "name": "@maretha/cp-webui",
+  "version": "1.0.29",
+  "description": "Maretha AI layouts and contributions for the Angular Nuxeo Web UI",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json -c tsconfig.lib.json",
+    "pack": "npm run build && npm pack ./dist --pack-destination .",
+    "test": "npm run build && node --test tests/*.test.mjs src/lib/features/settings/*.test.mjs scripts/*.test.mjs",
+    "test:assembly": "node --test scripts/assemble-host.test.mjs",
+    "test:rich-response": "node scripts/test-rich-response.mjs",
+    "assemble": "node scripts/assemble-host.mjs"
+  },
+  "peerDependencies": {
+    "@angular/common": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "@maretha/webui-sdk": "^0.1.1",
+    "rxjs": "^7.5.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/compiler": "21.2.25",
+    "@angular/compiler-cli": "21.2.25",
+    "ng-packagr": "21.2.7",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  }
+}
