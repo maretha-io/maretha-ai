@@ -1,0 +1,87 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=439_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/settings?admin=maretha-cp-interactions"
+  uid=439_1 complementary "Application navigation"
+    uid=439_2 button "Dashboard"
+    uid=439_3 navigation "Main navigation"
+      uid=439_4 button "AI search" expandable
+      uid=439_5 button "Browse" expandable
+      uid=439_6 button "Recently Viewed" expandable
+      uid=439_7 button "Search" expandable
+      uid=439_8 button "Expired" expandable
+      uid=439_9 button "Assets" expandable
+      uid=439_10 button "Tasks" expandable
+      uid=439_11 button "Favorites" expandable
+      uid=439_12 button "Collections" expandable
+      uid=439_13 button "Personal Space" expandable
+      uid=439_14 button "Clipboard" expandable
+      uid=439_15 button "Trash" expandable
+    uid=439_16 navigation "Account and administration"
+      uid=439_17 button "Administration" expandable expanded
+      uid=439_18 button "User menu" expandable
+  uid=441_0 region "Navigation details"
+    uid=441_1 banner
+      uid=441_2 heading "Administration" level="6"
+    uid=441_3 navigation "Administration"
+      uid=441_4 button "Analytics"
+      uid=441_5 button "Users & Groups"
+      uid=441_6 button "Vocabularies"
+      uid=441_7 button "Audit"
+      uid=441_8 button "Cloud Services"
+      uid=441_9 button "NXQL Search"
+      uid=441_10 button "Metadata layouts"
+      uid=441_11 button "AI Settings"
+  uid=441_12 navigation "Drawer controls"
+    uid=441_13 separator "Resize navigation drawer" description="Drag to resize. Use arrow keys to adjust; press Enter or double-click to reset." orientation="vertical" value="298" valuemax="640" valuemin="200" valuetext=""
+    uid=441_14 button "Close navigation"
+  uid=439_19 banner "Application actions"
+    uid=439_20 button "Quick Search" expandable haspopup="dialog"
+  uid=439_23 region "Application activity"
+    uid=439_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=439_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=442_0 tabpanel "AI Settings"
+    uid=442_1 banner
+      uid=442_2 heading "AI Settings" level="1"
+    uid=442_3 region "AI Interactions Management"
+      uid=442_4 heading "AI Interactions Management" level="1"
+      uid=442_5 "Manage interactions, metadata and document automation."
+      uid=442_6 button "Save changes" disableable disabled
+      uid=442_7 button "Discard changes" disableable disabled
+      uid=442_8 button "Reload" description="Reload saved settings"
+      uid=442_9 navigation "AI settings sections"
+        uid=442_10 button "Interactions"
+        uid=442_11 button "Metadata"
+        uid=442_12 button "Events"
+        uid=442_13 button "Settings"
+      uid=442_14 "AI settings editor"
+      uid=442_15 region "Interactions"
+        uid=442_16 DisclosureTriangle "Legal Analyst - Chat Discuss an image or document with an AI legal analyst that highlights potential legal risks to identify problems early and determine when further legal review is needed Enabled ⌄" expandable
+        uid=442_17 DisclosureTriangle "Dynamic Metadata Save metadata into Nuxeo. Enabled ⌄" expandable
+        uid=442_18 DisclosureTriangle "Image Description / Abstract Provide a short, consistent description of an image to improve searchability, tagging, and content organization across the asset library Enabled ⌄" expandable
+        uid=442_19 DisclosureTriangle "Shot Type Detection - vocab Identify the specific shot type used in an image so marketing teams can quickly organize, tag, and route assets within production workflows. Classifying images as laydown, on-model, lifestyle, hero, or other shot types enables faster content sorting, automated placement in templates, improved searchability, and more efficient reuse across campaigns, e-commerce, and creative operations. Enabled ⌄" expandable
+        uid=442_20 DisclosureTriangle "Brand Mark Detection - text Detect visible brand names, logos, or trademarked symbols in an image so organizations can avoid unauthorized brand use, mitigate legal exposure, and prevent reputational risks. Identifying brand identifiers ensures compliance with licensing, rights management, and marketing guidelines before assets are published or reused. Enabled ⌄" expandable
+        uid=442_21 DisclosureTriangle "Brand Safety / Cultural Sensitivity - text Flag brand-safety, compliance, and cultural-sensitivity risks within an image or document so companies can prevent inappropriate, offensive, or non-compliant content from entering marketing or public channels. Identifying issues such as alcohol, violence, hate symbols, or culturally sensitive elements helps protect brand reputation, reduce legal exposure, and ensure assets meet internal standards before use. Enabled ⌄" expandable
+        uid=442_22 DisclosureTriangle "WCAG Alt Text Generator - text Provide accessibility tagging for WCAG-compliant alt text so images are accessible to screen-reader users, supporting legal accessibility requirements and improving the quality of public-facing content. Enabled ⌄" expandable
+        uid=442_23 DisclosureTriangle "SEO Keyword Generator - text Generate SEO-optimized keyword phrases from product images to improve how public-facing content is indexed and discovered across search engines. Enabled ⌄" expandable
+        uid=442_24 DisclosureTriangle "Rights & Permissions Detection - text Identify potential rights and usage-permission issues in an image or document—such as copyrighted artwork, third-party logos, identifiable people, minors, or watermarks—to ensure the asset can be legally used. This field helps teams flag clearance risks early and avoid rights violations. It focuses solely on legal/permissions concerns, not brand safety or cultural sensitivities. Enabled ⌄" expandable
+        uid=442_25 DisclosureTriangle "Document Classification - vocab Classify documents into standardized types to improve organization, searchability, and workflow routing. This reduces manual tagging, supports compliance, and ensures each document is handled correctly based on its purpose and structure. Enabled ⌄" expandable
+        uid=442_26 DisclosureTriangle "CTA Hotspot Detection Identify visually distinct subjects, objects, or logical regions in an image that could function as clickable call-to-action areas. This enables teams to create interactive images—such as shoppable content or linked product hotspots—by automatically generating precise bounding boxes for use in digital marketing and e-commerce experiences Enabled ⌄" expandable
+        uid=442_27 DisclosureTriangle "Channel-Optimized Crop Generator Generate standardized crop recommendations for key channel aspect ratios so marketing teams can quickly produce channel-ready images for hero banners, product detail pages, and social media. Automating crop box creation saves manual editing time, ensures visual consistency across platforms, and accelerates content production for retail and e-commerce workflows. Enabled ⌄" expandable
+        uid=442_28 DisclosureTriangle "Document Abstract Generate a brief, high-level summary of a document with key points, themes, and actions. Enabled ⌄" expandable
+        uid=442_29 DisclosureTriangle "Competitive Intelligence Analyst Extract key technical and messaging insights about competitor products from images or documents. This helps teams quickly understand how rival offerings are designed, engineered, and positioned, supporting product strategy and competitive decision-making Enabled ⌄" expandable
+        uid=442_30 DisclosureTriangle "Structured Image Semantics - text Captures the key visual components of an asset in a structured, machine-readable format to improve searchability, tagging accuracy, and content understanding. These semantic elements help organizations organize large asset libraries, enable more precise retrieval, support downstream automation, and provide richer metadata for marketing, creative, and AI-driven workflows. Enabled ⌄" expandable
+        uid=442_31 DisclosureTriangle "Compare documents Diff between documents Enabled ⌄" expandable
+        uid=442_32 DisclosureTriangle "Brand Safety / Cultural Sensitivity - vocab Capture standardized brand-safety and cultural-sensitivity classifications for an image using a controlled vocabulary. It enables teams to quickly identify and flag content that may pose legal, compliance, reputational, or policy risks. By tagging images with consistent, predefined safety categories, organizations can automate review workflows, prevent inappropriate assets from entering marketing or public channels, and maintain alignment with internal and platform-level content guidelines. Enabled ⌄" expandable
+        uid=442_33 DisclosureTriangle "Brand Design Guidelines Compliance Assess image compliance with brand guidelines, leveraging existing metadata to highlight risks and edge cases. Enabled ⌄" expandable
+        uid=442_34 DisclosureTriangle "Retail Messaging Compliance Executes compliance review for retail messaging using logic for messaging type and regional regulatory requirements. Enabled ⌄" expandable
+        uid=442_35 DisclosureTriangle "FinServ Jurisdiction-Aware Regulatory Compliance Performs an analysis of customer communications against regulatory rules, guidelines and law in relevant jurisdiction. Enabled ⌄" expandable
+        uid=442_36 DisclosureTriangle "Job Description Generator Generates a job description based on role defintion materials Enabled ⌄" expandable
+        uid=442_37 DisclosureTriangle "Loan Data JSON Extraction Extract the document data into valid json format. Enabled ⌄" expandable
+        uid=442_38 DisclosureTriangle "Loan Summary Enabled ⌄" expandable
+        uid=442_39 DisclosureTriangle "Text Placement Analysis Detects text placement potential in images Disabled ⌄" expandable
+        uid=442_40 "Add new interaction"
+        uid=442_41 "Interaction name"
+        uid=442_42 textbox "Interaction name"
+        uid=442_43 button "Add interaction"
+  uid=439_194 generic live="polite" relevant="additions text"
+  uid=440_40 generic atomic live="polite" relevant="additions text"

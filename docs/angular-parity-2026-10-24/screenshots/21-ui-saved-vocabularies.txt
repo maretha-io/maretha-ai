@@ -1,0 +1,112 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=502_0 RootWebArea "CP parity audit response 2026-10-24 - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/doc/23321079-d3f1-4b69-a99d-cba43f396724"
+  uid=502_1 banner
+    uid=502_2 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=502_4 button "Quick Search" expandable
+  uid=502_5 complementary
+    uid=502_6 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=502_7 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=502_8 listbox "Drawer" orientation="vertical"
+      uid=502_9 option "AI search"
+        uid=502_10 button "AI search" expandable
+      uid=502_11 generic
+      uid=502_12 option "Browse"
+        uid=502_13 button "Browse" expandable
+      uid=502_14 option "Recently Viewed"
+        uid=502_15 button "Recently Viewed" expandable
+      uid=502_16 option "Search"
+        uid=502_17 button "Search" expandable
+      uid=502_18 option "Expired"
+        uid=502_19 button "Expired" expandable
+      uid=502_20 option "Assets"
+        uid=502_21 button "Assets" expandable
+      uid=502_22 option "Tasks"
+        uid=502_23 button "Tasks" expandable
+      uid=502_24 option "MSA Work Queue"
+        uid=502_25 button "MSA Work Queue" expandable
+      uid=502_26 option "Favorites"
+        uid=502_27 button "Favorites" expandable
+      uid=502_28 option "Collections"
+        uid=502_29 button "Collections" expandable
+      uid=502_30 option "Personal Space"
+        uid=502_31 button "Personal Space" expandable
+      uid=502_32 option "Clipboard"
+        uid=502_33 button "Clipboard" expandable
+      uid=502_34 option "Trash"
+        uid=502_35 button "Trash" expandable
+      uid=502_36 generic
+      uid=502_37 option "Administration"
+        uid=502_38 button "Administration" expandable
+      uid=502_39 option "User Settings"
+        uid=502_40 button "User Settings" expandable
+  uid=502_41 main
+    uid=502_42 link "CP parity audit response 2026-10-24" url="https://demo.maretha.io/nuxeo/ui/#!/browse/InteractionResults/InteractionResults-Red-throated%20Bird%20Flight.1792875968130"
+    uid=502_44 navigation "Breadcrumb"
+      uid=502_45 link "InteractionResults" url="https://demo.maretha.io/nuxeo/ui/#!/browse/InteractionResults"
+    uid=502_47 button "Render with Template"
+    uid=502_48 tooltip
+    uid=502_49 button "Edit document"
+    uid=502_50 button "Delete document"
+    uid=502_51 button "Add to Collection"
+    uid=502_52 button "Add to Favorites"
+    uid=502_53 button "More options" description="More"
+    uid=502_54 navigation
+      uid=502_55 tablist orientation="horizontal"
+        uid=502_56 tab "View" selectable selected
+        uid=502_57 tab "AI" selectable
+        uid=502_58 tab "Permissions" selectable
+        uid=502_59 tab "History" selectable
+    uid=502_60 "CTA Hotspot Detection"
+    uid=502_61 "Bird 1 (110, 35, 285, 315)"
+    uid=502_62 "2026-10-24T21:06:08.020Z"
+    uid=502_63 image "thumbnail"
+    uid=502_64 button "Upload main file"
+    uid=502_65 separator "Resize the information pane. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." orientation="vertical" value="447" valuemax="716" valuemin="280" valuetext=""
+    uid=502_66 button "Details" expandable expanded
+    uid=502_67 "State"
+    uid=502_68 "undefined"
+    uid=502_69 "Last Modified"
+    uid=502_70 "October 24, 2026"
+    uid=502_71 "Created"
+    uid=502_72 "October 24, 2026"
+    uid=502_73 "By"
+    uid=502_74 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+      uid=502_75 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=502_76 "Contributors"
+    uid=502_77 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+      uid=502_78 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=502_79 "Title"
+    uid=502_80 "CP parity audit response 2026-10-24"
+    uid=502_81 "Related Document"
+    uid=502_82 link "Red-throated Bird Flight" url="https://demo.maretha.io/nuxeo/ui/#!/doc/6ceeabb6-c464-4369-adf6-bdeb966ffcd9"
+    uid=502_84 "Nature"
+    uid=502_85 "Booklet"
+    uid=502_86 "Subjects"
+    uid=502_87 generic
+      uid=502_88 "Art"
+      uid=502_89 generic "Subjects"
+    uid=502_90 "Coverage"
+    uid=502_91 "Europe"
+    uid=502_92 tablist orientation="horizontal"
+      uid=502_93 tab "Activity" selectable selected
+    uid=502_94 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+      uid=502_95 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=502_96 "modified the document"
+    uid=502_97 "4 minutes ago"
+    uid=502_98 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+      uid=502_99 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=502_100 "modified the document"
+    uid=502_101 "32 minutes ago"
+    uid=502_102 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+      uid=502_103 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=502_104 "modified the document"
+    uid=502_105 "39 minutes ago"
+    uid=502_106 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+      uid=502_107 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=502_108 "created the document"
+    uid=502_109 "39 minutes ago"
+  uid=502_110 button
+  uid=502_111 tooltip
+  uid=502_112 status atomic live="polite" relevant="additions text"
+  uid=502_113 generic live="polite" relevant="additions text"

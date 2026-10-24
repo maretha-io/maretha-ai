@@ -1,0 +1,2 @@
+Rich HTML, links, JSON fallback and XSS checks passed with Angular DomSanitizer in Chrome.
+Search primary-button contrast passed in default, hover, focus and active states.

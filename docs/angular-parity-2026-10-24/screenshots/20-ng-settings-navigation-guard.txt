@@ -1,0 +1,8 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=461_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/settings?admin=maretha-cp-interactions"
+  uid=481_0 dialog "Discard and leave" modal
+    uid=481_1 heading "Discard and leave" level="2"
+    uid=481_2 "Leave AI settings and discard your unsaved changes?"
+    uid=481_3 button "Cancel" focusable focused
+    uid=481_4 button "Discard and leave"

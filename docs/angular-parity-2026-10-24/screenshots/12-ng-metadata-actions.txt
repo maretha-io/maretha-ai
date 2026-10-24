@@ -1,0 +1,206 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=408_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature/2022's%20Best%20Photos/Birdy?view=view"
+  uid=408_1 complementary "Application navigation"
+    uid=408_2 button "Dashboard"
+    uid=408_3 navigation "Main navigation"
+      uid=408_4 button "AI search" expandable
+      uid=408_5 button "Browse" expandable
+      uid=408_6 button "Recently Viewed" expandable
+      uid=408_7 button "Search" expandable
+      uid=408_8 button "Expired" expandable
+      uid=408_9 button "Assets" expandable
+      uid=408_10 button "Tasks" expandable
+      uid=408_11 button "Favorites" expandable
+      uid=408_12 button "Collections" expandable
+      uid=408_13 button "Personal Space" expandable
+      uid=408_14 button "Clipboard" expandable
+      uid=408_15 button "Trash" expandable
+    uid=408_16 navigation "Account and administration"
+      uid=408_17 button "Administration" expandable
+      uid=408_18 button "User menu" expandable
+  uid=408_19 banner "Application actions"
+    uid=408_20 button "Quick Search" expandable haspopup="dialog"
+    uid=408_21 generic
+      uid=408_22 button "Add Content" haspopup="dialog"
+  uid=408_23 region "Application activity"
+    uid=408_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=408_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=408_26 banner
+    uid=408_27 heading "Birdy" level="1"
+    uid=408_28 navigation "Document location"
+      uid=408_29 link "Domain" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain"
+      uid=408_31 link "Workspaces" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces"
+      uid=408_33 link "Nature" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature"
+      uid=408_35 link "2022's Best Photos" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature/2022's%20Best%20Photos"
+    uid=408_37 button "Edit document"
+    uid=408_38 button "Add to Collection"
+    uid=408_39 button "Share"
+    uid=408_40 button "Move to trash"
+    uid=408_41 button "Add to Favorites"
+    uid=408_42 button "More actions" expandable expanded haspopup="dialog"
+  uid=408_43 tablist "Document views" orientation="horizontal"
+    uid=408_44 tab "View" selectable selected
+    uid=408_45 tab "AI" selectable
+    uid=408_46 tab "More Like This" selectable
+    uid=408_47 tab "Permissions" selectable
+    uid=408_48 tab "History" selectable
+    uid=408_49 tab "Publishing" selectable
+  uid=415_0 tabpanel "View"
+    uid=415_1 main
+      uid=415_2 group "Image preview"
+        uid=415_3 image "Birdy" url="blob:https://demo.maretha.io/26cb6014-57e3-43be-8147-4204975377cc"
+      uid=415_4 button "Rotate left"
+      uid=415_5 button "Rotate right"
+      uid=415_6 button "Fit" pressed
+      uid=415_7 button "Actual size"
+      uid=415_8 button "Zoom out"
+      uid=415_9 status atomic live="polite" relevant="additions text"
+        uid=415_10 "Fit"
+      uid=415_11 button "Zoom in"
+      uid=415_12 button "Fullscreen"
+      uid=415_13 "897A4110.jpeg"
+      uid=415_14 "2.4 MB"
+      uid=415_15 button "Download file" description="Download file"
+      uid=415_16 button "Preview" description="Preview"
+    uid=415_17 complementary
+      uid=415_18 heading "Metadata" level="2"
+      uid=415_19 button "Edit metadata"
+      uid=415_20 DisclosureTriangle "Metadata settings" description="Metadata settings" expandable expanded
+      uid=416_0 button "Customize fields"
+      uid=415_21 button "Hide metadata"
+      uid=415_22 region "Document details"
+        uid=415_23 region "Document information"
+          uid=415_24 "State"
+          uid=415_25 "Project"
+          uid=415_26 "Version"
+          uid=415_27 DisclosureTriangle "0.0 " expandable
+          uid=415_28 "Last modified"
+          uid=415_29 "October 15, 2025"
+          uid=415_30 "Created"
+          uid=415_31 "October 14, 2025"
+          uid=415_32 "By"
+          uid=415_33 link "Ethan Steiner" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Ethan%20Steiner"
+          uid=415_35 "Contributors"
+          uid=415_36 link "Ethan Steiner" url="https://demo.maretha.io/nuxeo/ng/page/user?id=EthanAdmin"
+        uid=415_38 heading "Details" level="3"
+        uid=415_39 button "Edit metadata"
+        uid=415_40 "Title"
+        uid=415_41 " Birdy "
+        uid=415_42 region "Attachments"
+          uid=415_43 heading "Attachments" level="3"
+          uid=415_44 "Click to upload files"
+          uid=415_45 button "Click to upload files" value="No file chosen"
+        uid=415_46 DisclosureTriangle "Collections" expandable
+        uid=415_47 heading "Tags" level="5"
+        uid=415_48 "outdoors"
+        uid=415_49 button "Remove outdoors"
+        uid=415_50 "reflection"
+        uid=415_51 button "Remove reflection"
+        uid=415_52 "nature"
+        uid=415_53 button "Remove nature"
+        uid=415_54 "bird"
+        uid=415_55 button "Remove bird"
+        uid=415_56 "animal"
+        uid=415_57 button "Remove animal"
+        uid=415_58 "water"
+        uid=415_59 button "Remove water"
+        uid=415_60 "wildlife"
+        uid=415_61 button "Remove wildlife"
+        uid=415_62 combobox "Search or create a tag" autocomplete="list" expandable haspopup="listbox"
+        uid=415_63 status atomic live="polite" relevant="additions text"
+        uid=415_64 "Search or create a tag"
+        uid=415_65 tab "COMMENTS" selectable selected
+        uid=415_66 tab "ACTIVITY" selectable
+        uid=415_67 form
+          uid=415_68 textbox "Write a comment" multiline
+          uid=415_69 button disableable disabled
+          uid=415_70 button disableable disabled
+    uid=415_71 region "Technical metadata and formats"
+      uid=415_72 DisclosureTriangle "Picture Info" expandable expanded
+      uid=415_73 "Dimensions"
+      uid=415_74 "1,922 × 2,883"
+      uid=415_75 "Format"
+      uid=415_76 "JPEG"
+      uid=415_77 "Color profile"
+      uid=415_78 "sRGB"
+      uid=415_79 "Bit depth per channel"
+      uid=415_80 "8"
+      uid=415_81 DisclosureTriangle "Additional formats 5" expandable expanded
+      uid=415_82 radio "Thumbnail · JPEG"
+      uid=415_83 "Thumbnail "
+      uid=415_84 "· JPEG"
+      uid=415_85 "67×100"
+      uid=415_86 "sRGB · 8 bit"
+      uid=415_87 "55 KB"
+      uid=415_88 button "Download Thumbnail"
+      uid=415_89 radio "Small · JPEG"
+      uid=415_90 "Small "
+      uid=415_91 "· JPEG"
+      uid=415_92 "373×560"
+      uid=415_93 "sRGB · 8 bit"
+      uid=415_94 "200.4 KB"
+      uid=415_95 button "Download Small"
+      uid=415_96 radio "Medium · JPEG"
+      uid=415_97 "Medium "
+      uid=415_98 "· JPEG"
+      uid=415_99 "667×1,000"
+      uid=415_100 "sRGB · 8 bit"
+      uid=415_101 "459.6 KB"
+      uid=415_102 button "Download Medium"
+      uid=415_103 radio "FullHD · JPEG" checked
+      uid=415_104 "FullHD "
+      uid=415_105 "· JPEG"
+      uid=415_106 "1,280×1,920"
+      uid=415_107 "sRGB · 8 bit"
+      uid=415_108 "1.4 MB"
+      uid=415_109 button "Download FullHD"
+      uid=415_110 radio "OriginalJpeg · JPEG"
+      uid=415_111 "OriginalJpeg "
+      uid=415_112 "· JPEG"
+      uid=415_113 "1,922×2,883"
+      uid=415_114 "sRGB · 8 bit"
+      uid=415_115 "2.6 MB"
+      uid=415_116 button "Download OriginalJpeg"
+      uid=415_117 radio "Original file · JPEG"
+      uid=415_118 "Original file "
+      uid=415_119 "· JPEG"
+      uid=415_120 "1,922×2,883"
+      uid=415_121 "sRGB · 8 bit"
+      uid=415_122 "2.4 MB"
+      uid=415_123 button "Download original file"
+      uid=415_124 DisclosureTriangle "EXIF" expandable expanded
+      uid=415_125 "Color space"
+      uid=415_126 "sRGB"
+      uid=415_127 "Date taken"
+      uid=415_128 "Jul 11, 2024, 4:12 AM"
+      uid=415_129 "White balance"
+      uid=415_130 "Auto"
+      uid=415_131 "Aperture"
+      uid=415_132 "f/8"
+      uid=415_133 "Exposure"
+      uid=415_134 "1/500 s"
+      uid=415_135 "Horizontal resolution"
+      uid=415_136 "300 dpi"
+      uid=415_137 "ISO"
+      uid=415_138 "250"
+      uid=415_139 "Vertical resolution"
+      uid=415_140 "300 dpi"
+      uid=415_141 "Focal Length"
+      uid=415_142 "500.0 mm"
+      uid=415_143 DisclosureTriangle "IPTC Not available" expandable
+  uid=408_54 generic live="polite" relevant="additions text"
+  uid=417_0 dialog "Document actions"
+    uid=417_1 DisclosureTriangle "✧ AI Metadata" description="AI Metadata" expandable expanded focusable focused
+    uid=418_0 button "Update metadata"
+    uid=418_1 button "Enhance metadata"
+    uid=418_2 button "Show document information"
+    uid=417_2 button "Add to Clipboard"
+    uid=417_3 button "Export XML"
+    uid=417_4 button "Export ZIP"
+    uid=418_3 button "Versions" expandable
+    uid=418_4 button "Start Process"
+    uid=417_5 button "Notify Me"
+    uid=417_6 button "Lock"
+    uid=417_7 button "Download"
+    uid=417_8 button "Publish document"

@@ -1,0 +1,149 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=451_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/InteractionResults/InteractionResults-Red-throated%20Bird%20Flight?view=view"
+  uid=451_1 complementary "Application navigation"
+    uid=451_2 button "Dashboard"
+    uid=451_3 navigation "Main navigation"
+      uid=451_4 button "AI search" expandable
+      uid=451_5 button "Browse" expandable
+      uid=451_6 button "Recently Viewed" expandable
+      uid=451_7 button "Search" expandable
+      uid=451_8 button "Expired" expandable
+      uid=451_9 button "Assets" expandable
+      uid=451_10 button "Tasks" expandable
+      uid=451_11 button "Favorites" expandable
+      uid=451_12 button "Collections" expandable
+      uid=451_13 button "Personal Space" expandable
+      uid=451_14 button "Clipboard" expandable
+      uid=451_15 button "Trash" expandable
+    uid=451_16 navigation "Account and administration"
+      uid=451_17 button "Administration" expandable
+      uid=451_18 button "User menu" expandable
+  uid=451_19 banner "Application actions"
+    uid=451_20 button "Quick Search" expandable haspopup="dialog"
+    uid=451_21 generic
+      uid=451_22 button "Add Content" haspopup="dialog"
+  uid=451_23 region "Application activity"
+    uid=451_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=451_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=451_26 banner
+    uid=451_27 heading "InteractionResults-Red-throated Bird Flight" level="1"
+    uid=451_28 navigation "Document location"
+      uid=451_29 link "InteractionResults" url="https://demo.maretha.io/nuxeo/ng/browse/InteractionResults"
+    uid=451_31 button "Edit document"
+    uid=451_32 button "Add to Collection"
+    uid=451_33 button "Share"
+    uid=451_34 button "Move to trash"
+    uid=451_35 button "Add to Favorites"
+    uid=451_36 button "More actions" expandable haspopup="dialog"
+  uid=451_37 tablist "Document views" orientation="horizontal"
+    uid=451_38 tab "View" selectable selected
+    uid=451_39 tab "AI" selectable
+    uid=451_40 tab "Permissions" selectable
+    uid=451_41 tab "History" selectable
+  uid=451_42 tabpanel "View"
+    uid=451_43 heading "Generate Birdwatching Location and Itinerary" level="3"
+    uid=451_44 "2025-08-28 19:41:33"
+    uid=451_45 "Sure, I can help with that."
+    uid=451_46 LineBreak "
+"
+    uid=451_47 "That is a male **Siberian Rubythroat** (*Luscinia calliope*). During the breeding season, the Siberian Rubythroat is found in dense, damp taiga forests with thick undergrowth, often near water. You are most likely to see them in Siberia, Russia."
+    uid=451_48 LineBreak "
+"
+    uid=451_49 "Here is a sample itinerary to make the most of your bird watching trip."
+    uid=451_50 LineBreak "
+"
+    uid=451_51 "Day"
+    uid=451_52 "Location"
+    uid=451_53 "Activities"
+    uid=451_54 "Day 1"
+    uid=451_55 "Arrival in Irkutsk, Russia"
+    uid=451_56 "Arrive at Irkutsk International Airport (IKT)."
+    uid=451_57 LineBreak "
+"
+    uid=451_58 "Transfer to your hotel in Irkutsk."
+    uid=451_59 LineBreak "
+"
+    uid=451_60 "Take a city tour to see local attractions."
+    uid=451_61 "Day 2"
+    uid=451_62 "Lake Baikal – Listvyanka"
+    uid=451_63 "Travel to Listvyanka, a settlement on the shore of Lake Baikal."
+    uid=451_64 LineBreak "
+"
+    uid=451_65 "Visit the Baikal Museum to learn about the lake's unique ecosystem."
+    uid=451_66 LineBreak "
+"
+    uid=451_67 "Enjoy a boat trip on Lake Baikal."
+    uid=451_68 "Day 3"
+    uid=451_69 "Lake Baikal – Birdwatching"
+    uid=451_70 "Explore the forests and wetlands around Lake Baikal for birdwatching."
+    uid=451_71 LineBreak "
+"
+    uid=451_72 "Focus on areas with dense undergrowth and proximity to water."
+    uid=451_73 LineBreak "
+"
+    uid=451_74 "Look for Siberian Rubythroats and other local bird species."
+    uid=451_75 "Day 4"
+    uid=451_76 "Ulan-Ude"
+    uid=451_77 "Take a train or bus to Ulan-Ude, the capital of Buryatia."
+    uid=451_78 LineBreak "
+"
+    uid=451_79 "Check into your hotel."
+    uid=451_80 LineBreak "
+"
+    uid=451_81 "Explore the city."
+    uid=451_82 "Day 5"
+    uid=451_83 "Ivolginsky Datsan"
+    uid=451_84 "Visit the Ivolginsky Datsan, a Buddhist monastery located near Ulan-Ude."
+    uid=451_85 LineBreak "
+"
+    uid=451_86 "Enjoy the serene surroundings."
+    uid=451_87 "Day 6"
+    uid=451_88 "Selenga River Delta"
+    uid=451_89 "Travel to the Selenga River Delta, an important wetland area."
+    uid=451_90 LineBreak "
+"
+    uid=451_91 "Spend the day birdwatching in the delta."
+    uid=451_92 LineBreak "
+"
+    uid=451_93 "Continue to search for Siberian Rubythroats and other wetland species."
+    uid=451_94 "Day 7"
+    uid=451_95 "Departure"
+    uid=451_96 "Transfer to Ulan-Ude Airport (UUD) for your flight home."
+    uid=451_97 LineBreak "
+"
+    uid=451_98 "Remember to pack appropriate clothing and gear for the Siberian climate, including waterproof layers, warm clothing, and sturdy hiking boots. Don't forget to bring binoculars and a field guide for bird identification. Also, make sure to check visa requirements and health advisories before traveling to Russia."
+    uid=451_99 LineBreak "
+"
+    uid=451_100 LineBreak "
+"
+    uid=451_101 main
+      uid=451_102 "This document doesn't have a main file attached to it."
+    uid=451_103 complementary
+      uid=451_104 heading "Metadata" level="2"
+      uid=451_105 button "Hide metadata"
+      uid=451_106 region "Document details"
+        uid=451_107 region "Document information"
+          uid=451_108 "State"
+          uid=451_109 "Undefined"
+          uid=451_110 "Last modified"
+          uid=451_111 "August 28, 2025"
+          uid=451_112 "Created"
+          uid=451_113 "August 28, 2025"
+          uid=451_114 "By"
+          uid=451_115 link "Ethan Steiner" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Ethan%20Steiner"
+          uid=451_117 "Contributors"
+          uid=451_118 link "Ethan Steiner" url="https://demo.maretha.io/nuxeo/ng/page/user?id=EthanAdmin"
+        uid=451_120 "Related Document"
+        uid=451_121 link "Red-throated Bird Flight" url="https://demo.maretha.io/nuxeo/ng/browse/documents/6ceeabb6-c464-4369-adf6-bdeb966ffcd9"
+        uid=451_123 form
+          uid=451_124 "Title"
+          uid=451_125 "InteractionResults-Red-throated Bird Flight"
+        uid=451_126 DisclosureTriangle "Collections" expandable
+        uid=451_127 tab "COMMENTS" selectable selected
+        uid=451_128 tab "ACTIVITY" selectable
+        uid=451_129 form
+          uid=451_130 textbox "Write a comment" multiline
+          uid=451_131 button disableable disabled
+          uid=451_132 button disableable disabled
+  uid=451_133 generic live="polite" relevant="additions text"

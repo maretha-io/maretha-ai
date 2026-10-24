@@ -1,0 +1,81 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=439_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/settings?admin=maretha-cp-interactions"
+  uid=439_1 complementary "Application navigation"
+    uid=439_2 button "Dashboard"
+    uid=439_3 navigation "Main navigation"
+      uid=439_4 button "AI search" expandable
+      uid=439_5 button "Browse" expandable
+      uid=439_6 button "Recently Viewed" expandable
+      uid=439_7 button "Search" expandable
+      uid=439_8 button "Expired" expandable
+      uid=439_9 button "Assets" expandable
+      uid=439_10 button "Tasks" expandable
+      uid=439_11 button "Favorites" expandable
+      uid=439_12 button "Collections" expandable
+      uid=439_13 button "Personal Space" expandable
+      uid=439_14 button "Clipboard" expandable
+      uid=439_15 button "Trash" expandable
+    uid=439_16 navigation "Account and administration"
+      uid=439_17 button "Administration" expandable expanded
+      uid=439_18 button "User menu" expandable
+  uid=441_0 region "Navigation details"
+    uid=441_1 banner
+      uid=441_2 heading "Administration" level="6"
+    uid=441_3 navigation "Administration"
+      uid=441_4 button "Analytics"
+      uid=441_5 button "Users & Groups"
+      uid=441_6 button "Vocabularies"
+      uid=441_7 button "Audit"
+      uid=441_8 button "Cloud Services"
+      uid=441_9 button "NXQL Search"
+      uid=441_10 button "Metadata layouts"
+      uid=441_11 button "AI Settings"
+  uid=441_12 navigation "Drawer controls"
+    uid=441_13 separator "Resize navigation drawer" description="Drag to resize. Use arrow keys to adjust; press Enter or double-click to reset." orientation="vertical" value="298" valuemax="640" valuemin="200" valuetext=""
+    uid=441_14 button "Close navigation"
+  uid=439_19 banner "Application actions"
+    uid=439_20 button "Quick Search" expandable haspopup="dialog"
+  uid=439_23 region "Application activity"
+    uid=439_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=439_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=442_0 tabpanel "AI Settings"
+    uid=442_1 banner
+      uid=442_2 heading "AI Settings" level="1"
+    uid=442_3 region "AI Interactions Management"
+      uid=442_4 heading "AI Interactions Management" level="1"
+      uid=442_5 "Manage interactions, metadata and document automation."
+      uid=442_6 button "Save changes" disableable disabled
+      uid=442_7 button "Discard changes" disableable disabled
+      uid=442_8 button "Reload" description="Reload saved settings"
+      uid=442_9 navigation "AI settings sections"
+        uid=442_10 button "Interactions"
+        uid=442_11 button "Metadata"
+        uid=442_12 button "Events"
+        uid=442_13 button "Settings" focusable focused
+      uid=442_14 "AI settings editor"
+      uid=445_0 region "AI and search settings"
+        uid=445_1 "AI settings"
+        uid=445_2 "Embedding model"
+        uid=445_3 textbox "Embedding model Model used to generate text vectors." value="amazon.titan-embed-text-v2:0"
+        uid=445_4 "Model used to generate text vectors."
+        uid=445_5 "Supported MIME types"
+        uid=445_6 textbox "Supported MIME types Comma-separated content types."
+        uid=445_7 "Comma-separated content types."
+        uid=445_8 "Directory bucket size"
+        uid=445_9 spinbutton "Directory bucket size Maximum vocabulary values sent in each request." value="100" valuemax="0" valuemin="1" valuetext="100"
+        uid=445_10 "Maximum vocabulary values sent in each request."
+        uid=445_11 checkbox "Enable S3 access"
+        uid=445_12 "Elasticsearch query settings"
+        uid=445_13 "BOOST"
+        uid=445_14 textbox "BOOST" value="1.0"
+        uid=445_15 "TEXT_WEIGHT"
+        uid=445_16 textbox "TEXT_WEIGHT" value="1.0"
+        uid=445_17 "IMAGE_WEIGHT"
+        uid=445_18 textbox "IMAGE_WEIGHT" value="1.0"
+        uid=445_19 "SCORE_MODE"
+        uid=445_20 textbox "SCORE_MODE" value="AVG"
+        uid=445_21 "BOOST_MODE"
+        uid=445_22 textbox "BOOST_MODE" value="AVG"
+  uid=439_194 generic live="polite" relevant="additions text"
+  uid=440_40 generic atomic live="polite" relevant="additions text"

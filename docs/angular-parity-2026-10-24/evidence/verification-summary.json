@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-10-24T21:52:44.682935+00:00",
+  "checks": [
+    {
+      "check": "Core Angular regression suite",
+      "tests": 1457,
+      "result": "passed",
+      "sourceLog": "cp-host-tests-final.log"
+    },
+    {
+      "check": "Search regression tests",
+      "tests": 69,
+      "result": "passed",
+      "sourceLog": "cp-search-tests-final.log"
+    },
+    {
+      "check": "Picture binary editor focused tests",
+      "tests": 26,
+      "result": "passed",
+      "sourceLog": "cp-picture-fields-tests.log"
+    },
+    {
+      "check": "Generic schema/profile focused tests",
+      "tests": 75,
+      "result": "passed",
+      "sourceLog": "cp-schema-focused-tests.log"
+    },
+    {
+      "check": "Persisted vocabulary label focused tests",
+      "tests": 70,
+      "result": "passed",
+      "sourceLog": "cp-vocabulary-label-tests.log"
+    },
+    {
+      "check": "CP library and helper tests",
+      "tests": 32,
+      "result": "passed",
+      "sourceLog": "cp-assembly-final6.log"
+    },
+    {
+      "check": "Angular server/package tests",
+      "tests": 66,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "result": "passed",
+      "sourceLog": "cp-assembly-final6.log"
+    },
+    {
+      "check": "CP Maven reactor",
+      "tests": 103,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "result": "passed",
+      "sourceLog": "cp-assembly-final6.log"
+    },
+    {
+      "check": "SDK compatibility guards",
+      "tests": 67,
+      "result": "passed",
+      "evidence": "Release operator confirmed"
+    },
+    {
+      "check": "Rich HTML sanitizer, links, JSON fallback, XSS and search primary contrast states",
+      "result": "passed",
+      "evidence": "browser-safety-checks.txt"
+    }
+  ],
+  "note": "Counts refer to separate, potentially overlapping suites; no aggregate total is implied. Full regression suites preceded the later focused schema/vocabulary fixes. Full Maven logs are not included.",
+  "productionBuilds": {
+    "bareCoreInitial": "5.99 MB",
+    "bareCoreHardLimit": "6 MB",
+    "cpComposedInitial": "6.17 MB",
+    "cpComposedHardLimit": "6.5 MB",
+    "cpComposedWarningThreshold": "6 MB"
+  },
+  "liveAcceptance": "Final r4 rollout and smoke checks passed; temporary fixtures deleted, original source and response preserved.",
+  "liveEvidence": "qa-summary.json"
+}
