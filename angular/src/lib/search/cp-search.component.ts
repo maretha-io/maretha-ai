@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
   DrawerItemComponent, ResultsProjectionComponent, ResultsProjectionTemplateDirective,
-  WebUiAppState, WebUiSlotComponent, RESULTS_COMMAND_GATEWAY,
+  WebUiAppState, WebUiSlotComponent, WebUiIcons, RESULTS_COMMAND_GATEWAY,
   type DocumentActionContext, type DrawerContext, type PageContext, type ResultsColumnLayout,
   type ResultsProjectionColumn, type ResultsProjectionMode, type ResultsProjectionRow,
   type ResultsSelectionContext, type ResultsToolbarContext,
@@ -16,6 +16,8 @@ import { CpApiService } from '../cp-api.service';
 import type { CpDocument } from '../cp-models';
 import { cpConfidence, cpScore, cpSearchParameters, cpSimilarityVector, type CpSearchCriteria } from './search-state';
 import { CpSavedSearchesComponent } from './cp-saved-searches.component';
+import { CP_SEARCH_ICONS } from './cp-search-icons';
+import { CpSearchControlIconComponent } from './cp-search-control-icon.component';
 
 /** Queue state survives opening a result and is reset when the signed-in user changes. */
 @Injectable({ providedIn: 'root' })
@@ -30,17 +32,22 @@ class CpSearchSession {
 
 @Component({
   selector: 'cp-search-item', standalone: true, imports: [DrawerItemComponent],
-  template: '<nx-drawer-item [context]="context()" pageId="find" label="AI search" icon="nuxeo:search" />',
+  template: '<nx-drawer-item [context]="context()" pageId="find" label="AI search" icon="cp:ai-search" />',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CpSearchItemComponent { readonly context = input.required<DrawerContext>(); }
+export class CpSearchItemComponent {
+  readonly context = input.required<DrawerContext>();
+  constructor() {
+    inject(DestroyRef).onDestroy(inject(WebUiIcons).register('io.maretha.cp.search', CP_SEARCH_ICONS));
+  }
+}
 
 @Component({
-  selector: 'cp-search-drawer', standalone: true, imports: [FormsModule, RouterLink, CpSavedSearchesComponent],
+  selector: 'cp-search-drawer', standalone: true, imports: [FormsModule, RouterLink, CpSavedSearchesComponent, CpSearchControlIconComponent],
   styleUrls: ['./cp-search-controls.css'],
   template: `<h2>AI search</h2>
     <cp-saved-searches [params]="savedParams" (selected)="applySaved($event)" />
-    <button class="queue-switch" type="button" (click)="toggleQueue()" [attr.aria-label]="queue() ? 'Switch to Filters View' : 'Switch to Queue View'">{{ queue() ? 'Switch to Filters View' : 'Switch to Queue View' }}</button>
+    <button class="queue-switch" type="button" (click)="toggleQueue()" [attr.aria-label]="queue() ? 'Switch to Filters View' : 'Switch to Queue View'"><cp-search-control-icon [kind]="queue() ? 'filter' : 'queue'" />{{ queue() ? 'Switch to Filters View' : 'Switch to Queue View' }}</button>
     <form (ngSubmit)="search()" [hidden]="queue()">
     <label for="cp-vector-query">What are you looking for?</label>
     <input id="cp-vector-query" name="vectorQuery" type="search" [(ngModel)]="query" (ngModelChange)="scheduleSearch()" autofocus />
@@ -168,20 +175,20 @@ export class CpSimilarDocumentsComponent {
 @Component({
   selector: 'cp-embedding-results', standalone: true,
   styleUrls: ['./cp-search-controls.css'],
-  imports: [FormsModule, RouterLink, DatePipe, ResultsProjectionComponent, ResultsProjectionTemplateDirective, WebUiSlotComponent],
+  imports: [FormsModule, RouterLink, DatePipe, ResultsProjectionComponent, ResultsProjectionTemplateDirective, WebUiSlotComponent, CpSearchControlIconComponent],
   template: `
     <div class="tools">
       <span role="status">{{ total() }} results · {{ selection().length }} selected</span>
-      <label>Display <select [ngModel]="mode()" (ngModelChange)="setMode($event)"><option value="grid">Grid</option><option value="table">Table</option></select></label>
-      <label>Sort by <select [ngModel]="sortBy()" (ngModelChange)="sort($event)">
+      <label><cp-search-control-icon [kind]="mode() === 'grid' ? 'grid' : 'table'" />Display <select [ngModel]="mode()" (ngModelChange)="setMode($event)"><option value="grid">Grid</option><option value="table">Table</option></select></label>
+      <label><cp-search-control-icon kind="sort" />Sort by <select [ngModel]="sortBy()" (ngModelChange)="sort($event)">
         <option value="contextParameters.relevance_score">Relevance</option><option value="dc:title">Title</option>
         <option value="dc:created">Created</option><option value="dc:modified">Modified</option>
       </select></label>
-      <button type="button" (click)="direction() === 'asc' ? direction.set('desc') : direction.set('asc'); reload()">{{ direction() === 'asc' ? 'Ascending' : 'Descending' }}</button>
-      <details><summary>Columns</summary>@for (column of allColumns; track column.id) {
+      <button type="button" (click)="direction() === 'asc' ? direction.set('desc') : direction.set('asc'); reload()" [attr.title]="direction() === 'asc' ? 'Sort ascending' : 'Sort descending'"><cp-search-control-icon [kind]="direction() === 'asc' ? 'ascending' : 'descending'" />{{ direction() === 'asc' ? 'Ascending' : 'Descending' }}</button>
+      <details><summary><cp-search-control-icon kind="columns" />Columns</summary>@for (column of allColumns; track column.id) {
         <label><input type="checkbox" [checked]="!hiddenColumns().includes(column.id)" (change)="toggleColumn(column.id)" />{{ column.label }}</label>
       }</details>
-      <button type="button" (click)="reload()" [disabled]="loading()">Refresh</button>
+      <button type="button" (click)="reload()" [disabled]="loading()" title="Refresh results"><cp-search-control-icon kind="refresh" />Refresh</button>
     </div>
     @if (error()) { <p role="alert">{{ error() }}</p><button type="button" (click)="reload()">Retry</button> }
     @if (!hasQuery()) { <p role="status">{{ criteria().vectorField === 'text' ? 'Enter what you are looking for in AI search.' : 'This document has no embeddings for similarity search.' }}</p> }

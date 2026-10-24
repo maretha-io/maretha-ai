@@ -120,3 +120,15 @@
 :host summary {
   cursor: pointer;
 }
+
+/* Match the original results toolbar's visual cues without changing its controls. */
+:host .tools button,
+:host .tools summary,
+:host .queue-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+:host .tools summary { min-height: 36px; }
+:host .tools cp-search-control-icon { color: var(--nuxeo-text-secondary, #62626d); }
+:host .tools button:hover:not(:disabled) cp-search-control-icon { color: var(--nuxeo-primary-color, #006bff); }
