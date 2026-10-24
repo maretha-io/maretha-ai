@@ -1,0 +1,59 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=408_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature/2022's%20Best%20Photos/Birdy?view=AiTab"
+  uid=408_1 complementary "Application navigation"
+    uid=408_2 button "Dashboard"
+    uid=408_3 navigation "Main navigation"
+      uid=408_4 button "AI search" expandable
+      uid=408_5 button "Browse" expandable
+      uid=408_6 button "Recently Viewed" expandable
+      uid=408_7 button "Search" expandable
+      uid=408_8 button "Expired" expandable
+      uid=408_9 button "Assets" expandable
+      uid=408_10 button "Tasks" expandable
+      uid=408_11 button "Favorites" expandable
+      uid=408_12 button "Collections" expandable
+      uid=408_13 button "Personal Space" expandable
+      uid=408_14 button "Clipboard" expandable
+      uid=408_15 button "Trash" expandable
+    uid=408_16 navigation "Account and administration"
+      uid=408_17 button "Administration" expandable
+      uid=408_18 button "User menu" expandable
+  uid=408_19 banner "Application actions"
+    uid=408_20 button "Quick Search" expandable haspopup="dialog"
+    uid=408_21 generic
+      uid=408_22 button "Add Content" haspopup="dialog"
+  uid=408_23 region "Application activity"
+    uid=408_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=408_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=408_26 banner
+    uid=408_27 heading "Birdy" level="1"
+    uid=408_28 navigation "Document location"
+      uid=408_29 link "Domain" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain"
+      uid=408_31 link "Workspaces" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces"
+      uid=408_33 link "Nature" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature"
+      uid=408_35 link "2022's Best Photos" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature/2022's%20Best%20Photos"
+    uid=408_37 button "Edit document"
+    uid=408_38 button "Add to Collection"
+    uid=408_39 button "Share"
+    uid=408_40 button "Move to trash"
+    uid=408_41 button "Add to Favorites"
+    uid=408_42 button "More actions" expandable haspopup="dialog"
+  uid=408_43 tablist "Document views" orientation="horizontal"
+    uid=408_44 tab "View" selectable
+    uid=408_45 tab "AI" selectable selected
+    uid=408_46 tab "More Like This" selectable
+    uid=408_47 tab "Permissions" selectable
+    uid=408_48 tab "History" selectable
+    uid=408_49 tab "Publishing" selectable
+  uid=408_50 tabpanel "AI"
+    uid=408_51 DisclosureTriangle "Legal Analyst - Chat Discuss an image or document with an AI legal analyst that highlights potential legal risks to identify problems early and determine when further legal review is needed" expandable
+    uid=408_52 DisclosureTriangle "Run interactions Execute different interactions against this document" expandable expanded focusable focused
+    uid=409_0 "Select AI Interaction"
+    uid=409_1 combobox "Select AI Interaction" expandable haspopup="menu" value="CTA Hotspot Detection"
+      uid=409_2 option "CTA Hotspot Detection" selected
+      uid=409_3 option "Competitive Intelligence Analyst"
+      uid=409_4 option "Brand Design Guidelines Compliance"
+    uid=409_5 button "Run interaction" description="Run interaction"
+    uid=408_53 DisclosureTriangle "Saved interactions Your previously saved interactions" expandable
+  uid=408_54 generic live="polite" relevant="additions text"

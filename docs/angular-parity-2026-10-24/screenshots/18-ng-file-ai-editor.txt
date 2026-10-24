@@ -1,0 +1,218 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=499_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Adrian/Images/Surgical_Gloves_Catalog_Brochure_2021-05.pdf?view=view"
+  uid=499_1 complementary "Application navigation"
+    uid=499_2 button "Dashboard"
+    uid=499_3 navigation "Main navigation"
+      uid=499_4 button "AI search" expandable
+      uid=499_5 button "Browse" expandable
+      uid=499_6 button "Recently Viewed" expandable
+      uid=499_7 button "Search" expandable
+      uid=499_8 button "Expired" expandable
+      uid=499_9 button "Assets" expandable
+      uid=499_10 button "Tasks" expandable
+      uid=499_11 button "Favorites" expandable
+      uid=499_12 button "Collections" expandable
+      uid=499_13 button "Personal Space" expandable
+      uid=499_14 button "Clipboard" expandable
+      uid=499_15 button "Trash" expandable
+    uid=499_16 navigation "Account and administration"
+      uid=499_17 button "Administration" expandable
+      uid=499_18 button "User menu" expandable
+  uid=499_19 banner "Application actions"
+    uid=499_20 button "Quick Search" expandable haspopup="dialog"
+    uid=499_21 generic
+      uid=499_22 button "Add Content" haspopup="dialog"
+  uid=499_23 region "Application activity"
+    uid=499_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=499_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=499_26 banner
+    uid=499_27 heading "McKesson Surgical Gloves" level="1"
+    uid=499_28 navigation "Document location"
+      uid=499_29 link "Domain" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain"
+      uid=499_31 link "Workspaces" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces"
+      uid=499_33 link "Adrian" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Adrian"
+      uid=499_35 link "Images" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Adrian/Images"
+    uid=499_37 button "Edit document"
+    uid=499_38 button "Add to Collection"
+    uid=499_39 button "Share"
+    uid=499_40 button "Move to trash"
+    uid=499_41 button "Add to Favorites"
+    uid=499_42 button "More actions" expandable haspopup="dialog"
+  uid=499_43 tablist "Document views" orientation="horizontal"
+    uid=499_44 tab "View" selectable selected
+    uid=499_45 tab "AI" selectable
+    uid=499_46 tab "More Like This" selectable
+    uid=499_47 tab "Permissions" selectable
+    uid=499_48 tab "History" selectable
+    uid=499_49 tab "Publishing" selectable
+  uid=499_50 tabpanel "View"
+    uid=499_51 main
+      uid=499_52 button "Fullscreen"
+      uid=499_53 group "Zoom in/out" haspopup="menu"
+      uid=500_0 region "Page ⁨1⁩"
+        uid=500_1 "Find the right fit with"
+        uid=500_2 "McKesson Surgical Gloves"
+        uid=500_3 generic
+      uid=500_4 region "Page ⁨2⁩"
+        uid=500_5 "At McKesson Medical-Surgical, we understand that today’s ambulatory"
+        uid=500_6 "surgery center and physician office settings have unique business and"
+        uid=500_7 "product needs. That’s why we offer a wide variety of quality, cost-effective"
+        uid=500_8 "products within our own McKesson Brands portfolio, including surgical"
+        uid=500_9 "gloves. Our selection of surgical gloves features the tactile sensitivity and"
+        uid=500_10 "dexterity you want in a glove, while offering the protection you need."
+        uid=500_11 "Never Compromise on Care"
+        uid=500_12 " "
+        uid=500_13 "SM"
+        uid=500_14 "With McKesson Brands, you’ll never have to compromise. We deliver"
+        uid=500_15 "quality products at competitive prices, backed by our 100%"
+        uid=500_16 "satisfaction guarantee. We have decades of experience in the"
+        uid=500_17 "market, and we offer you support and work to help ensure you"
+        uid=500_18 "have the products you need, when you need them — making"
+        uid=500_19 "it even easier for you to provide the best care for your patients."
+        uid=500_20 generic
+      uid=500_21 region "Page ⁨3⁩"
+        uid=500_22 "TABLE OF CONTENTS"
+        uid=500_23 "Surgical Gloves Comparison Chart"
+        uid=500_24 " "
+        uid=500_25 "3-4"
+        uid=500_26 "McKesson Perry® Latex Surgical Gloves"
+        uid=500_27 " "
+        uid=500_28 "5"
+        uid=500_29 "McKesson Perry® AquaTouch™ Latex Surgical Gloves"
+        uid=500_30 " "
+        uid=500_31 "6"
+        uid=500_32 "McKesson Perry® Micro-Thin Latex Surgical Gloves"
+        uid=500_33 " "
+        uid=500_34 "7"
+        uid=500_35 "McKesson Perry® Polyisoprene Surgical Gloves"
+        uid=500_36 " "
+        uid=500_37 "8"
+        uid=500_38 "McKesson Perry® Neoprene Surgical Gloves"
+        uid=500_39 " "
+        uid=500_40 "9"
+        uid=500_41 "McKesson Perry® Neoprene Sensitive Surgical Gloves"
+        uid=500_42 " "
+        uid=500_43 "10"
+        uid=500_44 generic
+      uid=500_45 region "Page ⁨4⁩"
+      uid=500_46 region "Page ⁨5⁩"
+      uid=500_47 region "Page ⁨6⁩"
+      uid=500_48 region "Page ⁨7⁩"
+      uid=500_49 region "Page ⁨8⁩"
+      uid=500_50 region "Page ⁨9⁩"
+      uid=500_51 region "Page ⁨10⁩"
+      uid=500_52 region "Page ⁨11⁩"
+      uid=500_53 region "Page ⁨12⁩"
+      uid=499_54 "Surgical_Gloves_Catalog_Brochure_2021-05.pdf"
+      uid=499_55 "1 MB"
+      uid=499_56 button "Download file" description="Download file"
+      uid=499_57 button "Preview" description="Preview"
+    uid=499_58 complementary
+      uid=499_59 heading "Metadata" level="2"
+      uid=499_60 button "Edit metadata"
+      uid=499_61 DisclosureTriangle "Metadata settings" description="Metadata settings" expandable
+      uid=499_62 button "Hide metadata"
+      uid=499_63 region "Document details"
+        uid=499_64 region "Document information"
+          uid=499_65 "State"
+          uid=499_66 "Project"
+          uid=499_67 "Version"
+          uid=499_68 DisclosureTriangle "0.0 " expandable
+          uid=499_69 "Last modified"
+          uid=499_70 "June 4, 2025"
+          uid=499_71 "Created"
+          uid=499_72 "April 24, 2025"
+          uid=499_73 "By"
+          uid=499_74 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Administrator"
+          uid=499_76 "Contributors"
+          uid=499_77 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Administrator"
+        uid=499_79 heading "Details" level="3"
+        uid=499_80 button "Edit metadata"
+        uid=499_81 "Title"
+        uid=499_82 " McKesson Surgical Gloves "
+        uid=499_83 "Description"
+        uid=499_84 " McKesson Surgical Gloves product catalog "
+        uid=499_85 "Nature"
+        uid=499_86 " label.directories.nature.booklet "
+        uid=499_87 region "Attachments"
+          uid=499_88 heading "Attachments" level="3"
+          uid=499_89 "Click to upload files"
+          uid=499_90 button "Click to upload files" value="No file chosen"
+        uid=499_91 DisclosureTriangle "Collections" expandable
+        uid=499_92 heading "Tags" level="5"
+        uid=499_93 "Perry"
+        uid=499_94 button "Remove Perry"
+        uid=499_95 "Polyisoprene"
+        uid=499_96 button "Remove Polyisoprene"
+        uid=499_97 "Neoprene"
+        uid=499_98 button "Remove Neoprene"
+        uid=499_99 "McKesson"
+        uid=499_100 button "Remove McKesson"
+        uid=499_101 "AquaTouch"
+        uid=499_102 button "Remove AquaTouch"
+        uid=499_103 "surgical gloves"
+        uid=499_104 button "Remove surgical gloves"
+        uid=499_105 "Micro-Thin"
+        uid=499_106 button "Remove Micro-Thin"
+        uid=499_107 "Latex"
+        uid=499_108 button "Remove Latex"
+        uid=499_109 combobox "Search or create a tag" autocomplete="list" expandable haspopup="listbox"
+        uid=499_110 status atomic live="polite" relevant="additions text"
+        uid=499_111 "Search or create a tag"
+        uid=499_112 tab "COMMENTS" selectable selected
+        uid=499_113 tab "ACTIVITY" selectable
+        uid=499_114 form
+          uid=499_115 textbox "Write a comment" multiline
+          uid=499_116 button disableable disabled
+          uid=499_117 button disableable disabled
+  uid=499_118 generic live="polite" relevant="additions text"
+  uid=500_54 dialog focusable focused modal
+    uid=500_55 heading "Edit File" level="2"
+    uid=500_56 button "Close"
+    uid=500_57 status atomic live="polite" relevant="additions text"
+    uid=500_58 alert atomic live="assertive" relevant="additions text"
+    uid=500_59 form
+      uid=500_60 "Title *"
+      uid=500_61 textbox "Title *" required value="McKesson Surgical Gloves"
+      uid=500_62 "Description"
+      uid=500_63 textbox "Description" multiline value="McKesson Surgical Gloves product catalog"
+      uid=500_64 "Nature"
+      uid=500_65 "Booklet"
+      uid=500_66 combobox "Nature" autocomplete="list" expandable haspopup="listbox"
+      uid=500_67 button "Clear all"
+      uid=500_68 status atomic live="polite" relevant="additions text"
+      uid=500_69 "Subjects"
+      uid=500_70 combobox "Subjects" autocomplete="list" expandable haspopup="listbox"
+      uid=500_71 status atomic live="polite" relevant="additions text"
+      uid=500_72 "Coverage"
+      uid=500_73 combobox "Coverage" autocomplete="list" expandable haspopup="listbox"
+      uid=500_74 status atomic live="polite" relevant="additions text"
+      uid=500_75 "Expiration date"
+      uid=500_76 textbox "Expiration date"
+      uid=500_77 "Alt Text"
+      uid=500_78 textbox "Alt Text"
+      uid=500_79 "Brand"
+      uid=500_80 textbox "Brand"
+      uid=500_81 "SEO"
+      uid=500_82 textbox "SEO" multiline
+      uid=500_83 "Restrictions"
+      uid=500_84 textbox "Restrictions" multiline
+      uid=500_85 "Elements Detected"
+      uid=500_86 button "Add Elements Detected"
+      uid=500_87 "Smart Crops"
+      uid=500_88 button "Add Smart Crops"
+      uid=500_89 "Classification"
+      uid=500_90 combobox "Classification" autocomplete="list" expandable haspopup="listbox"
+      uid=500_91 button "Classification matches" expandable
+      uid=500_92 "Safety Text"
+      uid=500_93 textbox "Safety Text" multiline
+      uid=500_94 "Safety"
+      uid=500_95 combobox "Safety" autocomplete="list" expandable haspopup="listbox"
+      uid=500_96 button "Safety matches" expandable
+      uid=500_97 "Image Scene"
+      uid=500_98 combobox "Image Scene" autocomplete="list" expandable haspopup="listbox"
+      uid=500_99 button "Image Scene matches" expandable
+    uid=500_100 button "Cancel"
+    uid=500_101 button "Save" disableable disabled
+  uid=500_102 generic atomic live="polite" relevant="additions text"

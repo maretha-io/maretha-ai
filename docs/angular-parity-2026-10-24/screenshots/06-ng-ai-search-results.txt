@@ -1,0 +1,68 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=513_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/page/embedding-search?vectorQuery=bird&min_score=0.8"
+  uid=513_1 complementary "Application navigation"
+    uid=513_2 button "Dashboard"
+    uid=513_3 navigation "Main navigation"
+      uid=513_4 button "AI search" expandable expanded
+      uid=513_5 button "Browse" expandable
+      uid=513_6 button "Recently Viewed" expandable
+      uid=513_7 button "Search" expandable
+      uid=513_8 button "Expired" expandable
+      uid=513_9 button "Assets" expandable
+      uid=513_10 button "Tasks" expandable
+      uid=513_11 button "Favorites" expandable
+      uid=513_12 button "Collections" expandable
+      uid=513_13 button "Personal Space" expandable
+      uid=513_14 button "Clipboard" expandable
+      uid=513_15 button "Trash" expandable
+    uid=513_16 navigation "Account and administration"
+      uid=513_17 button "Administration" expandable
+      uid=513_18 button "User menu" expandable
+  uid=514_0 region "Navigation details"
+    uid=516_0 heading "AI search" level="2"
+    uid=516_1 "Search Filters"
+    uid=516_2 combobox "Search Filters" expandable haspopup="menu" value="Select a saved search"
+      uid=516_3 option "Select a saved search" selected
+    uid=516_4 DisclosureTriangle "Saved search actions" expandable
+    uid=516_5 button "Switch to Queue View"
+    uid=516_6 form
+      uid=516_7 "What are you looking for?"
+      uid=516_8 searchbox "What are you looking for?" value="bird"
+      uid=516_9 "Confidence value "
+      uid=516_10 status atomic live="polite" relevant="additions text"
+        uid=516_11 "0.8"
+      uid=516_12 slider "Confidence value" orientation="horizontal" value="0.800000011920929" valuemax="1" valuemin="0" valuetext="0.8"
+      uid=516_13 "Full text"
+      uid=516_14 searchbox "Full text"
+      uid=516_15 button "Search" focusable focused
+      uid=516_16 button "Reset"
+  uid=514_18 navigation "Drawer controls"
+    uid=514_19 separator "Resize navigation drawer" description="Drag to resize. Use arrow keys to adjust; press Enter or double-click to reset." orientation="vertical" value="298" valuemax="640" valuemin="200" valuetext=""
+    uid=514_20 button "Close navigation"
+  uid=513_19 banner "Application actions"
+    uid=513_20 button "Quick Search" expandable haspopup="dialog"
+    uid=513_21 generic
+      uid=513_22 button "Add Content" haspopup="dialog"
+  uid=513_23 region "Application activity"
+    uid=513_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=513_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=516_17 heading "AI search" level="1"
+  uid=516_18 status atomic live="polite" relevant="additions text"
+    uid=516_19 "0 results · 0 selected"
+  uid=516_20 "Display"
+  uid=516_21 combobox "Display" expandable haspopup="menu" value="Grid"
+    uid=516_22 option "Grid" selected
+    uid=516_23 option "Table"
+  uid=516_24 "Sort by"
+  uid=516_25 combobox "Sort by" expandable haspopup="menu" value="Relevance"
+    uid=516_26 option "Relevance" selected
+    uid=516_27 option "Title"
+    uid=516_28 option "Created"
+    uid=516_29 option "Modified"
+  uid=516_30 button "Descending" description="Sort descending"
+  uid=516_31 DisclosureTriangle "Columns" expandable
+  uid=516_32 button "Refresh" description="Refresh results"
+  uid=516_33 status atomic live="polite" relevant="additions text"
+    uid=516_34 "No results."
+  uid=513_118 generic live="polite" relevant="additions text"

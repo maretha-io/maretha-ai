@@ -1,0 +1,77 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=431_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/InteractionResults/InteractionResults-Red-throated%20Bird%20Flight.1792875968130?view=view"
+  uid=431_1 complementary "Application navigation"
+    uid=431_2 button "Dashboard"
+    uid=431_3 navigation "Main navigation"
+      uid=431_4 button "AI search" expandable
+      uid=431_5 button "Browse" expandable
+      uid=431_6 button "Recently Viewed" expandable
+      uid=431_7 button "Search" expandable
+      uid=431_8 button "Expired" expandable
+      uid=431_9 button "Assets" expandable
+      uid=431_10 button "Tasks" expandable
+      uid=431_11 button "Favorites" expandable
+      uid=431_12 button "Collections" expandable
+      uid=431_13 button "Personal Space" expandable
+      uid=431_14 button "Clipboard" expandable
+      uid=431_15 button "Trash" expandable
+    uid=431_16 navigation "Account and administration"
+      uid=431_17 button "Administration" expandable
+      uid=431_18 button "User menu" expandable
+  uid=431_19 banner "Application actions"
+    uid=431_20 button "Quick Search" expandable haspopup="dialog"
+    uid=431_21 generic
+      uid=431_22 button "Add Content" haspopup="dialog"
+  uid=431_23 region "Application activity"
+    uid=431_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=431_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=431_26 banner
+    uid=431_27 heading "InteractionResults-Red-throated Bird Flight" level="1"
+    uid=431_28 navigation "Document location"
+      uid=431_29 link "InteractionResults" url="https://demo.maretha.io/nuxeo/ng/browse/InteractionResults"
+    uid=431_31 button "Edit document"
+    uid=431_32 button "Add to Collection"
+    uid=431_33 button "Share"
+    uid=431_34 button "Move to trash"
+    uid=431_35 button "Add to Favorites"
+    uid=431_36 button "More actions" expandable haspopup="dialog"
+  uid=431_37 tablist "Document views" orientation="horizontal"
+    uid=431_38 tab "View" selectable selected
+    uid=431_39 tab "AI" selectable
+    uid=431_40 tab "Permissions" selectable
+    uid=431_41 tab "History" selectable
+  uid=431_42 tabpanel "View"
+    uid=431_43 heading "CTA Hotspot Detection" level="3"
+    uid=431_44 "2026-10-24 17:06:08"
+    uid=431_45 "Bird 1 (110, 35, 285, 315)"
+    uid=431_46 main
+      uid=431_47 "This document doesn't have a main file attached to it."
+    uid=431_48 complementary
+      uid=431_49 heading "Metadata" level="2"
+      uid=431_50 button "Hide metadata"
+      uid=431_51 region "Document details"
+        uid=431_52 region "Document information"
+          uid=431_53 "State"
+          uid=431_54 "Undefined"
+          uid=431_55 "Last modified"
+          uid=431_56 "October 24, 2026"
+          uid=431_57 "Created"
+          uid=431_58 "October 24, 2026"
+          uid=431_59 "By"
+          uid=431_60 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+          uid=431_62 "Contributors"
+          uid=431_63 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+        uid=431_65 "Related Document"
+        uid=431_66 link "Red-throated Bird Flight" url="https://demo.maretha.io/nuxeo/ng/browse/documents/6ceeabb6-c464-4369-adf6-bdeb966ffcd9"
+        uid=431_68 form
+          uid=431_69 "Title"
+          uid=431_70 "InteractionResults-Red-throated Bird Flight"
+        uid=431_71 DisclosureTriangle "Collections" expandable
+        uid=431_72 tab "COMMENTS" selectable selected
+        uid=431_73 tab "ACTIVITY" selectable
+        uid=431_74 form
+          uid=431_75 textbox "Write a comment" multiline
+          uid=431_76 button disableable disabled
+          uid=431_77 button disableable disabled
+  uid=431_78 generic live="polite" relevant="additions text"

@@ -1,0 +1,176 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=367_0 RootWebArea "InteractionResults-Red-throated Bird Flight - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/doc/940fc34e-9bb7-408c-beda-f9e313322be5"
+  uid=368_0 banner
+    uid=368_1 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=368_3 button "Quick Search" expandable
+  uid=368_4 complementary
+    uid=368_5 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=368_6 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=368_7 listbox "Drawer" orientation="vertical"
+      uid=368_8 option "AI search" selected
+        uid=368_9 button "AI search" expandable expanded
+      uid=368_10 generic
+      uid=368_11 option "Browse"
+        uid=368_12 button "Browse" expandable
+      uid=368_13 option "Recently Viewed"
+        uid=368_14 button "Recently Viewed" expandable
+      uid=368_15 option "Search"
+        uid=368_16 button "Search" expandable
+      uid=368_17 option "Expired"
+        uid=368_18 button "Expired" expandable
+      uid=368_19 option "Assets"
+        uid=368_20 button "Assets" expandable
+      uid=368_21 option "Tasks"
+        uid=368_22 button "Tasks" expandable
+      uid=368_23 option "MSA Work Queue"
+        uid=368_24 button "MSA Work Queue" expandable
+      uid=368_25 option "Favorites"
+        uid=368_26 button "Favorites" expandable
+      uid=368_27 option "Collections"
+        uid=368_28 button "Collections" expandable
+      uid=368_29 option "Personal Space"
+        uid=368_30 button "Personal Space" expandable
+      uid=368_31 option "Clipboard"
+        uid=368_32 button "Clipboard" expandable
+      uid=368_33 option "Trash"
+        uid=368_34 button "Trash" expandable
+      uid=368_35 generic
+      uid=368_36 option "Administration"
+        uid=368_37 button "Administration" expandable
+      uid=368_38 option "User Settings"
+        uid=368_39 button "User Settings" expandable
+    uid=376_0 "Search Filters"
+    uid=376_1 generic
+      uid=376_2 combobox "Search Filters" autocomplete="list" expandable haspopup="listbox"
+      uid=376_3 "Select a saved search"
+    uid=376_4 button "Switch to Queue View"
+    uid=376_5 "What are you looking for?"
+    uid=376_6 group "What are you looking for?"
+      uid=376_7 searchbox "What are you looking for?" value="bird"
+    uid=376_8 "Confidence value"
+    uid=376_9 generic
+      "0.8"
+    uid=376_10 "Full Text"
+    uid=376_11 group "Full Text"
+      uid=376_12 searchbox "Full Text"
+    uid=376_13 button "Reset"
+    uid=369_17 button "Collapse the side navigation panel" expandable expanded
+    uid=369_18 separator "Resize the side navigation panel. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." orientation="vertical" value="350" valuemax="720" valuemin="350" valuetext=""
+  uid=368_40 main
+    uid=378_0 link "InteractionResults-Red-throated Bird Flight" url="https://demo.maretha.io/nuxeo/ui/#!/browse/InteractionResults/InteractionResults-Red-throated%20Bird%20Flight"
+    uid=378_2 navigation "Breadcrumb"
+      uid=387_0 link "InteractionResults" url="https://demo.maretha.io/nuxeo/ui/#!/browse/InteractionResults"
+    uid=378_11 button "Render with Template"
+    uid=378_12 tooltip
+    uid=378_13 button focusable focused
+    uid=378_15 button "Edit document"
+    uid=378_16 button "Delete document"
+    uid=378_17 button "More options" description="More"
+    uid=378_18 navigation
+      uid=378_19 tablist orientation="horizontal"
+        uid=378_20 tab "View" selectable selected
+        uid=378_21 tab "AI" selectable
+        uid=378_23 tab "Permissions" selectable
+        uid=378_24 tab "History" selectable
+    uid=387_2 "Generate Birdwatching Location and Itinerary"
+    uid=387_3 "Sure, I can help with that."
+    uid=387_4 LineBreak "
+"
+    uid=387_5 "That is a male **Siberian Rubythroat** (*Luscinia calliope*). During the breeding season, the Siberian Rubythroat is found in dense, damp taiga forests with thick undergrowth, often near water. You are most likely to see them in Siberia, Russia."
+    uid=387_6 LineBreak "
+"
+    uid=387_7 "Here is a sample itinerary to make the most of your bird watching trip."
+    uid=387_8 LineBreak "
+"
+    uid=387_9 "Day"
+    uid=387_10 "Location"
+    uid=387_11 "Activities"
+    uid=387_12 "Day 1"
+    uid=387_13 "Arrival in Irkutsk, Russia"
+    uid=387_14 "Arrive at Irkutsk International Airport (IKT)."
+    uid=387_15 LineBreak "
+"
+    uid=387_16 "Transfer to your hotel in Irkutsk."
+    uid=387_17 LineBreak "
+"
+    uid=387_18 "Take a city tour to see local attractions."
+    uid=387_19 "Day 2"
+    uid=387_20 "Lake Baikal – Listvyanka"
+    uid=387_21 "Travel to Listvyanka, a settlement on the shore of Lake Baikal."
+    uid=387_22 LineBreak "
+"
+    uid=387_23 "Visit the Baikal Museum to learn about the lake's unique ecosystem."
+    uid=387_24 LineBreak "
+"
+    uid=387_25 "Enjoy a boat trip on Lake Baikal."
+    uid=387_26 "Day 3"
+    uid=387_27 "Lake Baikal – Birdwatching"
+    uid=387_28 "Explore the forests and wetlands around Lake Baikal for birdwatching."
+    uid=387_29 LineBreak "
+"
+    uid=387_30 "Focus on areas with dense undergrowth and proximity to water."
+    uid=387_31 LineBreak "
+"
+    uid=387_32 "Look for Siberian Rubythroats and other local bird species."
+    uid=387_33 "Day 4"
+    uid=387_34 "Ulan-Ude"
+    uid=387_35 "Take a train or bus to Ulan-Ude, the capital of Buryatia."
+    uid=387_36 LineBreak "
+"
+    uid=387_37 "Check into your hotel."
+    uid=387_38 LineBreak "
+"
+    uid=387_39 "Explore the city."
+    uid=387_40 "Day 5"
+    uid=387_41 "Ivolginsky Datsan"
+    uid=387_42 "Visit the Ivolginsky Datsan, a Buddhist monastery located near Ulan-Ude."
+    uid=387_43 LineBreak "
+"
+    uid=387_44 "Enjoy the serene surroundings."
+    uid=387_45 "Day 6"
+    uid=387_46 "Selenga River Delta"
+    uid=387_47 "Travel to the Selenga River Delta, an important wetland area."
+    uid=387_48 LineBreak "
+"
+    uid=387_49 "Spend the day birdwatching in the delta."
+    uid=387_50 LineBreak "
+"
+    uid=387_51 "Continue to search for Siberian Rubythroats and other wetland species."
+    uid=387_52 "Day 7"
+    uid=387_53 "Departure"
+    uid=387_54 "Transfer to Ulan-Ude Airport (UUD) for your flight home."
+    uid=387_55 LineBreak "
+"
+    uid=387_56 "Remember to pack appropriate clothing and gear for the Siberian climate, including waterproof layers, warm clothing, and sturdy hiking boots. Don't forget to bring binoculars and a field guide for bird identification. Also, make sure to check visa requirements and health advisories before traveling to Russia."
+    uid=387_57 LineBreak "
+"
+    uid=387_58 LineBreak "
+"
+    uid=387_59 "2025-08-28T23:41:33.510Z"
+    uid=387_60 image "thumbnail"
+    uid=387_61 button "Upload main file"
+    uid=387_62 separator "Resize the information pane. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." orientation="vertical" value="280" valuemax="512" valuemin="280" valuetext=""
+    uid=387_63 button "Details" expandable expanded
+    uid=387_64 "State"
+    uid=387_65 "undefined"
+    uid=387_66 "Last Modified"
+    uid=387_67 "August 28, 2025"
+    uid=387_68 "Created"
+    uid=387_69 "August 28, 2025"
+    uid=387_70 "By"
+    uid=387_71 button "Ethan Steiner" description="EthanAdmin esteiner@maretha.io"
+      uid=387_72 link "Ethan Steiner" url="https://demo.maretha.io/nuxeo/ui/#!/user/EthanAdmin"
+    uid=387_73 "Contributors"
+    uid=387_74 button "Ethan Steiner" description="EthanAdmin esteiner@maretha.io"
+      uid=387_75 link "Ethan Steiner" url="https://demo.maretha.io/nuxeo/ui/#!/user/EthanAdmin"
+    uid=387_76 "Title"
+    uid=387_77 "InteractionResults-Red-throated Bird Flight"
+    uid=387_78 "Related Document"
+    uid=387_79 link "Red-throated Bird Flight" url="https://demo.maretha.io/nuxeo/ui/#!/doc/6ceeabb6-c464-4369-adf6-bdeb966ffcd9"
+    uid=387_81 tablist orientation="horizontal"
+      uid=387_82 tab "Activity" selectable selected
+  uid=377_12 button
+  uid=377_13 tooltip
+  uid=368_175 status atomic live="polite" relevant="additions text"
+  uid=368_176 generic live="polite" relevant="additions text"

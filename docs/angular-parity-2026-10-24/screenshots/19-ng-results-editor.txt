@@ -1,0 +1,113 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=509_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/InteractionResults/InteractionResults-Red-throated%20Bird%20Flight.1792875968130?view=view"
+  uid=509_1 complementary "Application navigation"
+    uid=509_2 button "Dashboard"
+    uid=509_3 navigation "Main navigation"
+      uid=509_4 button "AI search" expandable
+      uid=509_5 button "Browse" expandable
+      uid=509_6 button "Recently Viewed" expandable
+      uid=509_7 button "Search" expandable
+      uid=509_8 button "Expired" expandable
+      uid=509_9 button "Assets" expandable
+      uid=509_10 button "Tasks" expandable
+      uid=509_11 button "Favorites" expandable
+      uid=509_12 button "Collections" expandable
+      uid=509_13 button "Personal Space" expandable
+      uid=509_14 button "Clipboard" expandable
+      uid=509_15 button "Trash" expandable
+    uid=509_16 navigation "Account and administration"
+      uid=509_17 button "Administration" expandable
+      uid=509_18 button "User menu" expandable
+  uid=509_19 banner "Application actions"
+    uid=509_20 button "Quick Search" expandable haspopup="dialog"
+    uid=509_21 generic
+      uid=509_22 button "Add Content" haspopup="dialog"
+  uid=509_23 region "Application activity"
+    uid=509_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=509_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=509_26 banner
+    uid=509_27 heading "CP parity audit response 2026-10-24" level="1"
+    uid=509_28 navigation "Document location"
+      uid=509_29 link "InteractionResults" url="https://demo.maretha.io/nuxeo/ng/browse/InteractionResults"
+    uid=509_31 button "Edit document"
+    uid=509_32 button "Add to Collection"
+    uid=509_33 button "Share"
+    uid=509_34 button "Move to trash"
+    uid=509_35 button "Add to Favorites"
+    uid=509_36 button "More actions" expandable haspopup="dialog"
+  uid=509_37 tablist "Document views" orientation="horizontal"
+    uid=509_38 tab "View" selectable selected
+    uid=509_39 tab "AI" selectable
+    uid=509_40 tab "Permissions" selectable
+    uid=509_41 tab "History" selectable
+  uid=509_42 tabpanel "View"
+    uid=509_43 heading "CTA Hotspot Detection" level="3"
+    uid=509_44 "2026-10-24 17:06:08"
+    uid=509_45 "Bird 1 (110, 35, 285, 315)"
+    uid=509_46 main
+      uid=509_47 "This document doesn't have a main file attached to it."
+    uid=509_48 complementary
+      uid=509_49 heading "Metadata" level="2"
+      uid=509_50 button "Hide metadata"
+      uid=509_51 region "Document details"
+        uid=509_52 region "Document information"
+          uid=509_53 "State"
+          uid=509_54 "Undefined"
+          uid=509_55 "Last modified"
+          uid=509_56 "October 24, 2026"
+          uid=509_57 "Created"
+          uid=509_58 "October 24, 2026"
+          uid=509_59 "By"
+          uid=509_60 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+          uid=509_62 "Contributors"
+          uid=509_63 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+        uid=509_65 "Related Document"
+        uid=509_66 link "Red-throated Bird Flight" url="https://demo.maretha.io/nuxeo/ng/browse/documents/6ceeabb6-c464-4369-adf6-bdeb966ffcd9"
+        uid=509_68 form
+          uid=509_69 "Title"
+          uid=509_70 "CP parity audit response 2026-10-24"
+          uid=509_71 "Nature"
+          uid=509_72 "Booklet"
+          uid=509_73 "Subjects"
+          uid=509_74 "Art"
+          uid=509_75 "Coverage"
+          uid=509_76 "Europe"
+        uid=509_77 DisclosureTriangle "Collections" expandable
+        uid=509_78 tab "COMMENTS" selectable selected
+        uid=509_79 tab "ACTIVITY" selectable
+        uid=509_80 form
+          uid=509_81 textbox "Write a comment" multiline
+          uid=509_82 button disableable disabled
+          uid=509_83 button disableable disabled
+  uid=509_84 generic live="polite" relevant="additions text"
+  uid=511_0 dialog focusable focused modal
+    uid=511_1 form
+      uid=511_2 "Title *"
+      uid=511_3 textbox "Title *" required value="CP parity audit response 2026-10-24"
+      uid=511_4 "Description"
+      uid=511_5 textbox "Description" multiline
+      uid=511_6 "Nature"
+      uid=511_7 combobox "Nature" autocomplete="list" expandable haspopup="listbox" value="Booklet"
+      uid=511_8 button "Remove"
+      uid=511_9 button "Nature matches" expandable
+      uid=511_10 "Subjects"
+      uid=511_11 "Art"
+      uid=511_12 button "Remove"
+      uid=511_13 combobox "Subjects" autocomplete="list" expandable haspopup="listbox"
+      uid=511_14 button "Subjects matches" expandable
+      uid=511_15 "Coverage"
+      uid=511_16 combobox "Coverage" autocomplete="list" expandable haspopup="listbox" value="Europe"
+      uid=511_17 button "Remove"
+      uid=511_18 button "Coverage matches" expandable
+      uid=511_19 "Expiration date"
+      uid=511_20 Date "Expiration date"
+        uid=511_21 spinbutton "Month Month" value="0" valuemax="12" valuemin="1" valuetext=""
+        uid=511_22 "/"
+        uid=511_23 spinbutton "Day Day" value="0" valuemax="31" valuemin="1" valuetext=""
+        uid=511_24 "/"
+        uid=511_25 spinbutton "Year Year" value="0" valuemax="275760" valuemin="1" valuetext=""
+        uid=511_26 button "Show date picker Show date picker" haspopup="menu"
+      uid=511_27 button "Save" disableable disabled
+      uid=511_28 button "Discard changes" disableable disabled
+    uid=511_29 button "Cancel"

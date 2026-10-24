@@ -1,0 +1,21 @@
+{
+  "createdAt": "2026-10-24T21:50:44.252Z",
+  "coreVersion": "3.21.3",
+  "addonVersion": "1.0.29",
+  "coreRevision": "e2dda1af60caf51e1ad9c8d4e449c0639264591b",
+  "addonRevision": "8832350a0725f45112dbf599253005b2d84dca8d",
+  "coreSourceSha256": "237b0b0da976c1967be17ff56f2c15bcbbee766289f8ec4589f9de0708c2a8bf",
+  "initialBundleBudget": "6.5mb",
+  "nodeVersion": "v24.18.0",
+  "packages": [
+    {
+      "path": "maretha-angular-webui-package-3.21.3.zip",
+      "sha256": "8b0517b80ab36d93580f36777aa42be6a4bb4386618fb6fd8992d1464567eb86"
+    },
+    {
+      "path": "maretha-ai-package-1.0.29.zip",
+      "sha256": "4026e8d4f2d7713da4c33b699801f2a65621c18c66d315598b43096703ff6936"
+    }
+  ],
+  "sdkVersion": "0.1.1"
+}

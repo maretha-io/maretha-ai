@@ -1,0 +1,68 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=421_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature/Macaulay%20Library%20Ornithology/480.jpg?view=AiTab"
+  uid=421_1 complementary "Application navigation"
+    uid=421_2 button "Dashboard"
+    uid=421_3 navigation "Main navigation"
+      uid=421_4 button "AI search" expandable
+      uid=421_5 button "Browse" expandable
+      uid=421_6 button "Recently Viewed" expandable
+      uid=421_7 button "Search" expandable
+      uid=421_8 button "Expired" expandable
+      uid=421_9 button "Assets" expandable
+      uid=421_10 button "Tasks" expandable
+      uid=421_11 button "Favorites" expandable
+      uid=421_12 button "Collections" expandable
+      uid=421_13 button "Personal Space" expandable
+      uid=421_14 button "Clipboard" expandable
+      uid=421_15 button "Trash" expandable
+    uid=421_16 navigation "Account and administration"
+      uid=421_17 button "Administration" expandable
+      uid=421_18 button "User menu" expandable
+  uid=421_19 banner "Application actions"
+    uid=421_20 button "Quick Search" expandable haspopup="dialog"
+    uid=421_21 generic
+      uid=421_22 button "Add Content" haspopup="dialog"
+  uid=421_23 region "Application activity"
+    uid=421_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=421_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=422_0 banner
+    uid=422_1 heading "Red-throated Bird Flight" level="1"
+    uid=422_2 navigation "Document location"
+      uid=422_3 link "Domain" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain"
+      uid=422_5 link "Workspaces" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces"
+      uid=422_7 link "Nature" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature"
+      uid=422_9 link "Macaulay Library Ornithology" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature/Macaulay%20Library%20Ornithology"
+    uid=422_11 button "Edit document"
+    uid=422_12 button "Add to Collection"
+    uid=422_13 button "Share"
+    uid=422_14 button "Move to trash"
+    uid=422_15 button "Add to Favorites"
+    uid=422_16 button "More actions" expandable haspopup="dialog"
+  uid=422_17 tablist "Document views" orientation="horizontal"
+    uid=422_18 tab "View" selectable
+    uid=422_19 tab "AI" selectable selected
+    uid=422_20 tab "More Like This" selectable
+    uid=422_21 tab "Permissions" selectable
+    uid=422_22 tab "History" selectable
+    uid=422_23 tab "Publishing" selectable
+  uid=423_0 tabpanel "AI"
+    uid=423_1 DisclosureTriangle "Legal Analyst - Chat Discuss an image or document with an AI legal analyst that highlights potential legal risks to identify problems early and determine when further legal review is needed" expandable
+    uid=423_2 DisclosureTriangle "Run interactions Execute different interactions against this document" expandable expanded
+    uid=425_0 generic live="polite" relevant="additions text"
+      uid=425_1 "You"
+      uid=425_2 "17:05"
+      uid=425_3 "Identify visually distinct subjects, objects, or logical regions in an image that could function as clickable call-to-action areas. This enables teams to create interactive images—such as shoppable content or linked product hotspots—by automatically generating precise bounding boxes for use in digital marketing and e-commerce experiences"
+      uid=425_4 "AI"
+      uid=425_5 "17:05"
+      uid=425_6 "Bird 1 (110, 35, 285, 315)"
+      uid=425_7 DisclosureTriangle "Save response" description="⋮" expandable
+    uid=424_0 "Select AI Interaction"
+    uid=424_1 combobox "Select AI Interaction" expandable haspopup="menu" value="CTA Hotspot Detection"
+      uid=424_2 option "CTA Hotspot Detection" selected
+      uid=424_3 option "Competitive Intelligence Analyst"
+      uid=424_4 option "Brand Design Guidelines Compliance"
+    uid=424_5 button "Run interaction" description="Run interaction"
+    uid=425_8 button "Reset"
+    uid=423_3 DisclosureTriangle "Saved interactions Your previously saved interactions" expandable
+  uid=421_142 generic live="polite" relevant="additions text"

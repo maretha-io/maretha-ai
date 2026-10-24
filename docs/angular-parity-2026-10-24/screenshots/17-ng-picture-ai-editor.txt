@@ -1,0 +1,116 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=491_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature/2022's%20Best%20Photos/Birdy?view=SimilarDocumentsTab"
+  uid=491_1 complementary "Application navigation"
+    uid=491_2 button "Dashboard"
+    uid=491_3 navigation "Main navigation"
+      uid=491_4 button "AI search" expandable
+      uid=491_5 button "Browse" expandable
+      uid=491_6 button "Recently Viewed" expandable
+      uid=491_7 button "Search" expandable
+      uid=491_8 button "Expired" expandable
+      uid=491_9 button "Assets" expandable
+      uid=491_10 button "Tasks" expandable
+      uid=491_11 button "Favorites" expandable
+      uid=491_12 button "Collections" expandable
+      uid=491_13 button "Personal Space" expandable
+      uid=491_14 button "Clipboard" expandable
+      uid=491_15 button "Trash" expandable
+    uid=491_16 navigation "Account and administration"
+      uid=491_17 button "Administration" expandable
+      uid=491_18 button "User menu" expandable
+  uid=491_19 banner "Application actions"
+    uid=491_20 button "Quick Search" expandable haspopup="dialog"
+    uid=491_21 generic
+      uid=491_22 button "Add Content" haspopup="dialog"
+  uid=491_23 region "Application activity"
+    uid=491_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=491_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=491_26 banner
+    uid=491_27 heading "Birdy" level="1"
+    uid=491_28 navigation "Document location"
+      uid=491_29 link "Domain" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain"
+      uid=491_31 link "Workspaces" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces"
+      uid=491_33 link "Nature" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature"
+      uid=491_35 link "2022's Best Photos" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature/2022's%20Best%20Photos"
+    uid=491_37 button "Edit document"
+    uid=491_38 button "Add to Collection"
+    uid=491_39 button "Share"
+    uid=491_40 button "Move to trash"
+    uid=491_41 button "Add to Favorites"
+    uid=491_42 button "More actions" expandable haspopup="dialog"
+  uid=491_43 tablist "Document views" orientation="horizontal"
+    uid=491_44 tab "View" selectable
+    uid=491_45 tab "AI" selectable
+    uid=491_46 tab "More Like This" selectable selected
+    uid=491_47 tab "Permissions" selectable
+    uid=491_48 tab "History" selectable
+    uid=491_49 tab "Publishing" selectable
+  uid=493_0 tabpanel "More Like This"
+    uid=493_1 "Confidence value"
+    uid=493_2 status "Confidence value 0.4" atomic live="polite" relevant="additions text"
+      uid=493_3 "0.4"
+    uid=493_4 slider orientation="horizontal" value="0.4000000059604645" valuemax="1" valuemin="0" valuetext="0.4"
+    uid=493_5 status atomic live="polite" relevant="additions text"
+      uid=493_6 "0 results · 0 selected"
+    uid=493_7 "Display"
+    uid=493_8 combobox "Display" expandable haspopup="menu" value="Grid"
+      uid=493_9 option "Grid" selected
+      uid=493_10 option "Table"
+    uid=493_11 "Sort by"
+    uid=493_12 combobox "Sort by" expandable haspopup="menu" value="Relevance"
+      uid=493_13 option "Relevance" selected
+      uid=493_14 option "Title"
+      uid=493_15 option "Created"
+      uid=493_16 option "Modified"
+    uid=493_17 button "Descending" description="Sort descending"
+    uid=493_18 DisclosureTriangle "Columns" expandable
+    uid=493_19 button "Refresh" description="Refresh results"
+    uid=493_20 status atomic live="polite" relevant="additions text"
+      uid=493_21 "No results."
+  uid=491_194 generic live="polite" relevant="additions text"
+  uid=496_0 dialog modal
+    uid=496_1 heading "Edit document F7183713-EB12-4CDA-A8AC-C9C29261982B" level="2"
+    uid=496_2 button "Close"
+    uid=496_3 status atomic live="polite" relevant="additions text"
+    uid=496_4 alert atomic live="assertive" relevant="additions text"
+    uid=496_5 form
+      uid=496_6 textbox "Title" focusable focused value="Birdy"
+      uid=496_7 "Title"
+      "◉"
+      uid=496_8 "Main file"
+      uid=496_9 "897A4110.jpeg"
+      uid=496_10 "2 MB"
+      uid=496_11 button "Download file" description="Download file"
+      uid=496_12 button "Preview" description="Preview"
+      uid=496_13 button "Replace file" description="You can either manually select files or drag them over"
+      uid=496_14 button "Remove file" description="Remove file"
+      uid=496_15 "Additional attachments"
+      uid=496_16 button "Add files" description="You can either manually select files or drag them over"
+      uid=496_17 button "Show additional fields"
+      uid=496_18 "Alt Text"
+      uid=496_19 textbox "Alt Text"
+      uid=496_20 "Brand"
+      uid=496_21 textbox "Brand"
+      uid=496_22 "SEO"
+      uid=496_23 textbox "SEO" multiline
+      uid=496_24 "Restrictions"
+      uid=496_25 textbox "Restrictions" multiline
+      uid=496_26 "Elements Detected"
+      uid=496_27 button "Add Elements Detected"
+      uid=496_28 "Smart Crops"
+      uid=496_29 button "Add Smart Crops"
+      uid=496_30 "Classification"
+      uid=496_31 combobox "Classification" autocomplete="list" expandable haspopup="listbox"
+      uid=496_32 button "Classification matches" expandable
+      uid=496_33 "Safety Text"
+      uid=496_34 textbox "Safety Text" multiline
+      uid=496_35 "Safety"
+      uid=496_36 combobox "Safety" autocomplete="list" expandable haspopup="listbox"
+      uid=496_37 button "Safety matches" expandable
+      uid=496_38 "Image Scene"
+      uid=496_39 combobox "Image Scene" autocomplete="list" expandable haspopup="listbox"
+      uid=496_40 button "Image Scene matches" expandable
+    uid=496_41 button "Close without saving"
+    uid=496_42 button "Save changes" disableable disabled
+  uid=496_43 generic atomic live="polite" relevant="additions text"

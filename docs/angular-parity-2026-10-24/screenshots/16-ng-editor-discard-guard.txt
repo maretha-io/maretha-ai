@@ -1,0 +1,117 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=461_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/InteractionResults/InteractionResults-Red-throated%20Bird%20Flight.1792875968130?view=view"
+  uid=461_1 complementary "Application navigation"
+    uid=461_2 button "Dashboard"
+    uid=461_3 navigation "Main navigation"
+      uid=461_4 button "AI search" expandable
+      uid=461_5 button "Browse" expandable
+      uid=461_6 button "Recently Viewed" expandable
+      uid=461_7 button "Search" expandable
+      uid=461_8 button "Expired" expandable
+      uid=461_9 button "Assets" expandable
+      uid=461_10 button "Tasks" expandable
+      uid=461_11 button "Favorites" expandable
+      uid=461_12 button "Collections" expandable
+      uid=461_13 button "Personal Space" expandable
+      uid=461_14 button "Clipboard" expandable
+      uid=461_15 button "Trash" expandable
+    uid=461_16 navigation "Account and administration"
+      uid=461_17 button "Administration" expandable
+      uid=461_18 button "User menu" expandable
+  uid=461_19 banner "Application actions"
+    uid=461_20 button "Quick Search" expandable haspopup="dialog"
+    uid=461_21 generic
+      uid=461_22 button "Add Content" haspopup="dialog"
+  uid=461_23 region "Application activity"
+    uid=461_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=461_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=461_26 banner
+    uid=461_27 heading "CP parity audit response 2026-10-24" level="1"
+    uid=461_28 navigation "Document location"
+      uid=461_29 link "InteractionResults" url="https://demo.maretha.io/nuxeo/ng/browse/InteractionResults"
+    uid=461_31 button "Edit document"
+    uid=461_32 button "Add to Collection"
+    uid=461_33 button "Share"
+    uid=461_34 button "Move to trash"
+    uid=461_35 button "Add to Favorites"
+    uid=461_36 button "More actions" expandable haspopup="dialog"
+  uid=461_37 tablist "Document views" orientation="horizontal"
+    uid=461_38 tab "View" selectable selected
+    uid=461_39 tab "AI" selectable
+    uid=461_40 tab "Permissions" selectable
+    uid=461_41 tab "History" selectable
+  uid=461_42 tabpanel "View"
+    uid=461_43 heading "CTA Hotspot Detection" level="3"
+    uid=461_44 "2026-10-24 17:06:08"
+    uid=461_45 "Bird 1 (110, 35, 285, 315)"
+    uid=461_46 main
+      uid=461_47 "This document doesn't have a main file attached to it."
+    uid=461_48 complementary
+      uid=461_49 heading "Metadata" level="2"
+      uid=461_50 button "Hide metadata"
+      uid=461_51 region "Document details"
+        uid=461_52 region "Document information"
+          uid=461_53 "State"
+          uid=461_54 "Undefined"
+          uid=461_55 "Last modified"
+          uid=461_56 "October 24, 2026"
+          uid=461_57 "Created"
+          uid=461_58 "October 24, 2026"
+          uid=461_59 "By"
+          uid=461_60 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+          uid=461_62 "Contributors"
+          uid=461_63 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+        uid=469_0 "Related Document"
+        uid=469_1 link "Red-throated Bird Flight" url="https://demo.maretha.io/nuxeo/ng/browse/documents/6ceeabb6-c464-4369-adf6-bdeb966ffcd9"
+        uid=469_3 form
+          uid=469_4 "Title"
+          uid=469_5 "CP parity audit response 2026-10-24"
+          uid=469_6 "Nature"
+          uid=469_7 "booklet"
+          uid=469_8 "Subjects"
+          uid=469_9 "art"
+          uid=469_10 "Coverage"
+          uid=469_11 "europe"
+        uid=461_71 DisclosureTriangle "Collections" expandable
+        uid=461_72 tab "COMMENTS" selectable selected
+        uid=461_73 tab "ACTIVITY" selectable
+        uid=461_74 form
+          uid=461_75 textbox "Write a comment" multiline
+          uid=461_76 button disableable disabled
+          uid=461_77 button disableable disabled
+  uid=461_78 generic live="polite" relevant="additions text"
+  uid=470_0 dialog modal
+    uid=470_1 form
+      uid=470_2 "Title *"
+      uid=470_3 textbox "Title *" required value="CP parity audit response unsaved"
+      uid=470_4 "Description"
+      uid=470_5 textbox "Description" multiline
+      uid=470_6 "Nature"
+      uid=470_7 combobox "Nature" autocomplete="list" expandable haspopup="listbox" value="booklet"
+      uid=470_8 button "Remove"
+      uid=470_9 button "Nature matches" expandable
+      uid=470_10 "Subjects"
+      uid=470_11 "art"
+      uid=470_12 button "Remove"
+      uid=470_13 combobox "Subjects" autocomplete="list" expandable haspopup="listbox"
+      uid=470_14 button "Subjects matches" expandable
+      uid=470_15 "Coverage"
+      uid=470_16 combobox "Coverage" autocomplete="list" expandable haspopup="listbox" value="europe"
+      uid=470_17 button "Remove"
+      uid=470_18 button "Coverage matches" expandable
+      uid=470_19 "Expiration date"
+      uid=470_20 Date "Expiration date"
+        uid=470_21 spinbutton "Month Month" value="0" valuemax="12" valuemin="1" valuetext=""
+        uid=470_22 "/"
+        uid=470_23 spinbutton "Day Day" value="0" valuemax="31" valuemin="1" valuetext=""
+        uid=470_24 "/"
+        uid=470_25 spinbutton "Year Year" value="0" valuemax="275760" valuemin="1" valuetext=""
+        uid=470_26 button "Show date picker Show date picker" haspopup="menu"
+      uid=470_27 button "Save"
+      uid=470_28 button "Discard changes"
+    uid=472_0 alert atomic live="assertive" relevant="additions text"
+      uid=472_1 "There are unsaved changes."
+      uid=472_2 button "Keep editing"
+      uid=472_3 button "Discard and leave"
+    uid=470_29 button "Cancel" focusable focused

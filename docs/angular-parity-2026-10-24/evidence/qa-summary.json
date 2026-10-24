@@ -1,0 +1,88 @@
+{
+  "fixture": {
+    "uid": "23321079-d3f1-4b69-a99d-cba43f396724",
+    "title": "CP parity audit response 2026-10-24",
+    "created": "2026-10-24T21:06:08.129Z",
+    "source": "6ceeabb6-c464-4369-adf6-bdeb966ffcd9",
+    "cleanup": "deleted",
+    "deleteStatus": 204,
+    "deletedConfirmed404": true,
+    "existingResponseAndSourceRemain200": true
+  },
+  "savedSearchFixture": {
+    "uid": "34b64d24-26ab-4b23-bdd6-4226c2b1d751",
+    "deletedConfirmed404": true
+  },
+  "aiRun": {
+    "sourceUid": "6ceeabb6-c464-4369-adf6-bdeb966ffcd9",
+    "name": "CTA Hotspot Detection",
+    "status": 200,
+    "sourcePropertiesHashBeforeAndAfter": "a9fe51e3a28dc1f0a84bd89544f918b9978d9db7fe9d6c419778ac16f16814a0",
+    "saveAsNewStatus": 200
+  },
+  "checks": [
+    "24 settings interactions loaded",
+    "settings dirty discard restores original values",
+    "saved search create/update/refresh/share with self without notification/delete",
+    "AI run and save as new results document",
+    "custom results editor title saved",
+    "custom editor keep editing and discard guard",
+    "File/Picture show all10AI fields plus native controls",
+    "Picture dirty discard confirmed no saved metadata change",
+    "native Administration AI Settings link",
+    "related document link and existing rich HTML saved response",
+    "grid/table/sort/columns/queue empty states match baseline",
+    "baseline Polymer UI healthy",
+    "r3 saved vocabulary values booklet/art/europe persisted via UI and baseline renders Booklet/Art/Europe",
+    "r3 settings dirty navigation Cancel retains101;Discard and leave navigates dashboard",
+    "r3 profile page and change-password dialog open/cancel",
+    "r3 File native editor shows Booklet and all10AIfields",
+    "r3 native Picture all10AI fields and preview",
+    "r3 search toolbar icons verified",
+    "r4 custom metadata and reopened editor display Booklet/Art/Europe",
+    "r4 native File view metadata displays Booklet",
+    "r4 search button hovered/focused: white text rgb255,255,255 on blue rgb0,102,255; enabled; vector search no results",
+    "r4 existing source and Birdy dc:modified unchanged",
+    "r4 Polymer baseline healthy with existing rich response",
+    "r4 AI Settings directory bucket remains100; Save disabled; all24interaction disclosures loaded"
+  ],
+  "limits": [
+    "Vector and similar searches returned no results in both baseline and Angular; nonempty selection bulk commands not exercised live",
+    "AI metadata overwrite and global settings writes not performed on existing demo data",
+    "Two existing 404 lookups: optional metadata policy and legacy user Ethan Steiner",
+    "Existing ngx-extended-pdf-viewer ICC profile404: PDF renders using DeviceCMYK fallback"
+  ],
+  "deployment": {
+    "image": "nuxeo-maretha:cp-1.0.29-ng-3.21.3-20261024-r4",
+    "ociIndexDigest": "sha256:846f7593aa118a00582f48bf429e692c7c053f04430c652268312cfd250fd337",
+    "containerImageId": "sha256:de75e157fefb49df238243a6468861f677152f9a0353e9893343a20893d66829",
+    "pod": "nuxeo-6bd5976c66-wtqg4",
+    "rollout": "successful",
+    "healthStatus": 200,
+    "bundleDelta": {
+      "status": 200,
+      "beforeCount": 146,
+      "afterCount": 146,
+      "changed": [
+        {
+          "name": "io.maretha.cp.core.maretha-cp-core",
+          "version": "1.0.29"
+        },
+        {
+          "name": "io.maretha.cp.maretha-cp-web",
+          "version": "1.0.29"
+        },
+        {
+          "name": "io.maretha.maretha-angular-webui",
+          "version": "3.21.3"
+        },
+        {
+          "name": "io.maretha.maretha-angular-webui.server",
+          "version": "3.21.3"
+        }
+      ],
+      "removed": [],
+      "appVersion": "2025.20-SNAPSHOT"
+    }
+  }
+}
