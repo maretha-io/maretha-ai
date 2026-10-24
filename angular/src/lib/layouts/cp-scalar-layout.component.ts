@@ -27,7 +27,7 @@ import { CP_DUBLINCORE_FIELDS } from './cp-layout-fields';
       @if (host) { <button type="button" (click)="cancel()">{{ layoutContext.mode === 'metadata' ? 'Close' : 'Cancel' }}</button> }
     }
   `,
-  styles: `nx-schema-layout.readonly-metadata{white-space:pre-wrap}:host{display:block;padding:16px}.related{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}button{appearance:none;font:inherit;color:inherit;border:1px solid var(--nuxeo-border,#d8d8dc);border-radius:2px;background:var(--nuxeo-box,#fff);box-shadow:none;padding:8px 16px;margin-top:12px;cursor:pointer}button:hover:not(:disabled){background:var(--nuxeo-pill-background,#f3f3f5)}button:focus-visible{outline:2px solid var(--nuxeo-primary-color,#006bff);outline-offset:3px}`,
+  styles: `nx-schema-layout.readonly-metadata{white-space:pre-wrap}:host{display:block;padding:16px}.related{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}button{appearance:none;font:inherit;color:var(--nuxeo-primary-color,#006bff);border:1px solid var(--nuxeo-primary-color,#006bff);border-radius:2px;background:var(--nuxeo-box,#fff);box-shadow:none;padding:8px 16px;margin-top:12px;cursor:pointer}button:hover:not(:disabled){background:var(--nuxeo-pill-background,#f3f3f5)}button:focus-visible{outline:2px solid var(--nuxeo-primary-color,#006bff);outline-offset:3px}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CpScalarLayoutComponent implements OnChanges, OnDestroy, GuardedView {
