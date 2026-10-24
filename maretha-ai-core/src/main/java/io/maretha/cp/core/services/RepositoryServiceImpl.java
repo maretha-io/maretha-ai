@@ -144,7 +144,8 @@ public class RepositoryServiceImpl implements RepositoryService {
             cpSettingsDoc = session.createDocument(cpSettingsDoc);
         }
 
-        if (CollectionUtils.isNotEmpty(interactions)) {
+        // A supplied empty list clears the final interaction; null means this field was omitted.
+        if (interactions != null) {
             List<HashMap<String, Object>> interactionsMap = interactions.stream()
                     .map(objNode -> convertToType(objNode, Interaction.class))
                     .map(this::convertToInteractionComplexType)

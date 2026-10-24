@@ -1,0 +1,117 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=367_0 RootWebArea "AI Settings - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/maretha-cp-interactions"
+  uid=368_0 banner
+    uid=368_1 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=368_3 button "Quick Search" expandable
+  uid=368_4 complementary
+    uid=368_5 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=368_6 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=368_7 listbox "Drawer" orientation="vertical"
+      uid=368_8 option "AI search"
+        uid=368_9 button "AI search" expandable
+      uid=368_10 generic
+      uid=368_11 option "Browse"
+        uid=368_12 button "Browse" expandable
+      uid=368_13 option "Recently Viewed"
+        uid=368_14 button "Recently Viewed" expandable
+      uid=368_15 option "Search"
+        uid=368_16 button "Search" expandable
+      uid=368_17 option "Expired"
+        uid=368_18 button "Expired" expandable
+      uid=368_19 option "Assets"
+        uid=368_20 button "Assets" expandable
+      uid=368_21 option "Tasks"
+        uid=368_22 button "Tasks" expandable
+      uid=368_23 option "MSA Work Queue"
+        uid=368_24 button "MSA Work Queue" expandable
+      uid=368_25 option "Favorites"
+        uid=368_26 button "Favorites" expandable
+      uid=368_27 option "Collections"
+        uid=368_28 button "Collections" expandable
+      uid=368_29 option "Personal Space"
+        uid=368_30 button "Personal Space" expandable
+      uid=368_31 option "Clipboard"
+        uid=368_32 button "Clipboard" expandable
+      uid=368_33 option "Trash"
+        uid=368_34 button "Trash" expandable
+      uid=368_35 generic
+      uid=368_36 option "Administration" selected
+        uid=368_37 button "Administration" expandable expanded
+      uid=368_38 option "User Settings"
+        uid=368_39 button "User Settings" expandable
+    uid=369_0 heading "Administration" level="5"
+    uid=369_1 link "AI Settings" url="https://demo.maretha.io/nuxeo/ui/#!/maretha-cp-interactions"
+    uid=369_3 link "Analytics" url="https://demo.maretha.io/nuxeo/ui/#!/admin/analytics"
+    uid=369_5 link "Workflows" url="https://demo.maretha.io/nuxeo/ui/#!/admin/maretha-workflow"
+    uid=369_7 link "Users & Groups" url="https://demo.maretha.io/nuxeo/ui/#!/admin/user-group-management"
+    uid=369_9 link "Vocabularies" url="https://demo.maretha.io/nuxeo/ui/#!/admin/vocabulary-management"
+    uid=369_11 link "Audit" url="https://demo.maretha.io/nuxeo/ui/#!/admin/audit"
+    uid=369_13 link "Cloud Services" url="https://demo.maretha.io/nuxeo/ui/#!/admin/cloud-services"
+    uid=369_15 link "NXQL Search" url="https://demo.maretha.io/nuxeo/ui/#!/admin/nxql"
+    uid=369_17 button "Collapse the side navigation panel" expandable expanded
+    uid=369_18 separator "Resize the side navigation panel. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." orientation="vertical" value="350" valuemax="720" valuemin="350" valuetext=""
+  uid=368_40 main
+    uid=370_0 "AI Interactions Management"
+    uid=370_1 navigation
+      uid=370_2 listbox orientation="vertical"
+        uid=370_3 tab "Interactions" selectable
+        uid=370_4 tab "Metadata" selectable
+        uid=370_5 tab "Events" focusable focused selectable selected
+        uid=370_6 tab "Settings" selectable
+      uid=370_7 button "Save Changes" disableable disabled
+      uid=370_8 button description="Discard all changes" disableable disabled
+      uid=370_9 button description="Refresh interactions, metadata, events and settings"
+    uid=374_0 "Document type"
+    uid=374_1 tooltip
+    uid=374_2 "Events"
+    uid=374_3 tooltip
+    uid=374_4 "Interactions"
+    uid=374_5 tooltip
+    uid=374_6 "Active"
+    uid=374_7 tooltip
+    uid=374_8 button
+    uid=374_9 generic
+      uid=374_10 combobox autocomplete="list" expandable haspopup="listbox" value="Picture"
+      uid=374_11 button "Remove"
+      uid=374_12 "Picture"
+    uid=374_13 generic
+      uid=374_14 button "Remove"
+      uid=374_15 "Rendition Created"
+      uid=374_16 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=374_17 generic
+      uid=374_18 button "Remove"
+      uid=374_19 "Dynamic Metadata"
+      uid=374_20 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=374_21 button pressed
+    uid=374_22 button
+    uid=374_23 generic
+      uid=374_24 combobox autocomplete="list" expandable haspopup="listbox" value="Picture"
+      uid=374_25 button "Remove"
+      uid=374_26 "Picture"
+    uid=374_27 generic
+      uid=374_28 button "Remove"
+      uid=374_29 "Document Created"
+      uid=374_30 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=374_31 generic
+      uid=374_32 button "Remove"
+      uid=374_33 "Brand Safety / Cultural Sensitivity - text"
+      uid=374_34 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=374_35 button pressed
+    uid=374_36 button
+    uid=374_37 generic
+      uid=374_38 combobox autocomplete="list" expandable haspopup="listbox" value="File"
+      uid=374_39 button "Remove"
+      uid=374_40 "File"
+    uid=374_41 generic
+      uid=374_42 button "Remove"
+      uid=374_43 "Document Created"
+      uid=374_44 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=374_45 generic
+      uid=374_46 button "Remove"
+      uid=374_47 "Dynamic Metadata"
+      uid=374_48 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=374_49 button pressed
+    uid=374_50 button
+  uid=368_175 status atomic live="polite" relevant="additions text"
+  uid=368_176 generic live="polite" relevant="additions text"

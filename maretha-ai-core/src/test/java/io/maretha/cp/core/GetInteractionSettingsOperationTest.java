@@ -59,12 +59,8 @@ public class GetInteractionSettingsOperationTest {
     ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    public void shouldReturnInteractionSettingsFromAPI() throws OperationException {
-        //GIVEN
-        DocumentModel cpSettingsDoc = session.createDocumentModel("/", SETTINGS_DOCUMENT_NAME, SETTINGS_DOCUMENT_TYPE);
-        cpSettingsDoc = session.createDocument(cpSettingsDoc);
-        txFeature.nextTransaction();
-        Interaction interaction = Interaction.builder().id("test").build();
+    public void shouldReturnDefaultInteractionsBeforeSettingsAreSaved() throws OperationException {
+        // No persisted settings document: offer the bundled first-use defaults.
         //WHEN
         OperationContext ctx = new OperationContext(session);
         //THEN
@@ -104,4 +100,29 @@ public class GetInteractionSettingsOperationTest {
     }
 
 
+
+    @Test
+    public void shouldKeepSavedEmptyInteractionsAcrossReloads() throws OperationException {
+        Interaction interaction = Interaction.builder().id("delete-me").build();
+        repositoryService.saveInteractionSettings(session, List.of(mapper.convertValue(interaction, ObjectNode.class)), Map.of("awsS3AccessEnabled", true));
+        txFeature.nextTransaction();
+
+        repositoryService.saveInteractionSettings(session, List.of(), Map.of());
+        txFeature.nextTransaction();
+
+        Settings settings = (Settings) automationService.run(new OperationContext(session), GetSettingsOperation.ID);
+        assertNotNull(settings);
+        assertTrue("Reload must not restore bundled interactions", settings.getInteractions().isEmpty());
+        assertTrue(settings.isAwsS3AccessEnabled());
+    }
+
+    @Test
+    public void shouldRespectAnExistingBlankSettingsDocument() throws OperationException {
+        session.createDocument(session.createDocumentModel("/", SETTINGS_DOCUMENT_NAME, SETTINGS_DOCUMENT_TYPE));
+        txFeature.nextTransaction();
+
+        Settings settings = (Settings) automationService.run(new OperationContext(session), GetSettingsOperation.ID);
+        assertNotNull(settings);
+        assertTrue(settings.getInteractions().isEmpty());
+    }
 }

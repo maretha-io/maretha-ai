@@ -1,0 +1,6 @@
+{
+  "extends": "../../../tsconfig.lib.json",
+  "files": ["./cp-settings.component.ts"],
+  "include": [],
+  "exclude": []
+}

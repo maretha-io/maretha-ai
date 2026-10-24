@@ -5,7 +5,7 @@
     <parent>
         <artifactId>maretha-ai-parent</artifactId>
         <groupId>io.maretha.cp</groupId>
-        <version>1.0.28</version>
+        <version>1.0.29</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,5 +18,22 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <!-- The extension remains owned and distributed by this add-on.
+                 The assembled host compiles it through the public SDK. -->
+            <resource>
+                <directory>../angular/dist</directory>
+                <targetPath>META-INF/maretha/angular</targetPath>
+                <excludes>
+                    <exclude>**/*.map</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
 
 </project>

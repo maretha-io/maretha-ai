@@ -1,0 +1,2111 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":1000}
+## Latest page snapshot
+uid=367_0 RootWebArea "AI Settings - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/maretha-cp-interactions"
+  uid=368_0 banner
+    uid=368_1 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=368_3 button "Quick Search" expandable
+  uid=368_4 complementary
+    uid=368_5 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=368_6 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=368_7 listbox "Drawer" orientation="vertical"
+      uid=368_8 option "AI search"
+        uid=368_9 button "AI search" expandable
+      uid=368_10 generic
+      uid=368_11 option "Browse"
+        uid=368_12 button "Browse" expandable
+      uid=368_13 option "Recently Viewed"
+        uid=368_14 button "Recently Viewed" expandable
+      uid=368_15 option "Search"
+        uid=368_16 button "Search" expandable
+      uid=368_17 option "Expired"
+        uid=368_18 button "Expired" expandable
+      uid=368_19 option "Assets"
+        uid=368_20 button "Assets" expandable
+      uid=368_21 option "Tasks"
+        uid=368_22 button "Tasks" expandable
+      uid=368_23 option "MSA Work Queue"
+        uid=368_24 button "MSA Work Queue" expandable
+      uid=368_25 option "Favorites"
+        uid=368_26 button "Favorites" expandable
+      uid=368_27 option "Collections"
+        uid=368_28 button "Collections" expandable
+      uid=368_29 option "Personal Space"
+        uid=368_30 button "Personal Space" expandable
+      uid=368_31 option "Clipboard"
+        uid=368_32 button "Clipboard" expandable
+      uid=368_33 option "Trash"
+        uid=368_34 button "Trash" expandable
+      uid=368_35 generic
+      uid=368_36 option "Administration" selected
+        uid=368_37 button "Administration" expandable expanded
+      uid=368_38 option "User Settings"
+        uid=368_39 button "User Settings" expandable
+    uid=369_0 heading "Administration" level="5"
+    uid=369_1 link "AI Settings" url="https://demo.maretha.io/nuxeo/ui/#!/maretha-cp-interactions"
+    uid=369_3 link "Analytics" url="https://demo.maretha.io/nuxeo/ui/#!/admin/analytics"
+    uid=369_5 link "Workflows" url="https://demo.maretha.io/nuxeo/ui/#!/admin/maretha-workflow"
+    uid=369_7 link "Users & Groups" url="https://demo.maretha.io/nuxeo/ui/#!/admin/user-group-management"
+    uid=369_9 link "Vocabularies" url="https://demo.maretha.io/nuxeo/ui/#!/admin/vocabulary-management"
+    uid=369_11 link "Audit" url="https://demo.maretha.io/nuxeo/ui/#!/admin/audit"
+    uid=369_13 link "Cloud Services" url="https://demo.maretha.io/nuxeo/ui/#!/admin/cloud-services"
+    uid=369_15 link "NXQL Search" url="https://demo.maretha.io/nuxeo/ui/#!/admin/nxql"
+    uid=369_17 button "Collapse the side navigation panel" expandable expanded
+    uid=369_18 separator "Resize the side navigation panel. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." orientation="vertical" value="350" valuemax="720" valuemin="350" valuetext=""
+  uid=368_40 main
+    uid=370_0 "AI Interactions Management"
+    uid=370_1 navigation
+      uid=370_2 listbox orientation="vertical"
+        uid=370_3 tab "Interactions" focusable focused selectable selected
+        uid=370_4 tab "Metadata" selectable
+        uid=370_5 tab "Events" selectable
+        uid=370_6 tab "Settings" selectable
+      uid=370_7 button "Save Changes" disableable disabled
+      uid=370_8 button description="Discard all changes" disableable disabled
+      uid=370_9 button description="Refresh interactions, metadata, events and settings"
+    uid=373_0 heading "Legal Analyst - Chat" level="4"
+    uid=373_1 "Discuss an image or document with an AI legal analyst that highlights potential legal risks to identify problems early and determine when further legal review is needed"
+    uid=373_2 heading "General" level="5"
+    uid=373_3 generic
+      uid=373_4 textbox "Interaction Name" required value="Legal Analyst - Chat"
+    uid=373_5 generic
+      uid=373_6 textbox multiline value="Discuss an image or document with an AI legal analyst that highlights potential legal risks to identify problems early and determine when further legal review is needed"
+    uid=373_7 heading "Prompt" level="5"
+    uid=373_8 generic
+      uid=373_9 textbox multiline value="You are a legal analyst. Review and discuss the attached image or document with the user. If an MSA document is provided use that as the master framework under which the primary document or contract is evaluated based on. Analyze the document from a legal-risk perspective, including potential corporate liability, rights and usage infringements, regulatory or notification requirements, contractual implications, fiduciary duties, and reputational considerations. Anything is the analyzed documents that deviate from terms specified in the MSA document should be flagged and surfaced in summary format at the beginning of your response. Provide clear, structured observations, identify possible areas of concern, and ask clarifying questions when needed. Do not provide legal advice; instead, offer risk-oriented analysis and point out issues that may warrant review by qualified legal counsel. Format the answer as HTML."
+    uid=373_10 heading "Activation" level="5"
+    uid=373_11 "List of document types this interaction is active for"
+    "*"
+    uid=373_12 generic
+      uid=373_13 button "Remove"
+      uid=373_14 "File"
+      uid=373_15 button "Remove"
+      uid=373_16 "Picture"
+      uid=373_17 button "Remove"
+      uid=373_18 "Folder"
+      uid=373_19 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_20 heading "AI Model" level="5"
+    uid=373_21 "AI model"
+    "*"
+    uid=373_22 generic
+      uid=373_23 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_24 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_25 heading "Settings" level="5"
+    uid=373_26 button "Enabled" pressed
+    uid=373_27 tooltip
+    uid=373_28 button "Visible in Action Menu"
+    uid=373_29 tooltip
+    uid=373_30 button "Executable on Folders" pressed
+    uid=373_31 tooltip
+    uid=373_32 button "Is Chat" pressed
+    uid=373_33 tooltip
+    uid=373_34 button "Save Metadata"
+    uid=373_35 tooltip
+    uid=373_36 button "Main Metadata" disableable disabled
+    uid=373_37 tooltip
+    uid=373_38 button "Send Parents Context"
+    uid=373_39 tooltip
+    uid=373_40 button "Send Attachments"
+    uid=373_41 tooltip
+    uid=373_42 button "Requires User Input"
+    uid=373_43 tooltip
+    uid=373_44 heading "Parameters" level="5"
+    uid=373_45 "Name"
+    uid=373_46 "Type"
+    uid=373_47 "Description"
+    uid=373_48 "Default value"
+    uid=373_49 "Read-only"
+    uid=373_50 "Additional context"
+    uid=373_51 "Chat Context"
+    uid=373_52 "Enable selection"
+    uid=373_53 "Selected document(s)"
+    uid=373_54 "Read-only selection"
+    uid=373_55 "Actions"
+    uid=373_56 generic
+      uid=373_57 textbox value="context"
+    uid=373_58 generic
+      uid=373_59 combobox autocomplete="list" expandable haspopup="listbox" value="string"
+      uid=373_60 button "Remove"
+      uid=373_61 "string"
+    uid=373_62 generic
+      uid=373_63 textbox
+    uid=373_64 generic
+      uid=373_65 textbox
+    uid=373_66 checkbox checked
+    uid=373_67 checkbox
+    uid=373_68 checkbox checked
+    uid=373_69 checkbox
+    uid=373_70 "N/A"
+    uid=373_71 "N/A"
+    uid=373_72 button "Delete parameter"
+    uid=373_73 generic
+      uid=373_74 textbox value="question"
+    uid=373_75 generic
+      uid=373_76 combobox autocomplete="list" expandable haspopup="listbox" value="string"
+      uid=373_77 button "Remove"
+      uid=373_78 "string"
+    uid=373_79 generic
+      uid=373_80 textbox
+    uid=373_81 generic
+      uid=373_82 textbox
+    uid=373_83 checkbox
+    uid=373_84 checkbox
+    uid=373_85 checkbox
+    uid=373_86 checkbox
+    uid=373_87 "N/A"
+    uid=373_88 "N/A"
+    uid=373_89 button "Delete parameter"
+    uid=373_90 generic
+      uid=373_91 textbox value="Rainier MSA"
+    uid=373_92 generic
+      uid=373_93 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_94 button "Remove"
+      uid=373_95 "array"
+    uid=373_96 generic
+      uid=373_97 textbox
+    uid=373_98 generic
+      uid=373_99 textbox
+    uid=373_100 checkbox
+    uid=373_101 checkbox
+    uid=373_102 checkbox checked
+    uid=373_103 checkbox checked
+    uid=373_104 generic
+      uid=373_105 button "Remove"
+      uid=373_106 link "Rainier-ACME Master Service Agreement.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Guidelines%20%26%20MA%20Contracts/Rainier-ACME%20Master%20Service%20Agreement.pdf"
+      uid=373_108 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_109 checkbox
+    uid=373_110 button "Delete parameter"
+    uid=373_111 button "Add Parameter"
+    uid=373_112 button "Delete"
+    uid=373_113 "Status:"
+    uid=373_114 "Version: "
+    uid=373_115 "1"
+    uid=373_116 heading "Dynamic Metadata" level="4"
+    uid=373_117 "Save metadata into Nuxeo."
+    uid=373_118 heading "General" level="5"
+    uid=373_119 generic
+      uid=373_120 textbox "Interaction Name" required value="Dynamic Metadata"
+    uid=373_121 generic
+      uid=373_122 textbox multiline value="Save metadata into Nuxeo."
+    uid=373_123 heading "Prompt" level="5"
+    uid=373_124 generic
+      uid=373_125 textbox multiline value="Extract Document Metadata."
+    uid=373_126 heading "Activation" level="5"
+    uid=373_127 "List of document types this interaction is active for"
+    "*"
+    uid=373_128 generic
+      uid=373_129 button "Remove"
+      uid=373_130 "File"
+      uid=373_131 button "Remove"
+      uid=373_132 "Picture"
+      uid=373_133 button "Remove"
+      uid=373_134 "Folder"
+      uid=373_135 button "Remove"
+      uid=373_136 "Collection"
+      uid=373_137 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_138 heading "AI Model" level="5"
+    uid=373_139 "AI model"
+    "*"
+    uid=373_140 generic
+      uid=373_141 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_142 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_143 heading "Settings" level="5"
+    uid=373_144 button "Enabled" pressed
+    uid=373_145 tooltip
+    uid=373_146 button "Visible in Action Menu" pressed
+    uid=373_147 tooltip
+    uid=373_148 button "Executable on Folders" pressed
+    uid=373_149 tooltip
+    uid=373_150 button "Is Chat"
+    uid=373_151 tooltip
+    uid=373_152 button "Save Metadata" pressed
+    uid=373_153 tooltip
+    uid=373_154 button "Main Metadata" pressed
+    uid=373_155 tooltip
+    uid=373_156 button "Send Parents Context"
+    uid=373_157 tooltip
+    uid=373_158 button "Send Attachments"
+    uid=373_159 tooltip
+    uid=373_160 button "Requires User Input"
+    uid=373_161 tooltip
+    uid=373_162 heading "Parameters" level="5"
+    uid=373_163 "Name"
+    uid=373_164 "Type"
+    uid=373_165 "Description"
+    uid=373_166 "Default value"
+    uid=373_167 "Read-only"
+    uid=373_168 "Additional context"
+    uid=373_169 "Chat Context"
+    uid=373_170 "Enable selection"
+    uid=373_171 "Selected document(s)"
+    uid=373_172 "Read-only selection"
+    uid=373_173 "Actions"
+    uid=373_174 generic
+      uid=373_175 textbox value="document"
+    uid=373_176 generic
+      uid=373_177 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_178 generic
+      uid=373_179 textbox
+    uid=373_180 generic
+      uid=373_181 textbox
+    uid=373_182 checkbox checked
+    uid=373_183 checkbox
+    uid=373_184 "N/A"
+    uid=373_185 checkbox
+    uid=373_186 "N/A"
+    uid=373_187 "N/A"
+    uid=373_188 button "Delete parameter"
+    uid=373_189 generic
+      uid=373_190 textbox value="schema"
+    uid=373_191 generic
+      uid=373_192 combobox autocomplete="list" expandable haspopup="listbox" value="string"
+      uid=373_193 button "Remove"
+      uid=373_194 "string"
+    uid=373_195 generic
+      uid=373_196 textbox
+    uid=373_197 generic
+      uid=373_198 textbox
+    uid=373_199 checkbox checked
+    uid=373_200 checkbox
+    uid=373_201 "N/A"
+    uid=373_202 checkbox
+    uid=373_203 "N/A"
+    uid=373_204 "N/A"
+    uid=373_205 button "Delete parameter"
+    uid=373_206 generic
+      uid=373_207 textbox value="media"
+    uid=373_208 generic
+      uid=373_209 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_210 generic
+      uid=373_211 textbox
+    uid=373_212 generic
+      uid=373_213 textbox
+    uid=373_214 checkbox checked
+    uid=373_215 checkbox
+    uid=373_216 "N/A"
+    uid=373_217 checkbox
+    uid=373_218 "N/A"
+    uid=373_219 "N/A"
+    uid=373_220 button "Delete parameter"
+    uid=373_221 generic
+      uid=373_222 textbox value="additionalContext"
+    uid=373_223 generic
+      uid=373_224 combobox autocomplete="list" expandable haspopup="listbox" value="string"
+      uid=373_225 button "Remove"
+      uid=373_226 "string"
+    uid=373_227 generic
+      uid=373_228 textbox
+    uid=373_229 generic
+      uid=373_230 textbox
+    uid=373_231 checkbox checked
+    uid=373_232 checkbox checked
+    uid=373_233 "N/A"
+    uid=373_234 checkbox
+    uid=373_235 "N/A"
+    uid=373_236 "N/A"
+    uid=373_237 button "Delete parameter"
+    uid=373_238 button "Add Parameter"
+    uid=373_239 button "Delete"
+    uid=373_240 "Status: "
+    uid=373_241 "draft"
+    uid=373_242 "Version: "
+    uid=373_243 "2"
+    uid=373_244 heading "Image Description / Abstract" level="4"
+    uid=373_245 "Provide a short, consistent description of an image to improve searchability, tagging, and content organization across the asset library"
+    uid=373_246 heading "General" level="5"
+    uid=373_247 generic
+      uid=373_248 textbox "Interaction Name" required value="Image Description / Abstract"
+    uid=373_249 generic
+      uid=373_250 textbox multiline value="Provide a short, consistent description of an image to improve searchability, tagging, and content organization across the asset library"
+    uid=373_251 heading "Prompt" level="5"
+    uid=373_252 generic
+      uid=373_253 textbox multiline value="Describe this image in max 20 words."
+    uid=373_254 heading "Activation" level="5"
+    uid=373_255 "List of document types this interaction is active for"
+    "*"
+    uid=373_256 generic
+      uid=373_257 button "Remove"
+      uid=373_258 "Picture"
+      uid=373_259 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_260 heading "AI Model" level="5"
+    uid=373_261 "AI model"
+    "*"
+    uid=373_262 generic
+      uid=373_263 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_264 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_265 heading "Settings" level="5"
+    uid=373_266 button "Enabled" pressed
+    uid=373_267 tooltip
+    uid=373_268 button "Visible in Action Menu"
+    uid=373_269 tooltip
+    uid=373_270 button "Executable on Folders"
+    uid=373_271 tooltip
+    uid=373_272 button "Is Chat"
+    uid=373_273 tooltip
+    uid=373_274 button "Save Metadata"
+    uid=373_275 tooltip
+    uid=373_276 button "Main Metadata" disableable disabled
+    uid=373_277 tooltip
+    uid=373_278 button "Send Parents Context"
+    uid=373_279 tooltip
+    uid=373_280 button "Send Attachments"
+    uid=373_281 tooltip
+    uid=373_282 button "Requires User Input"
+    uid=373_283 tooltip
+    uid=373_284 heading "Parameters" level="5"
+    uid=373_285 "Name"
+    uid=373_286 "Type"
+    uid=373_287 "Description"
+    uid=373_288 "Default value"
+    uid=373_289 "Read-only"
+    uid=373_290 "Additional context"
+    uid=373_291 "Chat Context"
+    uid=373_292 "Enable selection"
+    uid=373_293 "Selected document(s)"
+    uid=373_294 "Read-only selection"
+    uid=373_295 "Actions"
+    uid=373_296 generic
+      uid=373_297 textbox value="doc"
+    uid=373_298 generic
+      uid=373_299 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_300 generic
+      uid=373_301 textbox
+    uid=373_302 generic
+      uid=373_303 textbox
+    uid=373_304 checkbox checked
+    uid=373_305 checkbox
+    uid=373_306 "N/A"
+    uid=373_307 checkbox
+    uid=373_308 "N/A"
+    uid=373_309 "N/A"
+    uid=373_310 button "Delete parameter"
+    uid=373_311 button "Add Parameter"
+    uid=373_312 button "Delete"
+    uid=373_313 "Status: "
+    uid=373_314 "draft"
+    uid=373_315 "Version: "
+    uid=373_316 "1"
+    uid=373_317 heading "Shot Type Detection - vocab" level="4"
+    uid=373_318 "Identify the specific shot type used in an image so marketing teams can quickly organize, tag, and route assets within production workflows. Classifying images as laydown, on-model, lifestyle, hero, or other shot types enables faster content sorting, automated placement in templates, improved searchability, and more efficient reuse across campaigns, e-commerce, and creative operations."
+    uid=373_319 heading "General" level="5"
+    uid=373_320 generic
+      uid=373_321 textbox "Interaction Name" required value="Shot Type Detection - vocab"
+    uid=373_322 generic
+      uid=373_323 textbox multiline value="Identify the specific shot type used in an image so marketing teams can quickly organize, tag, and route assets within production workflows. Classifying images as laydown, on-model, lifestyle, hero, or other shot types enables faster content sorting, automated placement in templates, improved searchability, and more efficient reuse across campaigns, e-commerce, and creative operations."
+    uid=373_324 heading "Prompt" level="5"
+    uid=373_325 generic
+      uid=373_326 textbox multiline value="Evaluate the image and classify it using the provided shot-type vocabulary. Select the term(s) that most accurately represent how the product or subject is photographed (e.g., on-model, laydown, lifestyle, detail, hero). Return only valid vocabulary values and no additional text. If no match is appropriate, return null."
+    uid=373_327 heading "Activation" level="5"
+    uid=373_328 "List of document types this interaction is active for"
+    "*"
+    uid=373_329 generic
+      uid=373_330 button "Remove"
+      uid=373_331 "Picture"
+      uid=373_332 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_333 heading "AI Model" level="5"
+    uid=373_334 "AI model"
+    "*"
+    uid=373_335 generic
+      uid=373_336 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_337 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_338 heading "Settings" level="5"
+    uid=373_339 button "Enabled" pressed
+    uid=373_340 tooltip
+    uid=373_341 button "Visible in Action Menu" pressed
+    uid=373_342 tooltip
+    uid=373_343 button "Executable on Folders" pressed
+    uid=373_344 tooltip
+    uid=373_345 button "Is Chat"
+    uid=373_346 tooltip
+    uid=373_347 button "Save Metadata" pressed
+    uid=373_348 tooltip
+    uid=373_349 button "Main Metadata"
+    uid=373_350 tooltip
+    uid=373_351 button "Send Parents Context"
+    uid=373_352 tooltip
+    uid=373_353 button "Send Attachments"
+    uid=373_354 tooltip
+    uid=373_355 button "Requires User Input"
+    uid=373_356 tooltip
+    uid=373_357 heading "Parameters" level="5"
+    uid=373_358 button "Add Parameter"
+    uid=373_359 button "Delete"
+    uid=373_360 "Status:"
+    uid=373_361 "Version: "
+    uid=373_362 "1"
+    uid=373_363 heading "Brand Mark Detection - text" level="4"
+    uid=373_364 "Detect visible brand names, logos, or trademarked symbols in an image so organizations can avoid unauthorized brand use, mitigate legal exposure, and prevent reputational risks. Identifying brand identifiers ensures compliance with licensing, rights management, and marketing guidelines before assets are published or reused."
+    uid=373_365 heading "General" level="5"
+    uid=373_366 generic
+      uid=373_367 textbox "Interaction Name" required value="Brand Mark Detection - text"
+    uid=373_368 generic
+      uid=373_369 textbox multiline value="Detect visible brand names, logos, or trademarked symbols in an image so organizations can avoid unauthorized brand use, mitigate legal exposure, and prevent reputational risks. Identifying brand identifiers ensures compliance with licensing, rights management, and marketing guidelines before assets are published or reused."
+    uid=373_370 heading "Prompt" level="5"
+    uid=373_371 generic
+      uid=373_372 textbox multiline value="Analyze the image and identify any visible brand names, logos, or trademarked symbols. If a brand is recognizable, report the brand name and briefly note where it appears in the image (e.g., ‘on chest patch’, ‘on shoe side’, ‘in background signage’). If a logo is present but the brand cannot be identified, describe it briefly (e.g., ‘unidentified circular logo on hat’). If no brand or logo appears, return null."
+    uid=373_373 heading "Activation" level="5"
+    uid=373_374 "List of document types this interaction is active for"
+    "*"
+    uid=373_375 generic
+      uid=373_376 button "Remove"
+      uid=373_377 "Picture"
+      uid=373_378 button "Remove"
+      uid=373_379 "Document"
+      uid=373_380 button "Remove"
+      uid=373_381 "File"
+      uid=373_382 button "Remove"
+      uid=373_383 "Folder"
+      uid=373_384 button "Remove"
+      uid=373_385 "Collection"
+      uid=373_386 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_387 heading "AI Model" level="5"
+    uid=373_388 "AI model"
+    "*"
+    uid=373_389 generic
+      uid=373_390 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_391 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_392 heading "Settings" level="5"
+    uid=373_393 button "Enabled" pressed
+    uid=373_394 tooltip
+    uid=373_395 button "Visible in Action Menu" pressed
+    uid=373_396 tooltip
+    uid=373_397 button "Executable on Folders" pressed
+    uid=373_398 tooltip
+    uid=373_399 button "Is Chat"
+    uid=373_400 tooltip
+    uid=373_401 button "Save Metadata" pressed
+    uid=373_402 tooltip
+    uid=373_403 button "Main Metadata"
+    uid=373_404 tooltip
+    uid=373_405 button "Send Parents Context"
+    uid=373_406 tooltip
+    uid=373_407 button "Send Attachments"
+    uid=373_408 tooltip
+    uid=373_409 button "Requires User Input"
+    uid=373_410 tooltip
+    uid=373_411 heading "Parameters" level="5"
+    uid=373_412 button "Add Parameter"
+    uid=373_413 button "Delete"
+    uid=373_414 "Status:"
+    uid=373_415 "Version: "
+    uid=373_416 "1"
+    uid=373_417 heading "Brand Safety / Cultural Sensitivity - text" level="4"
+    uid=373_418 "Flag brand-safety, compliance, and cultural-sensitivity risks within an image or document so companies can prevent inappropriate, offensive, or non-compliant content from entering marketing or public channels. Identifying issues such as alcohol, violence, hate symbols, or culturally sensitive elements helps protect brand reputation, reduce legal exposure, and ensure assets meet internal standards before use."
+    uid=373_419 heading "General" level="5"
+    uid=373_420 generic
+      uid=373_421 textbox "Interaction Name" required value="Brand Safety / Cultural Sensitivity - text"
+    uid=373_422 generic
+      uid=373_423 textbox multiline value="Flag brand-safety, compliance, and cultural-sensitivity risks within an image or document so companies can prevent inappropriate, offensive, or non-compliant content from entering marketing or public channels. Identifying issues such as alcohol, violence, hate symbols, or culturally sensitive elements helps protect brand reputation, reduce legal exposure, and ensure assets meet internal standards before use."
+    uid=373_424 heading "Prompt" level="5"
+    uid=373_425 generic
+      uid=373_426 textbox multiline value="Analyze the image or document and briefly describe any brand-safety, reputational or cultural-sensitivity concerns it contains, including the specific issue and where it appears (e.g., ‘alcohol – man holding beer at table’, ‘hate imagery – symbol on wall’, ‘violence – knife visible on counter’). Use short, factual phrases rather than full sentences, and list only the meaningful risks. If the image contains no brand-safety issues, return null."
+    uid=373_427 heading "Activation" level="5"
+    uid=373_428 "List of document types this interaction is active for"
+    "*"
+    uid=373_429 generic
+      uid=373_430 button "Remove"
+      uid=373_431 "Picture"
+      uid=373_432 button "Remove"
+      uid=373_433 "Document"
+      uid=373_434 button "Remove"
+      uid=373_435 "File"
+      uid=373_436 button "Remove"
+      uid=373_437 "Folder"
+      uid=373_438 button "Remove"
+      uid=373_439 "Collection"
+      uid=373_440 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_441 heading "AI Model" level="5"
+    uid=373_442 "AI model"
+    "*"
+    uid=373_443 generic
+      uid=373_444 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_445 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_446 heading "Settings" level="5"
+    uid=373_447 button "Enabled" pressed
+    uid=373_448 tooltip
+    uid=373_449 button "Visible in Action Menu" pressed
+    uid=373_450 tooltip
+    uid=373_451 button "Executable on Folders" pressed
+    uid=373_452 tooltip
+    uid=373_453 button "Is Chat"
+    uid=373_454 tooltip
+    uid=373_455 button "Save Metadata" pressed
+    uid=373_456 tooltip
+    uid=373_457 button "Main Metadata"
+    uid=373_458 tooltip
+    uid=373_459 button "Send Parents Context"
+    uid=373_460 tooltip
+    uid=373_461 button "Send Attachments"
+    uid=373_462 tooltip
+    uid=373_463 button "Requires User Input"
+    uid=373_464 tooltip
+    uid=373_465 heading "Parameters" level="5"
+    uid=373_466 button "Add Parameter"
+    uid=373_467 button "Delete"
+    uid=373_468 "Status:"
+    uid=373_469 "Version: "
+    uid=373_470 "1"
+    uid=373_471 heading "WCAG Alt Text Generator - text" level="4"
+    uid=373_472 "Provide accessibility tagging for WCAG-compliant alt text so images are accessible to screen-reader users, supporting legal accessibility requirements and improving the quality of public-facing content."
+    uid=373_473 heading "General" level="5"
+    uid=373_474 generic
+      uid=373_475 textbox "Interaction Name" required value="WCAG Alt Text Generator - text"
+    uid=373_476 generic
+      uid=373_477 textbox multiline value="Provide accessibility tagging for WCAG-compliant alt text so images are accessible to screen-reader users, supporting legal accessibility requirements and improving the quality of public-facing content."
+    uid=373_478 heading "Prompt" level="5"
+    uid=373_479 generic
+      uid=373_480 textbox multiline value="Write accessible alt text for this image or document that complies with WCAG guidelines. Use one concise sentence (ideally 80–140 characters) that clearly describes the main subject, relevant action, and context, as a human would perceive it. Do not start with phrases like ‘image of’ or ‘picture of’; just describe it. If the image is purely decorative and carries no meaningful information, return null instead of any text."
+    uid=373_481 heading "Activation" level="5"
+    uid=373_482 "List of document types this interaction is active for"
+    "*"
+    uid=373_483 generic
+      uid=373_484 button "Remove"
+      uid=373_485 "Picture"
+      uid=373_486 button "Remove"
+      uid=373_487 "File"
+      uid=373_488 button "Remove"
+      uid=373_489 "Folder"
+      uid=373_490 button "Remove"
+      uid=373_491 "Collection"
+      uid=373_492 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_493 heading "AI Model" level="5"
+    uid=373_494 "AI model"
+    "*"
+    uid=373_495 generic
+      uid=373_496 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_497 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_498 heading "Settings" level="5"
+    uid=373_499 button "Enabled" pressed
+    uid=373_500 tooltip
+    uid=373_501 button "Visible in Action Menu" pressed
+    uid=373_502 tooltip
+    uid=373_503 button "Executable on Folders" pressed
+    uid=373_504 tooltip
+    uid=373_505 button "Is Chat"
+    uid=373_506 tooltip
+    uid=373_507 button "Save Metadata" pressed
+    uid=373_508 tooltip
+    uid=373_509 button "Main Metadata"
+    uid=373_510 tooltip
+    uid=373_511 button "Send Parents Context"
+    uid=373_512 tooltip
+    uid=373_513 button "Send Attachments"
+    uid=373_514 tooltip
+    uid=373_515 button "Requires User Input"
+    uid=373_516 tooltip
+    uid=373_517 heading "Parameters" level="5"
+    uid=373_518 button "Add Parameter"
+    uid=373_519 button "Delete"
+    uid=373_520 "Status:"
+    uid=373_521 "Version: "
+    uid=373_522 "1"
+    uid=373_523 heading "SEO Keyword Generator - text" level="4"
+    uid=373_524 "Generate SEO-optimized keyword phrases from product images to improve how public-facing content is indexed and discovered across search engines."
+    uid=373_525 heading "General" level="5"
+    uid=373_526 generic
+      uid=373_527 textbox "Interaction Name" required value="SEO Keyword Generator - text"
+    uid=373_528 generic
+      uid=373_529 textbox multiline value="Generate SEO-optimized keyword phrases from product images to improve how public-facing content is indexed and discovered across search engines."
+    uid=373_530 heading "Prompt" level="5"
+    uid=373_531 generic
+      uid=373_532 textbox multiline value="Analyze the provided image or document and generate a concise set of SEO-optimized keyword phrases (not full sentences) that accurately describe the content for search indexing and discovery.
+Step 1: Determine content context
+First determine the primary content type based on what is visible or described:
+•	Product or commercial content (e.g., products, services, offerings)
+•	Business or operational documentation (e.g., legal, financial, HR, regulatory)
+•	Marketing or promotional content (e.g., campaigns, ads, social, direct outreach)
+•	Corporate or investor communications (e.g., reports, announcements, governance)
+Step 2: Generate context-appropriate keyword phrases
+Based on the identified content type, generate keyword phrases that reflect:
+•	What the content is (type, category, or document class)
+•	Key attributes or themes (features, topics, functions, claims, or focus areas)
+•	Intended use, audience, or purpose (where applicable)
+For product or service content, emphasize tangible attributes such as category, function, materials, features, use-cases, and target audience.
+For business or corporate documentation, emphasize document type, subject matter, regulatory or operational focus, and organizational context.
+For marketing or communications content, emphasize campaign themes, messaging focus, channels, and audience orientation.
+Output requirements
+•	Return 5–12 comma-separated, multi-word keyword phrases
+•	Use descriptive phrases suitable for SEO indexing (not full sentences)
+•	Avoid generic filler terms, long descriptions, or single-word tags
+•	Do not include explanations or headings—return keywords only
+"
+    uid=373_533 heading "Activation" level="5"
+    uid=373_534 "List of document types this interaction is active for"
+    "*"
+    uid=373_535 generic
+      uid=373_536 button "Remove"
+      uid=373_537 "Picture"
+      uid=373_538 button "Remove"
+      uid=373_539 "Document"
+      uid=373_540 button "Remove"
+      uid=373_541 "File"
+      uid=373_542 button "Remove"
+      uid=373_543 "Collection"
+      uid=373_544 button "Remove"
+      uid=373_545 "Folder"
+      uid=373_546 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_547 heading "AI Model" level="5"
+    uid=373_548 "AI model"
+    "*"
+    uid=373_549 generic
+      uid=373_550 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_551 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_552 heading "Settings" level="5"
+    uid=373_553 button "Enabled" pressed
+    uid=373_554 tooltip
+    uid=373_555 button "Visible in Action Menu" pressed
+    uid=373_556 tooltip
+    uid=373_557 button "Executable on Folders" pressed
+    uid=373_558 tooltip
+    uid=373_559 button "Is Chat"
+    uid=373_560 tooltip
+    uid=373_561 button "Save Metadata" pressed
+    uid=373_562 tooltip
+    uid=373_563 button "Main Metadata"
+    uid=373_564 tooltip
+    uid=373_565 button "Send Parents Context"
+    uid=373_566 tooltip
+    uid=373_567 button "Send Attachments"
+    uid=373_568 tooltip
+    uid=373_569 button "Requires User Input"
+    uid=373_570 tooltip
+    uid=373_571 heading "Parameters" level="5"
+    uid=373_572 button "Add Parameter"
+    uid=373_573 button "Delete"
+    uid=373_574 "Status:"
+    uid=373_575 "Version: "
+    uid=373_576 "1"
+    uid=373_577 heading "Rights & Permissions Detection - text" level="4"
+    uid=373_578 "Identify potential rights and usage-permission issues in an image or document—such as copyrighted artwork, third-party logos, identifiable people, minors, or watermarks—to ensure the asset can be legally used. This field helps teams flag clearance risks early and avoid rights violations. It focuses solely on legal/permissions concerns, not brand safety or cultural sensitivities."
+    uid=373_579 heading "General" level="5"
+    uid=373_580 generic
+      uid=373_581 textbox "Interaction Name" required value="Rights & Permissions Detection - text"
+    uid=373_582 generic
+      uid=373_583 textbox multiline value="Identify potential rights and usage-permission issues in an image or document—such as copyrighted artwork, third-party logos, identifiable people, minors, or watermarks—to ensure the asset can be legally used. This field helps teams flag clearance risks early and avoid rights violations. It focuses solely on legal/permissions concerns, not brand safety or cultural sensitivities."
+    uid=373_584 heading "Prompt" level="5"
+    uid=373_585 generic
+      uid=373_586 textbox multiline value="Evaluate the image to identify potential digital-rights or usage-permission issues in the image or document—such as copyrighted artwork, third-party logos or designs, identifiable people requiring model releases, minors, or privately owned locations requiring property releases. Specifically check for stock agency watermarks, creator/photographer credits, embedded copyright text, third-party brand logos, or distinctive designs. Do not include regulatory, cultural, ethical, content-policy, brand-safety concerns or or audience-based restrictions. If no likely rights or clearance issues exist, return null."
+    uid=373_587 heading "Activation" level="5"
+    uid=373_588 "List of document types this interaction is active for"
+    "*"
+    uid=373_589 generic
+      uid=373_590 button "Remove"
+      uid=373_591 "Picture"
+      uid=373_592 button "Remove"
+      uid=373_593 "Document"
+      uid=373_594 button "Remove"
+      uid=373_595 "File"
+      uid=373_596 button "Remove"
+      uid=373_597 "Folder"
+      uid=373_598 button "Remove"
+      uid=373_599 "Collection"
+      uid=373_600 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_601 heading "AI Model" level="5"
+    uid=373_602 "AI model"
+    "*"
+    uid=373_603 generic
+      uid=373_604 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_605 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_606 heading "Settings" level="5"
+    uid=373_607 button "Enabled" pressed
+    uid=373_608 tooltip
+    uid=373_609 button "Visible in Action Menu" pressed
+    uid=373_610 tooltip
+    uid=373_611 button "Executable on Folders" pressed
+    uid=373_612 tooltip
+    uid=373_613 button "Is Chat"
+    uid=373_614 tooltip
+    uid=373_615 button "Save Metadata" pressed
+    uid=373_616 tooltip
+    uid=373_617 button "Main Metadata"
+    uid=373_618 tooltip
+    uid=373_619 button "Send Parents Context"
+    uid=373_620 tooltip
+    uid=373_621 button "Send Attachments"
+    uid=373_622 tooltip
+    uid=373_623 button "Requires User Input"
+    uid=373_624 tooltip
+    uid=373_625 heading "Parameters" level="5"
+    uid=373_626 button "Add Parameter"
+    uid=373_627 button "Delete"
+    uid=373_628 "Status:"
+    uid=373_629 "Version: "
+    uid=373_630 "1"
+    uid=373_631 heading "Document Classification - vocab" level="4"
+    uid=373_632 "Classify documents into standardized types to improve organization, searchability, and workflow routing. This reduces manual tagging, supports compliance, and ensures each document is handled correctly based on its purpose and structure."
+    uid=373_633 heading "General" level="5"
+    uid=373_634 generic
+      uid=373_635 textbox "Interaction Name" required value="Document Classification - vocab"
+    uid=373_636 generic
+      uid=373_637 textbox multiline value="Classify documents into standardized types to improve organization, searchability, and workflow routing. This reduces manual tagging, supports compliance, and ensures each document is handled correctly based on its purpose and structure."
+    uid=373_638 heading "Prompt" level="5"
+    uid=373_639 generic
+      uid=373_640 textbox multiline value="Analyze the document and classify it using only the document-type vocabulary values provided. Select the single most accurate document type based on the document’s structure, purpose, and content using the below descriptive prompts for each value. Do not invent new terms or output anything not contained in the vocabulary. If no vocabulary value applies, return null.
+
+policy = Identify documents that define organizational rules, standards, or governing procedures for employees or business operations. These documents describe required behaviors, compliance expectations, or internal guidelines. Exclude insurance policies or coverage documents
+
+contract = Identify documents that follow formal legal contract structure, including clauses, obligations, terms and conditions, signatures, and legally binding language between two or more parties. Focus on documents with clear enforceable commitments
+
+creativeBrief = Identify documents that outline objectives, audiences, messaging, visual direction, deliverables, timelines, or logistics for marketing, creative, advertising, branding, event, or promotional activities. May include shoot plans, concepts, or campaign goals
+
+projectPlan = Identify documents that define a project’s scope, milestones, schedules, tasks, dependencies, and assigned resources. Look for structured planning elements such as timelines, workflow stages, and ownership across a project lifecycle
+
+productBrief = Identify documents that describe features, requirements, concepts, testing plans, or enhancements related to a product’s development. These documents outline product goals, problems to solve, user needs, technical considerations, or innovation proposals. Identification should encompass product data sheets and general product specification documents"
+    uid=373_641 heading "Activation" level="5"
+    uid=373_642 "List of document types this interaction is active for"
+    "*"
+    uid=373_643 generic
+      uid=373_644 button "Remove"
+      uid=373_645 "File"
+      uid=373_646 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_647 heading "AI Model" level="5"
+    uid=373_648 "AI model"
+    "*"
+    uid=373_649 generic
+      uid=373_650 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_651 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_652 heading "Settings" level="5"
+    uid=373_653 button "Enabled" pressed
+    uid=373_654 tooltip
+    uid=373_655 button "Visible in Action Menu" pressed
+    uid=373_656 tooltip
+    uid=373_657 button "Executable on Folders" pressed
+    uid=373_658 tooltip
+    uid=373_659 button "Is Chat"
+    uid=373_660 tooltip
+    uid=373_661 button "Save Metadata" pressed
+    uid=373_662 tooltip
+    uid=373_663 button "Main Metadata"
+    uid=373_664 tooltip
+    uid=373_665 button "Send Parents Context"
+    uid=373_666 tooltip
+    uid=373_667 button "Send Attachments"
+    uid=373_668 tooltip
+    uid=373_669 button "Requires User Input"
+    uid=373_670 tooltip
+    uid=373_671 heading "Parameters" level="5"
+    uid=373_672 button "Add Parameter"
+    uid=373_673 button "Delete"
+    uid=373_674 "Status:"
+    uid=373_675 "Version: "
+    uid=373_676 "1"
+    uid=373_677 heading "CTA Hotspot Detection" level="4"
+    uid=373_678 "Identify visually distinct subjects, objects, or logical regions in an image that could function as clickable call-to-action areas. This enables teams to create interactive images—such as shoppable content or linked product hotspots—by automatically generating precise bounding boxes for use in digital marketing and e-commerce experiences"
+    uid=373_679 heading "General" level="5"
+    uid=373_680 generic
+      uid=373_681 textbox "Interaction Name" required value="CTA Hotspot Detection"
+    uid=373_682 generic
+      uid=373_683 textbox multiline value="Identify visually distinct subjects, objects, or logical regions in an image that could function as clickable call-to-action areas. This enables teams to create interactive images—such as shoppable content or linked product hotspots—by automatically generating precise bounding boxes for use in digital marketing and e-commerce experiences"
+    uid=373_684 heading "Prompt" level="5"
+    uid=373_685 generic
+      uid=373_686 textbox multiline value="Identify all clearly defined, visually distinct subjects or key objects or logical regions in the image that could serve as call-to-action targets (e.g., people, products, primary objects, or prominent items of user interest). For each identified subject, object or region, generate one recommended bounding box.
+Use ONLY absolute pixel coordinates from the original image resolution in the format: (x_min, y_min, width, height). DO NOT return fractional or normalized coordinates.
+Name each subject, object or region using a short, descriptive label such as ‘Person 1’, ‘Product 1’, ‘Object 1’, etc. Output each bounding box on its own line exactly in the format:
+[Subject or Object or Region Name] (x_min, y_min, width, height)
+If no suitable subjects or objects are present, return exactly: null
+DO NOT output any explanation, reasoning, or additional text."
+    uid=373_687 heading "Activation" level="5"
+    uid=373_688 "List of document types this interaction is active for"
+    "*"
+    uid=373_689 generic
+      uid=373_690 button "Remove"
+      uid=373_691 "Picture"
+      uid=373_692 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_693 heading "AI Model" level="5"
+    uid=373_694 "AI model"
+    "*"
+    uid=373_695 generic
+      uid=373_696 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_697 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_698 heading "Settings" level="5"
+    uid=373_699 button "Enabled" pressed
+    uid=373_700 tooltip
+    uid=373_701 button "Visible in Action Menu" pressed
+    uid=373_702 tooltip
+    uid=373_703 button "Executable on Folders"
+    uid=373_704 tooltip
+    uid=373_705 button "Is Chat"
+    uid=373_706 tooltip
+    uid=373_707 button "Save Metadata"
+    uid=373_708 tooltip
+    uid=373_709 button "Main Metadata" disableable disabled
+    uid=373_710 tooltip
+    uid=373_711 button "Send Parents Context"
+    uid=373_712 tooltip
+    uid=373_713 button "Send Attachments"
+    uid=373_714 tooltip
+    uid=373_715 button "Requires User Input"
+    uid=373_716 tooltip
+    uid=373_717 heading "Parameters" level="5"
+    uid=373_718 button "Add Parameter"
+    uid=373_719 button "Delete"
+    uid=373_720 "Status:"
+    uid=373_721 "Version: "
+    uid=373_722 "1"
+    uid=373_723 heading "Channel-Optimized Crop Generator" level="4"
+    uid=373_724 "Generate standardized crop recommendations for key channel aspect ratios so marketing teams can quickly produce channel-ready images for hero banners, product detail pages, and social media. Automating crop box creation saves manual editing time, ensures visual consistency across platforms, and accelerates content production for retail and e-commerce workflows."
+    uid=373_725 heading "General" level="5"
+    uid=373_726 generic
+      uid=373_727 textbox "Interaction Name" required value="Channel-Optimized Crop Generator"
+    uid=373_728 generic
+      uid=373_729 textbox multiline value="Generate standardized crop recommendations for key channel aspect ratios so marketing teams can quickly produce channel-ready images for hero banners, product detail pages, and social media. Automating crop box creation saves manual editing time, ensures visual consistency across platforms, and accelerates content production for retail and e-commerce workflows."
+    uid=373_730 heading "Prompt" level="5"
+    uid=373_731 generic
+      uid=373_732 textbox multiline value="Identify the main subject(s) in the image and define recommended crop boxes for three aspect ratios:
+•	Hero (16:9)
+•	Detail (4:5)
+•	Social (1:1)
+Use ONLY absolute pixel coordinates based on the original image resolution, in the format:
+(x_min, y_min, width, height)
+Do NOT return fractional or normalized coordinates.
+For each aspect ratio:
+•	Calculate the most appropriate crop focused on the primary subject.
+•	Evaluate whether the resulting crop meets the minimum usable size requirement of at least 400 pixels in both width and height.
+Output rules
+•	Return each crop on its own line exactly in one of the following formats:
+Hero (x_min, y_min, width, height)
+Detail (x_min, y_min, width, height)
+Social (x_min, y_min, width, height)
+•	If a valid crop can be defined but the resulting width or height is less than 400 pixels, return:
+Hero INVALID_SIZE_BELOW_MINIMUM (x_min, y_min, width, height)
+(Apply the same format for Detail or Social.)
+•	If a crop is not applicable at all for that aspect ratio, return:
+Hero null
+Do NOT output any other text.
+"
+    uid=373_733 heading "Activation" level="5"
+    uid=373_734 "List of document types this interaction is active for"
+    "*"
+    uid=373_735 generic
+      uid=373_736 button "Remove"
+      uid=373_737 "Picture"
+      uid=373_738 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_739 heading "AI Model" level="5"
+    uid=373_740 "AI model"
+    "*"
+    uid=373_741 generic
+      uid=373_742 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_743 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_744 heading "Settings" level="5"
+    uid=373_745 button "Enabled" pressed
+    uid=373_746 tooltip
+    uid=373_747 button "Visible in Action Menu" pressed
+    uid=373_748 tooltip
+    uid=373_749 button "Executable on Folders"
+    uid=373_750 tooltip
+    uid=373_751 button "Is Chat"
+    uid=373_752 tooltip
+    uid=373_753 button "Save Metadata" pressed
+    uid=373_754 tooltip
+    uid=373_755 button "Main Metadata"
+    uid=373_756 tooltip
+    uid=373_757 button "Send Parents Context"
+    uid=373_758 tooltip
+    uid=373_759 button "Send Attachments"
+    uid=373_760 tooltip
+    uid=373_761 button "Requires User Input"
+    uid=373_762 tooltip
+    uid=373_763 heading "Parameters" level="5"
+    uid=373_764 button "Add Parameter"
+    uid=373_765 button "Delete"
+    uid=373_766 "Status:"
+    uid=373_767 "Version: "
+    uid=373_768 "1"
+    uid=373_769 heading "Document Abstract" level="4"
+    uid=373_770 "Generate a brief, high-level summary of a document with key points, themes, and actions."
+    uid=373_771 heading "General" level="5"
+    uid=373_772 generic
+      uid=373_773 textbox "Interaction Name" required value="Document Abstract"
+    uid=373_774 generic
+      uid=373_775 textbox multiline value="Generate a brief, high-level summary of a document with key points, themes, and actions."
+    uid=373_776 heading "Prompt" level="5"
+    uid=373_777 generic
+      uid=373_778 textbox multiline value="Read the document and produce a concise summary that captures its key points, themes, decisions, and action items. The summary should give a clear understanding of the document’s purpose, main ideas, and important takeaways without unnecessary detail. Write in clear, direct prose, approximately one paragraph. Do not include bullet points unless they improve clarity."
+    uid=373_779 heading "Activation" level="5"
+    uid=373_780 "List of document types this interaction is active for"
+    "*"
+    uid=373_781 generic
+      uid=373_782 button "Remove"
+      uid=373_783 "Document"
+      uid=373_784 button "Remove"
+      uid=373_785 "File"
+      uid=373_786 button "Remove"
+      uid=373_787 "Folder"
+      uid=373_788 button "Remove"
+      uid=373_789 "Collection"
+      uid=373_790 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_791 heading "AI Model" level="5"
+    uid=373_792 "AI model"
+    "*"
+    uid=373_793 generic
+      uid=373_794 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_795 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_796 heading "Settings" level="5"
+    uid=373_797 button "Enabled" pressed
+    uid=373_798 tooltip
+    uid=373_799 button "Visible in Action Menu" pressed
+    uid=373_800 tooltip
+    uid=373_801 button "Executable on Folders"
+    uid=373_802 tooltip
+    uid=373_803 button "Is Chat"
+    uid=373_804 tooltip
+    uid=373_805 button "Save Metadata"
+    uid=373_806 tooltip
+    uid=373_807 button "Main Metadata" disableable disabled
+    uid=373_808 tooltip
+    uid=373_809 button "Send Parents Context"
+    uid=373_810 tooltip
+    uid=373_811 button "Send Attachments"
+    uid=373_812 tooltip
+    uid=373_813 button "Requires User Input"
+    uid=373_814 tooltip
+    uid=373_815 heading "Parameters" level="5"
+    uid=373_816 button "Add Parameter"
+    uid=373_817 button "Delete"
+    uid=373_818 "Status:"
+    uid=373_819 "Version: "
+    uid=373_820 "1"
+    uid=373_821 heading "Competitive Intelligence Analyst" level="4"
+    uid=373_822 "Extract key technical and messaging insights about competitor products from images or documents. This helps teams quickly understand how rival offerings are designed, engineered, and positioned, supporting product strategy and competitive decision-making"
+    uid=373_823 heading "General" level="5"
+    uid=373_824 generic
+      uid=373_825 textbox "Interaction Name" required value="Competitive Intelligence Analyst"
+    uid=373_826 generic
+      uid=373_827 textbox multiline value="Extract key technical and messaging insights about competitor products from images or documents. This helps teams quickly understand how rival offerings are designed, engineered, and positioned, supporting product strategy and competitive decision-making"
+    uid=373_828 heading "Prompt" level="5"
+    uid=373_829 generic
+      uid=373_830 textbox multiline value="You are a competitive product analyst. Review the provided image, document, or set of materials to identify attributes of a competitor’s product relevant to functional, technical, and messaging analysis. Focus on key visible technical components and their functions (including hydraulic, electronic, and mechanical systems); distinctive engineering features or design elements; quality indicators such as materials, fabrication, and system integration; any modern technologies visible in the content such as sensors, controls, automation, or digital interfaces; how these features compare to industry norms or competing products; indicators of maintenance accessibility or serviceability; any brand-specific engineering approaches or proprietary systems; and performance-related design elements. Provide specific, factual observations and explain the potential competitive advantages or disadvantages implied by the visible features. Your response should be less than 500 words and formatted in clean HTML."
+    uid=373_831 heading "Activation" level="5"
+    uid=373_832 "List of document types this interaction is active for"
+    "*"
+    uid=373_833 generic
+      uid=373_834 button "Remove"
+      uid=373_835 "Document"
+      uid=373_836 button "Remove"
+      uid=373_837 "Picture"
+      uid=373_838 button "Remove"
+      uid=373_839 "Folder"
+      uid=373_840 button "Remove"
+      uid=373_841 "Collection"
+      uid=373_842 button "Remove"
+      uid=373_843 "File"
+      uid=373_844 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_845 heading "AI Model" level="5"
+    uid=373_846 "AI model"
+    "*"
+    uid=373_847 generic
+      uid=373_848 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_849 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_850 heading "Settings" level="5"
+    uid=373_851 button "Enabled" pressed
+    uid=373_852 tooltip
+    uid=373_853 button "Visible in Action Menu" pressed
+    uid=373_854 tooltip
+    uid=373_855 button "Executable on Folders" pressed
+    uid=373_856 tooltip
+    uid=373_857 button "Is Chat"
+    uid=373_858 tooltip
+    uid=373_859 button "Save Metadata"
+    uid=373_860 tooltip
+    uid=373_861 button "Main Metadata" disableable disabled
+    uid=373_862 tooltip
+    uid=373_863 button "Send Parents Context"
+    uid=373_864 tooltip
+    uid=373_865 button "Send Attachments"
+    uid=373_866 tooltip
+    uid=373_867 button "Requires User Input"
+    uid=373_868 tooltip
+    uid=373_869 heading "Parameters" level="5"
+    uid=373_870 button "Add Parameter"
+    uid=373_871 button "Delete"
+    uid=373_872 "Status:"
+    uid=373_873 "Version: "
+    uid=373_874 "1"
+    uid=373_875 heading "Structured Image Semantics - text" level="4"
+    uid=373_876 "Captures the key visual components of an asset in a structured, machine-readable format to improve searchability, tagging accuracy, and content understanding. These semantic elements help organizations organize large asset libraries, enable more precise retrieval, support downstream automation, and provide richer metadata for marketing, creative, and AI-driven workflows."
+    uid=373_877 heading "General" level="5"
+    uid=373_878 generic
+      uid=373_879 textbox "Interaction Name" required value="Structured Image Semantics - text"
+    uid=373_880 generic
+      uid=373_881 textbox multiline value="Captures the key visual components of an asset in a structured, machine-readable format to improve searchability, tagging accuracy, and content understanding. These semantic elements help organizations organize large asset libraries, enable more precise retrieval, support downstream automation, and provide richer metadata for marketing, creative, and AI-driven workflows."
+    uid=373_882 heading "Prompt" level="5"
+    uid=373_883 generic
+      uid=373_884 textbox multiline value="Analyze the image and list its key visual elements as concise, typed entries. For each important element, use the format <category>: <short description>, where category is one of: subject, product, environment, activity, camera_view, or other. Focus on the main people, products, setting, and actions; avoid full sentences and generic keywords. Return 5–15 lines, one entry per line, with no extra text."
+    uid=373_885 heading "Activation" level="5"
+    uid=373_886 "List of document types this interaction is active for"
+    "*"
+    uid=373_887 generic
+      uid=373_888 button "Remove"
+      uid=373_889 "Picture"
+      uid=373_890 button "Remove"
+      uid=373_891 "Document"
+      uid=373_892 button "Remove"
+      uid=373_893 "File"
+      uid=373_894 button "Remove"
+      uid=373_895 "Folder"
+      uid=373_896 button "Remove"
+      uid=373_897 "Collection"
+      uid=373_898 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_899 heading "AI Model" level="5"
+    uid=373_900 "AI model"
+    "*"
+    uid=373_901 generic
+      uid=373_902 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_903 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_904 heading "Settings" level="5"
+    uid=373_905 button "Enabled" pressed
+    uid=373_906 tooltip
+    uid=373_907 button "Visible in Action Menu" pressed
+    uid=373_908 tooltip
+    uid=373_909 button "Executable on Folders" pressed
+    uid=373_910 tooltip
+    uid=373_911 button "Is Chat"
+    uid=373_912 tooltip
+    uid=373_913 button "Save Metadata" pressed
+    uid=373_914 tooltip
+    uid=373_915 button "Main Metadata"
+    uid=373_916 tooltip
+    uid=373_917 button "Send Parents Context"
+    uid=373_918 tooltip
+    uid=373_919 button "Send Attachments"
+    uid=373_920 tooltip
+    uid=373_921 button "Requires User Input"
+    uid=373_922 tooltip
+    uid=373_923 heading "Parameters" level="5"
+    uid=373_924 button "Add Parameter"
+    uid=373_925 button "Delete"
+    uid=373_926 "Status:"
+    uid=373_927 "Version: "
+    uid=373_928 "1"
+    uid=373_929 heading "Compare documents" level="4"
+    uid=373_930 "Diff between documents"
+    uid=373_931 heading "General" level="5"
+    uid=373_932 generic
+      uid=373_933 textbox "Interaction Name" required value="Compare documents"
+    uid=373_934 generic
+      uid=373_935 textbox multiline value="Diff between documents"
+    uid=373_936 heading "Prompt" level="5"
+    uid=373_937 generic
+      uid=373_938 textbox multiline value="Make a diff between the given documents"
+    uid=373_939 heading "Activation" level="5"
+    uid=373_940 "List of document types this interaction is active for"
+    "*"
+    uid=373_941 generic
+      uid=373_942 button "Remove"
+      uid=373_943 "File"
+      uid=373_944 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_945 heading "AI Model" level="5"
+    uid=373_946 "AI model"
+    "*"
+    uid=373_947 generic
+      uid=373_948 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_949 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_950 heading "Settings" level="5"
+    uid=373_951 button "Enabled" pressed
+    uid=373_952 tooltip
+    uid=373_953 button "Visible in Action Menu" pressed
+    uid=373_954 tooltip
+    uid=373_955 button "Executable on Folders"
+    uid=373_956 tooltip
+    uid=373_957 button "Is Chat"
+    uid=373_958 tooltip
+    uid=373_959 button "Save Metadata"
+    uid=373_960 tooltip
+    uid=373_961 button "Main Metadata" disableable disabled
+    uid=373_962 tooltip
+    uid=373_963 button "Send Parents Context" pressed
+    uid=373_964 tooltip
+    uid=373_965 button "Send Attachments"
+    uid=373_966 tooltip
+    uid=373_967 button "Requires User Input"
+    uid=373_968 tooltip
+    uid=373_969 heading "Parameters" level="5"
+    uid=373_970 "Name"
+    uid=373_971 "Type"
+    uid=373_972 "Description"
+    uid=373_973 "Default value"
+    uid=373_974 "Read-only"
+    uid=373_975 "Additional context"
+    uid=373_976 "Chat Context"
+    uid=373_977 "Enable selection"
+    uid=373_978 "Selected document(s)"
+    uid=373_979 "Read-only selection"
+    uid=373_980 "Actions"
+    uid=373_981 generic
+      uid=373_982 textbox value="doc2"
+    uid=373_983 generic
+      uid=373_984 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_985 button "Remove"
+      uid=373_986 "array"
+    uid=373_987 generic
+      uid=373_988 textbox
+    uid=373_989 generic
+      uid=373_990 textbox
+    uid=373_991 checkbox
+    uid=373_992 checkbox
+    uid=373_993 "N/A"
+    uid=373_994 checkbox checked
+    uid=373_995 generic
+      uid=373_996 combobox "  " autocomplete="list" expandable haspopup="listbox"
+    uid=373_997 checkbox
+    uid=373_998 button "Delete parameter"
+    uid=373_999 generic
+      uid=373_1000 textbox value="fixedDoc"
+    uid=373_1001 generic
+      uid=373_1002 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1003 button "Remove"
+      uid=373_1004 "array"
+    uid=373_1005 generic
+      uid=373_1006 textbox
+    uid=373_1007 generic
+      uid=373_1008 textbox
+    uid=373_1009 checkbox
+    uid=373_1010 checkbox
+    uid=373_1011 "N/A"
+    uid=373_1012 checkbox checked
+    uid=373_1013 generic
+      uid=373_1014 button "Remove"
+      uid=373_1015 link "Siberian Husky - Wikipedia.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/Adrian/Docs/Siberian%20Husky%20-%20Wikipedia.pdf"
+      uid=373_1017 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1018 checkbox
+    uid=373_1019 button "Delete parameter"
+    uid=373_1020 button "Add Parameter"
+    uid=373_1021 button "Delete"
+    uid=373_1022 "Status:"
+    uid=373_1023 "Version: "
+    uid=373_1024 "1"
+    uid=373_1025 heading "Brand Safety / Cultural Sensitivity - vocab" level="4"
+    uid=373_1026 "Capture standardized brand-safety and cultural-sensitivity classifications for an image using a controlled vocabulary. It enables teams to quickly identify and flag content that may pose legal, compliance, reputational, or policy risks. By tagging images with consistent, predefined safety categories, organizations can automate review workflows, prevent inappropriate assets from entering marketing or public channels, and maintain alignment with internal and platform-level content guidelines."
+    uid=373_1027 heading "General" level="5"
+    uid=373_1028 generic
+      uid=373_1029 textbox "Interaction Name" required value="Brand Safety / Cultural Sensitivity - vocab"
+    uid=373_1030 generic
+      uid=373_1031 textbox multiline value="Capture standardized brand-safety and cultural-sensitivity classifications for an image using a controlled vocabulary. It enables teams to quickly identify and flag content that may pose legal, compliance, reputational, or policy risks. By tagging images with consistent, predefined safety categories, organizations can automate review workflows, prevent inappropriate assets from entering marketing or public channels, and maintain alignment with internal and platform-level content guidelines."
+    uid=373_1032 heading "Prompt" level="5"
+    uid=373_1033 generic
+      uid=373_1034 textbox multiline value="Evaluate the image and classify it using the provided brand-safety and cultural-sensitivity vocabulary. Select the term(s) that most accurately represent any sensitive, risky, or restricted content visible in the image (e.g., NSFW, weapons, dangerous, alcohol, drugs, hate, political, smoking). Return only valid vocabulary values and no additional text. If no match is appropriate, return null."
+    uid=373_1035 heading "Activation" level="5"
+    uid=373_1036 "List of document types this interaction is active for"
+    "*"
+    uid=373_1037 generic
+      uid=373_1038 button "Remove"
+      uid=373_1039 "Picture"
+      uid=373_1040 button "Remove"
+      uid=373_1041 "File"
+      uid=373_1042 button "Remove"
+      uid=373_1043 "Folder"
+      uid=373_1044 button "Remove"
+      uid=373_1045 "Collection"
+      uid=373_1046 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_1047 heading "AI Model" level="5"
+    uid=373_1048 "AI model"
+    "*"
+    uid=373_1049 generic
+      uid=373_1050 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_1051 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_1052 heading "Settings" level="5"
+    uid=373_1053 button "Enabled" pressed
+    uid=373_1054 tooltip
+    uid=373_1055 button "Visible in Action Menu" pressed
+    uid=373_1056 tooltip
+    uid=373_1057 button "Executable on Folders" pressed
+    uid=373_1058 tooltip
+    uid=373_1059 button "Is Chat"
+    uid=373_1060 tooltip
+    uid=373_1061 button "Save Metadata" pressed
+    uid=373_1062 tooltip
+    uid=373_1063 button "Main Metadata"
+    uid=373_1064 tooltip
+    uid=373_1065 button "Send Parents Context"
+    uid=373_1066 tooltip
+    uid=373_1067 button "Send Attachments"
+    uid=373_1068 tooltip
+    uid=373_1069 button "Requires User Input"
+    uid=373_1070 tooltip
+    uid=373_1071 heading "Parameters" level="5"
+    uid=373_1072 button "Add Parameter"
+    uid=373_1073 button "Delete"
+    uid=373_1074 "Status:"
+    uid=373_1075 "Version: "
+    uid=373_1076 "1"
+    uid=373_1077 heading "Brand Design Guidelines Compliance" level="4"
+    uid=373_1078 "Assess image compliance with brand guidelines, leveraging existing metadata to highlight risks and edge cases."
+    uid=373_1079 heading "General" level="5"
+    uid=373_1080 generic
+      uid=373_1081 textbox "Interaction Name" required value="Brand Design Guidelines Compliance"
+    uid=373_1082 generic
+      uid=373_1083 textbox multiline value="Assess image compliance with brand guidelines, leveraging existing metadata to highlight risks and edge cases."
+    uid=373_1084 heading "Prompt" level="5"
+    uid=373_1085 generic
+      uid=373_1086 textbox multiline value="Analyze the target image for compliance with the brand guidelines described in the linked document referenced by parameter entitled “Guidelines Document”.
+You are provided with AI-generated metadata associated with the image:
+•	ai:imageScene (shot type): {ai:imageScene}
+•	ai:safety (brand safety categories): {ai:safety}
+•	ai:safetyText (details of detected issues): {ai:safetyText}
+Review focus
+•	The primary focus of this review is visual design, presentation, and usage compliance with the brand guidelines (composition, styling, context, imagery standards).
+•	If ai:safety contains one or more values, treat those areas as heightened-risk zones and apply stricter interpretation of the brand guidelines in those contexts.
+•	Use ai:safetyText to understand what triggered the safety classification and where it appears in the image. Reference this information when explaining compliance concerns.
+•	Do not perform general content moderation or apply external policy standards. All determinations must be grounded in the linked Guidelines Document.
+Output format
+Provide the response in two sections:
+1) Out-of-Compliance Issues
+List specific visual elements that clearly violate the brand guidelines. Use concise bullet points. Where applicable, note relevant safety context (e.g., “safety tag: alcohol – bottle visible on table”).
+2) Borderline Issues
+List elements that may be technically acceptable but appear close to violating brand standards, require clarification, or may present elevated brand risk due to the safety context.
+
+If more than five issues are detected in either section, report only the top five and add: “Further issues detected but truncated.”
+Focus only on guideline compliance. Do not provide creative suggestions, redesign ideas, or subjective aesthetic feedback.
+Ignore brand ownership, brand identity mismatches, or logo-brand inconsistencies between the image and the reference guidelines. Treat the guidelines as a generic design and usage standard, and evaluate compliance only against visual, compositional, styling, and content rules."
+    uid=373_1087 heading "Activation" level="5"
+    uid=373_1088 "List of document types this interaction is active for"
+    "*"
+    uid=373_1089 generic
+      uid=373_1090 button "Remove"
+      uid=373_1091 "Picture"
+      uid=373_1092 button "Remove"
+      uid=373_1093 "File"
+      uid=373_1094 button "Remove"
+      uid=373_1095 "Document"
+      uid=373_1096 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_1097 heading "AI Model" level="5"
+    uid=373_1098 "AI model"
+    "*"
+    uid=373_1099 generic
+      uid=373_1100 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_1101 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_1102 heading "Settings" level="5"
+    uid=373_1103 button "Enabled" pressed
+    uid=373_1104 tooltip
+    uid=373_1105 button "Visible in Action Menu" pressed
+    uid=373_1106 tooltip
+    uid=373_1107 button "Executable on Folders"
+    uid=373_1108 tooltip
+    uid=373_1109 button "Is Chat"
+    uid=373_1110 tooltip
+    uid=373_1111 button "Save Metadata"
+    uid=373_1112 tooltip
+    uid=373_1113 button "Main Metadata" disableable disabled
+    uid=373_1114 tooltip
+    uid=373_1115 button "Send Parents Context"
+    uid=373_1116 tooltip
+    uid=373_1117 button "Send Attachments"
+    uid=373_1118 tooltip
+    uid=373_1119 button "Requires User Input"
+    uid=373_1120 tooltip
+    uid=373_1121 heading "Parameters" level="5"
+    uid=373_1122 "Name"
+    uid=373_1123 "Type"
+    uid=373_1124 "Description"
+    uid=373_1125 "Default value"
+    uid=373_1126 "Read-only"
+    uid=373_1127 "Additional context"
+    uid=373_1128 "Chat Context"
+    uid=373_1129 "Enable selection"
+    uid=373_1130 "Selected document(s)"
+    uid=373_1131 "Read-only selection"
+    uid=373_1132 "Actions"
+    uid=373_1133 generic
+      uid=373_1134 textbox value="Guidelines Document"
+    uid=373_1135 generic
+      uid=373_1136 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1137 button "Remove"
+      uid=373_1138 "array"
+    uid=373_1139 generic
+      uid=373_1140 textbox value="Guidelines doc"
+    uid=373_1141 generic
+      uid=373_1142 textbox
+    uid=373_1143 checkbox checked
+    uid=373_1144 checkbox checked
+    uid=373_1145 "N/A"
+    uid=373_1146 checkbox checked
+    uid=373_1147 generic
+      uid=373_1148 button "Remove"
+      uid=373_1149 link "REI Apparel-Footwear-StyleGuide-V2.0-02_comp.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Guidelines%20%26%20MA%20Contracts/REI%20Apparel-Footwear-StyleGuide-V2.0-02_comp.pdf"
+      uid=373_1151 button "Remove"
+      uid=373_1152 link "Image Quality Training_2025 (2)_comp.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Guidelines%20%26%20MA%20Contracts/Image%20Quality%20Training_2025%20(2)_comp.pdf"
+      uid=373_1154 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1155 checkbox
+    uid=373_1156 button "Delete parameter"
+    uid=373_1157 generic
+      uid=373_1158 textbox value="Brand Safety"
+    uid=373_1159 generic
+      uid=373_1160 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1161 button "Remove"
+      uid=373_1162 "array"
+    uid=373_1163 generic
+      uid=373_1164 textbox value="Safety Guide"
+    uid=373_1165 generic
+      uid=373_1166 textbox
+    uid=373_1167 checkbox checked
+    uid=373_1168 checkbox checked
+    uid=373_1169 "N/A"
+    uid=373_1170 checkbox checked
+    uid=373_1171 generic
+      uid=373_1172 button "Remove"
+      uid=373_1173 link "Brand_Messaging_and_Content_Sensitivity_Guidelines.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Guidelines%20%26%20MA%20Contracts/Brand_Messaging_and_Content_Sensitivity_Guidelines.pdf"
+      uid=373_1175 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1176 checkbox
+    uid=373_1177 button "Delete parameter"
+    uid=373_1178 button "Add Parameter"
+    uid=373_1179 button "Delete"
+    uid=373_1180 "Status:"
+    uid=373_1181 "Version: "
+    uid=373_1182 "1"
+    uid=373_1183 heading "Retail Messaging Compliance" level="4"
+    uid=373_1184 "Executes compliance review for retail messaging using logic for messaging type and regional regulatory requirements."
+    uid=373_1185 heading "General" level="5"
+    uid=373_1186 generic
+      uid=373_1187 textbox "Interaction Name" required value="Retail Messaging Compliance"
+    uid=373_1188 generic
+      uid=373_1189 textbox multiline value="Executes compliance review for retail messaging using logic for messaging type and regional regulatory requirements. "
+    uid=373_1190 heading "Prompt" level="5"
+    uid=373_1191 generic
+      uid=373_1192 textbox multiline value="Retail Messaging Compliance – Metadata-Driven Review
+GLOBAL OUTPUT RULE (HIGHEST PRIORITY)
+If at any point you are instructed to return an exact response string, you MUST return only that string and nothing else.
+Do NOT include headings, explanations, analysis, reasoning, or formatting.
+Violating this rule is an error.
+MANDATORY PRE-CHECK — EXECUTE BEFORE ANY REVIEW OR ANALYSIS
+You MUST complete Step 1 before performing any compliance evaluation.
+If any condition below is met, STOP immediately and return ONLY the specified response.
+
+Step 1: Validate document relevance
+A. Parent folder nature check
+- If the parent folder metadata does not include a dc:nature value, return exactly:
+“No retail messaging type specified on the parent folder.”
+Then STOP. Do not output anything else.
+B. Document relevance check
+- If the parent folder metadata includes dc:nature = product_marketing_materials, determine whether the document itself appears to be product marketing, launch, sell-in, promotional, or other consumer-facing messaging.
+- If the document does not appear to be product marketing material (for example: a contract, legal agreement, policy document, academic text, editorial, or news article), return exactly:
+“This document does not appear to be product marketing material and cannot be evaluated for retail messaging compliance.”
+Then STOP. Do not output anything else.
+ONLY IF STEP 1 DOES NOT TRIGGER A STOP, CONTINUE BELOW
+
+Step 2: Determine applicable compliance scope
+- If the document is valid product marketing material, use the parent folder metadata to determine the appropriate compliance review.
+A. Sustainability-focused review
+- If dc:subjects = sustainability, perform a sustainability and environmental claims compliance review.
+Use the folder’s dc:coverage value to select the applicable reference guidance:
+- If dc:coverage = US, evaluate the document only against the parameter entitled US Sustainability Rules (FTC Green Guides).
+- If dc:coverage = UK, evaluate the document only against the parameter entitled UK Sustainability Rules (CMA environmental claims guidance).
+Limit analysis strictly to sustainability and environmental claims.
+Ground all findings explicitly in the referenced guidance documents, not general sustainability knowledge.
+Identify:
+- Outright compliance risks
+- Borderline or potentially misleading claims
+- Missing qualifications, substantiation gaps, or implied claims (including via imagery or phrasing)
+B. General marketing and advertising claims review
+- If dc:subjects = marketing_claims, perform a general advertising and marketing compliance review.
+Use the parameter entitled US Advertising Guidelines (US ads substantiation guide) as the primary reference.
+This review may include broader advertising substantiation, clarity, or misleading-claims considerations.
+The dc:coverage value may be ignored for this case.
+
+Step 3: Output format (ONLY IF STEP 2 IS EXECUTED)
+Structure the response with the following sections:
+Out of Compliance Issues
+Borderline or High-Risk Areas
+- If more than five issues exist in either category, list the top five and add:
+"Additional issues detected but truncated."
+Do NOT provide legal advice. Frame all findings as potential risk indicators requiring further review.
+
+
+"
+    uid=373_1193 heading "Activation" level="5"
+    uid=373_1194 "List of document types this interaction is active for"
+    "*"
+    uid=373_1195 generic
+      uid=373_1196 button "Remove"
+      uid=373_1197 "File"
+      uid=373_1198 button "Remove"
+      uid=373_1199 "Folder"
+      uid=373_1200 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_1201 heading "AI Model" level="5"
+    uid=373_1202 "AI model"
+    "*"
+    uid=373_1203 generic
+      uid=373_1204 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_1205 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_1206 heading "Settings" level="5"
+    uid=373_1207 button "Enabled" pressed
+    uid=373_1208 tooltip
+    uid=373_1209 button "Visible in Action Menu" pressed
+    uid=373_1210 tooltip
+    uid=373_1211 button "Executable on Folders" pressed
+    uid=373_1212 tooltip
+    uid=373_1213 button "Is Chat"
+    uid=373_1214 tooltip
+    uid=373_1215 button "Save Metadata"
+    uid=373_1216 tooltip
+    uid=373_1217 button "Main Metadata" disableable disabled
+    uid=373_1218 tooltip
+    uid=373_1219 button "Send Parents Context" pressed
+    uid=373_1220 tooltip
+    uid=373_1221 button "Send Attachments"
+    uid=373_1222 tooltip
+    uid=373_1223 button "Requires User Input"
+    uid=373_1224 tooltip
+    uid=373_1225 heading "Parameters" level="5"
+    uid=373_1226 "Name"
+    uid=373_1227 "Type"
+    uid=373_1228 "Description"
+    uid=373_1229 "Default value"
+    uid=373_1230 "Read-only"
+    uid=373_1231 "Additional context"
+    uid=373_1232 "Chat Context"
+    uid=373_1233 "Enable selection"
+    uid=373_1234 "Selected document(s)"
+    uid=373_1235 "Read-only selection"
+    uid=373_1236 "Actions"
+    uid=373_1237 generic
+      uid=373_1238 textbox value="US Sustainability Rules"
+    uid=373_1239 generic
+      uid=373_1240 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1241 button "Remove"
+      uid=373_1242 "array"
+    uid=373_1243 generic
+      uid=373_1244 textbox
+    uid=373_1245 generic
+      uid=373_1246 textbox
+    uid=373_1247 checkbox checked
+    uid=373_1248 checkbox
+    uid=373_1249 "N/A"
+    uid=373_1250 checkbox checked
+    uid=373_1251 generic
+      uid=373_1252 button "Remove"
+      uid=373_1253 link "US _GreenGuides-FRN-11-5-22.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Contextual%20Review/Retail%20Product%20Launch/Retail%20Regulatory/US%20_GreenGuides-FRN-11-5-22.pdf"
+      uid=373_1255 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1256 checkbox
+    uid=373_1257 button "Delete parameter"
+    uid=373_1258 generic
+      uid=373_1259 textbox value="UK Sustainability Rules"
+    uid=373_1260 generic
+      uid=373_1261 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1262 button "Remove"
+      uid=373_1263 "array"
+    uid=373_1264 generic
+      uid=373_1265 textbox
+    uid=373_1266 generic
+      uid=373_1267 textbox
+    uid=373_1268 checkbox checked
+    uid=373_1269 checkbox
+    uid=373_1270 "N/A"
+    uid=373_1271 checkbox checked
+    uid=373_1272 generic
+      uid=373_1273 button "Remove"
+      uid=373_1274 link "UK Guidance_for_businesses_on_making_environmental_claims_.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Contextual%20Review/Retail%20Product%20Launch/Retail%20Regulatory/UK%20Guidance_for_businesses_on_making_environmental_claims_.pdf"
+      uid=373_1276 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1277 checkbox
+    uid=373_1278 button "Delete parameter"
+    uid=373_1279 generic
+      uid=373_1280 textbox value="US Ad Guidelines"
+    uid=373_1281 generic
+      uid=373_1282 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1283 button "Remove"
+      uid=373_1284 "array"
+    uid=373_1285 generic
+      uid=373_1286 textbox
+    uid=373_1287 generic
+      uid=373_1288 textbox
+    uid=373_1289 checkbox checked
+    uid=373_1290 checkbox
+    uid=373_1291 "N/A"
+    uid=373_1292 checkbox checked
+    uid=373_1293 generic
+      uid=373_1294 button "Remove"
+      uid=373_1295 link "US ads substantiation guide.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Contextual%20Review/Retail%20Product%20Launch/Retail%20Regulatory/US%20ads%20substantiation%20guide.pdf"
+      uid=373_1297 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1298 checkbox
+    uid=373_1299 button "Delete parameter"
+    uid=373_1300 generic
+      uid=373_1301 textbox value="parentsContext"
+    uid=373_1302 generic
+      uid=373_1303 combobox autocomplete="list" expandable haspopup="listbox" value="string"
+      uid=373_1304 button "Remove"
+      uid=373_1305 "string"
+    uid=373_1306 generic
+      uid=373_1307 textbox
+    uid=373_1308 generic
+      uid=373_1309 textbox
+    uid=373_1310 checkbox checked
+    uid=373_1311 checkbox checked
+    uid=373_1312 "N/A"
+    uid=373_1313 checkbox
+    uid=373_1314 "N/A"
+    uid=373_1315 "N/A"
+    uid=373_1316 button "Delete parameter"
+    uid=373_1317 button "Add Parameter"
+    uid=373_1318 button "Delete"
+    uid=373_1319 "Status:"
+    uid=373_1320 "Version: "
+    uid=373_1321 "1"
+    uid=373_1322 heading "FinServ Jurisdiction-Aware Regulatory Compliance" level="4"
+    uid=373_1323 "Performs an analysis of customer communications against regulatory rules, guidelines and law in relevant jurisdiction."
+    uid=373_1324 heading "General" level="5"
+    uid=373_1325 generic
+      uid=373_1326 textbox "Interaction Name" required value="FinServ Jurisdiction-Aware Regulatory Compliance "
+    uid=373_1327 generic
+      uid=373_1328 textbox multiline value="Performs an analysis of customer communications against regulatory rules, guidelines and law in relevant jurisdiction."
+    uid=373_1329 heading "Prompt" level="5"
+    uid=373_1330 generic
+      uid=373_1331 textbox multiline value="Review the provided document for regulatory and fair-treatment risks based on the jurisdiction specified in the document’s metadata. Use the referenced regulatory guidance documents to ground your analysis and avoid relying on general regulatory knowledge outside those materials.
+Step 1: Validate jurisdiction metadata
+•	If the document’s dc:coverage field is not populated, stop analysis and respond only with:
+	“No jurisdiction is specified for this content. Update metadata to complete regulatory risk analysis.”
+Step 2: Select applicable regulatory guidance
+Based on the document’s dc:coverage value, apply the corresponding regulatory framework:
+•	If dc:coverage = United_Kingdom_of_Great_Britain_N_Ireland:
+	Reference and ground the analysis in UK Guidelines, including: UK Consumer Duty (FG22/5) & UK Fair Treatment Guidance (FG21/1)
+•	If dc:coverage = United_States_of_America:
+	Reference and ground the analysis in US Guidelines, including: US Insurance Market Handbook
+Do not apply guidance from jurisdictions that do not match the document’s coverage metadata.
+Step 3: Perform regulatory risk analysis
+Using the applicable reference documents, evaluate the content for potential regulatory risks, including but not limited to:
+•	Fair treatment of customers
+•	Clarity, transparency, and absence of misleading language
+•	Appropriateness of claims, assurances, or representations
+•	Disclosure of limitations, exclusions, or conditions
+•	Claims handling or decision-making language that may create consumer detriment
+Keep the analysis specific to the principles, expectations, and examples described in the referenced guidance rather than abstract or generalized regulatory theory.
+Step 4: Output format
+•	Structure the response into the following sections:
+1.	Primary Regulatory Risk Areas
+2.	Potential or Borderline Concerns
+•	Clearly explain why each issue may present risk under the applicable guidance.
+•	If multiple issues are detected, list the most significant findings and note:
+“Additional potential risks identified but not exhaustively listed.”
+Do not provide legal advice. Frame findings as risk indicators that may warrant further review by compliance or legal teams.
+"
+    uid=373_1332 heading "Activation" level="5"
+    uid=373_1333 "List of document types this interaction is active for"
+    "*"
+    uid=373_1334 generic
+      uid=373_1335 button "Remove"
+      uid=373_1336 "File"
+      uid=373_1337 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_1338 heading "AI Model" level="5"
+    uid=373_1339 "AI model"
+    "*"
+    uid=373_1340 generic
+      uid=373_1341 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_1342 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_1343 heading "Settings" level="5"
+    uid=373_1344 button "Enabled" pressed
+    uid=373_1345 tooltip
+    uid=373_1346 button "Visible in Action Menu" pressed
+    uid=373_1347 tooltip
+    uid=373_1348 button "Executable on Folders"
+    uid=373_1349 tooltip
+    uid=373_1350 button "Is Chat"
+    uid=373_1351 tooltip
+    uid=373_1352 button "Save Metadata"
+    uid=373_1353 tooltip
+    uid=373_1354 button "Main Metadata" disableable disabled
+    uid=373_1355 tooltip
+    uid=373_1356 button "Send Parents Context"
+    uid=373_1357 tooltip
+    uid=373_1358 button "Send Attachments"
+    uid=373_1359 tooltip
+    uid=373_1360 button "Requires User Input"
+    uid=373_1361 tooltip
+    uid=373_1362 heading "Parameters" level="5"
+    uid=373_1363 "Name"
+    uid=373_1364 "Type"
+    uid=373_1365 "Description"
+    uid=373_1366 "Default value"
+    uid=373_1367 "Read-only"
+    uid=373_1368 "Additional context"
+    uid=373_1369 "Chat Context"
+    uid=373_1370 "Enable selection"
+    uid=373_1371 "Selected document(s)"
+    uid=373_1372 "Read-only selection"
+    uid=373_1373 "Actions"
+    uid=373_1374 generic
+      uid=373_1375 textbox value="UK Guidelines"
+    uid=373_1376 generic
+      uid=373_1377 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1378 button "Remove"
+      uid=373_1379 "array"
+    uid=373_1380 generic
+      uid=373_1381 textbox
+    uid=373_1382 generic
+      uid=373_1383 textbox
+    uid=373_1384 checkbox checked
+    uid=373_1385 checkbox checked
+    uid=373_1386 "N/A"
+    uid=373_1387 checkbox checked
+    uid=373_1388 generic
+      uid=373_1389 button "Remove"
+      uid=373_1390 link "UK Consumer Duty - fg22-5.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Contextual%20Review/FinServ%20Regulatory%20Risk/Insurance%20Guidelines/UK%20Consumer%20Duty%20-%20fg22-5.pdf"
+      uid=373_1392 button "Remove"
+      uid=373_1393 link "UK Fair Treatment - fg21-1.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Contextual%20Review/FinServ%20Regulatory%20Risk/Insurance%20Guidelines/UK%20Fair%20Treatment%20-%20fg21-1.pdf"
+      uid=373_1395 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1396 checkbox
+    uid=373_1397 button "Delete parameter"
+    uid=373_1398 generic
+      uid=373_1399 textbox value="US Guidelines"
+    uid=373_1400 generic
+      uid=373_1401 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1402 button "Remove"
+      uid=373_1403 "array"
+    uid=373_1404 generic
+      uid=373_1405 textbox
+    uid=373_1406 generic
+      uid=373_1407 textbox
+    uid=373_1408 checkbox checked
+    uid=373_1409 checkbox checked
+    uid=373_1410 "N/A"
+    uid=373_1411 checkbox checked
+    uid=373_1412 generic
+      uid=373_1413 button "Remove"
+      uid=373_1414 link "US Insurance market handbook.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Contextual%20Review/FinServ%20Regulatory%20Risk/Insurance%20Guidelines/US%20Insurance%20market%20handbook.pdf"
+      uid=373_1416 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1417 checkbox
+    uid=373_1418 button "Delete parameter"
+    uid=373_1419 button "Add Parameter"
+    uid=373_1420 button "Delete"
+    uid=373_1421 "Status:"
+    uid=373_1422 "Version: "
+    uid=373_1423 "1"
+    uid=373_1424 heading "Job Description Generator" level="4"
+    uid=373_1425 "Generates a job description based on role defintion materials"
+    uid=373_1426 heading "General" level="5"
+    uid=373_1427 generic
+      uid=373_1428 textbox "Interaction Name" required value="Job Description Generator"
+    uid=373_1429 generic
+      uid=373_1430 textbox multiline value="Generates a job description based on role defintion materials"
+    uid=373_1431 heading "Prompt" level="5"
+    uid=373_1432 generic
+      uid=373_1433 textbox multiline value="METADATA (provided by the system):
+dc:coverage = {{dc:coverage}}
+
+STEP 0: Validate required metadata (MANDATORY FIRST CHECK)
+• Read the METADATA line "dc:coverage = ...".
+• If the value is missing, blank, null, None, unknown, or is still shown as "{{dc:coverage}}", STOP immediately and return exactly:
+Job description generation cannot be completed because no coverage value is provided on the source document.
+• Do not include any other text.
+
+STEP 1: Determine region + output language + applicable regulations (MANDATORY, LOCKED)
+Use ONLY the dc:coverage value shown in METADATA.
+
+Determine the applicable regulation parameter and output language as follows:
+• If dc:coverage contains "France" → set Applicable_Regs = France_Regs AND output MUST be entirely in French.
+• Else if dc:coverage contains "United Kingdom" OR "Great Britain" OR "N. Ireland" OR "UK" → set Applicable_Regs = UK_Regs AND output MUST be entirely in English.
+• Else if dc:coverage contains "United States" OR "USA" → set Applicable_Regs = US_Regs AND output MUST be entirely in English.
+• Else STOP and return exactly:
+Unsupported coverage value for this interaction. Please set dc:coverage to United States, United Kingdom, or France.
+
+STEP 2: Use the Job Description Template
+• Use the job description template referenced by parameter JD_Template as the structural and formatting foundation.
+• Preserve all company-level boilerplate content exactly as written in the template (translate only if Step 1 requires French).
+• Identify all placeholders or bracketed sections in the template and populate them using information inferred from the role definition document.
+• Do not invent role details that cannot be reasonably inferred from the role definition.
+
+STEP 3: Populate role-specific content
+• Derive role title, responsibilities, qualifications, skills, work model, and expectations from the role definition document.
+• Use clear, professional, and public-facing language suitable for an external job posting.
+• Maintain a neutral, inclusive tone.
+
+Salary ranges
+• Include salary or compensation ranges only if they are explicitly mentioned in the role definition document.
+• If no salary information is present, omit compensation figures rather than guessing.
+
+STEP 4: Apply region-specific regulatory requirements (NO RE-DETECTION)
+• Apply ONLY the regulatory guidance found in the parameter selected in Step 1 (Applicable_Regs).
+• Incorporate required boilerplate statements exactly as provided.
+• Refine wording to align with the selected region’s compliance expectations.
+• Follow any instructional guidance (e.g., inclusive language requirements).
+• Do NOT apply regulatory guidance from other regions.
+
+STEP 5: Output requirements
+• Output the final job description as formatted text (headings, sections, and lists as appropriate).
+• Target approximately one page in length.
+• Slightly exceeding one page is acceptable if required to include regulatory language.
+• Do not include explanations, reasoning, or references to the source documents.
+• Output only the finished job description.
+"
+    uid=373_1434 heading "Activation" level="5"
+    uid=373_1435 "List of document types this interaction is active for"
+    "*"
+    uid=373_1436 generic
+      uid=373_1437 button "Remove"
+      uid=373_1438 "File"
+      uid=373_1439 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_1440 heading "AI Model" level="5"
+    uid=373_1441 "AI model"
+    "*"
+    uid=373_1442 generic
+      uid=373_1443 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_1444 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_1445 heading "Settings" level="5"
+    uid=373_1446 button "Enabled" pressed
+    uid=373_1447 tooltip
+    uid=373_1448 button "Visible in Action Menu" pressed
+    uid=373_1449 tooltip
+    uid=373_1450 button "Executable on Folders"
+    uid=373_1451 tooltip
+    uid=373_1452 button "Is Chat"
+    uid=373_1453 tooltip
+    uid=373_1454 button "Save Metadata"
+    uid=373_1455 tooltip
+    uid=373_1456 button "Main Metadata" disableable disabled
+    uid=373_1457 tooltip
+    uid=373_1458 button "Send Parents Context"
+    uid=373_1459 tooltip
+    uid=373_1460 button "Send Attachments"
+    uid=373_1461 tooltip
+    uid=373_1462 button "Requires User Input"
+    uid=373_1463 tooltip
+    uid=373_1464 heading "Parameters" level="5"
+    uid=373_1465 "Name"
+    uid=373_1466 "Type"
+    uid=373_1467 "Description"
+    uid=373_1468 "Default value"
+    uid=373_1469 "Read-only"
+    uid=373_1470 "Additional context"
+    uid=373_1471 "Chat Context"
+    uid=373_1472 "Enable selection"
+    uid=373_1473 "Selected document(s)"
+    uid=373_1474 "Read-only selection"
+    uid=373_1475 "Actions"
+    uid=373_1476 generic
+      uid=373_1477 textbox value="JD_Template"
+    uid=373_1478 generic
+      uid=373_1479 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1480 button "Remove"
+      uid=373_1481 "array"
+    uid=373_1482 generic
+      uid=373_1483 textbox
+    uid=373_1484 generic
+      uid=373_1485 textbox
+    uid=373_1486 checkbox checked
+    uid=373_1487 checkbox checked
+    uid=373_1488 "N/A"
+    uid=373_1489 checkbox checked
+    uid=373_1490 generic
+      uid=373_1491 button "Remove"
+      uid=373_1492 link "JD_Template_ABC_Insurance.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Job%20Description/Reference%20%26%20Regulatory/JD_Template_ABC_Insurance.pdf"
+      uid=373_1494 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1495 checkbox
+    uid=373_1496 button "Delete parameter"
+    uid=373_1497 generic
+      uid=373_1498 textbox value="US_Regs"
+    uid=373_1499 generic
+      uid=373_1500 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1501 button "Remove"
+      uid=373_1502 "array"
+    uid=373_1503 generic
+      uid=373_1504 textbox
+    uid=373_1505 generic
+      uid=373_1506 textbox
+    uid=373_1507 checkbox checked
+    uid=373_1508 checkbox checked
+    uid=373_1509 "N/A"
+    uid=373_1510 checkbox checked
+    uid=373_1511 generic
+      uid=373_1512 button "Remove"
+      uid=373_1513 link "US_JD_Compliance_Guidelines_v2.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Job%20Description/Reference%20%26%20Regulatory/US_JD_Compliance_Guidelines_v2.pdf"
+      uid=373_1515 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1516 checkbox
+    uid=373_1517 button "Delete parameter"
+    uid=373_1518 generic
+      uid=373_1519 textbox value="UK_Regs"
+    uid=373_1520 generic
+      uid=373_1521 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1522 button "Remove"
+      uid=373_1523 "array"
+    uid=373_1524 generic
+      uid=373_1525 textbox
+    uid=373_1526 generic
+      uid=373_1527 textbox
+    uid=373_1528 checkbox checked
+    uid=373_1529 checkbox checked
+    uid=373_1530 "N/A"
+    uid=373_1531 checkbox checked
+    uid=373_1532 generic
+      uid=373_1533 button "Remove"
+      uid=373_1534 link "UK_JD_Compliance_Guidelines_v2.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Job%20Description/Reference%20%26%20Regulatory/UK_JD_Compliance_Guidelines_v2.pdf"
+      uid=373_1536 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1537 checkbox
+    uid=373_1538 button "Delete parameter"
+    uid=373_1539 generic
+      uid=373_1540 textbox value="France_Regs"
+    uid=373_1541 generic
+      uid=373_1542 combobox autocomplete="list" expandable haspopup="listbox" value="array"
+      uid=373_1543 button "Remove"
+      uid=373_1544 "array"
+    uid=373_1545 generic
+      uid=373_1546 textbox
+    uid=373_1547 generic
+      uid=373_1548 textbox
+    uid=373_1549 checkbox checked
+    uid=373_1550 checkbox checked
+    uid=373_1551 "N/A"
+    uid=373_1552 checkbox checked
+    uid=373_1553 generic
+      uid=373_1554 button "Remove"
+      uid=373_1555 link "France_JD_Compliance_Guidelines_v2.pdf" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Job%20Description/Reference%20%26%20Regulatory/France_JD_Compliance_Guidelines_v2.pdf"
+      uid=373_1557 combobox autocomplete="list" expandable haspopup="listbox"
+    uid=373_1558 checkbox
+    uid=373_1559 button "Delete parameter"
+    uid=373_1560 button "Add Parameter"
+    uid=373_1561 button "Delete"
+    uid=373_1562 "Status:"
+    uid=373_1563 "Version: "
+    uid=373_1564 "1"
+    uid=373_1565 heading "Loan Data JSON Extraction" level="4"
+    uid=373_1566 "Extract the document data into valid json format."
+    uid=373_1567 heading "General" level="5"
+    uid=373_1568 generic
+      uid=373_1569 textbox "Interaction Name" required value="Loan Data JSON Extraction"
+    uid=373_1570 generic
+      uid=373_1571 textbox multiline value="Extract the document data into valid json format."
+    uid=373_1572 heading "Prompt" level="5"
+    uid=373_1573 generic
+      uid=373_1574 textbox multiline value="Act as a high-precision data extraction engine. Your task is to analyze the provided Loan Application document and convert it into a structured JSON format.
+
+Instructions:
+Dynamic Schema Discovery: Identify all logical data categories within the document (e.g., Personal Details, Financial Information, Loan Terms, Employment History). Create a nested JSON structure that best represents these relationships.
+
+Fallback Requirement: If the provided text is empty, unreadable, or contains no extractable data, you must still output a valid JSON object representing a standard Loan Application schema with all values set to null.
+
+Data Types: * Use floats for all monetary values.
+
+Use ISO 8601 (YYYY-MM-DD) for all dates.
+
+Use arrays for lists.
+
+Strict Output: Return ONLY the raw valid JSON object. Do not include introductory remarks, explanations, or Markdown code blocks (no backticks).
+
+Handling Missing Info: If a specific field within a document is missing, set the value to null. Do not hallucinate data.
+
+Important: DO NOT ADD NEW LINE!"
+    uid=373_1575 heading "Activation" level="5"
+    uid=373_1576 "List of document types this interaction is active for"
+    "*"
+    uid=373_1577 generic
+      uid=373_1578 button "Remove"
+      uid=373_1579 "File"
+      uid=373_1580 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_1581 heading "AI Model" level="5"
+    uid=373_1582 "AI model"
+    "*"
+    uid=373_1583 generic
+      uid=373_1584 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_1585 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_1586 heading "Settings" level="5"
+    uid=373_1587 button "Enabled" pressed
+    uid=373_1588 tooltip
+    uid=373_1589 button "Visible in Action Menu" pressed
+    uid=373_1590 tooltip
+    uid=373_1591 button "Executable on Folders"
+    uid=373_1592 tooltip
+    uid=373_1593 button "Is Chat"
+    uid=373_1594 tooltip
+    uid=373_1595 button "Save Metadata" pressed
+    uid=373_1596 tooltip
+    uid=373_1597 button "Main Metadata"
+    uid=373_1598 tooltip
+    uid=373_1599 button "Send Parents Context"
+    uid=373_1600 tooltip
+    uid=373_1601 button "Send Attachments"
+    uid=373_1602 tooltip
+    uid=373_1603 button "Requires User Input"
+    uid=373_1604 tooltip
+    uid=373_1605 heading "Parameters" level="5"
+    uid=373_1606 button "Add Parameter"
+    uid=373_1607 button "Delete"
+    uid=373_1608 "Status:"
+    uid=373_1609 "Version: "
+    uid=373_1610 "1"
+    uid=373_1611 heading "Loan Summary" level="4"
+    uid=373_1612 heading "General" level="5"
+    uid=373_1613 generic
+      uid=373_1614 textbox "Interaction Name" required value="Loan Summary"
+    uid=373_1615 generic
+      uid=373_1616 textbox multiline
+    uid=373_1617 heading "Prompt" level="5"
+    uid=373_1618 generic
+      uid=373_1619 textbox multiline value="Document summary"
+    uid=373_1620 heading "Activation" level="5"
+    uid=373_1621 "List of document types this interaction is active for"
+    "*"
+    uid=373_1622 generic
+      uid=373_1623 button "Remove"
+      uid=373_1624 "File"
+      uid=373_1625 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_1626 heading "AI Model" level="5"
+    uid=373_1627 "AI model"
+    "*"
+    uid=373_1628 generic
+      uid=373_1629 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_1630 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_1631 heading "Settings" level="5"
+    uid=373_1632 button "Enabled" pressed
+    uid=373_1633 tooltip
+    uid=373_1634 button "Visible in Action Menu" pressed
+    uid=373_1635 tooltip
+    uid=373_1636 button "Executable on Folders"
+    uid=373_1637 tooltip
+    uid=373_1638 button "Is Chat"
+    uid=373_1639 tooltip
+    uid=373_1640 button "Save Metadata"
+    uid=373_1641 tooltip
+    uid=373_1642 button "Main Metadata" disableable disabled
+    uid=373_1643 tooltip
+    uid=373_1644 button "Send Parents Context"
+    uid=373_1645 tooltip
+    uid=373_1646 button "Send Attachments"
+    uid=373_1647 tooltip
+    uid=373_1648 button "Requires User Input"
+    uid=373_1649 tooltip
+    uid=373_1650 heading "Parameters" level="5"
+    uid=373_1651 button "Add Parameter"
+    uid=373_1652 button "Delete"
+    uid=373_1653 "Status:"
+    uid=373_1654 "Version: "
+    uid=373_1655 "1"
+    uid=373_1656 heading "Text Placement Analysis" level="4"
+    uid=373_1657 "Detects text placement potential in images"
+    uid=373_1658 heading "General" level="5"
+    uid=373_1659 generic
+      uid=373_1660 textbox "Interaction Name" required value="Text Placement Analysis"
+    uid=373_1661 generic
+      uid=373_1662 textbox multiline value="Detects text placement potential in images"
+    uid=373_1663 heading "Prompt" level="5"
+    uid=373_1664 generic
+      uid=373_1665 textbox multiline value="Analyze the image to evaluate its suitability for text overlays.
+
+Your task is to assess whether the image contains areas that would support placing readable text (headlines, promotional copy, product messaging) without obstructing key subjects.
+
+Evaluate visual factors such as:
+• Presence of negative space
+• Large uninterrupted areas
+• Background tone (light or dark)
+• Texture or visual noise
+• Subject placement
+• Contrast conditions
+• Visual hierarchy
+
+Use ONLY the controlled vocabulary provided below.
+
+------------------------------------------------------------
+OUTPUT FORMAT (strictly follow this format)
+
+Overlay Potential: <value>
+Recommended Text Color: <value>
+Best Regions: <comma-separated values>
+Usable Area Type: <comma-separated values>
+Risk Areas: <comma-separated values or None>
+Notes: <1–2 concise sentences explaining reasoning>
+
+Do not include any additional commentary.
+Do not add attributes beyond those listed above.
+------------------------------------------------------------
+
+CONTROLLED VOCABULARY
+
+Overlay Potential (select one):
+• High
+• Medium
+• Low
+• None
+
+Recommended Text Color (select one):
+• White (reverse)
+• Black
+• Either
+• Not recommended
+
+Best Regions (select one or more if applicable):
+• Top Left
+• Top Center
+• Top Right
+• Left Center
+• Center
+• Right Center
+• Bottom Left
+• Bottom Center
+• Bottom Right
+• None
+
+Usable Area Type (select one or more if applicable):
+• Solid Dark
+• Solid Light
+• Negative Space
+• Blurred Background
+• Soft Gradient
+• Sky
+• Wall
+• Studio Backdrop
+• Defocused Environment
+• None
+
+Risk Areas (select one or more if applicable):
+• Center Subject
+• Face
+• Product Logo
+• High Detail Texture
+• High Contrast Edges
+• Patterned Background
+• None
+
+------------------------------------------------------------
+
+Guidelines:
+• If no suitable overlay area exists, set:
+  Overlay Potential: None
+  Recommended Text Color: Not recommended
+  Best Regions: None
+  Usable Area Type: None
+  Risk Areas: None
+  Notes: Brief explanation why overlay is not suitable.
+• Keep Notes short and factual.
+• Be decisive — do not hedge with uncertainty language."
+    uid=373_1666 heading "Activation" level="5"
+    uid=373_1667 "List of document types this interaction is active for"
+    "*"
+    uid=373_1668 generic
+      uid=373_1669 button "Remove"
+      uid=373_1670 "Picture"
+      uid=373_1671 button "Remove"
+      uid=373_1672 "Folder"
+      uid=373_1673 button "Remove"
+      uid=373_1674 "Workspace"
+      uid=373_1675 combobox "List of document types this interaction is active for *" autocomplete="list" expandable haspopup="listbox" required
+    uid=373_1676 heading "AI Model" level="5"
+    uid=373_1677 "AI model"
+    "*"
+    uid=373_1678 generic
+      uid=373_1679 combobox "AI model *" autocomplete="list" expandable haspopup="listbox" required value="anthropic.claude-sonnet-4-5-20250929-v1:0"
+      uid=373_1680 "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    uid=373_1681 heading "Settings" level="5"
+    uid=373_1682 button "Enabled"
+    uid=373_1683 tooltip
+    uid=373_1684 button "Visible in Action Menu" pressed
+    uid=373_1685 tooltip
+    uid=373_1686 button "Executable on Folders"
+    uid=373_1687 tooltip
+    uid=373_1688 button "Is Chat"
+    uid=373_1689 tooltip
+    uid=373_1690 button "Save Metadata" pressed
+    uid=373_1691 tooltip
+    uid=373_1692 button "Main Metadata"
+    uid=373_1693 tooltip
+    uid=373_1694 button "Send Parents Context"
+    uid=373_1695 tooltip
+    uid=373_1696 button "Send Attachments"
+    uid=373_1697 tooltip
+    uid=373_1698 button "Requires User Input"
+    uid=373_1699 tooltip
+    uid=373_1700 heading "Parameters" level="5"
+    uid=373_1701 button "Add Parameter"
+    uid=373_1702 button "Delete"
+    uid=373_1703 "Status:"
+    uid=373_1704 "Version: "
+    uid=373_1705 "1"
+    uid=373_1706 heading "Add New Interaction" level="5"
+    uid=373_1707 generic
+      uid=373_1708 textbox "Interaction Name"
+    uid=373_1709 button "Add"
+  uid=368_175 status atomic live="polite" relevant="additions text"
+  uid=368_176 generic live="polite" relevant="additions text"

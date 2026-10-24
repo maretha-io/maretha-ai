@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(FeaturesRunner.class)
@@ -82,5 +83,37 @@ public class RepositoryServiceImplTest {
         assertTrue("sendParentsContext should be true", savedInteraction.isSendParentsContext());
         assertTrue("sendAttachments should be true", savedInteraction.isSendAttachments());
         assertTrue("requiresUserInput should be true", savedInteraction.isRequiresUserInput());
+    }
+
+    @Test
+    public void shouldClearExplicitEmptyInteractionListAndPreserveOtherSettings() {
+        RepositoryService repositoryService = Framework.getService(RepositoryService.class);
+        ObjectNode interaction = objectMapper.createObjectNode().put("id", "last-interaction").put("name", "Last interaction");
+        repositoryService.saveInteractionSettings(session, List.of(interaction), Map.of("awsS3AccessEnabled", true));
+        txFeature.nextTransaction();
+
+        repositoryService.saveInteractionSettings(session, List.of(), Map.of());
+        txFeature.nextTransaction();
+
+        Settings saved = repositoryService.getSavedSettings(session, false);
+        assertTrue("Explicit [] should clear the last interaction", saved.getInteractions().isEmpty());
+        assertTrue("Unspecified settings should remain unchanged", saved.isAwsS3AccessEnabled());
+        assertTrue("Cache should also reflect the empty list", repositoryService.getSavedSettings(session, true).getInteractions().isEmpty());
+    }
+
+    @Test
+    public void shouldPreserveInteractionsWhenListIsOmitted() {
+        RepositoryService repositoryService = Framework.getService(RepositoryService.class);
+        ObjectNode interaction = objectMapper.createObjectNode().put("id", "keep-interaction").put("name", "Keep interaction");
+        repositoryService.saveInteractionSettings(session, List.of(interaction), Map.of());
+        txFeature.nextTransaction();
+
+        repositoryService.saveInteractionSettings(session, null, Map.of("awsS3AccessEnabled", true));
+        txFeature.nextTransaction();
+
+        Settings saved = repositoryService.getSavedSettings(session, false);
+        assertEquals(1, saved.getInteractions().size());
+        assertEquals("keep-interaction", saved.getInteractions().get(0).getId());
+        assertTrue(saved.isAwsS3AccessEnabled());
     }
 }
