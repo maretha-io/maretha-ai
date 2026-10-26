@@ -1,6 +1,6 @@
 # Maretha CP Angular layouts
 
-`@maretha/cp-webui@1.0.31` owns the Angular implementation of the
+`@maretha/cp-webui@1.0.32` owns the Angular implementation of the
 `io.maretha.cp` add-on. It targets Angular 21.2 and `@maretha/webui-sdk` 0.1.2
 or a compatible later version. Nuxeo operations and schemas remain in the
 same add-on reactor.
@@ -64,5 +64,5 @@ This follows the admin console's feature/layout/shared organization while retain
 Run `npm test` from this directory after installing compatible Angular/SDK peers, or use `npm --prefix maretha-ai-web/angular test` from the repository root. The isolated
 `scripts/assemble-host.mjs` assembly script builds and tests the library, composes its provider into a copy
 of the host, and builds both Nuxeo marketplace packages. See
-[the release procedure](../../docs/angular-release-1.0.31.md). Installing only the
+[the release procedure](../../docs/angular-release-1.0.32.md). Installing only the
 library-bearing add-on JAR cannot change an already compiled Angular host.
