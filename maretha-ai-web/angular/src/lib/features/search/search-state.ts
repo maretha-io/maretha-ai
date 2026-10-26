@@ -1,4 +1,5 @@
 import type { CpDocument } from '../../shared/types/cp-models';
+import type { ResultsQueryScope } from '@maretha/webui-sdk';
 
 export interface CpSearchCriteria {
   vectorQuery: string | readonly number[];
@@ -6,6 +7,8 @@ export interface CpSearchCriteria {
   minScore: number;
   fulltext?: string;
 }
+/** Only the stock read-only export belongs in the CP query toolbar. */
+export const CP_CSV_ACTION_IDS = ['maretha.results.csv-export'] as const;
 export function cpConfidence(value: unknown, fallback: number): number {
   if (value === null || value === undefined || value === '') return fallback;
   const number = Number(value);
@@ -25,6 +28,17 @@ export function cpSearchParameters(criteria: CpSearchCriteria, page = 0, sortBy 
     ...(criteria.fulltext?.trim() ? { ecm_fulltext: criteria.fulltext.trim().replace(/-/g, ' ') } : {}),
     currentPageIndex: page, pageSize: criteria.vectorField === 'similarity' ? 100 : 40,
     sortBy, sortOrder,
+  };
+}
+/** Snapshot the complete provider query, independently of pagination and selected rows. */
+export function cpSearchQueryScope(criteria: CpSearchCriteria): ResultsQueryScope | undefined {
+  const query = criteria.vectorQuery;
+  if (typeof query === 'string' ? !query.trim() : !query.length || !query.every(value => Number.isFinite(value))) return undefined;
+  const { currentPageIndex, pageSize, sortBy, sortOrder, ...parameters } = cpSearchParameters(criteria);
+  // CpApiService.provider uses the server's default repository and serializes vectors as JSON.
+  return { repository: 'default', providerName: 'searchByEmbeddings', queryParams: [],
+    namedParameters: Object.fromEntries(Object.entries(parameters).map(([key, value]) =>
+      [key, Array.isArray(value) ? JSON.stringify(value) : String(value)])),
   };
 }
 export function cpScore(document: CpDocument | Readonly<Record<string, unknown>>): string {
