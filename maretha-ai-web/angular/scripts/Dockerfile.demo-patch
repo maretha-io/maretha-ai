@@ -3,18 +3,18 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 USER 900
-COPY --chown=900:0 maretha-ai-package-1.0.30.zip /tmp/maretha-ai-package-1.0.30.zip
-COPY --chown=900:0 maretha-angular-webui-package-3.21.4.zip /tmp/maretha-angular-webui-package-3.21.4.zip
+COPY --chown=900:0 maretha-ai-package-1.0.31.zip /tmp/maretha-ai-package-1.0.31.zip
+COPY --chown=900:0 maretha-angular-webui-package-3.21.5.zip /tmp/maretha-angular-webui-package-3.21.5.zip
 RUN set -eu; \
     export NUXEO_CONF=/opt/nuxeo/server/bin/nuxeo.conf; \
     test ! -f /opt/nuxeo/server/configured; \
     cp /opt/nuxeo/server/bin/nuxeo.conf /tmp/maretha-ai-original.conf; \
     printf '\norg.nuxeo.connect.server.reachable=false\n' >> /opt/nuxeo/server/bin/nuxeo.conf; \
     /opt/nuxeo/server/bin/nuxeoctl mp-uninstall --accept yes --nodeps maretha-ai maretha-angular-webui; \
-    /install-packages.sh --offline /tmp/maretha-ai-package-1.0.30.zip /tmp/maretha-angular-webui-package-3.21.4.zip; \
+    /install-packages.sh --offline /tmp/maretha-ai-package-1.0.31.zip /tmp/maretha-angular-webui-package-3.21.5.zip; \
     mv /tmp/maretha-ai-original.conf /opt/nuxeo/server/bin/nuxeo.conf; \
-    rm /tmp/maretha-ai-package-1.0.30.zip /tmp/maretha-angular-webui-package-3.21.4.zip; \
-    test -f /opt/nuxeo/server/nxserver/bundles/maretha-ai-web-1.0.30.jar; \
-    test -f /opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-ui-3.21.4.jar; \
+    rm /tmp/maretha-ai-package-1.0.31.zip /tmp/maretha-angular-webui-package-3.21.5.zip; \
+    test -f /opt/nuxeo/server/nxserver/bundles/maretha-ai-web-1.0.31.jar; \
+    test -f /opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-ui-3.21.5.jar; \
     test ! -f /opt/nuxeo/server/nxserver/bundles/maretha-ai-web-1.0.29.jar; \
     test ! -f /opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-ui-3.21.3.jar

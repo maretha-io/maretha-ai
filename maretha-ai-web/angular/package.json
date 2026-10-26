@@ -1,6 +1,6 @@
 {
   "name": "@maretha/cp-webui",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "Maretha AI layouts and contributions for the Angular Nuxeo Web UI",
   "license": "Apache-2.0",
   "type": "module",
