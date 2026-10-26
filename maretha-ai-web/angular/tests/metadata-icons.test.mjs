@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
-const canonical = readFileSync(new URL('../../src/main/resources/web/nuxeo.war/ui/cp-custom-icons.html', import.meta.url), 'utf8');
+const stagedCanonical = new URL('./fixtures/cp-custom-icons.html', import.meta.url);
+const canonical = readFileSync(existsSync(stagedCanonical) ? stagedCanonical : new URL('../../src/main/resources/web/nuxeo.war/ui/cp-custom-icons.html', import.meta.url), 'utf8');
 const angular = readFileSync(new URL('../src/lib/features/interactions/cp-metadata-icon.component.ts', import.meta.url), 'utf8');
 
 test('metadata trigger and menu use the complete canonical CP SVG glyphs', () => {
