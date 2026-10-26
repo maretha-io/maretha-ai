@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { linkDependencies } from './assemble-host.mjs';
+import { assemble, linkDependencies } from './assemble-host.mjs';
 
 const script = fileURLToPath(new URL('./prepare-demo-context.sh', import.meta.url));
 
@@ -33,19 +33,33 @@ test('isolated scoped package links do not mutate the shared dependency tree', t
 
 test('combined context requires the exact coordinated marketplace versions', t => {
   const dir = fixture(t), addon = path.join(dir, 'addon.zip'), host = path.join(dir, 'host.zip'), context = path.join(dir, 'context');
-  zip(addon, 'maretha-ai', '1.0.29'); zip(host, 'maretha-angular-webui', '3.21.3');
+  zip(addon, 'maretha-ai', '1.0.30'); zip(host, 'maretha-angular-webui', '3.21.4');
   execFileSync('bash', [script, addon, host, context]);
-  assert.deepEqual(readdirSync(context).sort(), ['Dockerfile', 'maretha-ai-package-1.0.29.zip', 'maretha-angular-webui-package-3.21.3.zip']);
-  assert.deepEqual(readFileSync(path.join(context, 'maretha-ai-package-1.0.29.zip')), readFileSync(addon));
-  assert.deepEqual(readFileSync(path.join(context, 'maretha-angular-webui-package-3.21.3.zip')), readFileSync(host));
+  assert.deepEqual(readdirSync(context).sort(), ['Dockerfile', 'maretha-ai-package-1.0.30.zip', 'maretha-angular-webui-package-3.21.4.zip']);
+  assert.deepEqual(readFileSync(path.join(context, 'maretha-ai-package-1.0.30.zip')), readFileSync(addon));
+  assert.deepEqual(readFileSync(path.join(context, 'maretha-angular-webui-package-3.21.4.zip')), readFileSync(host));
 });
 
-test('context rejects the previous Angular snapshot and avoids overwriting existing output', t => {
+test('context rejects the previous Angular release and avoids overwriting existing output', t => {
   const dir = fixture(t), addon = path.join(dir, 'addon.zip'), host = path.join(dir, 'host.zip'), context = path.join(dir, 'context');
-  zip(addon, 'maretha-ai', '1.0.29'); zip(host, 'maretha-angular-webui', '3.21.2-SNAPSHOT');
+  zip(addon, 'maretha-ai', '1.0.30'); zip(host, 'maretha-angular-webui', '3.21.3');
   assert.notEqual(spawnSync('bash', [script, addon, host, context]).status, 0);
   mkdirSync(context); writeFileSync(path.join(context, 'keep'), 'original');
-  zip(host, 'maretha-angular-webui', '3.21.3');
+  zip(host, 'maretha-angular-webui', '3.21.4');
   assert.notEqual(spawnSync('bash', [script, addon, host, context]).status, 0);
   assert.equal(readFileSync(path.join(context, 'keep'), 'utf8'), 'original');
+});
+
+test('context rejects the previous add-on release even with the current host', t => {
+  const dir = fixture(t), addon = path.join(dir, 'addon.zip'), host = path.join(dir, 'host.zip'), context = path.join(dir, 'context');
+  zip(addon, 'maretha-ai', '1.0.29'); zip(host, 'maretha-angular-webui', '3.21.4');
+  assert.notEqual(spawnSync('bash', [script, addon, host, context]).status, 0);
+});
+
+test('assembly rejects the prior SDK before building either package', t => {
+  const dir = fixture(t), source = path.join(dir, 'core');
+  mkdirSync(path.join(source, 'app/extensions'), { recursive: true });
+  writeFileSync(path.join(source, 'package.json'), JSON.stringify({ version: '3.21.4' }));
+  writeFileSync(path.join(source, 'app/extensions/package.json'), JSON.stringify({ version: '0.1.1' }));
+  assert.throws(() => assemble(source, path.join(dir, 'assembly')), /Expected WebUI SDK 0.1.2/);
 });

@@ -45,17 +45,17 @@ export class CpSearchItemComponent {
 @Component({
   selector: 'cp-search-drawer', standalone: true, imports: [FormsModule, RouterLink, CpSavedSearchesComponent, CpSearchControlIconComponent],
   styleUrls: ['./cp-search-controls.css'],
-  template: `<h2>AI search</h2>
+  template: `<h2 class="sr-only">AI search</h2>
     <cp-saved-searches [params]="savedParams" (selected)="applySaved($event)" />
-    <button class="queue-switch" type="button" (click)="toggleQueue()" [attr.aria-label]="queue() ? 'Switch to Filters View' : 'Switch to Queue View'"><cp-search-control-icon [kind]="queue() ? 'filter' : 'queue'" />{{ queue() ? 'Switch to Filters View' : 'Switch to Queue View' }}</button>
+    <button class="queue-switch icon-control" type="button" (click)="toggleQueue()" [attr.aria-label]="queue() ? 'Switch to Filters View' : 'Switch to Queue View'"><cp-search-control-icon [kind]="queue() ? 'filter' : 'queue'" /></button>
     <form (ngSubmit)="search()" [hidden]="queue()">
     <label for="cp-vector-query">What are you looking for?</label>
     <input id="cp-vector-query" name="vectorQuery" type="search" [(ngModel)]="query" (ngModelChange)="scheduleSearch()" autofocus />
-    <label for="cp-confidence">Confidence value <output>{{ confidence }}</output></label>
+    <label for="cp-confidence">Confidence value <output class="sr-only">{{ confidence }}</output></label>
     <input id="cp-confidence" name="confidence" type="range" min="0" max="1" step="0.1" [(ngModel)]="confidence" (ngModelChange)="scheduleSearch()" />
     <label for="cp-fulltext">Full text</label>
     <input id="cp-fulltext" name="fulltext" type="search" [(ngModel)]="fulltext" (ngModelChange)="scheduleSearch()" placeholder="Additional words in the document" />
-    <div class="buttons"><button type="submit">Search</button><button type="button" [disabled]="!query && !fulltext && confidence === 0.8" (click)="clear()">Reset</button></div>
+    <div class="buttons"><button type="submit" class="sr-only">Search</button><button type="button" [disabled]="!query && !fulltext && confidence === 0.8" (click)="clear()">Reset</button></div>
   </form>
   @if (queue()) {
     @if (queueError()) { <p role="alert">{{ queueError() }}</p><button type="button" (click)="loadQueue(false)">Retry</button> }
@@ -157,7 +157,7 @@ export class CpSearchPageComponent {
 @Component({
   selector: 'cp-similar-documents', standalone: true, imports: [forwardRef(() => CpEmbeddingResultsComponent)],
   styleUrls: ['./cp-search-controls.css'],
-  template: `<label class="confidence">Confidence value <output>{{ minScore() }}</output>
+  template: `<label class="confidence">Confidence value <output class="sr-only">{{ minScore() }}</output>
       <input type="range" min="0" max="1" step="0.1" [value]="minScore()" (change)="minScore.set(+$any($event.target).value)" />
     </label><cp-embedding-results [criteria]="criteria()" [sourceDocument]="document()" />`,
   styles: ':host{display:flex;flex:1;min-height:0;flex-direction:column;padding:16px}.confidence{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}input{width:100%}',
@@ -177,18 +177,23 @@ export class CpSimilarDocumentsComponent {
   styleUrls: ['./cp-search-controls.css'],
   imports: [FormsModule, RouterLink, DatePipe, ResultsProjectionComponent, ResultsProjectionTemplateDirective, WebUiSlotComponent, CpSearchControlIconComponent],
   template: `
+    <div class="display-tools">
+      <span class="sr-only" role="status">{{ total() }} results · {{ selection().length }} selected</span>
+      <button type="button" class="icon-control" (click)="setMode('grid')" [disabled]="mode() === 'grid'" aria-label="Switch to Grid View" title="Switch to Grid View"><cp-search-control-icon kind="grid" /></button>
+      <button type="button" class="icon-control" (click)="setMode('table')" [disabled]="mode() === 'table'" aria-label="Switch to Table View" title="Switch to Table View"><cp-search-control-icon kind="table" /></button>
+    </div>
     <div class="tools">
-      <span role="status">{{ total() }} results · {{ selection().length }} selected</span>
-      <label><cp-search-control-icon [kind]="mode() === 'grid' ? 'grid' : 'table'" />Display <select [ngModel]="mode()" (ngModelChange)="setMode($event)"><option value="grid">Grid</option><option value="table">Table</option></select></label>
-      <label><cp-search-control-icon kind="sort" />Sort by <select [ngModel]="sortBy()" (ngModelChange)="sort($event)">
+      <label>Sort by <select [ngModel]="sortBy()" (ngModelChange)="sort($event)">
         <option value="contextParameters.relevance_score">Relevance</option><option value="dc:title">Title</option>
         <option value="dc:created">Created</option><option value="dc:modified">Modified</option>
       </select></label>
-      <button type="button" (click)="direction() === 'asc' ? direction.set('desc') : direction.set('asc'); reload()" [attr.title]="direction() === 'asc' ? 'Sort ascending' : 'Sort descending'"><cp-search-control-icon [kind]="direction() === 'asc' ? 'ascending' : 'descending'" />{{ direction() === 'asc' ? 'Ascending' : 'Descending' }}</button>
-      <details><summary><cp-search-control-icon kind="columns" />Columns</summary>@for (column of allColumns; track column.id) {
-        <label><input type="checkbox" [checked]="!hiddenColumns().includes(column.id)" (change)="toggleColumn(column.id)" />{{ column.label }}</label>
-      }</details>
-      <button type="button" (click)="reload()" [disabled]="loading()" title="Refresh results"><cp-search-control-icon kind="refresh" />Refresh</button>
+      <button type="button" class="icon-control" (click)="direction() === 'asc' ? direction.set('desc') : direction.set('asc'); reload()" aria-label="Reverse sort order" [title]="direction() === 'asc' ? 'Sort ascending' : 'Sort descending'"><cp-search-control-icon [kind]="direction() === 'asc' ? 'ascending' : 'descending'" /></button>
+      @if (mode() === 'table') {
+        <details class="columns-menu"><summary aria-label="Columns" title="Columns"><cp-search-control-icon kind="columns" /></summary>@for (column of allColumns; track column.id) {
+          <label><input type="checkbox" [checked]="!hiddenColumns().includes(column.id)" (change)="toggleColumn(column.id)" />{{ column.label }}</label>
+        }</details>
+      }
+      <button type="button" class="icon-control refresh-control" (click)="reload()" [disabled]="loading()" aria-label="Refresh results" title="Refresh results"><cp-search-control-icon kind="refresh" /></button>
     </div>
     @if (error()) { <p role="alert">{{ error() }}</p><button type="button" (click)="reload()">Retry</button> }
     @if (!hasQuery()) { <p role="status">{{ criteria().vectorField === 'text' ? 'Enter what you are looking for in AI search.' : 'This document has no embeddings for similarity search.' }}</p> }
@@ -283,7 +288,10 @@ export class CpEmbeddingResultsComponent {
   });
   constructor() {
     effect(() => { const scope = this.criteria().vectorField; this.sourceDocument(); untracked(() => {
-      if (this.preferenceScope !== scope) { this.preferenceScope = scope; this.restorePreferences(); }
+      if (this.preferenceScope !== scope) {
+        this.preferenceScope = scope; this.sortBy.set(scope === 'similarity' ? 'dc:title' : 'contextParameters.relevance_score');
+        this.direction.set(scope === 'similarity' ? 'asc' : 'desc'); this.restorePreferences();
+      }
       this.reload();
     }); });
     inject(DestroyRef).onDestroy(() => { this.generation++; this.request?.unsubscribe(); });

@@ -35,9 +35,9 @@ export interface SchemaDraft {
 }
 export interface TypeSchemas { name: string; schemas: SchemaDraft[]; }
 export const EVENT_CHOICES = [
-  { id: 'documentCreated', label: 'Document created' },
-  { id: 'pictureViewsGenerationDone', label: 'Rendition created' },
-  { id: 'beforeDocumentModification', label: 'Document modified' },
+  { id: 'documentCreated', label: 'Document Created' },
+  { id: 'pictureViewsGenerationDone', label: 'Rendition Created' },
+  { id: 'beforeDocumentModification', label: 'Document Modified' },
 ] as const;
 export const MODEL_CHOICES = [
   'cohere.command-r-v1:0',
