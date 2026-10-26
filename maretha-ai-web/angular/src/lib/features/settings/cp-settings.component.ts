@@ -5,6 +5,7 @@ import { GuardedView, PageContext, ViewDeparture } from '@maretha/webui-sdk';
 import { firstValueFrom, forkJoin } from 'rxjs';
 import { CpApiService } from '../../shared/services/cp-api.service';
 import { CpSettingsDocumentPickerComponent } from './cp-settings-document-picker.component';
+import { CpSettingsChoicesComponent } from './cp-settings-choices.component';
 import {
   ES_FIELDS, EVENT_CHOICES, MODEL_CHOICES, PARAMETER_TYPES, EventDraft, InteractionDraft,
   ParameterDraft, SchemaDraft, SettingsDraft, TypeSchemas, clone, newInteraction, newParameter,
@@ -15,7 +16,7 @@ type SettingsTab = 'interactions' | 'metadata' | 'events' | 'settings';
 interface Confirmation { message: string; action: string; resolve: (allow: boolean) => void; }
 @Component({
   selector: 'cp-settings', standalone: true,
-  imports: [FormsModule, CpSettingsDocumentPickerComponent],
+  imports: [FormsModule, CpSettingsDocumentPickerComponent, CpSettingsChoicesComponent],
   templateUrl: './cp-settings.component.html', styleUrl: './cp-settings.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -55,6 +56,7 @@ export class CpSettingsComponent implements OnInit, OnDestroy, GuardedView {
   readonly status = signal('');
   readonly confirmation = signal<Confirmation | null>(null);
   readonly invalidEvents = computed(() => this.draft().eventsSettings.some(item => !validEvent(item)));
+  readonly interactionChoices = computed(() => this.draft().interactions.map(item => ({ id: item.id, label: item.name })));
   readonly metadataInteractions = computed(() => this.draft().interactions.filter(item => item.saveMetadata));
   newInteractionName = '';
   private readonly api = inject(CpApiService);

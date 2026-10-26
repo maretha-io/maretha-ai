@@ -4,17 +4,18 @@ import { DocumentActionContext } from '@maretha/webui-sdk';
 import { CpApiService } from '../../shared/services/cp-api.service';
 import { CpDocument } from '../../shared/types/cp-models';
 import type { CpInteraction } from '../../shared/types/interaction-models';
+import { CpMetadataIconComponent } from './cp-metadata-icon.component';
 import { errorMessage, hasGroup, isBulkDocument } from '../../shared/utils/interaction-utils';
 
 @Component({
-  selector: 'cp-metadata-action', standalone: true, changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'cp-metadata-action', standalone: true, imports: [CpMetadataIconComponent], changeDetection: ChangeDetectionStrategy.OnPush,
   template: `@if (allowed() && interaction()) {
-    <details #menu><summary [attr.aria-disabled]="pending()" title="AI Metadata">✧ <span>AI Metadata</span></summary><div class="menu"><button type="button" [disabled]="pending()" (click)="run(true); menu.open = false">Update metadata</button><button type="button" [disabled]="pending()" (click)="run(false); menu.open = false">Enhance metadata</button></div></details>
+    <details #menu><summary [attr.aria-disabled]="pending()" title="AI Metadata" aria-label="AI Metadata"><cp-metadata-icon /></summary><div class="menu"><button type="button" [disabled]="pending()" (click)="run(true); menu.open = false"><cp-metadata-icon kind="ai-metadata-update" />Update metadata</button><button type="button" [disabled]="pending()" (click)="run(false); menu.open = false"><cp-metadata-icon kind="ai-metadata-missing" />Enhance metadata</button></div></details>
   }
   @if (pending()) { <span role="status">Metadata request in progress…</span> }
   @if (notice()) { <span role="status">{{ notice() }}</span> }
   @if (error()) { <span role="alert">{{ error() }}</span> }`,
-  styles: `:host{display:inline-flex;align-items:center;gap:8px;position:relative;font-size:13px}summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:9px;color:var(--cp-primary,#3972b9)}summary::-webkit-details-marker{display:none}.menu{position:absolute;right:0;top:100%;z-index:30;min-width:190px;padding:6px;background:var(--cp-surface,#fff);border:1px solid var(--cp-border,#ddd);box-shadow:0 3px 12px #0002}.menu button{display:block;width:100%;font:inherit;text-align:left;padding:10px;border:0;background:transparent;color:inherit;cursor:pointer}.menu button:hover{background:var(--cp-subtle,#edf2f5)}button:disabled{opacity:.5;cursor:default}[role=alert]{color:#b3261e}summary:focus-visible,button:focus-visible{outline:2px solid var(--cp-primary,#3972b9);outline-offset:2px}`,
+  styles: `:host{display:inline-flex;align-items:center;gap:8px;position:relative;font-size:13px}summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:8px;color:inherit}summary::-webkit-details-marker{display:none}.menu{position:absolute;right:0;top:100%;z-index:30;min-width:190px;padding:6px;background:var(--cp-surface,#fff);border:1px solid var(--cp-border,#ddd);box-shadow:0 3px 12px #0002}.menu button{display:flex;align-items:center;gap:8px;width:100%;font:inherit;text-align:left;padding:10px;border:0;background:transparent;color:inherit;cursor:pointer}.menu button:hover{background:var(--cp-subtle,#edf2f5)}button:disabled{opacity:.5;cursor:default}[role=alert]{color:#b3261e}summary:focus-visible,button:focus-visible{outline:2px solid var(--cp-primary,#3972b9);outline-offset:2px}`,
 })
 export class CpMetadataActionComponent {
   readonly context = input.required<DocumentActionContext>();

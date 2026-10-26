@@ -7,7 +7,15 @@ import ts from 'typescript';
 // to validate server response parsing, permissions, and relation aggregation.
 const source = readFileSync(new URL('../src/lib/shared/utils/interaction-utils.ts', import.meta.url), 'utf8');
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ES2022, target: ts.ScriptTarget.ES2022 } }).outputText;
-const { formatResponse, responsePresentation, mergeSavedInteractions, hasGroup, isBulkDocument } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
+const { cpParameterVisible, formatResponse, responsePresentation, mergeSavedInteractions, hasGroup, isBulkDocument } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
+
+test('chat retains editable context fields while hiding read-only memory parameters', () => {
+  assert.equal(cpParameterVisible({ readOnly: false, isContextMemoryParameter: true }, true), true);
+  assert.equal(cpParameterVisible({ readOnly: true, isContextMemoryParameter: true }, true), false);
+  assert.equal(cpParameterVisible({ readOnly: false, isContextMemoryParameter: false }, true), true);
+  assert.equal(cpParameterVisible({ readOnly: true, isContextMemoryParameter: false }, false), true);
+  assert.equal(cpParameterVisible({ readOnly: false, isContextMemoryParameter: true }, false), false);
+});
 
 test('formats nested and double-encoded JSON without interpreting model HTML', () => {
   const value = { summary: 'Line one\nLine two', tags: ['one', 'two'], nested: { count: 3 } };

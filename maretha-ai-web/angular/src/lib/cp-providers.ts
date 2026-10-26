@@ -47,7 +47,7 @@ export function provideCpWebUi() {
           component: CpSettingsComponent, retain: true, when: context => context.user?.isAdministrator === true }),
         ...definePairedView({ items: ADMINISTRATION_MENU_SLOT, pages: ADMINISTRATION_PAGES_SLOT }, {
           id: 'io.maretha.cp.administration.settings', viewId: 'maretha-cp-interactions', label: 'AI Settings',
-          component: CpSettingsAdministrationPageComponent, order: 100, retain: true,
+          component: CpSettingsAdministrationPageComponent, order: 0, retain: true, pageHeading: 'component',
           when: context => context.user?.isAdministrator === true,
         }),
         defineContribution(DOCUMENT_ACTIONS_SLOT, { id: 'io.maretha.cp.document-actions.metadata',

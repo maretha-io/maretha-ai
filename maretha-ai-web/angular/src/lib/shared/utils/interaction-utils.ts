@@ -1,4 +1,9 @@
-import type { CpSavedInteraction } from '../types/interaction-models';
+import type { CpParameter, CpSavedInteraction } from '../types/interaction-models';
+
+/** Chat exposes every editable parameter, including editable context-memory fields. */
+export function cpParameterVisible(parameter: Pick<CpParameter, 'readOnly' | 'isContextMemoryParameter'>, compact: boolean): boolean {
+  return compact ? !parameter.readOnly : !parameter.isContextMemoryParameter;
+}
 
 /** Responses remain text: model output must never become executable markup. */
 export function formatResponse(value: unknown): string {

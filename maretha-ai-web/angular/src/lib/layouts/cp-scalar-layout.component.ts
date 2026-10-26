@@ -15,15 +15,15 @@ import { CP_DUBLINCORE_FIELDS } from './cp-layout-fields';
   imports: [SchemaLayoutComponent, RouterLink],
   template: `
     @if (layoutContext && layout) {
+      <nx-schema-layout [class.readonly-metadata]="layoutContext.mode === 'metadata'" [layout]="layout" [documentId]="documentId" [parentId]="parentId"
+        [name]="name" [mode]="layoutContext.mode" [noEdit]="layoutContext.noEdit"
+        (valueChanged)="rename($event)" (saved)="saved($event)" />
       @if (layoutContext.mode === 'metadata' && relatedDocument(); as related) {
         <div class="related"><strong>Related Document</strong>
           <a [routerLink]="['/browse/documents', related.uid]">{{ related.title || related.properties['dc:title'] || related.uid }}</a>
         </div>
       }
       @if (relatedError()) { <p role="status">{{ relatedError() }}</p> }
-      <nx-schema-layout [class.readonly-metadata]="layoutContext.mode === 'metadata'" [layout]="layout" [documentId]="documentId" [parentId]="parentId"
-        [name]="name" [mode]="layoutContext.mode" [noEdit]="layoutContext.noEdit"
-        (valueChanged)="rename($event)" (saved)="saved($event)" />
       @if (host) { <button type="button" (click)="cancel()">{{ layoutContext.mode === 'metadata' ? 'Close' : 'Cancel' }}</button> }
     }
   `,

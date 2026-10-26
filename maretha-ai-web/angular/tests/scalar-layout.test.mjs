@@ -2,7 +2,7 @@ import '@angular/compiler';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createEnvironmentInjector, runInInjectionContext } from '@angular/core';
-import { DOCUMENT_LAYOUT_HOST, documentLayoutContext } from '@maretha/webui-sdk';
+import { DOCUMENT_CONTENT_RENDERER, DOCUMENT_LAYOUT_HOST, documentLayoutContext } from '@maretha/webui-sdk';
 import { CpApiService, CP_DOCUMENT_LAYOUTS } from '../dist/fesm2022/maretha-cp-webui.mjs';
 
 const ScalarLayout = CP_DOCUMENT_LAYOUTS.find(layout => layout.documentType === 'InteractionResults' && layout.mode === 'edit').component;
@@ -55,4 +55,20 @@ test('metadata omits empty optional fields and presents descriptions as plain mu
     assert.equal(editable.component.layout.fields.length, 6);
     assert.equal(editable.component.layout.fields.find(field => field.property === 'dc:description').widget, 'cp-textarea');
   } finally { editable.destroy(); }
+});
+
+test('saved results project into the native viewer column beside document metadata', () => {
+  const ResultsLayout = CP_DOCUMENT_LAYOUTS.find(layout => layout.documentType === 'InteractionResults' && layout.mode === 'view').component;
+  class Renderer {}
+  const injector = createEnvironmentInjector([{ provide: DOCUMENT_CONTENT_RENDERER, useValue: Renderer }], null);
+  try {
+    const component = runInInjectionContext(injector, () => new ResultsLayout());
+    const document = { uid: 'saved-result', type: 'InteractionResults', properties: {} };
+    const template = {};
+    component.layoutContext = documentLayoutContext({ documentType: 'InteractionResults', mode: 'view', document });
+    component.response = () => template;
+    assert.equal(component.viewer, Renderer);
+    assert.equal(component.viewerInputs.document.uid, document.uid);
+    assert.equal(component.viewerInputs.mainContentTemplate, template);
+  } finally { injector.destroy(); }
 });

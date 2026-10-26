@@ -3,29 +3,26 @@
     <h1 id="cp-settings-heading">AI settings</h1>
     <p role="alert">Administrator access is required to manage AI settings.</p>
   } @else {
-    <header class="page-header">
-      <div><h1 id="cp-settings-heading">AI Interactions Management</h1>
-        <p>Manage interactions, metadata and document automation.</p></div>
-      <div class="page-actions">
-        @if (dirty()) { <span class="unsaved" role="status">Unsaved changes</span> }
-        <button type="button" class="primary" (click)="save()" [disabled]="!dirty() || saving() || loading() || !ready()">
-          {{ saving() ? 'Saving…' : 'Save changes' }}
-        </button>
-        <button type="button" (click)="discard()" [disabled]="!dirty() || saving() || loading()">Discard changes</button>
-        <button type="button" (click)="refresh()" [disabled]="saving() || loading()" title="Reload saved settings">Reload</button>
-      </div>
-    </header>
-    @if (error()) { <div class="notice error" role="alert">{{ error() }}</div> }
-    @if (status()) { <div class="notice success" role="status">{{ status() }}</div> }
-    @if (loading()) { <p class="notice" role="status">Loading AI settings…</p> }
-    @if (!ready() && !loading()) { <button type="button" (click)="load()">Retry loading settings</button> }
-    @if (ready()) {
+    <header class="page-header"><h1 id="cp-settings-heading">AI Interactions Management</h1></header>
+    <div class="management-toolbar">
       <nav class="tabs" aria-label="AI settings sections">
         @for (tab of tabs; track tab.id) {
           <button type="button" [class.selected]="selectedTab() === tab.id" (click)="setTab(tab.id)"
             [attr.aria-current]="selectedTab() === tab.id ? 'page' : null">{{ tab.label }}</button>
         }
       </nav>
+      <div class="page-actions">
+        @if (dirty()) { <span class="unsaved" role="status">Unsaved changes</span> }
+        <button type="button" class="primary" (click)="save()" [disabled]="!dirty() || saving() || loading() || !ready()">{{ saving() ? 'Saving…' : 'Save Changes' }}</button>
+        <button type="button" class="icon-button" aria-label="Discard changes" title="Discard changes" (click)="discard()" [disabled]="!dirty() || saving() || loading()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.3 12.9-1.4 1.4-2.9-2.9-2.9 2.9-1.4-1.4 2.9-2.9-2.9-2.9 1.4-1.4 2.9 2.9 2.9-2.9 1.4 1.4-2.9 2.9Z"/></svg></button>
+        <button type="button" class="icon-button" aria-label="Reload" title="Reload saved settings" (click)="refresh()" [disabled]="saving() || loading()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M19.4 12a7.4 7.4 0 1 0-1.5 4.5M20 12l-4-4" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+      </div>
+    </div>
+    @if (error()) { <div class="notice error" role="alert">{{ error() }}</div> }
+    @if (status()) { <div class="notice success" role="status">{{ status() }}</div> }
+    @if (loading()) { <p class="notice" role="status">Loading AI settings…</p> }
+    @if (!ready() && !loading()) { <button type="button" (click)="load()">Retry loading settings</button> }
+    @if (ready()) {
       <fieldset class="editor" [disabled]="saving() || loading()">
         <legend class="sr-only">AI settings editor</legend>
         @switch (selectedTab()) {
@@ -34,7 +31,7 @@
               @for (interaction of draft().interactions; track interaction.id; let ix = $index) {
                 <details class="interaction">
                   <summary><span class="state-dot" [class.active]="interaction.active" aria-hidden="true"></span>
-                    <span>{{ interaction.name || 'Unnamed interaction' }}<small>{{ interaction.description }}</small></span>
+                    <span><strong>{{ interaction.name || 'Unnamed interaction' }}</strong><small>{{ interaction.description }}</small></span>
                     <span class="state-label">{{ interaction.active ? 'Enabled' : 'Disabled' }}</span>
                   </summary>
                   <div class="interaction-body">
@@ -48,9 +45,7 @@
                     <div class="two-columns">
                       <fieldset class="card"><legend>Activation</legend>
                         <label>Document types and facets
-                          <select multiple size="6" required [(ngModel)]="interaction.activeOnDocumentTypes" (ngModelChange)="changed()">
-                            @for (type of documentTypes(); track type) { <option [value]="type">{{ type }}</option> }
-                          </select>
+                          <cp-settings-choices label="document types and facets" [choices]="documentTypes()" [values]="interaction.activeOnDocumentTypes" [disabled]="saving() || loading()" (valuesChange)="interaction.activeOnDocumentTypes = $event; changed()" />
                         </label><p class="hint">Select the document types or facets this interaction is active for.</p>
                       </fieldset>
                       <fieldset class="card"><legend>AI model</legend>
@@ -76,47 +71,39 @@
                       </div>
                     </fieldset>
                     <fieldset class="card"><legend>Parameters</legend>
-                      @for (parameter of interaction.parameters; track $index; let px = $index) {
-                        <fieldset class="parameter"><legend>{{ parameter.name || 'Parameter ' + (px + 1) }}</legend>
-                          <div class="parameter-grid">
-                            <label>Name <input [(ngModel)]="parameter.name" (ngModelChange)="changed()" /></label>
-                            <label>Type <select [(ngModel)]="parameter.type" (ngModelChange)="changed()">
-                              @for (type of parameterTypes; track type) { <option [value]="type">{{ type }}</option> }
-                              @if (!parameterTypes.includes($any(parameter.type))) { <option [value]="parameter.type">{{ parameter.type }}</option> }
-                            </select></label>
-                            <label>Description <input [(ngModel)]="parameter.description" (ngModelChange)="changed()" /></label>
-                            <label>Format <input [(ngModel)]="parameter.format" (ngModelChange)="changed()" placeholder="text or document" /></label>
-                            <label>Default value
-                              @if (parameter.type === 'boolean') {
-                                <select [ngModel]="parameter.value" (ngModelChange)="setDefault(parameter, $event)">
-                                  <option value="">No default</option><option value="true">true</option><option value="false">false</option>
-                                </select>
+                      @if (interaction.parameters.length) {
+                        <div class="parameter-table-scroll"><table class="parameter-table">
+                          <thead><tr><th>Name</th><th>Type</th><th>Description</th><th>Default value</th><th>Read-only</th><th>Additional context</th><th>Chat Context</th><th>Enable selection</th><th>Selected document(s)</th><th>Read-only selection</th><th>Actions</th></tr></thead>
+                          <tbody>@for (parameter of interaction.parameters; track $index; let px = $index) {
+                            <tr>
+                              <td><input [(ngModel)]="parameter.name" (ngModelChange)="changed()" [attr.aria-label]="'Name for parameter ' + (px + 1)" /></td>
+                              <td><select [(ngModel)]="parameter.type" (ngModelChange)="changed()" [attr.aria-label]="'Type for parameter ' + (px + 1)">
+                                @for (type of parameterTypes; track type) { <option [value]="type">{{ type }}</option> }
+                                @if (!parameterTypes.includes($any(parameter.type))) { <option [value]="parameter.type">{{ parameter.type }}</option> }
+                              </select></td>
+                              <td><input [(ngModel)]="parameter.description" (ngModelChange)="changed()" [attr.aria-label]="'Description for parameter ' + (px + 1)" /></td>
+                              <td>@if (parameter.type === 'boolean') {
+                                <select [ngModel]="parameter.value" (ngModelChange)="setDefault(parameter, $event)" [attr.aria-label]="'Default value for parameter ' + (px + 1)"><option value="">No default</option><option value="true">true</option><option value="false">false</option></select>
                               } @else if (parameter.type === 'object' || parameter.type === 'array') {
-                                <textarea rows="2" [ngModel]="parameter.value" (ngModelChange)="setDefault(parameter, $event)" placeholder="JSON value" spellcheck="false"></textarea>
+                                <textarea rows="1" [ngModel]="parameter.value" (ngModelChange)="setDefault(parameter, $event)" [attr.aria-label]="'Default value for parameter ' + (px + 1)" spellcheck="false"></textarea>
                               } @else {
-                                <input [type]="defaultValueType(parameter)" [ngModel]="parameter.value" (ngModelChange)="setDefault(parameter, $event)" />
-                              }
-                            </label>
-                          </div>
-                          <div class="flags parameter-flags">
-                            <label class="checkbox"><input type="checkbox" [(ngModel)]="parameter.readOnly" (ngModelChange)="changed()" />Read-only</label>
-                            <label class="checkbox"><input type="checkbox" [(ngModel)]="parameter.isMainDocument" (ngModelChange)="changed()" />Main document</label>
-                            <label class="checkbox"><input type="checkbox" [(ngModel)]="parameter.isAdditionalContext" (ngModelChange)="changed()" />Additional context</label>
-                            @if (interaction.chat) {
-                              <label class="checkbox"><input type="checkbox" [(ngModel)]="parameter.isContextMemoryParameter" (ngModelChange)="changed()" />Chat context memory</label>
-                            }
-                            <label class="checkbox"><input type="checkbox" [(ngModel)]="parameter.enableDocSelection" (ngModelChange)="changed()" />Enable document selection</label>
-                            @if (parameter.enableDocSelection) {
-                              <label class="checkbox"><input type="checkbox" [(ngModel)]="parameter.selectionReadOnly" (ngModelChange)="changed()" />Read-only selection</label>
-                            }
-                          </div>
-                          @if (parameter.enableDocSelection) {
-                            <cp-settings-document-picker [label]="'Selected documents for ' + (parameter.name || 'parameter ' + (px + 1))"
-                              [values]="documentIds(parameter)" (valuesChange)="setDocuments(parameter, $event)" [disabled]="saving() || loading()" />
-                          }
-                          <button class="danger" type="button" (click)="deleteParameter(interaction, parameter)">Delete parameter</button>
-                        </fieldset>
-                      } @empty { <p class="hint">This interaction has no parameters.</p> }
+                                <input [type]="defaultValueType(parameter)" [ngModel]="parameter.value" (ngModelChange)="setDefault(parameter, $event)" [attr.aria-label]="'Default value for parameter ' + (px + 1)" />
+                              }</td>
+                              <td><input type="checkbox" [(ngModel)]="parameter.readOnly" (ngModelChange)="changed()" [attr.aria-label]="'Read-only parameter ' + (px + 1)" /></td>
+                              <td><input type="checkbox" [(ngModel)]="parameter.isAdditionalContext" (ngModelChange)="changed()" [attr.aria-label]="'Additional context for parameter ' + (px + 1)" /></td>
+                              <td>@if (interaction.chat) { <input type="checkbox" [(ngModel)]="parameter.isContextMemoryParameter" (ngModelChange)="changed()" [attr.aria-label]="'Chat context memory for parameter ' + (px + 1)" /> } @else { N/A }</td>
+                              <td><input type="checkbox" [(ngModel)]="parameter.enableDocSelection" (ngModelChange)="changed()" [attr.aria-label]="'Enable document selection for parameter ' + (px + 1)" /></td>
+                              <td>@if (parameter.enableDocSelection) {
+                                <cp-settings-document-picker [label]="'Selected documents for ' + (parameter.name || 'parameter ' + (px + 1))" [values]="documentIds(parameter)" (valuesChange)="setDocuments(parameter, $event)" [disabled]="saving() || loading()" />
+                              } @else { N/A }</td>
+                              <td>@if (parameter.enableDocSelection) { <input type="checkbox" [(ngModel)]="parameter.selectionReadOnly" (ngModelChange)="changed()" [attr.aria-label]="'Read-only selection for parameter ' + (px + 1)" /> } @else { N/A }</td>
+                              <td><button class="icon-button" type="button" aria-label="Delete parameter" title="Delete parameter" (click)="deleteParameter(interaction, parameter)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7Zm3-4h6l1 2h4v2H4V5h4l1-2Z"/></svg></button>
+                                <details class="parameter-options"><summary [attr.aria-label]="'Additional options for parameter ' + (px + 1)">More</summary><label>Format <input [(ngModel)]="parameter.format" (ngModelChange)="changed()" /></label><label class="checkbox"><input type="checkbox" [(ngModel)]="parameter.isMainDocument" (ngModelChange)="changed()" />Main document</label></details>
+                              </td>
+                            </tr>
+                          }</tbody>
+                        </table></div>
+                      }
                       <button type="button" (click)="addParameter(interaction)">Add parameter</button>
                     </fieldset>
                     <button type="button" class="danger" (click)="deleteInteraction(interaction)">Delete interaction</button>
@@ -131,22 +118,15 @@
           }
           @case ('metadata') {
             <section aria-labelledby="metadata-heading">
-              <h2 id="metadata-heading">Metadata mapping</h2>
-              <p class="hint">Choose a document type or facet, then select a schema to configure its fields.</p>
-              <div class="two-columns">
-                <label>Document type or facet
-                  <select [ngModel]="selectedType()" (ngModelChange)="selectType($event)">
-                    <option value="">Select a document type or facet</option>
-                    @for (type of documentTypes(); track type) { <option [value]="type">{{ type }}</option> }
-                  </select>
-                </label>
-                <label>Schema
-                  <select [ngModel]="selectedSchema()?.name || ''" (ngModelChange)="selectSchema($event)" [disabled]="schemaLoading() || !schemas().length">
-                    <option value="">Select a schema</option>
-                    @for (schema of schemas(); track schema.name) { <option [value]="schema.name">{{ schema.name }}</option> }
-                  </select>
-                </label>
-              </div>
+              <h2 id="metadata-heading" class="sr-only">Metadata mapping</h2>
+              <div class="metadata-columns">
+                <nav class="type-list" aria-label="Document type or facet">
+                  @for (type of documentTypes(); track type) { <button type="button" [class.selected]="selectedType() === type" [attr.aria-current]="selectedType() === type ? 'true' : null" (click)="selectType(type)">{{ type }}</button> }
+                </nav>
+                <nav class="schema-list" aria-label="Schema">
+                  @for (schema of schemas(); track schema.name) { <button type="button" [class.selected]="selectedSchema()?.name === schema.name" [attr.aria-current]="selectedSchema()?.name === schema.name ? 'true' : null" (click)="selectSchema(schema.name)">{{ schema.name }}</button> }
+                </nav>
+                <div class="schema-fields">
               @if (schemaLoading()) { <p role="status">Loading schemas…</p> }
               @if (selectedType() && !schemaLoading() && !schemas().length) { <p>No schemas available for this type or facet.</p> }
               @if (selectedSchema(); as schema) {
@@ -171,50 +151,40 @@
                   </tbody>
                 </table></div>
               }
+                </div>
+              </div>
             </section>
           }
           @case ('events') {
             <section aria-labelledby="events-heading">
-              <div class="section-heading"><div><h2 id="events-heading">Document event mappings</h2>
-                <p class="hint">Metadata interactions save their response when a document event occurs.</p></div>
-                <button type="button" (click)="addEvent()">Add event mapping</button></div>
+              <h2 id="events-heading" class="sr-only">Document event mappings</h2>
               @if (invalidEvents()) { <p class="notice" role="status">Complete or remove incomplete mappings before saving.</p> }
-              @for (event of draft().eventsSettings; track $index; let index = $index) {
-                <fieldset class="card event" [class.invalid]="!eventValid(event) || missingEventInteractions(event)">
-                  <legend>Event mapping {{ index + 1 }}</legend>
-                  <div class="event-grid">
-                    <label>Document type or facet
-                      <select [(ngModel)]="event.docType" (ngModelChange)="changed()" required>
-                        <option value="">Select a document type or facet</option>
-                        @for (type of documentTypes(); track type) { <option [value]="type">{{ type }}</option> }
-                      </select>
-                    </label>
-                    <label>Events <select multiple size="3" [(ngModel)]="event.events" (ngModelChange)="changed()" required>
-                      @for (choice of eventChoices; track choice.id) { <option [value]="choice.id">{{ choice.label }}</option> }
-                    </select></label>
-                    <label>Interactions <select multiple size="4" [(ngModel)]="event.interactions" (ngModelChange)="changed()" required>
-                      @for (interaction of draft().interactions; track interaction.id) { <option [value]="interaction.id">{{ interaction.name }}</option> }
-                    </select></label>
-                  </div>
-                  <div class="row-actions"><label class="checkbox"><input type="checkbox" [(ngModel)]="event.active" (ngModelChange)="changed()" />Active</label>
-                    <button type="button" class="danger" (click)="deleteEvent(event)">Delete event mapping</button></div>
-                  @if (!eventValid(event)) { <p class="field-error">Choose a document type, at least one event and at least one interaction.</p> }
-                  @if (missingEventInteractions(event)) { <p class="field-error">This mapping references a deleted interaction. Select an existing interaction.</p> }
-                </fieldset>
-              } @empty { <p class="empty">No event mappings. Add a mapping to run metadata interactions automatically.</p> }
+              <div class="event-table-scroll"><table class="event-table">
+                <thead><tr><th>Document type</th><th>Events</th><th>Interactions</th><th>Active</th><th><button type="button" class="add-event icon-button" aria-label="Add event mapping" title="Add event mapping" (click)="addEvent()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M6 12h12" stroke="white" stroke-width="1.5"/></svg></button></th></tr></thead>
+                <tbody>@for (event of draft().eventsSettings; track $index; let index = $index) {
+                  <tr class="event" [class.invalid]="!eventValid(event) || missingEventInteractions(event)">
+                    <td><select [(ngModel)]="event.docType" (ngModelChange)="changed()" required [attr.aria-label]="'Document type for event mapping ' + (index + 1)"><option value="">Select a document type or facet</option>@for (type of documentTypes(); track type) { <option [value]="type">{{ type }}</option> }</select></td>
+                    <td><cp-settings-choices [label]="'Events for mapping ' + (index + 1)" [choices]="eventChoices" [values]="event.events" [disabled]="saving() || loading()" (valuesChange)="event.events = $event; changed()" /></td>
+                    <td><cp-settings-choices [label]="'Interactions for mapping ' + (index + 1)" [choices]="interactionChoices()" [values]="event.interactions" [disabled]="saving() || loading()" (valuesChange)="event.interactions = $event; changed()" />
+                      @if (missingEventInteractions(event)) { <p class="field-error">This mapping references a deleted interaction. Select an existing interaction.</p> }
+                    </td>
+                    <td><label class="checkbox"><input type="checkbox" [(ngModel)]="event.active" (ngModelChange)="changed()" [attr.aria-label]="'Active event mapping ' + (index + 1)" /></label></td>
+                    <td><details class="event-menu"><summary [attr.aria-label]="'Actions for event mapping ' + (index + 1)">⋮</summary><button type="button" class="danger" (click)="deleteEvent(event)">Delete event mapping</button></details></td>
+                  </tr>
+                } @empty { <tr><td colspan="5" class="empty">No event mappings.</td></tr> }</tbody>
+              </table></div>
             </section>
           }
           @case ('settings') {
             <section aria-label="AI and search settings">
-              <fieldset class="card"><legend>AI settings</legend>
+              <fieldset class="card settings-section"><legend>AI settings</legend>
                 <div class="settings-grid">
-                  <label>Embedding model <input [(ngModel)]="draft().aiSettings['embeddingModel']" (ngModelChange)="changed()" placeholder="amazon.titan-embed-text-v2:0" /><span class="hint">Model used to generate text vectors.</span></label>
-                  <label>Supported MIME types <input [(ngModel)]="draft().aiSettings['mimeTypes']" (ngModelChange)="changed()" placeholder="text/plain,application/pdf" /><span class="hint">Comma-separated content types.</span></label>
-                  <label>Directory bucket size <input type="number" min="1" [(ngModel)]="draft().aiSettings['directoryBucketSize']" (ngModelChange)="changed()" /><span class="hint">Maximum vocabulary values sent in each request.</span></label>
+                  <label>embeddingModel <input [(ngModel)]="draft().aiSettings['embeddingModel']" (ngModelChange)="changed()" placeholder="amazon.titan-embed-text-v2:0" /></label>
+                  <label>mimeTypes <input [(ngModel)]="draft().aiSettings['mimeTypes']" (ngModelChange)="changed()" placeholder="text/plain,application/pdf" /></label>
+                  <label>directoryBucketSize <input type="number" min="1" [(ngModel)]="draft().aiSettings['directoryBucketSize']" (ngModelChange)="changed()" /></label>
                 </div>
-                <label class="checkbox"><input type="checkbox" [(ngModel)]="draft().awsS3AccessEnabled" (ngModelChange)="changed()" />Enable S3 access</label>
               </fieldset>
-              <fieldset class="card"><legend>Elasticsearch query settings</legend>
+              <fieldset class="card settings-section"><legend>Elasticsearch Query Settings</legend>
                 <div class="settings-grid">
                   @for (field of esFields; track field) {
                     <label>{{ field }} <input [(ngModel)]="draft().esSettings[field]" (ngModelChange)="changed()" /></label>

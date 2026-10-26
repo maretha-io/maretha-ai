@@ -19,7 +19,7 @@ export const CP_DUBLINCORE_FIELDS: readonly LayoutField[] = Object.freeze([
   { property: 'dc:nature', label: 'Nature', widget: 'directory', directoryName: 'nature' },
   { property: 'dc:subjects', label: 'Subjects', widget: 'directory', directoryName: 'l10nsubjects' },
   { property: 'dc:coverage', label: 'Coverage', widget: 'directory', directoryName: 'l10ncoverage' },
-  { property: 'dc:expired', label: 'Expiration date' },
+  { property: 'dc:expired', label: 'Expires' },
 ]);
 
 export function cpHasAiSchema(document: Readonly<Record<string, unknown>> | null | undefined): boolean {
