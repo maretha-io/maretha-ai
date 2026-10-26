@@ -42,33 +42,33 @@ test('isolated library glyph tests receive the current canonical Polymer asset',
 
 test('combined context requires the exact coordinated marketplace versions', t => {
   const dir = fixture(t), addon = path.join(dir, 'addon.zip'), host = path.join(dir, 'host.zip'), context = path.join(dir, 'context');
-  zip(addon, 'maretha-ai', '1.0.31'); zip(host, 'maretha-angular-webui', '3.21.5');
+  zip(addon, 'maretha-ai', '1.0.32'); zip(host, 'maretha-angular-webui', '3.21.6');
   execFileSync('bash', [script, addon, host, context]);
-  assert.deepEqual(readdirSync(context).sort(), ['Dockerfile', 'maretha-ai-package-1.0.31.zip', 'maretha-angular-webui-package-3.21.5.zip']);
-  assert.deepEqual(readFileSync(path.join(context, 'maretha-ai-package-1.0.31.zip')), readFileSync(addon));
-  assert.deepEqual(readFileSync(path.join(context, 'maretha-angular-webui-package-3.21.5.zip')), readFileSync(host));
+  assert.deepEqual(readdirSync(context).sort(), ['Dockerfile', 'maretha-ai-package-1.0.32.zip', 'maretha-angular-webui-package-3.21.6.zip']);
+  assert.deepEqual(readFileSync(path.join(context, 'maretha-ai-package-1.0.32.zip')), readFileSync(addon));
+  assert.deepEqual(readFileSync(path.join(context, 'maretha-angular-webui-package-3.21.6.zip')), readFileSync(host));
 });
 
 test('context rejects the previous Angular release and avoids overwriting existing output', t => {
   const dir = fixture(t), addon = path.join(dir, 'addon.zip'), host = path.join(dir, 'host.zip'), context = path.join(dir, 'context');
-  zip(addon, 'maretha-ai', '1.0.31'); zip(host, 'maretha-angular-webui', '3.21.3');
+  zip(addon, 'maretha-ai', '1.0.32'); zip(host, 'maretha-angular-webui', '3.21.5');
   assert.notEqual(spawnSync('bash', [script, addon, host, context]).status, 0);
   mkdirSync(context); writeFileSync(path.join(context, 'keep'), 'original');
-  zip(host, 'maretha-angular-webui', '3.21.5');
+  zip(host, 'maretha-angular-webui', '3.21.6');
   assert.notEqual(spawnSync('bash', [script, addon, host, context]).status, 0);
   assert.equal(readFileSync(path.join(context, 'keep'), 'utf8'), 'original');
 });
 
 test('context rejects the previous add-on release even with the current host', t => {
   const dir = fixture(t), addon = path.join(dir, 'addon.zip'), host = path.join(dir, 'host.zip'), context = path.join(dir, 'context');
-  zip(addon, 'maretha-ai', '1.0.29'); zip(host, 'maretha-angular-webui', '3.21.5');
+  zip(addon, 'maretha-ai', '1.0.31'); zip(host, 'maretha-angular-webui', '3.21.6');
   assert.notEqual(spawnSync('bash', [script, addon, host, context]).status, 0);
 });
 
 test('assembly rejects the prior SDK before building either package', t => {
   const dir = fixture(t), source = path.join(dir, 'core');
   mkdirSync(path.join(source, 'app/extensions'), { recursive: true });
-  writeFileSync(path.join(source, 'package.json'), JSON.stringify({ version: '3.21.5' }));
+  writeFileSync(path.join(source, 'package.json'), JSON.stringify({ version: '3.21.6' }));
   writeFileSync(path.join(source, 'app/extensions/package.json'), JSON.stringify({ version: '0.1.1' }));
   assert.throws(() => assemble(source, path.join(dir, 'assembly')), /Expected WebUI SDK 0.1.2/);
 });

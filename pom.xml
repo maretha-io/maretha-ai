@@ -9,7 +9,7 @@
 
   <groupId>io.maretha.cp</groupId>
   <artifactId>maretha-ai-parent</artifactId>
-  <version>1.0.31</version>
+  <version>1.0.32</version>
   <name>Maretha cp parent</name>
   <description>Maretha Nuxeo Add-On AI</description>
   <packaging>pom</packaging>
