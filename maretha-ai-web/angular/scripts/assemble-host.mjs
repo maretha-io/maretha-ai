@@ -61,7 +61,7 @@ export function assemble(coreRoot, outputRoot) {
   const corePackage = readJson(path.join(coreRoot, 'package.json'));
   const cpPackage = readJson(path.join(angularRoot, 'package.json'));
   const sdkPackage = readJson(path.join(coreRoot, 'app/extensions/package.json'));
-  if (corePackage.version !== '3.21.6' || cpPackage.version !== '1.0.32') throw new Error('Expected host 3.21.6 and add-on 1.0.32.');
+  if (corePackage.version !== '3.21.7' || cpPackage.version !== '1.0.33') throw new Error('Expected host 3.21.7 and add-on 1.0.33.');
   if (sdkPackage.version !== '0.1.2') throw new Error('Expected WebUI SDK 0.1.2.');
   const sharedModules = path.join(coreRoot, 'node_modules');
   if (!existsSync(sharedModules)) throw new Error('Install the host dependencies before assembly.');
@@ -91,7 +91,7 @@ export function assemble(coreRoot, outputRoot) {
   writeFileSync(path.join(hostRoot, 'custom/index.ts'), "import { provideCpWebUi } from '@maretha/cp-webui';\nexport function provideCustomExtensions() { return provideCpWebUi(); }\n");
   writeFileSync(path.join(hostRoot, 'custom/dependencies.allow.json'), JSON.stringify({ packages: ['@maretha/cp-webui'] }, null, 2) + '\n');
   const stagedPackage = readJson(path.join(hostRoot, 'package.json'));
-  stagedPackage.dependencies = { ...stagedPackage.dependencies, '@maretha/cp-webui': '1.0.32' };
+  stagedPackage.dependencies = { ...stagedPackage.dependencies, '@maretha/cp-webui': '1.0.33' };
   writeFileSync(path.join(hostRoot, 'package.json'), JSON.stringify(stagedPackage, null, 2) + '\n');
   // This composed distribution includes the CP settings, schema forms and search UI.
   // Keep the core's 6 MB ceiling unchanged; cap this add-on assembly at 6.5 MB.
@@ -103,8 +103,8 @@ export function assemble(coreRoot, outputRoot) {
   writeFileSync(angularConfigPath, JSON.stringify(angularConfig, null, 2) + '\n');
   run('npm', ['run', 'package:nuxeo'], hostRoot);
   run('mvn', ['-B', 'verify'], addonRoot);
-  const hostZip = path.join(hostRoot, 'nuxeo/package/target/maretha-angular-webui-package-3.21.6.zip');
-  const addonZip = path.join(addonRoot, 'maretha-ai-package/target/maretha-ai-package-1.0.32.zip');
+  const hostZip = path.join(hostRoot, 'nuxeo/package/target/maretha-angular-webui-package-3.21.7.zip');
+  const addonZip = path.join(addonRoot, 'maretha-ai-package/target/maretha-ai-package-1.0.33.zip');
   if (!existsSync(hostZip) || !existsSync(addonZip)) throw new Error('Expected release packages were not produced.');
   const manifest = {
     createdAt: new Date().toISOString(), coreVersion: corePackage.version, addonVersion: cpPackage.version,

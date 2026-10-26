@@ -9,12 +9,12 @@ import {
   WebUiAppState, WebUiSlotComponent, WebUiIcons, RESULTS_COMMAND_GATEWAY,
   type DocumentActionContext, type DrawerContext, type PageContext, type ResultsColumnLayout,
   type ResultsProjectionColumn, type ResultsProjectionMode, type ResultsProjectionRow,
-  type ResultsSelectionContext, type ResultsToolbarContext,
+  type ResultsQueryScope, type ResultsSelectionContext, type ResultsToolbarContext,
 } from '@maretha/webui-sdk';
 import { Subscription } from 'rxjs';
 import { CpApiService } from '../../shared/services/cp-api.service';
 import type { CpDocument } from '../../shared/types/cp-models';
-import { cpConfidence, cpScore, cpSearchParameters, cpSimilarityVector, type CpSearchCriteria } from './search-state';
+import { CP_CSV_ACTION_IDS, cpConfidence, cpScore, cpSearchParameters, cpSearchQueryScope, cpSimilarityVector, type CpSearchCriteria } from './search-state';
 import { CpSavedSearchesComponent } from './cp-saved-searches.component';
 import { CP_SEARCH_ICONS } from './cp-search-icons';
 import { CpSearchControlIconComponent } from './cp-search-control-icon.component';
@@ -179,6 +179,7 @@ export class CpSimilarDocumentsComponent {
   template: `
     <div class="display-tools">
       <span class="sr-only" role="status">{{ total() }} results · {{ selection().length }} selected</span>
+      <nx-webui-slot name="RESULTS_ACTIONS" [context]="toolbarContext()" [includeIds]="csvActionIds" />
       <button type="button" class="icon-control" (click)="setMode('grid')" [disabled]="mode() === 'grid'" aria-label="Switch to Grid View" title="Switch to Grid View"><cp-search-control-icon kind="grid" /></button>
       <button type="button" class="icon-control" (click)="setMode('table')" [disabled]="mode() === 'table'" aria-label="Switch to Table View" title="Switch to Table View"><cp-search-control-icon kind="table" /></button>
     </div>
@@ -241,6 +242,8 @@ export class CpEmbeddingResultsComponent {
   readonly loading = signal(false);
   readonly error = signal('');
   readonly epoch = signal(0);
+  readonly csvActionIds = CP_CSV_ACTION_IDS;
+  private readonly appliedQueryScope = signal<ResultsQueryScope | undefined>(undefined);
   readonly mode = signal<ResultsProjectionMode>('grid');
   readonly sortBy = signal('contextParameters.relevance_score');
   readonly direction = signal<'asc' | 'desc'>('desc');
@@ -253,7 +256,7 @@ export class CpEmbeddingResultsComponent {
   private readonly actionBusy = signal(false);
   private preferenceScope = '';
   private readonly contexts = new WeakMap<object, DocumentActionContext>();
-  readonly hasQuery = computed(() => this.criteria().vectorQuery.length > 0);
+  readonly hasQuery = computed(() => !!cpSearchQueryScope(this.criteria()));
   readonly allColumns: readonly ResultsProjectionColumn<CpDocument>[] = [
     { id: 'title', label: 'Title', value: row => row.title || row.properties['dc:title'], flex: 2 },
     { id: 'relevance', label: 'Relevance', value: row => cpScore(row), width: 110 },
@@ -278,11 +281,13 @@ export class CpEmbeddingResultsComponent {
       document: this.sourceDocument(), user: this.app.user(), noEdit: false,
       selectedDocuments: this.rows().filter(row => chosen.has(row.uid)), items: this.rows(), displayMode: this.mode(),
       columns: this.columns().filter(column => !column.hidden).map(column => ({ field: column.id, label: column.label })),
+      queryScope: this.appliedQueryScope(),
       busy: this.loading() || this.actionBusy(), setBusy: busy => this.actionBusy.set(busy),
       refresh: removed => this.refresh(removed), reportError: message => this.error.set(message),
     };
     return { ...selectionContext, queryToken: this.epoch(), routeToken: this.epoch(),
-      loadedCount: this.rows().length, totalCount: this.total(), allSelected: chosen.size === this.rows().length,
+      loadedCount: this.rows().length, totalCount: this.total(), allSelected: chosen.size > 0 && chosen.size === this.rows().length,
+      csvSchemas: ['dublincore'], csvSort: { sortBy: this.sortBy(), sortOrder: this.direction() },
       availableCommands: this.commands?.available(selectionContext) || [], workflows: [], execute: command => this.execute(command),
     };
   });
@@ -301,12 +306,15 @@ export class CpEmbeddingResultsComponent {
     this.page = 0;
     this.selection.set([]);
     this.rows.set([]);
+    this.appliedQueryScope.set(undefined);
+    this.total.set(0);
     this.epoch.update(epoch => epoch + 1);
     this.fetch(false);
   }
   private fetch(append: boolean): void {
     this.request?.unsubscribe();
     const generation = ++this.generation;
+    const queryScope = cpSearchQueryScope(this.criteria());
     this.error.set('');
     if (!this.hasQuery()) { this.loading.set(false); this.total.set(0); this.nextPage.set(false); return; }
     this.loading.set(true);
@@ -317,6 +325,7 @@ export class CpEmbeddingResultsComponent {
         const combined = append ? [...this.rows(), ...entries] : entries;
         this.rows.set([...new Map(combined.map(row => [row.uid, row])).values()]);
         this.total.set(result.resultsCount ?? this.rows().length);
+        this.appliedQueryScope.set(queryScope);
         this.nextPage.set(result.isNextPageAvailable ?? (entries.length > 0 && this.rows().length < this.total()));
         this.loading.set(false);
       },
