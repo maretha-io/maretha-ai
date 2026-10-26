@@ -26,6 +26,13 @@ export function linkDependencies(source, target) {
   }
 }
 
+/** Stage the current Polymer asset used by the Angular glyph regression test. */
+export function stageCanonicalIconFixture(sourceAddonRoot, libraryRoot) {
+  const fixture = path.join(libraryRoot, 'tests/fixtures/cp-custom-icons.html');
+  mkdirSync(path.dirname(fixture), { recursive: true });
+  cpSync(path.join(sourceAddonRoot, 'maretha-ai-web/src/main/resources/web/nuxeo.war/ui/cp-custom-icons.html'), fixture);
+}
+
 function linkPackage(modules, name, destination) {
   const target = path.join(modules, name);
   mkdirSync(path.dirname(target), { recursive: true });
@@ -66,6 +73,7 @@ export function assemble(coreRoot, outputRoot) {
     const input = path.join(angularRoot, name);
     if (existsSync(input)) cpSync(input, path.join(libraryRoot, name), { recursive: true });
   }
+  stageCanonicalIconFixture(addonRoot, libraryRoot);
   linkDependencies(sharedModules, path.join(libraryRoot, 'node_modules'));
   linkPackage(path.join(libraryRoot, 'node_modules'), '@maretha/webui-sdk', path.join(coreRoot, 'dist/webui-sdk'));
   run('npm', ['test'], libraryRoot);

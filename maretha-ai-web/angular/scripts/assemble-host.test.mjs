@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { assemble, linkDependencies } from './assemble-host.mjs';
+import { assemble, linkDependencies, stageCanonicalIconFixture } from './assemble-host.mjs';
 
 const script = fileURLToPath(new URL('./prepare-demo-context.sh', import.meta.url));
 
@@ -29,6 +29,15 @@ test('isolated scoped package links do not mutate the shared dependency tree', t
   assert.deepEqual(readdirSync(path.join(source, '@maretha')), ['webui-sdk']);
   assert.equal(realpathSync(path.join(target, 'rxjs')), realpathSync(path.join(source, 'rxjs')));
   assert.equal(realpathSync(path.join(target, '@maretha/webui-sdk')), realpathSync(path.join(source, '@maretha/webui-sdk')));
+});
+
+test('isolated library glyph tests receive the current canonical Polymer asset', t => {
+  const dir = fixture(t), source = path.join(dir, 'addon'), library = path.join(dir, 'cp-library');
+  const asset = path.join(source, 'maretha-ai-web/src/main/resources/web/nuxeo.war/ui/cp-custom-icons.html');
+  mkdirSync(path.dirname(asset), { recursive: true });
+  writeFileSync(asset, '<svg id="ai-metadata">current asset</svg>');
+  stageCanonicalIconFixture(source, library);
+  assert.equal(readFileSync(path.join(library, 'tests/fixtures/cp-custom-icons.html'), 'utf8'), readFileSync(asset, 'utf8'));
 });
 
 test('combined context requires the exact coordinated marketplace versions', t => {
