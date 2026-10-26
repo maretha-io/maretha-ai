@@ -12,12 +12,12 @@ script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 [[ -f "$package_path" ]] || { echo 'Package does not exist.' >&2; exit 2; }
 [[ -f "$host_package_path" ]] || { echo 'Angular package does not exist.' >&2; exit 2; }
 [[ ! -e "$context_path" ]] || { echo 'Context directory already exists; choose a new directory.' >&2; exit 2; }
-unzip -p "$package_path" package.xml | python3 -c 'import sys,xml.etree.ElementTree as E; p=E.fromstring(sys.stdin.read()); assert p.get("name")=="maretha-ai" and p.get("version")=="1.0.30", "Expected maretha-ai 1.0.30 package"'
-unzip -p "$host_package_path" package.xml | python3 -c 'import sys,xml.etree.ElementTree as E; p=E.fromstring(sys.stdin.read()); assert p.get("name")=="maretha-angular-webui" and p.get("version")=="3.21.4", "Expected maretha-angular-webui 3.21.4 package"'
+unzip -p "$package_path" package.xml | python3 -c 'import sys,xml.etree.ElementTree as E; p=E.fromstring(sys.stdin.read()); assert p.get("name")=="maretha-ai" and p.get("version")=="1.0.31", "Expected maretha-ai 1.0.31 package"'
+unzip -p "$host_package_path" package.xml | python3 -c 'import sys,xml.etree.ElementTree as E; p=E.fromstring(sys.stdin.read()); assert p.get("name")=="maretha-angular-webui" and p.get("version")=="3.21.5", "Expected maretha-angular-webui 3.21.5 package"'
 mkdir -p -- "$context_path"
-cp -- "$package_path" "$context_path/maretha-ai-package-1.0.30.zip"
-cp -- "$host_package_path" "$context_path/maretha-angular-webui-package-3.21.4.zip"
+cp -- "$package_path" "$context_path/maretha-ai-package-1.0.31.zip"
+cp -- "$host_package_path" "$context_path/maretha-angular-webui-package-3.21.5.zip"
 cp -- "$script_dir/Dockerfile.demo-patch" "$context_path/Dockerfile"
 echo "Prepared: $context_path"
-shasum -a 256 "$context_path/maretha-ai-package-1.0.30.zip"
-shasum -a 256 "$context_path/maretha-angular-webui-package-3.21.4.zip"
+shasum -a 256 "$context_path/maretha-ai-package-1.0.31.zip"
+shasum -a 256 "$context_path/maretha-angular-webui-package-3.21.5.zip"

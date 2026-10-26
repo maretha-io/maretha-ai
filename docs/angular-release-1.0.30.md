@@ -34,16 +34,11 @@ reactor. `release-manifest.json` records source revisions, versions and both
 package SHA-256 hashes. Build output remains in the chosen assembly directory
 for inspection; it never deploys anything.
 
-To inspect and prepare the image context afterward:
+Inspect the resulting artifact before promoting it through the pipeline below:
 
 ```sh
-mvn -B verify
 shasum -a 256 maretha-ai-package/target/maretha-ai-package-1.0.30.zip
 unzip -p maretha-ai-package/target/maretha-ai-package-1.0.30.zip package.xml
-bash maretha-ai-web/angular/scripts/prepare-demo-context.sh \
-  maretha-ai-package/target/maretha-ai-package-1.0.30.zip \
-  /tmp/maretha-cp-1.0.30-assembly/host/nuxeo/package/target/maretha-angular-webui-package-3.21.4.zip \
-  /tmp/maretha-ai-1.0.30-context
 ```
 
 The add-on ZIP supplies the server bundles and its packaged Angular extension.
