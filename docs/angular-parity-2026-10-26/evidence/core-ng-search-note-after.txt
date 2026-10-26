@@ -1,0 +1,126 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=92_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/search/default"
+  uid=92_1 complementary "Application navigation"
+    uid=92_2 button "Dashboard"
+    uid=92_3 navigation "Main navigation"
+      uid=92_4 button "AI search" expandable
+      uid=92_5 button "Browse" expandable
+      uid=92_6 button "Recently Viewed" expandable
+      uid=92_7 button "Search" expandable expanded
+      uid=92_8 button "Expired" expandable
+      uid=92_9 button "Assets" expandable
+      uid=92_10 button "Tasks" expandable
+      uid=92_11 button "Favorites" expandable
+      uid=92_12 button "Collections" expandable
+      uid=92_13 button "Personal Space" expandable
+      uid=92_14 button "Clipboard" expandable
+      uid=92_15 button "Trash" expandable
+    uid=92_16 navigation "Account and administration"
+      uid=92_17 button "Administration" expandable
+      uid=92_18 button "User menu" expandable
+  uid=96_0 region "Navigation details"
+    uid=96_1 heading "Search Filters" level="6"
+    uid=101_0 form
+      uid=101_1 combobox "Select a saved search" expandable haspopup="menu" value="Select a saved search"
+        uid=101_2 option "Select a saved search" selected
+        uid=101_3 option "Parity audit 2026-10-26 saved search"
+      uid=101_4 button "Switch to Queue View"
+      uid=101_5 "Full Text"
+      uid=101_6 searchbox "Full Text" focusable focused value="core-note"
+      uid=101_7 DisclosureTriangle "Modification Date ⌄" expandable
+      uid=101_8 "Authors"
+      uid=101_9 "Search for authors..."
+      uid=101_10 combobox "Authors Search for authors..." autocomplete="list" expandable haspopup="listbox"
+      uid=101_11 status atomic live="polite" relevant="additions text"
+      uid=101_12 "Collections"
+      uid=101_13 "Select a value."
+      uid=101_14 combobox "Collections Select a value." autocomplete="list" expandable haspopup="listbox"
+      uid=101_15 status atomic live="polite" relevant="additions text"
+      uid=101_16 "Tags"
+      uid=101_17 "e.g. events, boston"
+      uid=101_18 combobox "Tags e.g. events, boston" autocomplete="list" expandable haspopup="listbox"
+      uid=101_19 status atomic live="polite" relevant="additions text"
+      uid=101_20 DisclosureTriangle "Nature ⌄" expandable
+      uid=101_21 DisclosureTriangle "Subjects ⌄" expandable
+      uid=101_22 DisclosureTriangle "Coverage ⌄" expandable
+      uid=101_23 DisclosureTriangle "Size ⌄" expandable
+      uid=101_24 DisclosureTriangle "Save As" expandable
+      uid=101_25 checkbox "Auto-search" checked
+      uid=101_26 "Auto-search"
+      uid=101_27 button " Reset"
+  uid=96_30 navigation "Drawer controls"
+    uid=96_31 separator "Resize navigation drawer" description="Drag to resize. Use arrow keys to adjust; press Enter or double-click to reset." orientation="vertical" value="298" valuemax="640" valuemin="200" valuetext=""
+    uid=96_32 button "Close navigation"
+  uid=92_19 banner "Application actions"
+    uid=92_20 button "Quick Search" expandable haspopup="dialog"
+    uid=92_21 generic
+      uid=92_22 button "Add Content" haspopup="dialog"
+  uid=92_23 region "Application activity"
+    uid=92_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=92_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=98_0 region "Default search results"
+    uid=98_1 heading "Search results" level="1"
+    uid=98_2 button "Save As"
+    uid=98_3 paragraph live="polite" relevant="additions text"
+      uid=98_4 "8 results"
+    uid=98_5 button "No Containers"
+    uid=98_6 button "Most Recent"
+    uid=98_7 button "Validated"
+    uid=98_8 button "Export CSV"
+    uid=98_9 button "Switch to grid view"
+    uid=98_10 button "Switch to table view"
+    uid=98_11 button "Switch to list view" disableable disabled
+    uid=98_12 "Sort by"
+    uid=98_13 combobox "Sort by" expandable haspopup="menu" value="Created"
+      uid=98_14 option "Title" disableable disabled
+      uid=98_15 option "Created" disableable disabled
+      uid=98_16 option "Modified" disableable disabled
+      uid=98_17 option "Last contributor" disableable disabled
+      uid=98_18 option "State" disableable disabled
+      uid=98_19 option "Nature" disableable disabled
+      uid=98_20 option "Coverage" disableable disabled
+    uid=98_21 button "Ascending order"
+    uid=98_22 checkbox "Select Dicaeidae Flowerpeckers"
+    uid=98_23 link "Dicaeidae Flowerpeckers" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Nature/Bird%20Families/Dicaeidae%20-%20Flowerpeckers%20-%20Birds%20of%20the%20World.pdf"
+    uid=98_25 "File"
+    uid=98_26 "Modified May 1, 2025"
+    uid=98_27 "Flowerpeckers are frenetic fruit-cruisers of tropical Asian forest canopies. They primarily feed on fruits and nectar, with many preferring mistletoe berries. Little is known about their breeding behavior, but they appear to be monogamous. Nests are hanging pouches constructed of mosses, spiderwebs, and small roots. Eight species (18%) of flowerpeckers are threatened by habitat loss. The family Dicaeidae is believed to be sister to Nectariniidae based on molecular phylogenetic studies."
+    uid=98_28 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Administrator"
+    uid=98_30 checkbox "Select AWS S3 Glacier Developer Guide"
+    uid=98_31 link "AWS S3 Glacier Developer Guide" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/AI%20Examples/AWS%20S3%20Glacier%20Developer%20Guide"
+    uid=98_33 "File"
+    uid=98_34 "Modified Jun 9, 2025"
+    uid=98_35 "Amazon S3 Glacier API Documentation"
+    uid=98_36 link "Ethan Steiner" url="https://demo.maretha.io/nuxeo/ng/page/user?id=EthanAdmin"
+    uid=98_38 checkbox "Select pro dev plan.pdf"
+    uid=98_39 link "pro dev plan.pdf" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Doc%20Classification/pro%20dev%20plan.pdf"
+    uid=98_41 "File"
+    uid=98_42 "Modified Dec 3, 2025"
+    uid=98_43 link "Joel Warwick" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Joel"
+    uid=98_45 checkbox "Select UK Guidance_for_businesses_on_making_environmental_claims_.pdf"
+    uid=98_46 link "UK Guidance_for_businesses_on_making_environmental_claims_.pdf" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Contextual%20Review/Retail%20Product%20Launch/Retail%20Regulatory/UK%20Guidance_for_businesses_on_making_environmental_claims_.pdf"
+    uid=98_48 "File"
+    uid=98_49 "Modified Dec 13, 2025"
+    uid=98_50 link "Joel Warwick" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Joel"
+    uid=98_52 checkbox "Select UK Fair Treatment - fg21-1.pdf"
+    uid=98_53 link "UK Fair Treatment - fg21-1.pdf" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/AI%20Examples/Joel%20Testing%20tmp/Contextual%20Review/FinServ%20Regulatory%20Risk/Insurance%20Guidelines/UK%20Fair%20Treatment%20-%20fg21-1.pdf"
+    uid=98_55 "File"
+    uid=98_56 "Modified Dec 13, 2025"
+    uid=98_57 link "Joel Warwick" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Joel"
+    uid=98_59 checkbox "Select core-note"
+    uid=98_60 link "core-note" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-target/core-note.1793044560166"
+    uid=98_62 "Note"
+    uid=98_63 "Modified Oct 26, 2026"
+    uid=98_64 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+    uid=98_66 checkbox "Select core-note"
+    uid=98_67 link "core-note" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-target/core-note"
+    uid=98_69 "Note"
+    uid=98_70 "Modified Oct 26, 2026"
+    uid=98_71 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+    uid=98_73 checkbox "Select core-note"
+    uid=98_74 link "core-note" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-note"
+    uid=98_76 "Note"
+    uid=98_77 "Modified Oct 26, 2026"
+    uid=98_78 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+  uid=92_137 generic live="polite" relevant="additions text"

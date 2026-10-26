@@ -1,0 +1,74 @@
+- complementary "Application navigation":
+  - button "Dashboard":
+    - img "Nuxeo"
+  - navigation "Main navigation":
+    - button "AI search":
+    - button "Browse":
+    - button "Recently Viewed":
+    - button "Search":
+    - button "Expired":
+    - button "Assets":
+    - button "Tasks":
+    - button "Favorites":
+    - button "Collections":
+    - button "Personal Space":
+    - button "Clipboard":
+    - button "Trash":
+  - navigation "Account and administration":
+    - button "Administration" [expanded]:
+    - button "User menu":
+- region "Navigation details":
+  - heading "Administration" [level=6]
+  - navigation "Administration":
+    - button "Analytics"
+    - button "Users & Groups"
+    - button "Vocabularies"
+    - button "Audit"
+    - button "Cloud Services"
+    - button "NXQL Search"
+    - button "Metadata layouts"
+    - button "AI Settings"
+- navigation "Drawer controls":
+  - separator "Resize navigation drawer"
+  - button "Close navigation":
+- banner "Application actions":
+  - button "Quick Search":
+- region "Application activity":
+  - progressbar "Loading content"
+  - progressbar "Loading page"
+- tabpanel "Analytics":
+  - banner:
+    - heading "Analytics" [level=1]
+  - tablist "Analytics views":
+    - tab "Document Distribution" [selected]
+    - tab "Repository Content"
+    - tab "Search"
+    - tab "Workflow"
+  - tabpanel "Document Distribution":
+    - text: Path
+    - combobox "Path": /default-domain/
+    - button "Apply"
+    - navigation "Distribution path":
+      - button "default-domain /"
+    - img "Document Distribution":
+      - 'button "/default-domain/workspaces/: 1,475"'
+      - 'button "/default-domain/UserWorkspaces/: 60"'
+      - 'button "/default-domain/sections/: 1"'
+      - 'button "/default-domain/templates/: 1"'
+    - list:
+      - button "workspaces (1,475)": workspaces (1,475)
+      - button "UserWorkspaces (60)": UserWorkspaces (60)
+      - button "sections (1)": sections (1)
+      - button "templates (1)": templates (1)
+    - group "Distribution options":
+      - generic: Distribution options
+      - checkbox "Include hidden documents"
+      - text: Include hidden documents
+      - checkbox "Include deleted documents"
+      - text: Include deleted documents
+      - checkbox "Include versions"
+      - text: Include versions
+      - checkbox "Only folders"
+      - text: Only folders
+    - generic: Depth 1
+    - slider "Depth 1": "1"

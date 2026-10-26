@@ -1,0 +1,449 @@
+- navigation "Application navigation":
+  - button "Main navigation" [expanded]:
+- complementary "Application navigation":
+  - button "Dashboard":
+    - img "Nuxeo"
+  - navigation "Main navigation":
+    - button "AI search":
+    - button "Browse":
+    - button "Recently Viewed":
+    - button "Search":
+    - button "Expired":
+    - button "Assets":
+    - button "Tasks":
+    - button "Favorites":
+    - button "Collections":
+    - button "Personal Space":
+    - button "Clipboard":
+    - button "Trash":
+  - navigation "Account and administration":
+    - button "Administration":
+    - button "User menu" [active]:
+- button: ×
+- button: Profile
+- button: Authorized Applications
+- button: Cloud Services
+- button: Themes
+- paragraph: Language
+- button [disabled]: English
+- button: Español
+- button: Français
+- button: العربية
+- button: Română
+- button: Português
+- button: Italiano
+- button: Sign Out
+- banner "Application actions":
+  - button "Quick Search":
+  - button "Add Content":
+- region "Application activity":
+  - progressbar "Loading content"
+  - progressbar "Loading page"
+- main "Dashboard":
+  - heading "Dashboard" [level=1]
+  - region "Dashboard":
+    - region "Recently Edited":
+      - heading "Recently Edited" [level=2]:
+        - text: Recently Edited
+      - grid "Recently Edited Documents":
+        - caption: Recently Edited Documents
+        - rowgroup:
+          - row "Title Modified Last Contributor":
+            - columnheader "Title":
+              - button "Title"
+              - 'generic "Open Filter Menu: Title"':
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+              - option "AND" [selected]
+              - option "OR"
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+            - columnheader "Modified":
+              - button "Modified"
+              - 'generic "Open Filter Menu: Modified"':
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+              - option "AND" [selected]
+              - option "OR"
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+            - columnheader "Last Contributor":
+              - button "Last Contributor"
+              - 'generic "Open Filter Menu: Last Contributor"':
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+              - option "AND" [selected]
+              - option "OR"
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+        - rowgroup:
+          - row "docs-note 2 minutes ago gpt@maretha.io":
+            - gridcell "docs-note":
+              - link "docs-note":
+                - /url: /nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/docs-note
+            - gridcell "2 minutes ago"
+            - gridcell "gpt@maretha.io":
+              - generic "gpt@maretha.io (gpt)":
+                - generic: G
+                - link "gpt@maretha.io":
+                  - /url: /nuxeo/ng/page/user?id=gpt
+          - row "core-collection 4 minutes ago gpt@maretha.io":
+            - gridcell "core-collection":
+              - link "core-collection":
+                - /url: /nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-collection
+            - gridcell "4 minutes ago"
+            - gridcell "gpt@maretha.io":
+              - generic "gpt@maretha.io (gpt)":
+                - generic: G
+                - link "gpt@maretha.io":
+                  - /url: /nuxeo/ng/page/user?id=gpt
+          - row "core-note 4 minutes ago gpt@maretha.io":
+            - gridcell "core-note":
+              - link "core-note":
+                - /url: /nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-note
+            - gridcell "4 minutes ago"
+            - gridcell "gpt@maretha.io":
+              - generic "gpt@maretha.io (gpt)":
+                - generic: G
+                - link "gpt@maretha.io":
+                  - /url: /nuxeo/ng/page/user?id=gpt
+          - row "Birdy 47 minutes ago Ethan Steiner":
+            - gridcell "Birdy":
+              - link "Birdy":
+                - /url: /nuxeo/ng/browse/Workflows/MSA/Review/birdy-fb161bb9
+            - gridcell "47 minutes ago"
+            - gridcell "Ethan Steiner":
+              - generic "Ethan Steiner (EthanAdmin)":
+                - generic: ES
+                - link "Ethan Steiner":
+                  - /url: /nuxeo/ng/page/user?id=EthanAdmin
+          - row "Gray Owl on Sandy Ground 47 minutes ago devnull@nuxeo.com":
+            - gridcell "Gray Owl on Sandy Ground":
+              - link "Gray Owl on Sandy Ground":
+                - /url: /nuxeo/ng/browse/Workflows/MSA/Review/gray-owl-on-sandy-ground-b444680d
+            - gridcell "47 minutes ago"
+            - gridcell "devnull@nuxeo.com":
+              - generic "devnull@nuxeo.com (Administrator)":
+                - generic: D
+                - link "devnull@nuxeo.com":
+                  - /url: /nuxeo/ng/page/user?id=Administrator
+          - row "Media Request Luana test 5 hours ago devnull@nuxeo.com":
+            - gridcell "Media Request Luana test":
+              - link "Media Request Luana test":
+                - /url: /nuxeo/ng/browse/default-domain/workspaces/Luana/Media%20Request%20Luana%20test
+            - gridcell "5 hours ago"
+            - gridcell "devnull@nuxeo.com":
+              - generic "devnull@nuxeo.com (Administrator)":
+                - generic: D
+                - link "devnull@nuxeo.com":
+                  - /url: /nuxeo/ng/page/user?id=Administrator
+          - row "Inventory Item Test Luana 1 5 hours ago devnull@nuxeo.com":
+            - gridcell "Inventory Item Test Luana 1":
+              - link "Inventory Item Test Luana 1":
+                - /url: /nuxeo/ng/browse/default-domain/workspaces/Luana/Inventory%20test%20Luana/Inventory%20Item%20Test%20Luana%201
+            - gridcell "5 hours ago"
+            - gridcell "devnull@nuxeo.com":
+              - generic "devnull@nuxeo.com (Administrator)":
+                - generic: D
+                - link "devnull@nuxeo.com":
+                  - /url: /nuxeo/ng/page/user?id=Administrator
+          - row "Luana Media Request test2 5 hours ago Luana Mincu":
+            - gridcell "Luana Media Request test2":
+              - link "Luana Media Request test2":
+                - /url: /nuxeo/ng/browse/default-domain/UserWorkspaces/lmincu/Luana%20Media%20Request%20test2
+            - gridcell "5 hours ago"
+            - gridcell "Luana Mincu":
+              - generic "Luana Mincu (lmincu)":
+                - generic: LM
+                - link "Luana Mincu":
+                  - /url: /nuxeo/ng/page/user?id=lmincu
+          - row "Art1 5 hours ago devnull@nuxeo.com":
+            - gridcell "Art1":
+              - link "Art1":
+                - /url: /nuxeo/ng/browse/default-domain/workspaces/Luana/Art1
+            - gridcell "5 hours ago"
+            - gridcell "devnull@nuxeo.com":
+              - generic "devnull@nuxeo.com (Administrator)":
+                - generic: D
+                - link "devnull@nuxeo.com":
+                  - /url: /nuxeo/ng/page/user?id=Administrator
+          - row "License request test Luana 6 hours ago devnull@nuxeo.com":
+            - gridcell "License request test Luana":
+              - link "License request test Luana":
+                - /url: /nuxeo/ng/browse/default-domain/workspaces/Luana/License%20request%20test%20Luana
+            - gridcell "6 hours ago"
+            - gridcell "devnull@nuxeo.com":
+              - generic "devnull@nuxeo.com (Administrator)":
+                - generic: D
+                - link "devnull@nuxeo.com":
+                  - /url: /nuxeo/ng/page/user?id=Administrator
+          - row "Invoice for license SA-LIC-2026-0003 - License request test Luana 7 hours ago devnull@nuxeo.com":
+            - gridcell "Invoice for license SA-LIC-2026-0003 - License request test Luana":
+              - link "Invoice for license SA-LIC-2026-0003 - License request test Luana":
+                - /url: /nuxeo/ng/browse/default-domain/workspaces/Luana/License%20request%20test%20Luana-invoice
+            - gridcell "7 hours ago"
+            - gridcell "devnull@nuxeo.com":
+              - generic "devnull@nuxeo.com (Administrator)":
+                - generic: D
+                - link "devnull@nuxeo.com":
+                  - /url: /nuxeo/ng/page/user?id=Administrator
+          - row "License contract SA-LIC-2026-0003 - License request test Luana 7 hours ago devnull@nuxeo.com":
+            - gridcell "License contract SA-LIC-2026-0003 - License request test Luana":
+              - link "License contract SA-LIC-2026-0003 - License request test Luana":
+                - /url: /nuxeo/ng/browse/default-domain/workspaces/Luana/License%20request%20test%20Luana-contract
+            - gridcell "7 hours ago"
+            - gridcell "devnull@nuxeo.com":
+              - generic "devnull@nuxeo.com (Administrator)":
+                - generic: D
+                - link "devnull@nuxeo.com":
+                  - /url: /nuxeo/ng/page/user?id=Administrator
+          - row "My Favorites 2 days ago gpt@maretha.io":
+            - gridcell "My Favorites":
+              - link "My Favorites":
+                - /url: /nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Favorites
+            - gridcell "2 days ago"
+            - gridcell "gpt@maretha.io":
+              - generic "gpt@maretha.io (gpt)":
+                - generic: G
+                - link "gpt@maretha.io":
+                  - /url: /nuxeo/ng/page/user?id=gpt
+          - row "Luana's contract 3 days ago devnull@nuxeo.com":
+            - gridcell "Luana's contract":
+              - link "Luana's contract":
+                - /url: /nuxeo/ng/browse/default-domain/workspaces/Luana/Luana's%20contract
+            - gridcell "3 days ago"
+            - gridcell "devnull@nuxeo.com":
+              - generic "devnull@nuxeo.com (Administrator)":
+                - generic: D
+                - link "devnull@nuxeo.com":
+                  - /url: /nuxeo/ng/page/user?id=Administrator
+          - row "My Favorites 3 days ago Luana Mincu":
+            - gridcell "My Favorites":
+              - link "My Favorites":
+                - /url: /nuxeo/ng/browse/default-domain/UserWorkspaces/lmincu/Favorites
+            - gridcell "3 days ago"
+            - gridcell "Luana Mincu":
+              - generic "Luana Mincu (lmincu)":
+                - generic: LM
+                - link "Luana Mincu":
+                  - /url: /nuxeo/ng/page/user?id=lmincu
+      - paragraph
+    - region "Tasks":
+      - heading "Tasks" [level=2]:
+        - text: Tasks
+      - paragraph: You don't have any tasks to process at the moment.
+    - region "Recently Viewed":
+      - heading "Recently Viewed" [level=2]:
+        - text: Recently Viewed
+      - grid "Recently Viewed Documents":
+        - caption: Recently Viewed Documents
+        - rowgroup:
+          - row "Title Type Last Viewed":
+            - columnheader "Title":
+              - button "Title"
+              - 'generic "Open Filter Menu: Title"':
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+              - option "AND" [selected]
+              - option "OR"
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+            - columnheader "Type":
+              - button "Type"
+              - 'generic "Open Filter Menu: Type"':
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+              - option "AND" [selected]
+              - option "OR"
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+            - columnheader "Last Viewed":
+              - button "Last Viewed"
+              - 'generic "Open Filter Menu: Last Viewed"':
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+              - option "AND" [selected]
+              - option "OR"
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+        - rowgroup:
+          - row "InteractionResults-Red-throated Bird Flight InteractionResults 2 minutes ago":
+            - gridcell "InteractionResults-Red-throated Bird Flight":
+              - link "InteractionResults-Red-throated Bird Flight":
+                - /url: /nuxeo/ng/browse/InteractionResults/InteractionResults-Red-throated%20Bird%20Flight
+            - gridcell "InteractionResults"
+            - gridcell "2 minutes ago"
+          - row "docs-note Note 3 minutes ago":
+            - gridcell "docs-note":
+              - link "docs-note":
+                - /url: /nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/docs-note
+            - gridcell "Note"
+            - gridcell "3 minutes ago"
+          - row "Parity audit 2026-10-26 Folder 4 minutes ago":
+            - gridcell "Parity audit 2026-10-26":
+              - link "Parity audit 2026-10-26":
+                - /url: /nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26
+            - gridcell "Folder"
+            - gridcell "4 minutes ago"
+          - row "Red-throated Bird Flight Picture 8 minutes ago":
+            - gridcell "Red-throated Bird Flight":
+              - link "Red-throated Bird Flight":
+                - /url: /nuxeo/ng/browse/default-domain/workspaces/Nature/Macaulay%20Library%20Ornithology/480.jpg
+            - gridcell "Picture"
+            - gridcell "8 minutes ago"
+          - row "McKesson Surgical Gloves File 9 minutes ago":
+            - gridcell "McKesson Surgical Gloves":
+              - link "McKesson Surgical Gloves":
+                - /url: /nuxeo/ng/browse/default-domain/workspaces/Adrian/Images/Surgical_Gloves_Catalog_Brochure_2021-05.pdf
+            - gridcell "File"
+            - gridcell "9 minutes ago"
+      - paragraph
+    - region "Favorite Items":
+      - heading "Favorite Items" [level=2]:
+        - text: Favorite Items
+      - grid "Favorites":
+        - caption: Favorites
+        - rowgroup:
+          - row "Title Modified Last Contributor":
+            - columnheader "Title":
+              - button "Title"
+              - 'generic "Open Filter Menu: Title"':
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+              - option "AND" [selected]
+              - option "OR"
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+            - columnheader "Modified":
+              - button "Modified"
+              - 'generic "Open Filter Menu: Modified"':
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+              - option "AND" [selected]
+              - option "OR"
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+            - columnheader "Last Contributor":
+              - button "Last Contributor"
+              - 'generic "Open Filter Menu: Last Contributor"':
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+              - option "AND" [selected]
+              - option "OR"
+              - option "Contains" [selected]
+              - option "Does not contain"
+              - option "Equals"
+              - option "Does not equal"
+              - option "Begins with"
+              - option "Ends with"
+              - option "Blank"
+              - option "Not blank"
+        - rowgroup:
+          - row "You haven't starred documents yet.":
+            - gridcell "You haven't starred documents yet.":
+              - paragraph: You haven't starred documents yet.
+      - paragraph
+- tooltip:
+  - generic: gpt

@@ -1,0 +1,558 @@
+{
+  "date": "2026-10-26",
+  "status": "Covered CP layouts and the deployed CSV control are verified. Saved-response rendering is resolved. CSV execution with nonempty results could not be exercised because both available similarity queries returned no matches. Successful chat and save-response persistence remain blocked by the backend AI timeout.",
+  "baseline": "https://demo.maretha.io/nuxeo/ui/",
+  "angular": "https://demo.maretha.io/nuxeo/ng/",
+  "harness": {
+    "browser": "Chrome extension via CUA",
+    "tabs": [
+      "169827284",
+      "169827285",
+      "169827292"
+    ],
+    "reason": "Per-agent chrome_devtools server profile conflict; root retained DevTools server; CP audit used separate regular Chrome tabs.",
+    "webdriver": "Regular Chrome required no automation hook. The official Polymer harness hook was verified in source index.js, lines 77–80, and packages/nuxeo-web-ui-ftest/pages/helpers.js: document.dispatchEvent(new CustomEvent(\"automation-ready\")) after initial load. Production source was not changed for automation."
+  },
+  "documents": {
+    "Picture": "6ceeabb6-c464-4369-adf6-bdeb966ffcd9",
+    "File": "63600e0e-cd52-493b-b90e-8e00f7a55250",
+    "InteractionResults": "940fc34e-9bb7-408c-beda-f9e313322be5"
+  },
+  "coverage": [
+    {
+      "area": "CP settings Interactions",
+      "observed": "Initial BEFORE observation: 24 interaction names and descriptions loaded in both; collapsed rows compared visually. Baseline bold headings/upward collapsed chevrons vs Angular regular text/downward chevrons; duplicate Angular page heading and extra toolbar row.",
+      "sourceFix": "Use a component-owned header through the paired view pageHeading option. Match toolbar icons, bold headings, dots, chevrons, and compact activation choices. Display interaction parameters in the baseline wide table, with Format and Main document in each row’s Additional options.",
+      "notExecuted": "No global settings fields edited or saved.",
+      "verification": "See afterObservations and screenshotProvenance for the deployed checks. Initial BEFORE differences below are historical findings, not current failures."
+    },
+    {
+      "area": "CP Metadata mapping",
+      "observed": "Initial BEFORE observation: File / dublincore loaded. dc:description was active and isolated, using Loan Data JSON Extraction; coverage, nature, and subjects context flags matched. Polymer used two side lists beside the table; Angular used dropdowns above it.",
+      "sourceFix": "Type/schema side lists next to unchanged mapping table.",
+      "verification": "See afterObservations and screenshotProvenance for the deployed checks. Initial BEFORE differences below are historical findings, not current failures."
+    },
+    {
+      "area": "CP Events",
+      "observed": "Initial BEFORE observation: All three mappings matched: Picture / Rendition Created / Dynamic Metadata; Picture / Document Created / Brand Safety / Cultural Sensitivity - text; File / Document Created / Dynamic Metadata. Polymer used a compact table; Angular used large cards.",
+      "sourceFix": "Compact table, chip dropdown multiple selections, SVG add icon, existing confirmation/validation retained.",
+      "verification": "See afterObservations and screenshotProvenance for the deployed checks. Initial BEFORE differences below are historical findings, not current failures."
+    },
+    {
+      "area": "CP Settings",
+      "observed": "Initial BEFORE observation: embeddingModel was amazon.titan-embed-text-v2:0, mimeTypes was empty, directoryBucketSize was 100, BOOST / TEXT_WEIGHT / IMAGE_WEIGHT were 1.0, and SCORE_MODE / BOOST_MODE were AVG in both applications.",
+      "sourceFix": "Plain source-property labels/sections; preserve hidden S3 transport value.",
+      "verification": "See afterObservations and screenshotProvenance for the deployed checks. Initial BEFORE differences below are historical findings, not current failures."
+    },
+    {
+      "area": "Picture/File AI",
+      "observed": "Initial BEFORE observation: Matching chat and Run/Saved accordions; Picture has three run choices, File eight. Picture saved list renders three existing responses including rich HTML and table with related saved-document link. File chat empty submission shows Enter a question before sending without executing AI. Compare documents form renders stored fixedDoc as raw UUID.",
+      "sourceFix": "Hydrate stored document selection titles, cancel reads on scope changes; canonical metadata trigger/update/enhance SVG glyphs. Editable chat context-memory fields remain visible like baseline; read-only memory fields remain hidden. Chat array parameters remain text inputs as in baseline.",
+      "notExecuted": "No AI request, Update metadata, Enhance metadata, or Save response was executed on legitimate existing documents. One short chat on a disposable upload failed with a backend read timeout; its error text was not saved.",
+      "verification": "See afterObservations and screenshotProvenance for the deployed checks. Initial BEFORE differences below are historical findings, not current failures."
+    },
+    {
+      "area": "InteractionResults view/edit",
+      "observed": "Initial BEFORE observation: Rich response content and related source link render in both; Angular response was above entire native split, pushing details below. Edit forms show Title/Description/Nature/Subjects/Coverage/expiry, closed unchanged.",
+      "sourceFix": "Project response into native viewer column using public renderer mainContentTemplate input coordinated with core; Title precedes Related Document; expiry label Expires.",
+      "verification": "See afterObservations and screenshotProvenance for the deployed checks. Initial BEFORE differences below are historical findings, not current failures."
+    },
+    {
+      "area": "Similar documents",
+      "observed": "Initial BEFORE observation: Picture confidence was 0.4 and both applications had no matches. Polymer used Title ascending, grid/table icons, and a separate sort row. Angular used Relevance descending and a text-heavy toolbar.",
+      "sourceFix": "Title/ascending for similarity; icon toggles and separate sort toolbar; retain accessible status and optional columns/refresh.",
+      "verification": "The deployed confidence, Title ascending default, and grid/table controls passed. CSV export was added and verified in CP 1.0.33: disabled at zero results and hidden without an applied query. Nonempty export/download could not be exercised."
+    },
+    {
+      "area": "AI vector search",
+      "observed": "Initial BEFORE observation: Both query fields accepted bird. Angular displayed no results. Polymer failed to import /nuxeo/ui/-20261024/node_modules/@nuxeo/nuxeo-ui-elements/search/embedding-search/nuxeo-embedding-search-search-results.html with HTTP 404.",
+      "classification": "The baseline packaging defect was fixed separately. After deployment, the baseline results layout loaded and the bird query returned no matches in both applications.",
+      "sourceFix": "Match drawer queue icon/reset arrangement, remove extra visible Search heading/button while retaining form keyboard submit.",
+      "verification": "See afterObservations and screenshotProvenance for the deployed checks. Initial BEFORE differences below are historical findings, not current failures."
+    }
+  ],
+  "excludedBaselineAddons": [
+    "Accessibility tab (SA addon)",
+    "Resize / Convert (SA media-transform addon)",
+    "Restrict downloads (SA DLP addon)",
+    "Render with Template (Nuxeo Template Rendering addon)",
+    "Create linked work task (separate Maretha work-task addon)",
+    "Inventory / Requests / MSA workflow features"
+  ],
+  "unchangedData": {
+    "settingsWrites": 0,
+    "existingDocumentWrites": 0,
+    "aiExecutions": 1,
+    "createdFixtures": [],
+    "permanentDeletions": 0,
+    "fixtureDocumentWrites": "One short chat request was sent on disposable upload 5ab62049-3af0-417b-8366-02be1163f8a9. It ended in a backend SDK read timeout. No response was saved and no legitimate document was edited. Cleanup is owned by the parent audit."
+  },
+  "validation": {
+    "commands": [
+      "npm run build",
+      "node --test tests/*.test.mjs src/lib/features/settings/*.test.mjs scripts/*.test.mjs",
+      "git diff --check"
+    ],
+    "result": "Historical CP 1.0.30 build and 41-test run passed, including coordinated assembly checks. The subsequent canonical-icon staging regression passed in a fresh isolated assembly. Later full release validation is recorded by the parent audit.",
+    "newTests": [
+      "selection-title resolution, deduplication, inaccessible ID fallback and cancellation",
+      "compact multi-choice preservation, immutable inputs, disabled guard, unknown IDs",
+      "IR native viewer projection contract",
+      "canonical metadata SVG paths match Polymer assets"
+    ],
+    "isolatedAssemblyFixtureFix": {
+      "commit": "e52dd6f06fd7e9097eada789971a9c274bb75a0e",
+      "behavior": "Copy current canonical Polymer SVG asset into isolated library test fixtures before npm test; source checkout test still reads live source asset.",
+      "focusedTests": "7 passed (metadata SVG plus six assembly tests)",
+      "isolatedStage": "The fresh isolated library build and all 36 library/settings tests passed with the staged canonical SVG and an explicit SDK link.",
+      "note": "First manual stage missed the SDK link required by the existing assembler and failed; corrected stage mirrored assembler SDK link and passed."
+    },
+    "lazyProxyFix": {
+      "command": "npm run test:ci -- --include=app/helpers/document-content-renderer.component.spec.ts",
+      "result": "1/1 ChromeHeadless PASS; targeted Prettier, ESLint and git diff --check PASS",
+      "files": [
+        "app/helpers/document-content-renderer.component.ts",
+        "app/helpers/document-content-renderer.component.spec.ts"
+      ],
+      "keepsLazyMedia": true
+    },
+    "csvExportFix": {
+      "releaseTarget": "CP 1.0.33",
+      "command": "npm test",
+      "result": "Angular package build and all 45 tests passed; git diff --check passed.",
+      "sourceFiles": [
+        "maretha-ai-web/angular/src/lib/features/search/cp-search.component.ts",
+        "maretha-ai-web/angular/src/lib/features/search/search-state.ts"
+      ],
+      "newTestFile": "maretha-ai-web/angular/tests/search-export.test.mjs",
+      "checks": [
+        "Complete query scope includes normalized full text, confidence, and JSON similarity vectors, without pagination or selected-row limits.",
+        "Empty or invalid queries cannot export an unfiltered repository.",
+        "The public slot retains the stock CSV action for a non-admin reader without selection, including zero results, and excludes mutating query actions.",
+        "The existing stock CSV action owns zero-result/loading execution guards, authenticated backend export, cancellation, and download errors."
+      ],
+      "browserVerification": "Final deployed CP 1.0.33 / Angular 3.21.7: zero-result CSV disabled and empty-query CSV hidden. See finalCsvVerification for the nonempty-result limitation."
+    }
+  },
+  "screenshots": [
+    "screenshots/cp-ai-metadata-menu-angular-after.jpg",
+    "screenshots/cp-csv-file-zero-angular-3.21.7-after.jpg",
+    "screenshots/cp-csv-vector-empty-angular-3.21.7-after.jpg",
+    "screenshots/cp-csv-zero-angular-3.21.7-after.jpg",
+    "screenshots/cp-csv-zero-confidence-angular-3.21.7-after.jpg",
+    "screenshots/cp-empty-chat-angular-before.jpg",
+    "screenshots/cp-events-angular-after.jpg",
+    "screenshots/cp-events-angular-before.jpg",
+    "screenshots/cp-events-polymer-after.jpg",
+    "screenshots/cp-events-polymer-before.jpg",
+    "screenshots/cp-file-ai-angular-before.jpg",
+    "screenshots/cp-file-ai-polymer-before.jpg",
+    "screenshots/cp-fixture-chat-request-angular-after.jpg",
+    "screenshots/cp-fixture-chat-timeout-angular-after.jpg",
+    "screenshots/cp-interactions-angular-after.jpg",
+    "screenshots/cp-interactions-polymer-after.jpg",
+    "screenshots/cp-metadata-angular-after.jpg",
+    "screenshots/cp-metadata-angular-before.jpg",
+    "screenshots/cp-metadata-polymer-after.jpg",
+    "screenshots/cp-metadata-polymer-before.jpg",
+    "screenshots/cp-parameter-table-angular-after.jpg",
+    "screenshots/cp-parameters-angular-before.jpg",
+    "screenshots/cp-picture-ai-angular-after.jpg",
+    "screenshots/cp-picture-ai-angular-before.jpg",
+    "screenshots/cp-picture-ai-polymer-after.jpg",
+    "screenshots/cp-picture-ai-polymer-before.jpg",
+    "screenshots/cp-results-angular-after.jpg",
+    "screenshots/cp-results-angular-before.jpg",
+    "screenshots/cp-results-angular-final-after.jpg",
+    "screenshots/cp-results-angular-interim-missing-response.jpg",
+    "screenshots/cp-results-edit-angular-before.jpg",
+    "screenshots/cp-results-edit-polymer-before.jpg",
+    "screenshots/cp-results-polymer-after.jpg",
+    "screenshots/cp-results-polymer-before.jpg",
+    "screenshots/cp-results-polymer-final-after.jpg",
+    "screenshots/cp-settings-angular-after.jpg",
+    "screenshots/cp-settings-angular-before.jpg",
+    "screenshots/cp-settings-polymer-after.jpg",
+    "screenshots/cp-settings-polymer-before.jpg",
+    "screenshots/cp-similar-angular-after.jpg",
+    "screenshots/cp-similar-angular-before.jpg",
+    "screenshots/cp-similar-polymer-after.jpg",
+    "screenshots/cp-similar-polymer-before.jpg",
+    "screenshots/cp-vector-angular-after.jpg",
+    "screenshots/cp-vector-angular-before.jpg",
+    "screenshots/cp-vector-polymer-after.jpg",
+    "screenshots/cp-vector-polymer-before.jpg"
+  ],
+  "remaining": [
+    "Enabled CSV export and download with nonempty results remain unverified: both available similarity sources returned no matches at confidence 0.4 and 0.",
+    "Successful chat and save-response persistence remain unverified because the single disposable request failed with a backend SDK read timeout.",
+    "Minor InteractionResults typography, timestamp, and metadata-heading differences remain."
+  ],
+  "graft": {
+    "scopedCpQuery": "No indexed CP prefix; safe scoped source fallback.",
+    "coreLookupSavedTokens": 83762,
+    "note": "Cumulative CP-agent savings include the later independent PDF-readiness review and captured-action residual review. No additional CP graph index was available."
+  },
+  "baselineImportDefect": {
+    "cause": "@nuxeo/nuxeo-ui-elements symlink resolves to sibling release checkout. @open-wc/webpack-import-meta-loader rootContext substring truncates sibling real path into -20261024/node_modules/... and existing postbuild prefix strip does not match it.",
+    "verifiedArtifact": "/Users/esteiner/Maretha/Nuxeo/source/nuxeo-web-ui-sidebar-2025.21.1/plugin/web-ui/addon/target/nuxeo-web-ui-2025.21.1.jar",
+    "observedMalformedImportPaths": 10,
+    "sourceFix": "webpack.config.js resolve.symlinks:false",
+    "test": "node --test scripts/test/unit/webpack-linked-import-meta.test.cjs",
+    "checks": "Targeted ESLint and Prettier, functional webpack symlink regression test and git diff --check pass. No full baseline build/deploy performed by CP audit.",
+    "correctedSearchBase": "/nuxeo/ui/search/",
+    "correctedPdfViewer": "/nuxeo/ui/vendor/pdfjs/web/viewer.html"
+  },
+  "regressionReview": {
+    "parameterDefaults": "Structured object/array defaults keep multiline textarea editing in the compact table.",
+    "permissions": "Stored selection titles use normal authenticated document reads; inaccessible IDs remain visible; pending reads cancel on parameter scope departure. Runtime removal now repeats the selectionReadOnly/disabled guard already used for additions. Renderer receives noEdit. Admin and group contribution gates unchanged.",
+    "result": "The source review, historical Angular build, and all 41 tests passed after the parameter and permission hardening changes."
+  },
+  "afterTestPlan": [
+    {
+      "area": "Settings toolbar and all four tabs at a matched viewport",
+      "status": "Passed in the recorded AFTER browser comparison; no settings were saved."
+    },
+    {
+      "area": "Interaction parameter table, default fields, document selection, and keyboard controls",
+      "status": "Passed in the recorded AFTER browser comparison; no global settings were persisted."
+    },
+    {
+      "area": "File/Picture AI chat context field, eight/three interaction choices, and stored document selection titles",
+      "status": "Passed in the recorded AFTER browser comparison; no AI was executed on legitimate content."
+    },
+    {
+      "area": "InteractionResults response beside metadata, related source link, and no-file controls",
+      "status": "Passed after deployment of Angular 3.21.5 / CP 1.0.31."
+    },
+    {
+      "area": "Similarity confidence, Title ascending default, and grid/table toggle",
+      "status": "Similarity controls passed. Final deployed CSV control is disabled at zero results and hidden without a query; enabled export/download remains unexercised because no matches were available."
+    },
+    {
+      "area": "Baseline vector query after the Polymer packaging fix",
+      "status": "Passed: the results layout loaded without HTTP 404."
+    },
+    {
+      "area": "One short chat on the disposable File, then save and reload a successful response",
+      "status": "Blocked: the chat ended in a backend SDK read timeout after about two minutes. No retry or save was performed."
+    }
+  ],
+  "screenshotSafety": {
+    "scope": "All CP BEFORE/AFTER/final screenshot captures",
+    "review": "All CP captures show settled non-login settings, document, search, or disposable chat states. No login, password, API-key, or token fields were captured. Settings show model/MIME/bucket and Elasticsearch configuration fields. Demo content, user display names, titles, and document IDs remain visible. Final CSV captures show zero-result or empty-query pages.",
+    "credentialRedactionRequired": false
+  },
+  "afterRelease": {
+    "CP": "1.0.30",
+    "Angular": "3.21.4",
+    "WebUI": "2025.21.2",
+    "image": "nuxeo-maretha:lab-20df1b8-94-1"
+  },
+  "afterObservations": [
+    {
+      "area": "Settings all four tabs",
+      "status": "pass",
+      "observed": "24 interactions, component-owned single heading and toolbar; 11-column parameter table; type/schema side lists; three matching event rows; nonsecret settings values match baseline. No global save performed."
+    },
+    {
+      "area": "Picture/File AI controls",
+      "status": "pass",
+      "observed": "Editable question and Rainier MSA context fields visible; Picture three run choices and File eight; Picture three existing rich HTML responses render. Canonical AI Metadata action exposes Update/Enhance menu; neither invoked."
+    },
+    {
+      "area": "Similarity",
+      "status": "pass",
+      "observed": "Confidence 0.4 and zero matches agreed in the original comparison. Title ascending, grid/table toggles, and table columns worked. Final CP 1.0.33 CSV controls were separately verified with zero results and no query; screenshotProvenance distinguishes the releases."
+    },
+    {
+      "area": "Vector search",
+      "status": "pass",
+      "observed": "The bird query yielded zero results in both applications. Polymer rendered its results layout without the malformed import-path HTTP 404."
+    },
+    {
+      "area": "InteractionResults",
+      "status": "pass after final deployed fix",
+      "observed": "The initial missing-response defect in Angular 3.21.4 was resolved in Angular 3.21.5 / CP 1.0.31. A fresh route reload showed the rich response and seven-day table on the left beside native metadata on the right. The interim failure capture is preserved separately."
+    }
+  ],
+  "fixtureChat": {
+    "document": "5ab62049-3af0-417b-8366-02be1163f8a9",
+    "title": "parity-upload-20261026.txt",
+    "path": "/default-domain/UserWorkspaces/gpt/Parity audit 2026-10-26/parity-upload-20261026.txt",
+    "createdBy": "Parent audit, through the import UI.",
+    "prompt": "Summarize this disposable audit upload in one short sentence.",
+    "status": "backend failure; no retry",
+    "attempts": 1,
+    "draft": "The uncreated cp-chat-parity-2026-10-26 draft was cancelled and discarded. The CP agent created no new document.",
+    "error": "Read timed out:Unable to execute HTTP request: Read timed out (SDK Attempt Count: 4)",
+    "responseTime": "16:38 EDT",
+    "requestTime": "16:36 EDT",
+    "saveResponse": "Not executed because the response was backend error text rather than a successful AI answer.",
+    "newResultDocument": null
+  },
+  "finalRelease": {
+    "CP": "1.0.31",
+    "Angular": "3.21.5",
+    "WebUI": "2025.21.3",
+    "deploymentRun": "40397518470",
+    "meaning": "Release used for the last CP InteractionResults capture. This field preserves screenshot provenance; it is not a claim that later releases were captured by the CP agent."
+  },
+  "finalInteractionResults": {
+    "status": "pass",
+    "angularUrl": "https://demo.maretha.io/nuxeo/ng/browse/documents/940fc34e-9bb7-408c-beda-f9e313322be5",
+    "baselineUrl": "https://demo.maretha.io/nuxeo/ui/#!/doc/940fc34e-9bb7-408c-beda-f9e313322be5",
+    "observed": "Fresh full-page load shows saved rich response and seven-day table in left main panel, native metadata information with Title before Related Document on right, source link points to original Picture, noEdit hides metadata edit. No document data changed.",
+    "viewport": {
+      "width": 1310,
+      "height": 1057
+    },
+    "screenshots": [
+      "screenshots/cp-results-angular-final-after.jpg",
+      "screenshots/cp-results-polymer-final-after.jpg"
+    ],
+    "interimFailureScreenshot": "screenshots/cp-results-angular-interim-missing-response.jpg",
+    "residualVisualDifferences": "Polymer response uses monospace and raw ISO timestamp below response; Angular response uses normal body font and local timestamp in response header. Metadata header presentation differs. Functional saved-response omission is resolved."
+  },
+  "beforeRelease": {
+    "CP": "1.0.29",
+    "Angular": "3.21.3",
+    "WebUI": "2025.21.1"
+  },
+  "parentRuntimeUpdate": {
+    "latestReportedVerified": {
+      "CP": "1.0.33",
+      "Angular": "3.21.7",
+      "WebUI": "2025.21.3",
+      "deploymentRun": "40401856241",
+      "cpSourceCommit": "43f0182",
+      "coreSourceCommit": "72c3433"
+    },
+    "note": "The final deployment succeeded. Parent owns PDF and metadata-pane resize verification. This CP browser pass checked the new CSV control; earlier screenshot releases remain unchanged in screenshotProvenance."
+  },
+  "screenshotProvenance": [
+    {
+      "release": {
+        "CP": "1.0.29",
+        "Angular": "3.21.3",
+        "WebUI": "2025.21.1"
+      },
+      "stage": "BEFORE",
+      "files": [
+        "screenshots/cp-empty-chat-angular-before.jpg",
+        "screenshots/cp-events-angular-before.jpg",
+        "screenshots/cp-events-polymer-before.jpg",
+        "screenshots/cp-file-ai-angular-before.jpg",
+        "screenshots/cp-file-ai-polymer-before.jpg",
+        "screenshots/cp-metadata-angular-before.jpg",
+        "screenshots/cp-metadata-polymer-before.jpg",
+        "screenshots/cp-parameters-angular-before.jpg",
+        "screenshots/cp-picture-ai-angular-before.jpg",
+        "screenshots/cp-picture-ai-polymer-before.jpg",
+        "screenshots/cp-results-angular-before.jpg",
+        "screenshots/cp-results-edit-angular-before.jpg",
+        "screenshots/cp-results-edit-polymer-before.jpg",
+        "screenshots/cp-results-polymer-before.jpg",
+        "screenshots/cp-settings-angular-before.jpg",
+        "screenshots/cp-settings-polymer-before.jpg",
+        "screenshots/cp-similar-angular-before.jpg",
+        "screenshots/cp-similar-polymer-before.jpg",
+        "screenshots/cp-vector-angular-before.jpg",
+        "screenshots/cp-vector-polymer-before.jpg"
+      ]
+    },
+    {
+      "release": {
+        "CP": "1.0.30",
+        "Angular": "3.21.4",
+        "WebUI": "2025.21.2",
+        "image": "nuxeo-maretha:lab-20df1b8-94-1"
+      },
+      "stage": "Initial AFTER comparison, including the single disposable chat timeout",
+      "files": [
+        "screenshots/cp-ai-metadata-menu-angular-after.jpg",
+        "screenshots/cp-events-angular-after.jpg",
+        "screenshots/cp-events-polymer-after.jpg",
+        "screenshots/cp-fixture-chat-request-angular-after.jpg",
+        "screenshots/cp-fixture-chat-timeout-angular-after.jpg",
+        "screenshots/cp-interactions-angular-after.jpg",
+        "screenshots/cp-interactions-polymer-after.jpg",
+        "screenshots/cp-metadata-angular-after.jpg",
+        "screenshots/cp-metadata-polymer-after.jpg",
+        "screenshots/cp-parameter-table-angular-after.jpg",
+        "screenshots/cp-picture-ai-angular-after.jpg",
+        "screenshots/cp-picture-ai-polymer-after.jpg",
+        "screenshots/cp-settings-angular-after.jpg",
+        "screenshots/cp-settings-polymer-after.jpg",
+        "screenshots/cp-similar-angular-after.jpg",
+        "screenshots/cp-similar-polymer-after.jpg",
+        "screenshots/cp-vector-angular-after.jpg",
+        "screenshots/cp-vector-polymer-after.jpg"
+      ]
+    },
+    {
+      "release": {
+        "CP": "1.0.30",
+        "Angular": "3.21.4",
+        "WebUI": "2025.21.2",
+        "image": "nuxeo-maretha:lab-20df1b8-94-1"
+      },
+      "stage": "Initial AFTER failure retained for diagnosis",
+      "files": [
+        "screenshots/cp-results-angular-interim-missing-response.jpg"
+      ]
+    },
+    {
+      "release": {
+        "CP": "1.0.31",
+        "Angular": "3.21.5",
+        "WebUI": "2025.21.3",
+        "deploymentRun": "40397518470"
+      },
+      "stage": "Resolved InteractionResults AFTER pair; canonical after filenames are copies of the final captures",
+      "files": [
+        "screenshots/cp-results-angular-after.jpg",
+        "screenshots/cp-results-angular-final-after.jpg",
+        "screenshots/cp-results-polymer-after.jpg",
+        "screenshots/cp-results-polymer-final-after.jpg"
+      ]
+    },
+    {
+      "release": {
+        "CP": "1.0.33",
+        "Angular": "3.21.7",
+        "WebUI": "2025.21.3",
+        "deploymentRun": "40401856241",
+        "cpSourceCommit": "43f0182",
+        "coreSourceCommit": "72c3433"
+      },
+      "stage": "Final CSV control and empty-query verification. These captures do not replace the earlier settings or InteractionResults screenshots.",
+      "files": [
+        "screenshots/cp-csv-file-zero-angular-3.21.7-after.jpg",
+        "screenshots/cp-csv-vector-empty-angular-3.21.7-after.jpg",
+        "screenshots/cp-csv-zero-angular-3.21.7-after.jpg",
+        "screenshots/cp-csv-zero-confidence-angular-3.21.7-after.jpg"
+      ]
+    }
+  ],
+  "excludedBaselineAddonEvidence": [
+    {
+      "label": "Resize / Convert",
+      "liveElement": "sa-media-transform",
+      "sourceEvidence": "CUA DOM ancestry of live baseline button; no match in pinned stock WebUI/nuxeo-elements",
+      "owner": "SA addon, excluded from core implementation"
+    },
+    {
+      "label": "Restrict downloads",
+      "liveElement": "sa-dlp-actions",
+      "sourceEvidence": "CUA DOM ancestry of live baseline button",
+      "owner": "SA addon, excluded from core implementation"
+    },
+    {
+      "label": "Create linked work task",
+      "liveElement": "maretha-create-linked-work-task-button",
+      "sourceEvidence": "CUA DOM ancestry of actions menu",
+      "owner": "separate Maretha work-task addon"
+    },
+    {
+      "label": "Render with Template",
+      "liveElement": "nuxeo-render-template-button",
+      "sourceEvidence": "CUA DOM ancestry of actions menu",
+      "owner": "Nuxeo Template Rendering addon"
+    },
+    {
+      "label": "Accessibility tab",
+      "sourceEvidence": "CUA live heading Alt-Text DOM ancestry returns <sa-accessibility-panel name=\"accessibility\">",
+      "status": "verified SA addon, excluded from core implementation",
+      "liveElement": "sa-accessibility-panel"
+    }
+  ],
+  "residualReview": [
+    {
+      "surface": "CP similarity and vector results toolbar",
+      "classification": "Missing action behavior",
+      "observed": "The baseline similarity capture includes Export CSV before grid/table. The Angular capture omits it. The shared CpEmbeddingResultsComponent template exposes grid/table, sort, columns, refresh, and selection actions, but no general CSV export control.",
+      "evidence": [
+        "screenshots/cp-similar-polymer-after.jpg",
+        "screenshots/cp-similar-angular-after.jpg"
+      ],
+      "source": "maretha-ai-web/angular/src/lib/features/search/cp-search.component.ts",
+      "status": "Fixed and deployed in CP 1.0.33. Browser verification passed for visible disabled export at zero results and hidden export without a query. Nonempty export/download remains unexercised because available similarity queries returned no matches.",
+      "sourceFix": "Render only the stock CSV export contribution in RESULTS_ACTIONS. Supply a snapshot of the successfully applied searchByEmbeddings query, with JSON-encoded similarity vectors, filters, confidence, and default repository scope. Keep selection actions separate and omit the scope for empty or failed queries. The stock action handles loading, zero results, cancellation, authenticated download, and errors.",
+      "tests": "Three targeted regressions cover complete immutable query snapshots, empty/invalid query rejection, and CSV availability without selection for a non-admin read-only user while filtering out mutating query actions."
+    },
+    {
+      "surface": "InteractionResults response and metadata",
+      "classification": "Typography and placement differences",
+      "observed": "Polymer uses monospace response text with a raw ISO timestamp below it. Angular uses normal body text and a local timestamp in the response header. The metadata heading also differs. Saved content, its table, and the source link render.",
+      "status": "Functional response omission resolved; residual presentation differences remain."
+    },
+    {
+      "surface": "Stock File/Picture action and viewer controls",
+      "classification": "No additional missing stock action confirmed by this review",
+      "observed": "The parent verified the stock overflow actions and PDF controls. Restrict downloads, Resize / Convert, template rendering, linked work tasks, and Accessibility are classified addons in documents-audit.json. Metadata-pane resizing is a known core gap being handled by the documents agent.",
+      "status": "Separate addon findings are excluded from CP/core parity; action placement alone is a minor presentation difference."
+    }
+  ],
+  "finalFunctionalReview": {
+    "scope": "Captured stock and CP action differences, plus the shared search query context. No browser or fixture writes in this final review.",
+    "findings": "No additional missing CP action was confirmed after the CSV fix. AI Metadata Update/Enhance, chat input/context field, Run/Saved interaction controls, settings tabs/parameter controls, similarity display/sort controls, and saved-response/source links are accounted for.",
+    "addonClassification": "Reuse documents-audit.json DOM ancestry evidence for SA DLP/media/accessibility and separate template/work-task actions.",
+    "coreFollowup": "PDF readiness is verified by the parent in Angular 3.21.6. Metadata-pane resizing is owned by the documents agent for Angular 3.21.7."
+  },
+  "finalRuntime": {
+    "CP": "1.0.33",
+    "Angular": "3.21.7",
+    "WebUI": "2025.21.3",
+    "deploymentRun": "40401856241",
+    "cpSourceCommit": "43f0182",
+    "coreSourceCommit": "72c3433"
+  },
+  "finalCsvVerification": {
+    "status": "CSV control and guards passed; nonempty export/download not exercised",
+    "release": {
+      "CP": "1.0.33",
+      "Angular": "3.21.7",
+      "WebUI": "2025.21.3",
+      "deploymentRun": "40401856241",
+      "cpSourceCommit": "43f0182",
+      "coreSourceCommit": "72c3433"
+    },
+    "tab": "169827301",
+    "checks": [
+      {
+        "surface": "Picture similarity",
+        "document": "6ceeabb6-c464-4369-adf6-bdeb966ffcd9",
+        "confidenceValues": [
+          0.4,
+          0
+        ],
+        "observed": "Both queries settled with zero results and no error. Export CSV was visible and disabled, with no selection.",
+        "restoredConfidence": 0.4
+      },
+      {
+        "surface": "File similarity",
+        "document": "63600e0e-cd52-493b-b90e-8e00f7a55250",
+        "confidenceValues": [
+          0.4,
+          0
+        ],
+        "observed": "Both queries settled with zero results and no error. Export CSV was visible and disabled, with no selection.",
+        "restoredConfidence": 0.4
+      },
+      {
+        "surface": "Empty vector search",
+        "url": "https://demo.maretha.io/nuxeo/ng/page/embedding-search",
+        "observed": "No query was submitted. The page showed Enter what you are looking for in AI search, zero results, and no CSV action. This prevents an unfiltered export."
+      }
+    ],
+    "screenshots": [
+      "screenshots/cp-csv-file-zero-angular-3.21.7-after.jpg",
+      "screenshots/cp-csv-vector-empty-angular-3.21.7-after.jpg",
+      "screenshots/cp-csv-zero-angular-3.21.7-after.jpg",
+      "screenshots/cp-csv-zero-confidence-angular-3.21.7-after.jpg"
+    ],
+    "limitation": "No existing similarity matches were available even at confidence zero, so enabled CSV export and download were not verified in the browser. No disabled control was bypassed and no text embedding or AI request was issued during this pass.",
+    "writes": "No account changes, settings saves, document edits, or fixture writes."
+  }
+}

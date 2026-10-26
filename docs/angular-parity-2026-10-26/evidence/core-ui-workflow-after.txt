@@ -1,0 +1,108 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=93_0 RootWebArea "Serial Document Review - Choose Participants - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/tasks/d0434c84-63fb-4474-9514-db67a26edba6"
+  uid=93_1 banner
+    uid=93_2 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=93_4 button "Quick Search" expandable
+  uid=93_5 complementary
+    uid=93_6 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=93_7 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=93_8 listbox "Drawer" orientation="vertical"
+      uid=93_9 option "AI search"
+        uid=93_10 button "AI search" expandable
+      uid=93_11 generic
+      uid=93_12 option "Browse"
+        uid=93_13 button "Browse" expandable
+      uid=93_14 option "Recently Viewed"
+        uid=93_15 button "Recently Viewed" expandable
+      uid=93_16 option "Search" selected
+        uid=93_17 button "Search" expandable expanded
+      uid=93_18 option "Expired"
+        uid=93_19 button "Expired" expandable
+      uid=93_20 option "Assets"
+        uid=93_21 button "Assets" expandable
+      uid=93_22 option "Inventory"
+        uid=93_23 button "Inventory" expandable
+      uid=93_24 option "Requests"
+        uid=93_25 button "Requests" expandable
+      uid=93_26 option "Tasks 1"
+        uid=93_27 button "Tasks" expandable
+        uid=93_28 status "1" atomic live="polite" relevant="additions text"
+      uid=93_29 option "MSA Work Queue"
+        uid=93_30 button "MSA Work Queue" expandable
+      uid=93_31 option "Favorites"
+        uid=93_32 button "Favorites" expandable
+      uid=93_33 option "Collections"
+        uid=93_34 button "Collections" expandable
+      uid=93_35 option "Personal Space"
+        uid=93_36 button "Personal Space" expandable
+      uid=93_37 option "Clipboard"
+        uid=93_38 button "Clipboard" expandable
+      uid=93_39 option "Trash"
+        uid=93_40 button "Trash" expandable
+      uid=93_41 generic
+      uid=93_42 option "Administration"
+        uid=93_43 button "Administration" expandable
+      uid=93_44 option "User Settings"
+        uid=93_45 button "User Settings" expandable
+    uid=97_0 "Search Filters"
+    uid=97_1 generic
+      uid=97_2 combobox "Search Filters" autocomplete="list" expandable haspopup="listbox"
+      uid=97_3 "Select a saved search"
+    uid=97_4 button "Switch to Queue View"
+    uid=97_5 "Full Text"
+    uid=97_6 group "Full Text"
+      uid=97_7 searchbox "Full Text" focusable focused value="core-note"
+    uid=97_8 button "Modification Date" expandable
+    uid=97_9 "Authors"
+    uid=97_10 generic
+      uid=97_11 combobox "Search for authors..." autocomplete="list" expandable haspopup="listbox"
+    uid=97_12 "Collections"
+    uid=97_13 generic
+      uid=97_14 combobox "Select a value." autocomplete="list" expandable haspopup="listbox"
+    uid=97_15 "Tags"
+    uid=97_16 generic
+      uid=97_17 combobox "e.g. events, boston" autocomplete="list" expandable haspopup="listbox"
+    uid=97_18 button "Nature" expandable
+    uid=97_19 button "Subjects" expandable
+    uid=97_20 button "Coverage" expandable
+    uid=97_21 button "Size" expandable
+    uid=97_22 button "Reset"
+    uid=97_23 button "Collapse the side navigation panel" expandable expanded
+    uid=97_24 separator "Resize the side navigation panel. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." orientation="vertical" value="350" valuemax="720" valuemin="350" valuetext=""
+  uid=93_46 main
+    uid=105_0 link "core-note" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-note"
+    uid=105_2 navigation "Breadcrumb"
+      uid=105_3 link "Domain" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain"
+      " > "
+      uid=105_5 link "UserWorkspaces" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces"
+      " > "
+      uid=105_7 link "gpt" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt"
+      " > "
+      uid=105_9 link "Parity audit 2026-10-26" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26"
+    uid=105_11 navigation
+    uid=105_12 heading "Choose Participants" level="5"
+    uid=105_13 button "Delegate"
+    uid=105_14 link "View Graph" url="https://demo.maretha.io/nuxeo/ui/#"
+    uid=105_16 "Actors in this task:"
+    uid=105_17 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+      uid=105_18 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=105_19 "Due"
+    uid=105_20 "in 5 days"
+    uid=105_21 "Participants"
+    "*"
+    uid=105_22 generic
+      uid=105_23 combobox "Participants *" autocomplete="list" expandable haspopup="listbox" required
+    uid=105_24 generic "Review Type"
+      uid=105_25 button "Review Type" haspopup="listbox" value="Validation"
+    uid=105_26 "Comment"
+    uid=105_27 generic "Comment"
+      uid=105_28 textbox "Comment" multiline
+    uid=105_29 button "Cancel Review"
+    uid=105_30 button "Start Review"
+    uid=105_31 tooltip
+    uid=105_32 "Parity audit text. Created only for reversible action checks."
+  uid=93_129 button
+  uid=93_130 tooltip
+  uid=93_131 status atomic live="polite" relevant="additions text"
+  uid=93_132 generic live="polite" relevant="additions text"

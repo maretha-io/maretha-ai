@@ -1,0 +1,10 @@
+{
+  "scripts": [
+    "https://demo.maretha.io/nuxeo/ui/main.bundle.js"
+  ],
+  "url": "https://demo.maretha.io/nuxeo/ui/#!/home",
+  "viewport": {
+    "height": 1057,
+    "width": 1310
+  }
+}

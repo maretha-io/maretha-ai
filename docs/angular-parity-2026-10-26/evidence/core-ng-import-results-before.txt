@@ -1,0 +1,141 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=65_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26?view=view"
+  uid=65_1 complementary "Application navigation"
+    uid=65_2 button "Dashboard"
+    uid=65_3 navigation "Main navigation"
+      uid=65_4 button "AI search" expandable
+      uid=65_5 button "Browse" expandable
+      uid=65_6 button "Recently Viewed" expandable
+      uid=65_7 button "Search" expandable
+      uid=65_8 button "Expired" expandable
+      uid=65_9 button "Assets" expandable
+      uid=65_10 button "Tasks" expandable
+      uid=65_11 button "Favorites" expandable
+      uid=65_12 button "Collections" expandable
+      uid=65_13 button "Personal Space" expandable
+      uid=65_14 button "Clipboard" expandable
+      uid=65_15 button "Trash" expandable
+    uid=65_16 navigation "Account and administration"
+      uid=65_17 button "Administration" expandable
+      uid=65_18 button "User menu" expandable
+  uid=65_19 banner "Application actions"
+    uid=65_20 button "Quick Search" expandable haspopup="dialog"
+    uid=65_21 generic
+      uid=65_22 button "Add Content" haspopup="dialog"
+  uid=65_23 region "Application activity"
+    uid=65_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=65_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=65_26 banner
+    uid=65_27 heading "Parity audit 2026-10-26" level="1"
+    uid=65_28 navigation "Document location"
+      uid=65_29 link "Domain" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain"
+      uid=65_31 link "UserWorkspaces" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces"
+      uid=65_33 link "gpt" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt"
+    uid=65_35 button "Edit document"
+    uid=65_36 button "Download All as Zip"
+    uid=65_37 button "Move to trash"
+    uid=65_38 button "Add to Collection"
+    uid=65_39 button "More actions" expandable haspopup="dialog"
+  uid=65_40 tablist "Document views" orientation="horizontal"
+    uid=65_41 tab "View" selectable selected
+    uid=65_42 tab "AI" selectable
+    uid=65_43 tab "Permissions" selectable
+    uid=65_44 tab "History" selectable
+    uid=65_45 tab "Trash" selectable
+  uid=65_46 tabpanel "View"
+    uid=65_47 DisclosureTriangle "Details ⌄" expandable
+    uid=65_48 button "Switch to Grid View" description="Switch to Grid View"
+    uid=65_49 button "Switch to Table View" description="Switch to Table View" disableable disabled
+    uid=65_50 generic atomic live="polite" relevant="additions text"
+      uid=65_51 "Loading..."
+    uid=65_52 generic
+    uid=75_0 row "Select displayed documents Title Type File size State Last modification"
+      uid=75_1 columnheader "Select displayed documents"
+        uid=75_2 checkbox "Select displayed documents"
+      uid=75_3 columnheader "Title"
+      uid=75_5 columnheader "Type"
+      uid=75_7 columnheader "File size"
+      uid=75_9 columnheader "State"
+      uid=75_11 columnheader "Last modification"
+    uid=65_66 row "Select core-collection core-collection Collection 0 Bytes project Oct 26, 2026, 3:58:44 PM" selectable
+      uid=65_67 gridcell "Select core-collection"
+        uid=65_68 checkbox "Select core-collection"
+      uid=65_69 gridcell "core-collection"
+        uid=65_70 link "core-collection" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-collection"
+          uid=65_71 heading "core-collection" level="6"
+      uid=65_72 gridcell "Collection"
+      uid=65_74 gridcell "0 Bytes"
+      uid=65_76 gridcell "project"
+      uid=65_78 gridcell "Oct 26, 2026, 3:58:44 PM"
+    uid=65_80 row "Select core-note core-note Note 0 Bytes project Oct 26, 2026, 3:42:53 PM" selectable
+      uid=65_81 gridcell "Select core-note"
+        uid=65_82 checkbox "Select core-note"
+      uid=65_83 gridcell "core-note"
+        uid=65_84 link "core-note" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-note"
+          uid=65_85 heading "core-note" level="6"
+      uid=65_86 gridcell "Note"
+      uid=65_88 gridcell "0 Bytes"
+      uid=65_90 gridcell "project"
+      uid=65_92 gridcell "Oct 26, 2026, 3:42:53 PM"
+    uid=65_94 row "Select core-target core-target Folder 0 Bytes project Oct 26, 2026, 3:42:53 PM" selectable
+      uid=65_95 gridcell "Select core-target"
+        uid=65_96 checkbox "Select core-target"
+      uid=65_97 gridcell "core-target"
+        uid=65_98 link "core-target" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-target"
+          uid=65_99 heading "core-target" level="6"
+      uid=65_100 gridcell "Folder"
+      uid=65_102 gridcell "0 Bytes"
+      uid=65_104 gridcell "project"
+      uid=65_106 gridcell "Oct 26, 2026, 3:42:53 PM"
+    uid=65_108 row "Select docs-note docs-note Note 0 Bytes project Oct 26, 2026, 3:44:44 PM" selectable
+      uid=65_109 gridcell "Select docs-note"
+        uid=65_110 checkbox "Select docs-note"
+      uid=65_111 gridcell "docs-note"
+        uid=65_112 link "docs-note" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/docs-note"
+          uid=65_113 heading "docs-note" level="6"
+      uid=65_114 gridcell "Note"
+      uid=65_116 gridcell "0 Bytes"
+      uid=65_118 gridcell "project"
+      uid=65_120 gridcell "Oct 26, 2026, 3:44:44 PM"
+    uid=74_13 row "Select parity-upload-20261026.txt parity-upload-20261026.txt File 69 Bytes project Oct 26, 2026, 4:07:17 PM" selectable
+      uid=74_14 gridcell "Select parity-upload-20261026.txt"
+        uid=74_15 checkbox "Select parity-upload-20261026.txt"
+      uid=74_16 gridcell "parity-upload-20261026.txt"
+        uid=74_17 link "parity-upload-20261026.txt" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/parity-upload-20261026.txt"
+          uid=74_18 heading "parity-upload-20261026.txt" level="6"
+      uid=74_19 gridcell "File"
+      uid=74_21 gridcell "69 Bytes"
+      uid=74_23 gridcell "project"
+      uid=74_25 gridcell "Oct 26, 2026, 4:07:17 PM"
+    uid=75_13 row "Select parity-picture-20261026.png parity-picture-20261026.png Picture 68 Bytes project Oct 26, 2026, 4:07:18 PM" selectable
+      uid=75_14 gridcell "Select parity-picture-20261026.png"
+        uid=75_15 checkbox "Select parity-picture-20261026.png"
+      uid=75_16 gridcell "parity-picture-20261026.png"
+        uid=75_17 link "parity-picture-20261026.png" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/parity-picture-20261026.png"
+          uid=75_18 heading "parity-picture-20261026.png" level="6"
+      uid=75_19 gridcell "Picture"
+      uid=75_21 gridcell "68 Bytes"
+      uid=75_23 gridcell "project"
+      uid=75_25 gridcell "Oct 26, 2026, 4:07:18 PM"
+    uid=65_122 generic
+  uid=65_123 generic live="polite" relevant="additions text"
+  uid=66_0 dialog modal
+    uid=66_1 tablist "Create content" orientation="horizontal"
+      uid=66_2 tab "Create" selectable
+      uid=66_3 tab "Import" selectable selected
+    uid=66_4 form
+      uid=66_5 "Location"
+      uid=66_6 textbox "Location" value="/default-domain/UserWorkspaces/gpt/Parity audit 2026-10-26"
+      uid=66_7 button "Browse folders" expandable
+    uid=74_27 region "Import results"
+      uid=74_28 status atomic live="polite" relevant="additions text"
+        uid=74_29 "2 of 2 documents created."
+      uid=74_30 "parity-upload-20261026.txt"
+      uid=74_31 "File · Created"
+      uid=74_32 link "Inspect created document" url="https://demo.maretha.io/nuxeo/ng/browse/documents/5ab62049-3af0-417b-8366-02be1163f8a9"
+      uid=74_34 "parity-picture-20261026.png"
+      uid=74_35 "Picture · Created"
+      uid=75_27 link "Inspect created document" url="https://demo.maretha.io/nuxeo/ng/browse/documents/e9e1d536-c8a2-4fdf-8c02-d83fa4e7a0df"
+    uid=71_51 button "Done"
+  uid=74_37 generic live="polite" relevant="additions text"

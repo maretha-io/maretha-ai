@@ -1,0 +1,401 @@
+{
+  "auditDate": "2026-10-26",
+  "environment": "https://demo.maretha.io/nuxeo",
+  "captureMethod": "CUA regular Chrome, agent-owned Angular169827271 and baseline169827274 before /169827288 after",
+  "captureViewport": {
+    "width": 1310,
+    "height": 1057
+  },
+  "beforeRuntime": {
+    "angular": "3.21.3",
+    "polymer": "2025.21.1",
+    "cp": "1.0.29",
+    "versionSource": "parent verified runtime"
+  },
+  "baselineSource": "/Users/esteiner/Maretha/Nuxeo/source/nuxeo-web-ui-sidebar-2025.21.1",
+  "angularSource": "/Users/esteiner/Maretha/Nuxeo/maretha-github/maretha-angular-webui",
+  "fixtures": [
+    {
+      "name": "docs-note",
+      "uid": "424a0d6f-cd85-4a96-9771-df5d7c2e2a24",
+      "path": "/default-domain/UserWorkspaces/gpt/Parity audit 2026-10-26/docs-note",
+      "createdThrough": "Angular UI",
+      "mutations": [
+        "create Note Format Text",
+        "save two-line plain text note",
+        "post comment Document parity audit comment.",
+        "create tag docs-parity",
+        "create tag docs-parity-after through Angular; verify Polymer",
+        "add favorite through header then remove through Favorites drawer",
+        "create minor version0.3 through Angular"
+      ],
+      "versionsObserved": [
+        "0.1",
+        "0.2",
+        "0.3"
+      ],
+      "uidSource": "parent read-only API confirmation"
+    }
+  ],
+  "existingReadOnlyDocuments": [
+    {
+      "type": "File",
+      "uid": "63600e0e-cd52-493b-b90e-8e00f7a55250"
+    },
+    {
+      "type": "Picture",
+      "uid": "6ceeabb6-c464-4369-adf6-bdeb966ffcd9"
+    }
+  ],
+  "checks": [
+    {
+      "id": "file-view",
+      "surface": "File PDF preview and file action row",
+      "before": "Angular PDF renders; baseline vendor PDF.js frame returns Page not found. Angular footer was beside the preview.",
+      "sourceChange": "Fixed footer column layout; retained working PDF preview.",
+      "afterDeploymentVerification": "PASS: full PDF toolbar, page navigation and Find verified on3.21.6 beyond four minutes; final3.21.7 still renders the PDF beyond90seconds. Footer is below the preview."
+    },
+    {
+      "id": "picture-view",
+      "surface": "Picture preview, metadata and technical metadata",
+      "before": "Angular exposed text Fit/Actual size/fullscreen controls instead of native Zoom/Fit/Rotate/Pan order. Metadata had extra internal Details header and narrow unused gutter.",
+      "sourceChange": "Native image controls and pan buttons implemented; duplicate internal toolbar suppressed; gutter removed.",
+      "afterDeploymentVerification": "PASS: all nine image controls and technical/rendition download controls are available. Metadata pane resizing is now implemented and live-verified. Typography and rendition arrangement remain approximate."
+    },
+    {
+      "id": "picture-edit",
+      "surface": "Picture Edit document",
+      "before": "Angular generic binary editor omitted default Description/Nature/Subjects/Coverage/Expires fields; Polymer presents those plus contributed AI fields.",
+      "sourceChange": "Registered Picture default StandardContentEditor and standard anchored document editor.",
+      "afterDeploymentVerification": "PASS: stock Title, Description, Nature, Subjects, Coverage and Expires fields in anchored editor. CP contributed fields verified after the lazy projection fix."
+    },
+    {
+      "id": "header-actions",
+      "surface": "Document primary/overflow actions",
+      "before": "Angular File/Picture used legacy primary favorites/collections/share actions; Compare Versions absent. CP action relegated to overflow. Export flat.",
+      "sourceChange": "File/Picture standard header opt-in; generic contributions visible primary; standard grouped export/compare/publish behavior enabled.",
+      "afterDeploymentVerification": "PASS: parent verified complete stock More menu on the disposable File. Delete placement differs: primary in baseline, More in Angular."
+    },
+    {
+      "id": "permissions",
+      "surface": "Picture Permissions tab",
+      "before": "Angular legacy three panels differ from native local/inherited/external permission sections.",
+      "sourceChange": "Enabled existing native standard permission view for File/Picture.",
+      "afterDeploymentVerification": "PASS File local/inherited/external sections and inheritedrows match baseline rights/principals; no ACL writes."
+    },
+    {
+      "id": "history",
+      "surface": "Picture History tab",
+      "before": "Angular only Who/When/What virtual table; baseline full audit filters and six audit columns.",
+      "sourceChange": "File/Picture routed to standard document History view.",
+      "afterDeploymentVerification": "PASS File full Username/From/To/PerformedActions/EventCategory filters and six audit columns with matching entries; no filter writes tested."
+    },
+    {
+      "id": "publication",
+      "surface": "Picture Publishing tab",
+      "before": "Angular legacy Publications/Publish to section differs from native Publication details/Unpublish All.",
+      "sourceChange": "File/Picture routed to standard publication view.",
+      "afterDeploymentVerification": "PASS File Publicationdetails/UnpublishAll/NoPublications. Publish mutation not exercised."
+    },
+    {
+      "id": "note-create",
+      "surface": "Plain text Note creation",
+      "before": "Created docs-note through Angular creation form with Title/Description/Format Text.",
+      "sourceChange": "Browser verified creation and routed open.",
+      "afterDeploymentVerification": "Existing own Note reloads after deployment with title,description,format preserved; creation was before deployment."
+    },
+    {
+      "id": "note-edit",
+      "surface": "Plain text Note content save",
+      "before": "Saved two text lines through Angular Note editor.",
+      "sourceChange": "Verified persisted content through Polymer page reload; current version0.2.",
+      "afterDeploymentVerification": "PASS persisted two-line content and anchored metadata editor. Save was verified before deployment; after cancel verified."
+    },
+    {
+      "id": "versions",
+      "surface": "Note version dropdown",
+      "before": "Angular popup contained blank headings/unlabeled icon buttons; baseline0.2/0.1 plus modified author.",
+      "sourceChange": "Compact version list renders raw server version properties and modified author; creation dialog supports minor/major. Unversioned inspector shows Create Version.",
+      "afterDeploymentVerification": "PASS compact0.2/0.1 list author/date and CreateVersion, minor0.3/major1.0dialog; created0.3 successfully. Unversioned File offersCreateVersion."
+    },
+    {
+      "id": "creator",
+      "surface": "Creator principal link",
+      "before": "Angular Picture By link targeted display name Ethan%20Steiner instead of EthanAdmin.",
+      "sourceChange": "Pass original dc:creator principal object to tag.",
+      "afterDeploymentVerification": "PASS Picture By and contributor links target EthanAdmin, matching baseline rather than display name."
+    },
+    {
+      "id": "blob-actions",
+      "surface": "File/Picture replace/remove/upload",
+      "before": "Angular generic blob context hardcoded noEdit true and omitted write callbacks.",
+      "sourceChange": "Added gateway upload/update/release + policy/immutable/repository guards and no-blob upload input.",
+      "afterDeploymentVerification": "PASS controls exposed for File/Picture; no replacement/removal of existing documents. Identity/xpath guards unit-tested."
+    },
+    {
+      "id": "query-isolation",
+      "surface": "Opened leaf from search queue",
+      "before": "Parent browser audit identified query ExportCSV/Trash all matching in leaf document header.",
+      "sourceChange": "Header query scope and selected-document actions cleared for leaf docs; queue state retained.",
+      "afterDeploymentVerification": "PASS: opened leaf headers contain no Export CSV or Trash All Matching bulk-query actions; search queue remains available."
+    },
+    {
+      "id": "extension-layout",
+      "surface": "InteractionResults preview projection",
+      "before": "CP agent verified results above entire split rather than alongside metadata.",
+      "sourceChange": "Public DOCUMENT_CONTENT_RENDERER optional mainContentTemplate prepends preview content; CP agent consumes it.",
+      "afterDeploymentVerification": "PASS: CP rich results and contributed editor fields render in the correct native pane after the lazy projection fix. Historical3.21.4 captures precede the correction."
+    },
+    {
+      "id": "workflow-task",
+      "surface": "Tasks detail and document Process this task",
+      "before": "Live serial task showed raw wf.* title/directive/action labels, UID document link, no inline task form; buttons opened legacy modal.",
+      "sourceChange": "Tasks detail reuses existing BaseWorkflowEditor embedded with public workflow layout; resolves named target document+breadcrumb; translates standard wf catalogue keys. Document workflow notice Process opens /tasks/id.",
+      "afterDeploymentVerification": "PASS: localized inline form, readable document link, single-encoded breadcrumb and successful approval/navigation; no remaining assigned tasks."
+    },
+    {
+      "id": "inline-draft-safety",
+      "surface": "Inline document editing dirty draft",
+      "before": "Independent review identified same-document refresh could clear inline editor and host did not forward nested departure guard.",
+      "sourceChange": "Host preserves editor identity across same UID/repository refresh, forwards GuardedView canDeactivate/hasPendingChanges. Existing BaseEditor route guard retained. Repeated Edit toggle checks departure.",
+      "afterDeploymentVerification": "Sameidentity/dirtydeparture regression covered focusedtests; after anchored forms open/cancel correctly. BrowserBack dirty confirm not retested."
+    },
+    {
+      "id": "retained-blob-context",
+      "surface": "Retained main blob action context",
+      "before": "Independent review identified stale action callback could target new document after navigation.",
+      "sourceChange": "Callbacks capture source document identity and require current UID/repository plus main-file xpath. Regression rejects old-document and rendition callbacks.",
+      "afterDeploymentVerification": "Focused staleUID/repository/rendition regression passed; browser no destructive stalecallbackexecution."
+    },
+    {
+      "id": "note-comment",
+      "surface": "Disposable Note comment",
+      "before": "Posted Document parity audit comment. through Angular, verified persisted comment in Polymer reload.",
+      "sourceChange": "No docs-agent comment change; root independently adds comment button accessible labels.",
+      "afterDeploymentVerification": "Own before-created comment visible in Polymer after reload. Parent owns post/reply after tests."
+    },
+    {
+      "id": "tag-state",
+      "surface": "Successful tag creation state",
+      "before": "Angular docs-parity chip disappeared after successful creation while Polymer reload showed persisted tag.",
+      "sourceChange": "Tag panel adopts successful operation document response rather than retaining stale local document.",
+      "afterDeploymentVerification": "PASS newdocs-parity-after chip remains immediately after success; fresh Polymer shows bothdocs-paritytags."
+    },
+    {
+      "id": "favorites-state",
+      "surface": "Open document after favorites drawer removal",
+      "before": "Root verified drawer removal persisted while header still said Remove from Favorites.",
+      "sourceChange": "DocumentsManager refreshes the currently routed document after matching membership events, restricted by repository.",
+      "afterDeploymentVerification": "PASS addheader then removeFavoritesdrawer; openNote header immediately saysAddtoFavorites without reload."
+    },
+    {
+      "id": "preview-list-isolation",
+      "surface": "Opened document with retained folder/search results",
+      "before": "Static review and regression reproduced generic viewer accepting first updated result instead of matching displayed UID/repository.",
+      "sourceChange": "Commit cc37bde scopes documentsUpdated assignment to same document identity; unrelated results/repositories cannot replace preview or blob actions.",
+      "afterDeploymentVerification": "Targeted7testPASS and File/Picture route preview identity remains matching after reload; retainedresultcrossUID simulated only in test."
+    },
+    {
+      "id": "metadata-resize",
+      "surface": "File/Picture document information pane",
+      "before": "Baseline pane supports draggable and keyboard accessible splitter; Angular generic leaf had fixedCSSgrid.",
+      "sourceChange": "Renderer-local accessible verticalseparator with10px/Shift50px steps, Home/Endbounds, Enter/Space/doubleclickreset, RTLpointerdirection, persistence, pointercapturecancellation, availablecontainerclamp and mobile/hidden disable.",
+      "afterDeploymentVerification": "PASS live3.21.7: pointer drag,10px/Shift50px arrow steps, Home/End bounds, Enter/double-click reset, persisted width, hide/show and narrow viewport behavior. Fourteen focused tests also pass."
+    }
+  ],
+  "addonFindings": [
+    {
+      "label": "Resize / Convert",
+      "liveElement": "sa-media-transform",
+      "sourceEvidence": "CUA DOM ancestry of live baseline button; no match in pinned stock WebUI/nuxeo-elements",
+      "owner": "SA addon, excluded from core implementation"
+    },
+    {
+      "label": "Restrict downloads",
+      "liveElement": "sa-dlp-actions",
+      "sourceEvidence": "CUA DOM ancestry of live baseline button",
+      "owner": "SA addon, excluded from core implementation"
+    },
+    {
+      "label": "Create linked work task",
+      "liveElement": "maretha-create-linked-work-task-button",
+      "sourceEvidence": "CUA DOM ancestry of actions menu",
+      "owner": "separate Maretha work-task addon"
+    },
+    {
+      "label": "Render with Template",
+      "liveElement": "nuxeo-render-template-button",
+      "sourceEvidence": "CUA DOM ancestry of actions menu",
+      "owner": "Nuxeo Template Rendering addon"
+    },
+    {
+      "label": "Accessibility tab",
+      "sourceEvidence": "CUA live heading Alt-Text DOM ancestry returns <sa-accessibility-panel name=\"accessibility\">",
+      "status": "verified SA addon, excluded from core implementation",
+      "liveElement": "sa-accessibility-panel"
+    }
+  ],
+  "tests": {
+    "initialDefaultMetadataToolbarNotice": "47 passed",
+    "routedViewsAndBlobMutationGuards": "26 passed",
+    "finalInlineVersionsQueryImageMetadata": "42 passed",
+    "lastAddedImageOrderTest": "pending full suite",
+    "appTypeScript": "passed before final inline/versions changes; full checks delegated to shell agent",
+    "workflowAndBlobCallbacks": "18 passed",
+    "inlineDraftAndEditorGuards": "25 passed",
+    "publishOptInExpectations": "7 passed",
+    "tagSuccessfulResponse": "3 passed",
+    "retainedResultPreview": "7 passed",
+    "membershipDrawerRefresh": "5 passed",
+    "followupCommitTypeScriptLintManifest": "passed cc37bde",
+    "workflowBreadcrumbAndSuccessfulDeparture": "12 passed (includes real ViewNavigation pending/success registry regression)",
+    "metadataPaneResize": "14focusedPASS; included in final1509full-suitePASS"
+  },
+  "screenshots": [
+    "docs-create-version-angular-after.jpg",
+    "docs-created-version-angular-after.jpg",
+    "docs-favorites-header-angular-after.jpg",
+    "docs-file-actions-polymer-final-after.jpg",
+    "docs-file-angular-after.jpg",
+    "docs-file-angular-before.jpg",
+    "docs-file-angular-final-after.jpg",
+    "docs-file-edit-angular-after.jpg",
+    "docs-file-edit-polymer-after.jpg",
+    "docs-file-polymer-after.jpg",
+    "docs-file-polymer-before.jpg",
+    "docs-history-angular-after.jpg",
+    "docs-history-angular-before.jpg",
+    "docs-history-polymer-after.jpg",
+    "docs-history-polymer-before.jpg",
+    "docs-note-angular-before.jpg",
+    "docs-note-edit-angular-after.jpg",
+    "docs-note-polymer-after-runtime-error.jpg",
+    "docs-note-polymer-after.jpg",
+    "docs-note-polymer-before.jpg",
+    "docs-note-tags-angular-after.jpg",
+    "docs-permissions-angular-after.jpg",
+    "docs-permissions-angular-before.jpg",
+    "docs-permissions-polymer-after.jpg",
+    "docs-permissions-polymer-before.jpg",
+    "docs-picture-actions-angular-before.jpg",
+    "docs-picture-actions-polymer-before.jpg",
+    "docs-picture-angular-after.jpg",
+    "docs-picture-angular-before.jpg",
+    "docs-picture-controls-angular-after.jpg",
+    "docs-picture-edit-angular-after.jpg",
+    "docs-picture-edit-angular-before.jpg",
+    "docs-picture-edit-polymer-after.jpg",
+    "docs-picture-edit-polymer-before.jpg",
+    "docs-picture-polymer-after.jpg",
+    "docs-picture-polymer-before.jpg",
+    "docs-publication-angular-after.jpg",
+    "docs-publication-angular-before.jpg",
+    "docs-publication-polymer-after.jpg",
+    "docs-publication-polymer-before.jpg",
+    "docs-versions-angular-after.jpg",
+    "docs-versions-angular-before.jpg",
+    "docs-versions-polymer-before.jpg",
+    "docs-workflow-breadcrumb-angular-final-after.jpg",
+    "docs-workflow-task-angular-before.jpg",
+    "docs-workflow-task-polymer-before.jpg"
+  ],
+  "limitations": [
+    "Before/after records retain original releases. docs-*-final-after captures are3.21.5; core-ng-file-pdf-range/find-final-after are3.21.6; core-ng-metadata-resize-*-final-after are3.21.7.",
+    "Existing documents remained read-only except automatic view/download audit events; no ACL/security writes or permanent deletions.",
+    "Live replace/remove was not tested by this agent; parent imported disposableFile/Picture fixtures and owns broader fixture tests.",
+    "Publishing surface read-only verification only by this agent; no publish/unpublish mutation.",
+    "Earlier baseline stale cached main.bundle/serviceworker chunk404 was bypassed using fresh querybustedtab for captures; root owns final cache policy verification.",
+    "Collections, disposableFileMore menu and fullworkflowcycle finalverification supplied by parent; CPprojection verification supplied byCPagent.",
+    "Small typography, technical metadata arrangement and action-placement differences remain. Stock pane resizing is implemented and verified; no known resize behavior gap remains."
+  ],
+  "graft": {
+    "calls": 6,
+    "estimatedTokensSaved": 1489826,
+    "note": "Five successful graft calls plus one no-index scope attempt; repository-map tool estimate dominates."
+  },
+  "afterRuntime": {
+    "image": "nuxeo-maretha:lab-20df1b8-94-1",
+    "angular": "3.21.4",
+    "polymer": "2025.21.2",
+    "cp": "1.0.30",
+    "versionSource": "parent verified deployment"
+  },
+  "residualDifferences": [
+    {
+      "surface": "Picture metadata typography and technical panes",
+      "observed": "Angular Metadata toolbar, additionalAttachments and accordion/radio rendition presentation differ from baseline Details/list. Audited image, edit, hide/show and renditiondownload controls remain available.",
+      "status": "accepted approximate styling/arrangement for these controls; does not waive separate pane resizing behavior"
+    },
+    {
+      "surface": "Leaf header stock action placement",
+      "observed": "Baseline File Delete primary; Angular Move to Trash inMore. AddtoCollection is inMore in both. Parent verified complete stockMore menu on disposableFile.",
+      "status": "minor placement difference; functions verified available"
+    },
+    {
+      "surface": "Document information pane resizing",
+      "observed": "Baseline File/Picture exposes nuxeo-resize-handle splitter with drag, keyboardstep, min/max and reset. Angular generic leaf fixed CSSgrid exposes hide/show but no splitter or resizehandlers.",
+      "sourceEvidence": "Pinned2025.21.1 elements/document/nuxeo-document-page.js264 nuxeo-resize-handle and resizeeventhandlers; Angular generic-non-folderish-viewer template/styles/component contains no splitter/resizehandlers.",
+      "status": "Resolved and live-verified in3.21.7. The observed absence above describes the pre-fix baseline comparison."
+    }
+  ],
+  "finalRuntime": {
+    "angular": "3.21.7",
+    "polymer": "2025.21.3",
+    "cp": "1.0.33",
+    "versionSource": "parent confirmed successful final deployment; final behavioral verification by parent DevTools",
+    "captureProvenance": "Before/after records retain original releases. docs-*-final-after captures are3.21.5; core-ng-file-pdf-range/find-final-after are3.21.6; core-ng-metadata-resize-*-final-after are3.21.7.",
+    "image": "nuxeo-maretha:lab-4f9af2f-97-1"
+  },
+  "finalChecks": [
+    {
+      "id": "task-breadcrumb",
+      "result": "PASS",
+      "href": "/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26",
+      "evidence": "Documents agent readonlyDOM3.21.5 and parent final verification",
+      "note": "Single encoding; translated labels, resolved title and document link correct. Capture docs-workflow-breadcrumb-angular-final-after.jpg is3.21.5."
+    },
+    {
+      "id": "pdf-toolbar",
+      "result": "PASS final3.21.6",
+      "evidence": "Parent DevTools final browser test",
+      "note": "Full PDF toolbar present; Next navigates page1 to2, Findbar opens, preview remains visible beyond4minutes. Prior3.21.4/3.21.5 compact toolbar screenshots are historical evidence. Final screenshot core-ng-file-pdf-range-final-after.jpg. Final3.21.7 toolbar and preview also remain visible beyond90seconds."
+    },
+    {
+      "id": "file-actions",
+      "result": "PASS available on disposable File",
+      "evidence": "Parent DevTools own fixture menu",
+      "actions": [
+        "Move to Trash",
+        "Add to Collection",
+        "Add to Favorites",
+        "Share",
+        "Publish",
+        "Notifications",
+        "Add to Clipboard",
+        "Unlock",
+        "Download",
+        "Export",
+        "Start Process"
+      ],
+      "note": "Baseline File Delete is primary; Angular Move to Trash is in More. Baseline Add to Collection is also in More. This is a minor action placement difference; stock actions are available. Existing legitimate File was not mutated."
+    },
+    {
+      "id": "workflow-completion",
+      "result": "PASS",
+      "evidence": "Parent final browser cycle",
+      "note": "Approval completed, workflow finished and tasks count0. Successful embedded task completion navigation verified after working guard fix."
+    },
+    {
+      "id": "cp-editor-projection",
+      "result": "PASS separate owner",
+      "evidence": "CP agent verified projection after3.21.5; final package remains corrected inCP1.0.33.",
+      "note": "Earlier3.21.4 screenshots without contributed fields are historical; projection gap resolved."
+    },
+    {
+      "id": "picture-stock-controls",
+      "result": "PASS audited controls and pane resizing",
+      "evidence": "Documents agent3.21.4 browser and current source inspection",
+      "note": "PASS live3.21.7: pointer drag,10px/Shift50px arrow steps, Home/End bounds, Enter/double-click reset, persisted width, hide/show and narrow viewport behavior. Fourteen focused tests also pass."
+    }
+  ]
+}

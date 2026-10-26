@@ -1,0 +1,134 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=152_0 RootWebArea "Default - Search - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/search/default"
+  uid=152_1 banner
+    uid=152_2 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=152_4 button "Quick Search" expandable
+  uid=152_5 complementary
+    uid=152_6 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=152_7 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=152_8 listbox "Drawer" orientation="vertical"
+      uid=152_9 option "AI search"
+        uid=152_10 button "AI search" expandable
+      uid=152_11 generic
+      uid=152_12 option "Browse"
+        uid=152_13 button "Browse" expandable
+      uid=152_14 option "Recently Viewed"
+        uid=152_15 button "Recently Viewed" expandable
+      uid=152_16 option "Search"
+        uid=152_17 button "Search" expandable
+      uid=152_18 option "Expired"
+        uid=152_19 button "Expired" expandable
+      uid=152_20 option "Assets"
+        uid=152_21 button "Assets" expandable
+      uid=152_22 option "Inventory"
+        uid=152_23 button "Inventory" expandable
+      uid=152_24 option "Requests"
+        uid=152_25 button "Requests" expandable
+      uid=152_26 option "Tasks"
+        uid=152_27 button "Tasks" expandable
+      uid=152_28 option "MSA Work Queue"
+        uid=152_29 button "MSA Work Queue" expandable
+      uid=152_30 option "Favorites"
+        uid=152_31 button "Favorites" expandable
+      uid=152_32 option "Collections"
+        uid=152_33 button "Collections" expandable
+      uid=152_34 option "Personal Space"
+        uid=152_35 button "Personal Space" expandable
+      uid=152_36 option "Clipboard"
+        uid=152_37 button "Clipboard" expandable
+      uid=152_38 option "Trash"
+        uid=152_39 button "Trash" expandable
+      uid=152_40 generic
+      uid=152_41 option "Administration"
+        uid=152_42 button "Administration" expandable
+      uid=152_43 option "User Settings" focusable focused selected
+        uid=152_44 button "User Settings" expandable expanded
+    uid=153_0 heading "gpt" level="5"
+    uid=153_1 link "Profile" url="https://demo.maretha.io/nuxeo/ui/#!/profile"
+    uid=153_3 link "Authorized Applications" url="https://demo.maretha.io/nuxeo/ui/#!/user-authorized-apps"
+    uid=153_5 link "Cloud Services" url="https://demo.maretha.io/nuxeo/ui/#!/user-cloud-services"
+    uid=153_7 link "Themes" url="https://demo.maretha.io/nuxeo/ui/#!/themes"
+    uid=153_9 link "Sign Out" url="https://demo.maretha.io/nuxeo/logout"
+    uid=153_11 button "Collapse the side navigation panel" expandable expanded
+    uid=153_12 separator "Resize the side navigation panel. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." orientation="vertical" value="350" valuemax="720" valuemin="350" valuetext=""
+  uid=152_45 main
+    uid=152_46 "Search Results"
+    uid=152_47 navigation
+    uid=152_48 generic live="polite" relevant="additions text"
+      uid=152_49 "1540 result(s)"
+    uid=152_50 button "No Containers"
+    uid=152_51 button "Most Recent"
+    uid=152_52 button "Validated"
+    uid=152_53 button "Export CSV"
+    uid=152_54 button "Switch to Grid View"
+    uid=152_55 button "Switch to Table View"
+    uid=152_56 button "Switch to List view" disableable disabled
+    uid=152_57 "Sort by"
+    uid=152_58 generic "Sort by"
+      uid=152_59 button "Sort by" haspopup="listbox" value="Created"
+    uid=152_60 button "Reverse sort order"
+    uid=152_61 generic
+      uid=152_62 image "Canvasback Duck in Water" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/d2398c82-9d57-4c56-aa8b-b95d6a629506/@rendition/thumbnail?changeToken=12-0&sync=true&clientReason=view"
+      uid=152_63 generic
+        uid=152_64 "Canvasback Duck in Water"
+        uid=152_65 "Picture"
+    uid=152_66 generic
+      uid=152_67 image "Vibrant Yellow Warbler Perched on Branch" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/1f36889d-696b-487b-adbb-e7e697b8bb85/@rendition/thumbnail?changeToken=12-0&sync=true&clientReason=view"
+      uid=152_68 generic
+        uid=152_69 "Vibrant Yellow Warbler Perched on Branch"
+        uid=152_70 "Picture"
+    uid=152_71 generic
+      uid=152_72 image "Fregatidae Frigatebirds" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/47ff64b8-1e70-4213-b0a6-b5de9d2b70f7/@rendition/thumbnail?changeToken=12-0&sync=true&clientReason=view"
+      uid=152_73 generic
+        uid=152_74 "Fregatidae Frigatebirds"
+        uid=152_75 "File"
+    uid=152_76 generic
+      uid=152_77 image "Eupetidae Rail-babbler" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/d7dadfb1-c27d-4ea8-ab3f-756f7b2b7508/@rendition/thumbnail?changeToken=14-0&sync=true&clientReason=view"
+      uid=152_78 generic
+        uid=152_79 "Eupetidae Rail-babbler"
+        uid=152_80 "File"
+    uid=152_81 generic
+      uid=152_82 image "Erythrocercidae Yellow Flycatchers" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/57d6f3cc-86f5-4b23-b7c3-438d06e08e66/@rendition/thumbnail?changeToken=12-0&sync=true&clientReason=view"
+      uid=152_83 generic
+        uid=152_84 "Erythrocercidae Yellow Flycatchers"
+        uid=152_85 "File"
+    uid=152_86 generic
+      uid=152_87 image "Haematopodidae Oystercatchers" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/068fb9cf-c50f-4d43-8525-e1e89d0dbfe7/@rendition/thumbnail?changeToken=14-0&sync=true&clientReason=view"
+      uid=152_88 generic
+        uid=152_89 "Haematopodidae Oystercatchers"
+        uid=152_90 "File"
+    uid=152_91 generic
+      uid=152_92 image "error log" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/cb22b21d-09b2-497b-8842-d4faa45d1a4b/@rendition/thumbnail?changeToken=22-0&sync=true&clientReason=view"
+      uid=152_93 generic
+        uid=152_94 "error log"
+        uid=152_95 "Note"
+    uid=152_96 generic
+      uid=152_97 image "sample" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/94a81c80-7147-41e5-81e0-66ee5b0cb3b6/@rendition/thumbnail?changeToken=14-0&sync=true&clientReason=view"
+      uid=152_98 generic
+        uid=152_99 "sample"
+        uid=152_100 "Note"
+    uid=152_101 generic
+      uid=152_102 image "Nyctibiidae Potoos" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/9ddaeded-a461-4263-8301-c4532da1c620/@rendition/thumbnail?changeToken=12-0&sync=true&clientReason=view"
+      uid=152_103 generic
+        uid=152_104 "Nyctibiidae Potoos"
+        uid=152_105 "File"
+    uid=152_106 generic
+      uid=152_107 image "Laridae Gulls, Terns, and Skimmers" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/9fbb41f4-d1f0-4062-a05c-c065b3da18fb/@rendition/thumbnail?changeToken=12-0&sync=true&clientReason=view"
+      uid=152_108 generic
+        uid=152_109 "Laridae Gulls, Terns, and Skimmers"
+        uid=152_110 "File"
+    uid=152_111 generic
+      uid=152_112 image "Pomatostomidae Pseudo-Babblers" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/9fa9e627-08a8-41d2-af8e-d42b2204addb/@rendition/thumbnail?changeToken=13-0&sync=true&clientReason=view"
+      uid=152_113 generic
+        uid=152_114 "Pomatostomidae Pseudo-Babblers"
+        uid=152_115 "File"
+    uid=152_116 generic
+      uid=152_117 image "Pandionidae Osprey" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/a16c3d2f-331a-4f36-aaad-1052aaf13a7b/@rendition/thumbnail?changeToken=14-0&sync=true&clientReason=view"
+      uid=152_118 generic
+        uid=152_119 "Pandionidae Osprey"
+        uid=152_120 "File"
+  uid=152_121 button
+  uid=152_122 tooltip
+  uid=152_123 status atomic live="polite" relevant="additions text"
+  uid=152_124 generic live="polite" relevant="additions text"

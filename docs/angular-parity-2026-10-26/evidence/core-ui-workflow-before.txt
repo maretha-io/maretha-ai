@@ -1,0 +1,83 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=3_0 RootWebArea "Serial Document Review - Choose Participants - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/tasks/d0434c84-63fb-4474-9514-db67a26edba6"
+  uid=3_1 banner
+    uid=3_2 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=3_4 button "Quick Search" expandable
+  uid=3_5 complementary
+    uid=3_6 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=3_7 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=3_8 listbox "Drawer" orientation="vertical"
+      uid=3_9 option "AI search"
+        uid=3_10 button "AI search" expandable
+      uid=3_11 generic
+      uid=3_12 option "Browse"
+        uid=3_13 button "Browse" expandable
+      uid=3_14 option "Recently Viewed"
+        uid=3_15 button "Recently Viewed" expandable
+      uid=3_16 option "Search"
+        uid=3_17 button "Search" expandable
+      uid=3_18 option "Expired"
+        uid=3_19 button "Expired" expandable
+      uid=3_20 option "Assets"
+        uid=3_21 button "Assets" expandable
+      uid=3_22 option "Inventory"
+        uid=3_23 button "Inventory" expandable
+      uid=3_24 option "Requests"
+        uid=3_25 button "Requests" expandable
+      uid=3_26 option "Tasks"
+        uid=3_27 button "Tasks" expandable
+      uid=3_28 option "MSA Work Queue"
+        uid=3_29 button "MSA Work Queue" expandable
+      uid=3_30 option "Favorites"
+        uid=3_31 button "Favorites" expandable
+      uid=3_32 option "Collections"
+        uid=3_33 button "Collections" expandable
+      uid=3_34 option "Personal Space"
+        uid=3_35 button "Personal Space" expandable
+      uid=3_36 option "Clipboard"
+        uid=3_37 button "Clipboard" expandable
+      uid=3_38 option "Trash"
+        uid=3_39 button "Trash" expandable
+      uid=3_40 generic
+      uid=3_41 option "Administration"
+        uid=3_42 button "Administration" expandable
+      uid=3_43 option "User Settings"
+        uid=3_44 button "User Settings" expandable
+  uid=3_45 main
+    uid=57_0 link "core-note" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-note"
+    uid=57_2 navigation "Breadcrumb"
+      uid=57_3 link "Domain" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain"
+      " > "
+      uid=57_5 link "UserWorkspaces" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces"
+      " > "
+      uid=57_7 link "gpt" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt"
+      " > "
+      uid=57_9 link "Parity audit 2026-10-26" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26"
+    uid=57_11 navigation
+    uid=57_12 heading "Choose Participants" level="5"
+    uid=57_13 button "Delegate"
+    uid=57_14 link "View Graph" url="https://demo.maretha.io/nuxeo/ui/#"
+    uid=57_16 "Actors in this task:"
+    uid=57_17 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+      uid=57_18 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=57_19 "Due"
+    uid=57_20 "in 5 days"
+    uid=57_21 "Participants"
+    "*"
+    uid=57_22 generic
+      uid=57_23 combobox "Participants *" autocomplete="list" expandable haspopup="listbox" required
+    uid=57_24 generic "Review Type"
+      uid=57_25 button "Review Type" haspopup="listbox" value="Validation"
+    uid=57_26 "Comment"
+    uid=57_27 generic "Comment"
+      uid=57_28 textbox "Comment" multiline
+    uid=57_29 button "Cancel Review"
+    uid=57_30 button "Start Review"
+    uid=57_31 tooltip
+    uid=57_32 "Parity audit text. Created only for reversible action checks."
+  uid=3_160 button
+  uid=3_161 tooltip
+  uid=3_162 status atomic live="polite" relevant="additions text"
+    uid=38_57 "Document added to clipboard"
+  uid=3_163 generic live="polite" relevant="additions text"

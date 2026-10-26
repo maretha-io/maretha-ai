@@ -1,0 +1,135 @@
+{
+  "verifiedAt": "2026-10-26T21:11:59.667374+00:00",
+  "status": "PASS",
+  "workflowRun": "https://github.com/maretha-io/hetzner-remote/actions/runs/40401856241",
+  "pipelineCommit": "4f9af2f95a951c6b9700acf061139955177e64fb",
+  "deployment": {
+    "namespace": "nuxeo",
+    "name": "nuxeo",
+    "generation": 123,
+    "observedGeneration": 123,
+    "desiredReplicas": 1,
+    "updatedReplicas": 1,
+    "availableReplicas": 1,
+    "image": "nuxeo-maretha:lab-4f9af2f-97-1"
+  },
+  "pod": {
+    "name": "nuxeo-5cc76cd4d7-md7ft",
+    "namespace": "nuxeo",
+    "phase": "Running",
+    "startTime": "2026-10-26T21:09:58Z",
+    "containers": [
+      {
+        "name": "nuxeo",
+        "image": "docker.io/library/nuxeo-maretha:lab-4f9af2f-97-1",
+        "imageID": "sha256:828c65ba8c82f2a86f1c5d8b1f69c2cae6af1b27af8d5d5030fac089b544a470",
+        "ready": true,
+        "restartCount": 0
+      }
+    ]
+  },
+  "method": "Read-only SSH kubectl deployment/pod metadata and direct final-pod find/sha256sum. Compare path/hash maps independent of listing order. Exclude package store/backup/cache paths under /opt/nuxeo/server/packages/. No cluster/deployment/repository changes. Only this final runtime evidence JSON written.",
+  "sources": {
+    "before": {
+      "path": "/Users/esteiner/Maretha/Nuxeo/source/ui-reaudit-release-20261026/runtime-before.sha256",
+      "sha256": "cb42d9fa89f20e7643ba3765be23f5b80d67f89ed21833f17bd4aad48a2ec223"
+    },
+    "freshCurrentPodAllJars": {
+      "path": "/tmp/parity-runtime-all-3.21.7-20261026.txt",
+      "sha256": "0d35c7689ffda8e0bd6ac5563f5ec737291fd8eedb9fa94060f85c2062afae7d"
+    },
+    "artifactManifest": {
+      "path": "/Users/esteiner/Maretha/Nuxeo/source/ui-reaudit-release-20261026/artifact-verification.json",
+      "sha256": "de0c249129817a04e18a29e1bbbd03162dc0d3d01a43b4245c6bc4e668aa4082"
+    }
+  },
+  "comparison": {
+    "beforeRuntimeJarCount": 570,
+    "finalAllJarCount": 794,
+    "excludedPackageCacheJarCount": 224,
+    "finalRuntimeJarCount": 570,
+    "unrelatedJarCount": 565,
+    "unrelatedUnchangedCount": 565,
+    "unrelatedChanged": [],
+    "unrelatedMissing": [],
+    "unrelatedAdded": [],
+    "replacedPayloadCount": 5,
+    "retiredPayloadPaths": [
+      "/opt/nuxeo/server/nxserver/bundles/maretha-ai-core-1.0.29.jar",
+      "/opt/nuxeo/server/nxserver/bundles/maretha-ai-web-1.0.29.jar",
+      "/opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-server-3.21.3.jar",
+      "/opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-ui-3.21.3.jar",
+      "/opt/nuxeo/server/nxserver/bundles/nuxeo-web-ui-2025.21.1.jar"
+    ],
+    "retiredPayloadsAbsent": true
+  },
+  "payloads": [
+    {
+      "file": "maretha-ai-core-1.0.33.jar",
+      "runtimePath": "/opt/nuxeo/server/nxserver/bundles/maretha-ai-core-1.0.33.jar",
+      "artifactSha256": "e5cf7418bb01a9feee3ac56e6b8d3e45ae8346cec7682ca881c5cb55d1185a12",
+      "liveSha256": "e5cf7418bb01a9feee3ac56e6b8d3e45ae8346cec7682ca881c5cb55d1185a12",
+      "matches": true
+    },
+    {
+      "file": "maretha-ai-web-1.0.33.jar",
+      "runtimePath": "/opt/nuxeo/server/nxserver/bundles/maretha-ai-web-1.0.33.jar",
+      "artifactSha256": "9c4d4316f626103c4d94ab620177f2e7786e259f03f27d6a126943cd7f8ca3be",
+      "liveSha256": "9c4d4316f626103c4d94ab620177f2e7786e259f03f27d6a126943cd7f8ca3be",
+      "matches": true
+    },
+    {
+      "file": "maretha-angular-webui-server-3.21.7.jar",
+      "runtimePath": "/opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-server-3.21.7.jar",
+      "artifactSha256": "9315b6d3270c705bfaaefcc2da7b65d7d309756481dd50d20b58895fecad5e5a",
+      "liveSha256": "9315b6d3270c705bfaaefcc2da7b65d7d309756481dd50d20b58895fecad5e5a",
+      "matches": true
+    },
+    {
+      "file": "maretha-angular-webui-ui-3.21.7.jar",
+      "runtimePath": "/opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-ui-3.21.7.jar",
+      "artifactSha256": "c308ef86b168c215edca16511d6b40d9af8cfc0667f7acc849d33ddb79fbe939",
+      "liveSha256": "c308ef86b168c215edca16511d6b40d9af8cfc0667f7acc849d33ddb79fbe939",
+      "matches": true
+    },
+    {
+      "file": "nuxeo-web-ui-2025.21.3.jar",
+      "runtimePath": "/opt/nuxeo/server/nxserver/bundles/nuxeo-web-ui-2025.21.3.jar",
+      "artifactSha256": "1c52e7ba4d8a2e50b386e062107a95cfc42e47ac71097b3a06d04031710e337c",
+      "liveSha256": "1c52e7ba4d8a2e50b386e062107a95cfc42e47ac71097b3a06d04031710e337c",
+      "matches": true
+    }
+  ],
+  "packages": [
+    {
+      "file": "maretha-ai-package-1.0.33.zip",
+      "name": "maretha-ai",
+      "version": "1.0.33",
+      "sha256": "416bcedb0c111729c2fa89b7fde95fdbadd84daf7e51c15980c75c83757fc260",
+      "matchesManifest": true
+    },
+    {
+      "file": "maretha-angular-webui-package-3.21.7.zip",
+      "name": "maretha-angular-webui",
+      "version": "3.21.7",
+      "sha256": "70325330355ee71245ebc448007068b3c16814f78a402a1498953a6d434acc37",
+      "matchesManifest": true
+    },
+    {
+      "file": "nuxeo-web-ui-marketplace-2025.21.3.zip",
+      "name": "nuxeo-web-ui",
+      "version": "2025.21.3",
+      "sha256": "ecda281f3bc45f59b198f6f44b1f11b6dbd92279fd76b3d4f628c79ec62b24ae",
+      "matchesManifest": true
+    }
+  ],
+  "versions": {
+    "angular": "3.21.7",
+    "cp": "1.0.33",
+    "polymer": "2025.21.3",
+    "backend": "2025.20-SNAPSHOT (all unrelated runtime paths/hash values unchanged)"
+  },
+  "sourceRevision": "72c34333d37204992161bf049f04093c175622e3",
+  "previousRuntimeVerification": "runtime-3.21.6-verification.json",
+  "graftTokensSavedShell": 62091
+}

@@ -1,0 +1,148 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=3_0 RootWebArea "Home - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+  uid=3_1 banner
+    uid=3_2 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=3_4 button "Quick Search" expandable
+  uid=3_5 complementary
+    uid=3_6 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=3_7 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=3_8 listbox "Drawer" orientation="vertical"
+      uid=3_9 option "AI search"
+        uid=3_10 button "AI search" expandable
+      uid=3_11 generic
+      uid=3_12 option "Browse"
+        uid=3_13 button "Browse" expandable
+      uid=3_14 option "Recently Viewed"
+        uid=3_15 button "Recently Viewed" expandable
+      uid=3_16 option "Search"
+        uid=3_17 button "Search" expandable
+      uid=3_18 option "Expired"
+        uid=3_19 button "Expired" expandable
+      uid=3_20 option "Assets"
+        uid=3_21 button "Assets" expandable
+      uid=3_22 option "Inventory"
+        uid=3_23 button "Inventory" expandable
+      uid=3_24 option "Requests"
+        uid=3_25 button "Requests" expandable
+      uid=3_26 option "Tasks"
+        uid=3_27 button "Tasks" expandable
+      uid=3_28 option "MSA Work Queue"
+        uid=3_29 button "MSA Work Queue" expandable
+      uid=3_30 option "Favorites"
+        uid=3_31 button "Favorites" expandable
+      uid=3_32 option "Collections"
+        uid=3_33 button "Collections" expandable
+      uid=3_34 option "Personal Space"
+        uid=3_35 button "Personal Space" expandable
+      uid=3_36 option "Clipboard"
+        uid=3_37 button "Clipboard" expandable
+      uid=3_38 option "Trash"
+        uid=3_39 button "Trash" expandable
+      uid=3_40 generic
+      uid=3_41 option "Administration"
+        uid=3_42 button "Administration" expandable
+      uid=3_43 option "User Settings"
+        uid=3_44 button "User Settings" expandable
+  uid=3_45 main
+    uid=3_46 "Dashboard"
+    uid=3_47 navigation
+    uid=3_48 heading "Recently Edited" level="5"
+    uid=3_49 row
+      uid=3_50 "Title"
+      uid=3_51 "Modified"
+      uid=3_52 "Last Contributor"
+    uid=3_53 row
+      uid=3_54 link "Birdy" url="https://demo.maretha.io/nuxeo/ui/#!/browse/Workflows/MSA/Review/birdy-fb161bb9"
+      uid=3_56 "39 minutes ago"
+      uid=3_57 button "Ethan Steiner" description="EthanAdmin esteiner@maretha.io"
+        uid=3_58 link "Ethan Steiner" url="https://demo.maretha.io/nuxeo/ui/#!/user/EthanAdmin"
+    uid=3_59 row
+      uid=3_60 link "Gray Owl on Sandy Ground" url="https://demo.maretha.io/nuxeo/ui/#!/browse/Workflows/MSA/Review/gray-owl-on-sandy-ground-b444680d"
+      uid=3_62 "39 minutes ago"
+      uid=3_63 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_64 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_65 row
+      uid=3_66 link "Media Request Luana test" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/Luana/Media%20Request%20Luana%20test"
+      uid=3_68 "5 hours ago"
+      uid=3_69 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_70 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_71 row
+      uid=3_72 link "Inventory Item Test Luana 1" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/Luana/Inventory%20test%20Luana/Inventory%20Item%20Test%20Luana%201"
+      uid=3_74 "5 hours ago"
+      uid=3_75 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_76 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_77 row
+      uid=3_78 link "Luana Media Request test2" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/lmincu/Luana%20Media%20Request%20test2"
+      uid=3_80 "5 hours ago"
+      uid=3_81 button "Luana Mincu" description="lmincu lmincu@maretha.io"
+        uid=3_82 link "Luana Mincu" url="https://demo.maretha.io/nuxeo/ui/#!/user/lmincu"
+    uid=3_83 row
+      uid=3_84 link "Art1" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/Luana/Art1"
+      uid=3_86 "5 hours ago"
+      uid=3_87 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_88 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_89 row
+      uid=3_90 link "License request test Luana" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/Luana/License%20request%20test%20Luana"
+      uid=3_92 "6 hours ago"
+      uid=3_93 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_94 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_95 row
+      uid=3_96 link "Invoice for license SA-LIC-2026-0003 - License request test Luana" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/Luana/License%20request%20test%20Luana-invoice"
+      uid=3_98 "7 hours ago"
+      uid=3_99 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_100 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_101 row
+      uid=3_102 link "License contract SA-LIC-2026-0003 - License request test Luana" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/Luana/License%20request%20test%20Luana-contract"
+      uid=3_104 "7 hours ago"
+      uid=3_105 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_106 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_107 row
+      uid=3_108 link "My Favorites" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Favorites"
+      uid=3_110 "2 days ago"
+      uid=3_111 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+        uid=3_112 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=3_113 row
+      uid=3_114 link "Luana's contract" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/Luana/Luana's%20contract"
+      uid=3_116 "3 days ago"
+      uid=3_117 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_118 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_119 row
+      uid=3_120 link "My Favorites" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/lmincu/Favorites"
+      uid=3_122 "3 days ago"
+      uid=3_123 button "Luana Mincu" description="lmincu lmincu@maretha.io"
+        uid=3_124 link "Luana Mincu" url="https://demo.maretha.io/nuxeo/ui/#!/user/lmincu"
+    uid=3_125 row
+      uid=3_126 link "sa-contract" url="https://demo.maretha.io/nuxeo/ui/#!/browse/sa-contract"
+      uid=3_128 "4 days ago"
+      uid=3_129 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_130 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_131 row
+      uid=3_132 link "Luana's checklist" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/Luana/Luana's%20checklist"
+      uid=3_134 "4 days ago"
+      uid=3_135 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_136 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_137 row
+      uid=3_138 link "Video test" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/workspaces/Luana/Video%20test"
+      uid=3_140 "4 days ago"
+      uid=3_141 button "devnull@nuxeo.com" description="Administrator devnull@nuxeo.com"
+        uid=3_142 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ui/#!/user/Administrator"
+    uid=3_143 heading "Tasks" level="5"
+    uid=3_144 generic live="polite" relevant="additions text"
+      uid=3_145 "You don't have any tasks to process at the moment."
+    uid=3_146 heading "Recently Viewed" level="5"
+    uid=3_147 row
+      uid=3_148 "Title"
+      uid=3_149 "Type"
+      uid=3_150 "Last Viewed"
+    uid=3_151 cell "There are no recent documents to display." live="polite" relevant="additions text"
+    uid=3_153 heading "Favorite Items" level="5"
+    uid=3_154 row
+      uid=3_155 "Title"
+      uid=3_156 "Modified"
+      uid=3_157 "Last Contributor"
+    uid=3_158 cell "You haven't starred documents yet." live="polite" relevant="additions text"
+  uid=3_160 button
+  uid=3_161 tooltip
+  uid=3_162 status atomic live="polite" relevant="additions text"
+  uid=3_163 generic live="polite" relevant="additions text"

@@ -1,0 +1,188 @@
+## Latest page snapshot
+uid=139_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Adrian/Images/Surgical_Gloves_Catalog_Brochure_2021-05.pdf?view=view"
+  uid=139_1 complementary "Application navigation"
+    uid=139_2 button "Dashboard"
+    uid=139_3 navigation "Main navigation"
+      uid=139_4 button "AI search" expandable
+      uid=139_5 button "Browse" expandable
+      uid=139_6 button "Recently Viewed" expandable
+      uid=139_7 button "Search" expandable
+      uid=139_8 button "Expired" expandable
+      uid=139_9 button "Assets" expandable
+      uid=139_10 button "Tasks" expandable
+      uid=139_11 button "Favorites" expandable
+      uid=139_12 button "Collections" expandable
+      uid=139_13 button "Personal Space" expandable
+      uid=139_14 button "Clipboard" expandable
+      uid=139_15 button "Trash" expandable
+    uid=139_16 navigation "Account and administration"
+      uid=139_17 button "Administration" expandable
+      uid=139_18 button "User menu" expandable
+  uid=139_19 banner "Application actions"
+    uid=139_20 button "Quick Search" expandable haspopup="dialog"
+    uid=139_21 generic
+      uid=139_22 button "Add Content" haspopup="dialog"
+  uid=139_23 region "Application activity"
+    uid=139_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=139_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=139_26 banner
+    uid=139_27 heading "McKesson Surgical Gloves" level="1"
+    uid=139_28 navigation "Document location"
+      uid=139_29 link "Domain" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain"
+      uid=139_31 link "Workspaces" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces"
+      uid=139_33 link "Adrian" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Adrian"
+      uid=139_35 link "Images" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Adrian/Images"
+    uid=139_37 DisclosureTriangle "AI Metadata" description="AI Metadata" expandable
+    uid=139_38 button "Edit document"
+    uid=139_39 button "More actions" expandable haspopup="dialog"
+  uid=139_40 tablist "Document views" orientation="horizontal"
+    uid=139_41 tab "View" selectable selected
+    uid=139_42 tab "AI" selectable
+    uid=139_43 tab "More Like This" selectable
+    uid=139_44 tab "Permissions" selectable
+    uid=139_45 tab "History" selectable
+    uid=139_46 tab "Publishing" selectable
+  uid=139_47 tabpanel "View"
+    uid=139_48 main
+      uid=139_49 button "Table of contents"
+      uid=139_50 button "First page"
+      uid=139_51 button "Previous page"
+      uid=139_52 spinbutton "Current page" value="2" valuemax="12" valuemin="0" valuetext="2"
+      uid=139_53 "of ⁨12⁩"
+      uid=139_54 button "Next page"
+      uid=139_55 button "Last page"
+      uid=139_56 button "Fullscreen"
+      uid=139_57 group "Zoom in/out" haspopup="menu"
+      uid=139_58 button "Rotate clockwise"
+      uid=139_59 button "Rotate counter clockwise"
+      uid=139_60 radiogroup
+        uid=139_61 radio "Hand tool" checked
+        uid=139_62 radio "Select text"
+      uid=139_63 button "Find in document..." focusable focused pressed
+      uid=139_64 button "Print this file"
+      uid=142_0 textbox "Find"
+      uid=142_1 button "Previous" description="Find the previous occurrence of the phrase"
+      uid=142_2 button "Next" description="Find the next occurrence of the phrase"
+      uid=142_3 checkbox "Highlight All"
+      uid=142_4 checkbox "Match Case"
+      uid=142_5 checkbox "Match Diacritics"
+      uid=142_6 checkbox "Whole Words"
+      uid=142_7 checkbox "Match Each Word"
+      uid=142_8 generic live="polite" relevant="additions text"
+      uid=139_65 region "Page ⁨1⁩"
+        uid=139_66 "Find the right fit with"
+        uid=139_67 "McKesson Surgical Gloves"
+        uid=139_68 generic
+      uid=139_69 region "Page ⁨2⁩"
+        uid=139_70 "At McKesson Medical-Surgical, we understand that today’s ambulatory"
+        uid=139_71 "surgery center and physician office settings have unique business and"
+        uid=139_72 "product needs. That’s why we offer a wide variety of quality, cost-effective"
+        uid=139_73 "products within our own McKesson Brands portfolio, including surgical"
+        uid=139_74 "gloves. Our selection of surgical gloves features the tactile sensitivity and"
+        uid=139_75 "dexterity you want in a glove, while offering the protection you need."
+        uid=139_76 "Never Compromise on Care"
+        uid=139_77 " "
+        uid=139_78 "SM"
+        uid=139_79 "With McKesson Brands, you’ll never have to compromise. We deliver"
+        uid=139_80 "quality products at competitive prices, backed by our 100%"
+        uid=139_81 "satisfaction guarantee. We have decades of experience in the"
+        uid=139_82 "market, and we offer you support and work to help ensure you"
+        uid=139_83 "have the products you need, when you need them — making"
+        uid=139_84 "it even easier for you to provide the best care for your patients."
+        uid=139_85 generic
+      uid=139_86 region "Page ⁨3⁩"
+        uid=140_0 "TABLE OF CONTENTS"
+        uid=140_1 "Surgical Gloves Comparison Chart"
+        uid=140_2 " "
+        uid=140_3 "3-4"
+        uid=140_4 "McKesson Perry® Latex Surgical Gloves"
+        uid=140_5 " "
+        uid=140_6 "5"
+        uid=140_7 "McKesson Perry® AquaTouch™ Latex Surgical Gloves"
+        uid=140_8 " "
+        uid=140_9 "6"
+        uid=140_10 "McKesson Perry® Micro-Thin Latex Surgical Gloves"
+        uid=140_11 " "
+        uid=140_12 "7"
+        uid=140_13 "McKesson Perry® Polyisoprene Surgical Gloves"
+        uid=140_14 " "
+        uid=140_15 "8"
+        uid=140_16 "McKesson Perry® Neoprene Surgical Gloves"
+        uid=140_17 " "
+        uid=140_18 "9"
+        uid=140_19 "McKesson Perry® Neoprene Sensitive Surgical Gloves"
+        uid=140_20 " "
+        uid=140_21 "10"
+        uid=140_22 generic
+      uid=139_87 region "Page ⁨4⁩"
+      uid=139_88 region "Page ⁨5⁩"
+      uid=139_89 region "Page ⁨6⁩"
+      uid=139_90 region "Page ⁨7⁩"
+      uid=139_91 region "Page ⁨8⁩"
+      uid=139_92 region "Page ⁨9⁩"
+      uid=139_93 region "Page ⁨10⁩"
+      uid=139_94 region "Page ⁨11⁩"
+      uid=139_95 region "Page ⁨12⁩"
+      uid=139_96 "Surgical_Gloves_Catalog_Brochure_2021-05.pdf"
+      uid=139_97 "1.19 MB"
+      uid=139_98 button "Download file" description="Download file"
+      uid=139_99 button "Preview" description="Preview"
+      uid=139_100 button "Replace file" description="You can either manually select files or drag them over"
+      uid=139_101 button "Remove file" description="Remove file"
+    uid=139_102 complementary
+      uid=139_103 heading "Metadata" level="2"
+      uid=139_104 button "Edit metadata"
+      uid=139_105 DisclosureTriangle "Metadata settings" description="Metadata settings" expandable
+      uid=139_106 button "Hide metadata"
+      uid=139_107 region "Document details"
+        uid=139_108 region "Document information"
+          uid=139_109 "State"
+          uid=139_110 "Project"
+          uid=139_111 "Version"
+          uid=139_112 button "Create Version"
+          uid=139_113 "Last modified"
+          uid=139_114 "June 4, 2025"
+          uid=139_115 "Created"
+          uid=139_116 "April 24, 2025"
+          uid=139_117 "By"
+          uid=139_118 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Administrator"
+          uid=139_120 "Contributors"
+          uid=139_121 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Administrator"
+        uid=139_123 "Title"
+        uid=139_124 " McKesson Surgical Gloves "
+        uid=139_125 "Description"
+        uid=139_126 " McKesson Surgical Gloves product catalog "
+        uid=139_127 "Nature"
+        uid=139_128 " Booklet "
+        uid=139_129 region "Attachments"
+          uid=139_130 heading "Attachments" level="3"
+          uid=139_131 "Click to upload files"
+          uid=139_132 button "Click to upload files" value="No file chosen"
+        uid=139_133 DisclosureTriangle "Collections" expandable
+        uid=139_134 heading "Tags" level="5"
+        uid=139_135 "Perry"
+        uid=139_136 button "Remove Perry"
+        uid=139_137 "Polyisoprene"
+        uid=139_138 button "Remove Polyisoprene"
+        uid=139_139 "Neoprene"
+        uid=139_140 button "Remove Neoprene"
+        uid=139_141 "McKesson"
+        uid=139_142 button "Remove McKesson"
+        uid=139_143 "AquaTouch"
+        uid=139_144 button "Remove AquaTouch"
+        uid=139_145 "surgical gloves"
+        uid=139_146 button "Remove surgical gloves"
+        uid=139_147 "Micro-Thin"
+        uid=139_148 button "Remove Micro-Thin"
+        uid=139_149 "Latex"
+        uid=139_150 button "Remove Latex"
+        uid=139_151 combobox "Search or create a tag" autocomplete="list" expandable haspopup="listbox"
+        uid=139_152 status atomic live="polite" relevant="additions text"
+        uid=139_153 "Search or create a tag"
+        uid=139_154 tab "COMMENTS" selectable selected
+        uid=139_155 tab "ACTIVITY" selectable
+        uid=139_156 form
+          uid=139_157 textbox "Write a comment" multiline
+          uid=139_158 button "Post your comment" disableable disabled
+          uid=139_159 button "Cancel" disableable disabled
+  uid=139_160 generic live="polite" relevant="additions text"

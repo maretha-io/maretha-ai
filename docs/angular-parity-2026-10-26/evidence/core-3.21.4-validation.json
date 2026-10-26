@@ -1,0 +1,83 @@
+{
+  "verifiedAt": "2026-10-26T20:23:39.442622+00:00",
+  "versions": {
+    "core": "3.21.4",
+    "sdk": "0.1.2",
+    "cp": "1.0.30"
+  },
+  "angularTests": {
+    "passed": 1496,
+    "failed": 0,
+    "log": "core-full-tests.log",
+    "transientFailure": {
+      "initialRun": "1495passed,1tooltip lifecycle assertion failed",
+      "initialLog": "core-full-tests-tooltip-failure.log",
+      "focusedRerun": "8/8passed unchangedsource",
+      "focusedLog": "core-tooltip-focused.log",
+      "completeRerun": "1496/1496passed unchangedsource",
+      "productionOrTestChangesForFailure": false
+    }
+  },
+  "typecheck": {
+    "passed": true,
+    "log": "core-typecheck.log"
+  },
+  "lint": {
+    "passed": true,
+    "scope": "app scripts e2e (all production app code, tests, scripts and end-to-end helpers)",
+    "command": "npx eslint app scripts e2e --max-warnings=0",
+    "log": "core-scoped-lint.log",
+    "unscopedLimitation": "npm run lint also scans the unrelated git-excluded local/maretha-angular-webui-oss-plan-2026-10-12.html and reports its standalone HTML as an Angular template parse error. That user-local artifact was left unchanged."
+  },
+  "i18n": {
+    "passed": true,
+    "guardTestsPassed": 25,
+    "guardTestsFailed": 0,
+    "validatorReport": "core-i18n-verification.json",
+    "log": "core-i18n.log",
+    "guardLog": "core-i18n-guards.log",
+    "newCatalogueKeys": [
+      "imagePreviewer.pan.left",
+      "imagePreviewer.pan.up",
+      "imagePreviewer.pan.down",
+      "imagePreviewer.pan.right"
+    ],
+    "locales": [
+      "en-US",
+      "es",
+      "fr",
+      "ar",
+      "ro",
+      "pt-PT",
+      "it"
+    ],
+    "independentLinguisticReview": false
+  },
+  "sdk": {
+    "consumerPassed": true,
+    "apiPassed": true,
+    "identitiesPassed": true,
+    "consumerReport": "core-sdk-consumer.json",
+    "consumerLog": "core-sdk-consumer.log",
+    "environmentAdaptation": "env -u npm_config_allow_scripts -u NPM_CONFIG_ALLOW_SCRIPTS node scripts/verify-sdk-consumer.mjs. The underlying npm install/ci calls retained --ignore-scripts. Initial npm run invocation inherited an incompatible allow-scripts setting and failed before install."
+  },
+  "releaseAssemblyTests": {
+    "passed": 5,
+    "failed": 0
+  },
+  "productionBuild": "Owned by root; not run by shell subtask.",
+  "afterDeployment": {
+    "image": "lab-20df1b8-94-1",
+    "shellChecks": "shell-after-checks.json",
+    "shellEvidence": "shell-audit.json",
+    "status": "Shell checks completed; new CP proxy/Polymer cache followup release pending."
+  },
+  "budgetOptimization": {
+    "files": [
+      "app/app-routing.module.ts",
+      "app/app-routing.module.spec.ts"
+    ],
+    "change": "All three task routes load TasksPageComponent lazily. Initial budget ceiling remains unchanged; nine focused route tests pass. Root owns production bundle measurement."
+  },
+  "sourceRevision": "cc37bde"
+}

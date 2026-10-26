@@ -1,0 +1,126 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=93_0 RootWebArea "Parity audit 2026-10-26 - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26"
+  uid=93_1 banner
+    uid=93_2 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=93_4 button "Quick Search" expandable
+  uid=93_5 complementary
+    uid=93_6 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=93_7 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=93_8 listbox "Drawer" orientation="vertical"
+      uid=93_9 option "AI search"
+        uid=93_10 button "AI search" expandable
+      uid=93_11 generic
+      uid=93_12 option "Browse"
+        uid=93_13 button "Browse" expandable
+      uid=93_14 option "Recently Viewed"
+        uid=93_15 button "Recently Viewed" expandable
+      uid=93_16 option "Search"
+        uid=93_17 button "Search" expandable
+      uid=93_18 option "Expired"
+        uid=93_19 button "Expired" expandable
+      uid=93_20 option "Assets"
+        uid=93_21 button "Assets" expandable
+      uid=93_22 option "Inventory"
+        uid=93_23 button "Inventory" expandable
+      uid=93_24 option "Requests"
+        uid=93_25 button "Requests" expandable
+      uid=93_26 option "Tasks 1"
+        uid=93_27 button "Tasks" expandable
+        uid=93_28 status "1" atomic live="polite" relevant="additions text"
+      uid=93_29 option "MSA Work Queue"
+        uid=93_30 button "MSA Work Queue" expandable
+      uid=93_31 option "Favorites"
+        uid=93_32 button "Favorites" expandable
+      uid=93_33 option "Collections"
+        uid=93_34 button "Collections" expandable
+      uid=93_35 option "Personal Space"
+        uid=93_36 button "Personal Space" expandable
+      uid=93_37 option "Clipboard"
+        uid=93_38 button "Clipboard" expandable
+      uid=93_39 option "Trash"
+        uid=93_40 button "Trash" expandable
+      uid=93_41 generic
+      uid=93_42 option "Administration"
+        uid=93_43 button "Administration" expandable
+      uid=93_44 option "User Settings"
+        uid=93_45 button "User Settings" expandable
+  uid=93_46 main
+    uid=93_47 link "Parity audit 2026-10-26" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26"
+    uid=93_49 navigation "Breadcrumb"
+      uid=93_50 link "Domain" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain"
+      " > "
+      uid=93_52 link "UserWorkspaces" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces"
+      " > "
+      uid=93_54 link "gpt" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt"
+    uid=93_56 button "Render with Template"
+    uid=93_57 tooltip
+    uid=93_58 button
+    uid=93_59 button "Edit document"
+    uid=93_60 button "Delete document"
+    uid=93_61 button "Add to Collection"
+    uid=93_62 button "More options" description="More"
+    uid=93_63 navigation
+      uid=93_64 tablist orientation="horizontal"
+        uid=93_65 tab "View" selectable selected
+        uid=93_66 tab "AI" selectable
+        uid=93_67 tab "Permissions" selectable
+        uid=93_68 tab "History" selectable
+        uid=93_69 tab "Trash" selectable
+    uid=93_70 heading "Details" level="5"
+    uid=93_71 generic live="polite" relevant="additions text"
+      uid=93_72 "6 result(s)"
+    uid=93_73 button "Export CSV"
+    uid=93_74 button "Switch to Grid View"
+    uid=93_75 button "Switch to Table View" disableable disabled
+    uid=93_76 row
+      uid=93_77 generic
+        uid=93_78 textbox "Title"
+      uid=93_79 button
+      uid=93_80 generic
+        uid=93_81 combobox "Modified" autocomplete="list" expandable haspopup="listbox"
+      uid=93_82 button
+      uid=93_83 generic
+        uid=93_84 combobox "Last Contributor" autocomplete="list" expandable haspopup="listbox"
+      uid=93_85 button
+      uid=93_86 button "Columns Settings"
+    uid=93_87 row
+      uid=93_88 checkbox "Select"
+      uid=93_89 link "parity-picture-20261026.png" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/parity-picture-20261026.png"
+      uid=93_91 "October 26, 2026"
+      uid=93_92 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+        uid=93_93 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=93_94 row
+      uid=93_95 checkbox "Select"
+      uid=93_96 link "parity-upload-20261026.txt" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/parity-upload-20261026.txt"
+      uid=93_98 "October 26, 2026"
+      uid=93_99 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+        uid=93_100 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=93_101 row
+      uid=93_102 checkbox "Select"
+      uid=93_103 link "core-collection" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-collection"
+      uid=93_105 "October 26, 2026"
+      uid=93_106 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+        uid=93_107 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=93_108 row
+      uid=93_109 checkbox "Select"
+      uid=93_110 link "docs-note" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/docs-note"
+      uid=93_112 "October 26, 2026"
+      uid=93_113 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+        uid=93_114 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=93_115 row
+      uid=93_116 checkbox "Select"
+      uid=93_117 link "core-target" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-target"
+      uid=93_119 "October 26, 2026"
+      uid=93_120 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+        uid=93_121 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+    uid=93_122 row
+      uid=93_123 checkbox "Select"
+      uid=93_124 link "core-note" url="https://demo.maretha.io/nuxeo/ui/#!/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-note"
+      uid=93_126 "October 26, 2026"
+      uid=93_127 button "gpt@maretha.io" description="gpt gpt@maretha.io"
+        uid=93_128 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ui/#!/user/gpt"
+  uid=93_129 button
+  uid=93_130 tooltip
+  uid=93_131 status atomic live="polite" relevant="additions text"
+  uid=93_132 generic live="polite" relevant="additions text"
