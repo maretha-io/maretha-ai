@@ -1,0 +1,91 @@
+{
+  "verifiedAt": "2026-10-26T21:06:09.008645+00:00",
+  "versions": {
+    "core": "3.21.7",
+    "sdk": "0.1.2",
+    "cp": "1.0.33",
+    "polymer": "2025.21.3"
+  },
+  "angularTests": {
+    "passed": 1509,
+    "failed": 0,
+    "log": "core-3.21.7-full-tests.log",
+    "focusedTaskCardAndRequests": "20/20PASS; core-dashboard-taskcard-focused.log",
+    "focusedResize": "14/14PASS owned by docsagent; includes realResizeObserver reset result."
+  },
+  "typecheck": {
+    "passed": true,
+    "log": "core-3.21.7-typecheck.log"
+  },
+  "lint": {
+    "passed": true,
+    "scope": "app scripts e2e (all production app code, tests, scripts and end-to-end helpers)",
+    "command": "npx eslint app scripts e2e --max-warnings=0",
+    "log": "core-3.21.7-scoped-lint.log",
+    "unscopedLimitation": "npm run lint also scans the unrelated git-excluded local/maretha-angular-webui-oss-plan-2026-10-12.html and reports its standalone HTML as an Angular template parse error. That user-local artifact was left unchanged."
+  },
+  "i18n": {
+    "passed": true,
+    "guardTestsPassed": 25,
+    "guardTestsFailed": 0,
+    "validatorReport": "core-3.21.7-i18n-verification.json",
+    "log": "core-3.21.7-i18n.log",
+    "guardLog": "core-3.21.7-i18n-guards.log",
+    "newCatalogueKeys": [
+      "documentPage.resize.side"
+    ],
+    "locales": [
+      "en-US",
+      "es",
+      "fr",
+      "ar",
+      "ro",
+      "pt-PT",
+      "it"
+    ],
+    "independentLinguisticReview": false,
+    "catalogueCorrection": "Existing English wf.serialDocumentReview.DocumentValidation now matches baseline Validate the Document. No other workflow text changed."
+  },
+  "sdk": {
+    "consumerPassed": true,
+    "apiPassed": true,
+    "identitiesPassed": true,
+    "consumerReport": "core-sdk-consumer.json",
+    "consumerLog": "core-sdk-consumer.log",
+    "environmentAdaptation": "env -u npm_config_allow_scripts -u NPM_CONFIG_ALLOW_SCRIPTS node scripts/verify-sdk-consumer.mjs. The underlying npm install/ci calls retained --ignore-scripts. Initial npm run invocation inherited an incompatible allow-scripts setting and failed before install."
+  },
+  "releaseAssemblyTests": {
+    "passed": 6,
+    "failed": 0,
+    "scope": "Previous3.21.6/1.0.32 guard run; root owns newCP1.0.33 assembly guard recheck."
+  },
+  "productionBuild": "Final coordinated3.21.7/CP1.0.33 production build and Maven verification passed;6.16MB initial bundle within6.5MB.",
+  "afterDeployment": {
+    "status": "PASS for recorded coverage; see core-audit.json, cp-audit.json and runtime-final-verification.json.",
+    "workflowRun": "https://github.com/maretha-io/hetzner-remote/actions/runs/40401856241",
+    "image": "nuxeo-maretha:lab-4f9af2f-97-1"
+  },
+  "budgetOptimization": {
+    "files": [
+      "app/app-routing.module.ts",
+      "app/app-routing.module.spec.ts"
+    ],
+    "change": "All three task routes load TasksPageComponent lazily. Initial budget ceiling remains unchanged; nine focused route tests pass. Root owns production bundle measurement."
+  },
+  "sourceRevision": "72c34333d37204992161bf049f04093c175622e3",
+  "previousReleaseValidation": "core-3.21.6-validation.json",
+  "coreManifest": {
+    "passed": true,
+    "lockedFileCount": 1645,
+    "log": "core-3.21.7-manifest-check.log",
+    "note": "Generator initially omitted untracked3newhandlefiles. After staging/tracking, regeneratedmanifest and amended unpublishedcommit; finalcheckmatchesall1645."
+  },
+  "commit": {
+    "author": "Ethan Steiner <esteiner@maretha.io>",
+    "sha": "72c34333d37204992161bf049f04093c175622e3",
+    "log": "core-3.21.7-commit.log",
+    "pushLog": "core-3.21.7-push.log",
+    "pushed": true
+  },
+  "graftTokensSavedShell": 62091
+}

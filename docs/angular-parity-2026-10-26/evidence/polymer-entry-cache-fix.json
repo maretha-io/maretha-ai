@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-26T20:35:09.071758+00:00",
+  "version": "2025.21.3",
+  "status": "Warm ordinary browser reload verified after deployed lab-a55f952-95-1; root owns exact cache headers.",
+  "package": "nuxeo-web-ui-marketplace-2025.21.3.zip",
+  "sha256": "ecda281f3bc45f59b198f6f44b1f11b6dbd92279fd76b3d4f628c79ec62b24ae",
+  "bytes": 11419150,
+  "nodeTests": {
+    "passed": 5,
+    "failed": 0,
+    "newCacheTests": 4,
+    "existingLinkedImportMetaTests": 1
+  },
+  "javaTests": {
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  },
+  "lint": "Scoped sw.js and new CJS regression pass; Prettier and git diff --check pass.",
+  "build": "npm run build PASS",
+  "maven": "mvn -o package -DskipInstall -DskipBuild PASS; offline, existing dependencies only.",
+  "packagedContents": "Nested jar cache contribution/JSP/minified SW validated from final ZIP.",
+  "cause": "Timestamp annual rule also matched stable main and service worker URLs. Stable entry URL reused a previously fresh HTTP cache key after removed hashed chunks changed.",
+  "fix": [
+    "First matching grant for main.bundle.js and sw.js with optional query uses cached=false private=true, producing private,no-cache,no-store,must-revalidate.",
+    "JSP main URL uses JVM start time, matching service worker registration; existing warm stable HTTP and CacheStorage keys are not reused.",
+    "Service worker replaces ts through URL.searchParams.set and preserves unrelated parameters; generic JS does the same."
+  ],
+  "existingWorkerCompatibility": "Old worker appends ?ts=old to the new entry URL; this still differs from all previous stable entry cache keys. New worker normalizes one ts value. Actual warm browser verification pending rollout.",
+  "unchanged": "Backend and unrelated asset caching. Legacy maretha-ai Dockerfile untouched.",
+  "sourceFiles": [
+    "plugin/web-ui/addon/src/main/resources/OSGI-INF/browser-cache-contrib.xml",
+    "plugin/web-ui/addon/src/main/resources/web/nuxeo.war/ui/index.jsp",
+    "sw.js",
+    "scripts/test/unit/stable-entry-cache.test.cjs"
+  ],
+  "versionFiles": [
+    "package.json",
+    "package-lock.json",
+    "pom.xml",
+    "plugin/a11y/pom.xml",
+    "plugin/itests/addon/pom.xml",
+    "plugin/itests/marketplace/pom.xml",
+    "plugin/metrics/pom.xml",
+    "plugin/web-ui/addon/pom.xml",
+    "plugin/web-ui/marketplace/pom.xml"
+  ],
+  "graftTokensSavedShell": 51746,
+  "sourceRevision": "e4cda0c87",
+  "warmBrowserVerification": {
+    "record": "shell-final-release-checks.json",
+    "priorEntry": "main.bundle.js",
+    "newEntry": "main.bundle.js?ts=1793047204310",
+    "outcome": "Existing tab ordinarily reloaded; expected sign-in after restart; dashboard+Themes hydrated, no CUAconsoleerrors, no storage/cache clearing."
+  }
+}

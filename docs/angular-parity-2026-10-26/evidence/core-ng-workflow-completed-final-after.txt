@@ -1,0 +1,33 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=114_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/tasks"
+  uid=114_1 complementary "Application navigation"
+    uid=114_2 button "Dashboard"
+    uid=114_3 navigation "Main navigation"
+      uid=114_4 button "AI search" expandable
+      uid=114_5 button "Browse" expandable
+      uid=114_6 button "Recently Viewed" expandable
+      uid=114_7 button "Search" expandable
+      uid=114_8 button "Expired" expandable
+      uid=114_9 button "Assets" expandable
+      uid=114_10 button "Tasks" expandable
+      uid=114_11 button "Favorites" expandable
+      uid=114_12 button "Collections" expandable
+      uid=114_13 button "Personal Space" expandable
+      uid=114_14 button "Clipboard" expandable
+      uid=114_15 button "Trash" expandable
+    uid=114_16 navigation "Account and administration"
+      uid=114_17 button "Administration" expandable
+      uid=114_18 button "User menu" expandable
+  uid=114_19 banner "Application actions"
+    uid=114_20 button "Quick Search" expandable haspopup="dialog"
+    uid=114_21 generic
+      uid=114_22 button "Add Content" haspopup="dialog"
+  uid=114_23 region "Application activity"
+    uid=114_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=114_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=115_0 main
+    uid=115_1 heading "Tasks" level="1"
+    uid=115_2 "You don't have any tasks to process at the moment."
+    uid=115_3 "0 tasks"
+  uid=114_60 generic live="polite" relevant="additions text"

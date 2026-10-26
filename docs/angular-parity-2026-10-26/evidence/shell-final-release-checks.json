@@ -1,0 +1,79 @@
+{
+  "image": "lab-a55f952-95-1",
+  "versions": {
+    "polymer": "2025.21.3",
+    "angular": "3.21.5",
+    "cp": "1.0.31"
+  },
+  "checks": [
+    {
+      "side": "ui",
+      "stage": "warm-normal-reload",
+      "entry": "https://demo.maretha.io/nuxeo/ui/main.bundle.js?ts=1793047204310",
+      "logs": [],
+      "viewport": {
+        "height": 640,
+        "width": 1280
+      }
+    },
+    {
+      "side": "ui",
+      "stage": "footer",
+      "bounds": {
+        "bottom": 640,
+        "top": 592
+      },
+      "profileVisible": true
+    },
+    {
+      "side": "ui",
+      "stage": "themes-after-warm-reload",
+      "currentVisible": true,
+      "logs": []
+    },
+    {
+      "side": "ng",
+      "stage": "dashboard",
+      "entry": "https://demo.maretha.io/nuxeo/ng/main.6b6f662e12c1dd92.js",
+      "viewport": {
+        "height": 640,
+        "width": 1280
+      },
+      "title": "26px"
+    },
+    {
+      "side": "ng",
+      "stage": "footer",
+      "bounds": {
+        "bottom": 640,
+        "top": 592
+      },
+      "profileVisible": true
+    },
+    {
+      "side": "ng",
+      "stage": "themes",
+      "currentVisible": true
+    },
+    {
+      "side": "ng",
+      "stage": "cloud",
+      "providers": true,
+      "tokens": true,
+      "consumers": true
+    },
+    {
+      "side": "ng",
+      "stage": "mobile-account",
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "bounds": {
+        "bottom": 844,
+        "top": 796
+      },
+      "profileVisible": true
+    }
+  ]
+}

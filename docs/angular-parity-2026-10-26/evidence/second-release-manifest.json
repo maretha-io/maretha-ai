@@ -1,0 +1,20 @@
+{
+  "createdAt": "2026-10-26T20:37:54.986Z",
+  "coreVersion": "3.21.5",
+  "addonVersion": "1.0.31",
+  "coreRevision": "05d81cd3cb9b689c2db3e5a382eaa5bc51b4707f",
+  "addonRevision": "0ad6c52478d27e13a84133f2cdb58ca3bd97674a",
+  "coreSourceSha256": "48cc8d6f4639c071fc19c554fcb3a2133e7ff99dceba08bd61e07b5b11d75135",
+  "initialBundleBudget": "6.5mb",
+  "nodeVersion": "v24.18.0",
+  "packages": [
+    {
+      "path": "/private/tmp/maretha-cp-1.0.31-assembly-final/host/nuxeo/package/target/maretha-angular-webui-package-3.21.5.zip",
+      "sha256": "b1aea6dc734d68b5c16deea748b9a48c570ecc833bdd50b04d8e6182d0f75134"
+    },
+    {
+      "path": "/Users/esteiner/Maretha/Nuxeo/source/maretha-ai-angular-parity/maretha-ai-package/target/maretha-ai-package-1.0.31.zip",
+      "sha256": "ff0121cb2018bc52a69082218093dd59cd5d4920b5d435868b75058f39b35b93"
+    }
+  ]
+}

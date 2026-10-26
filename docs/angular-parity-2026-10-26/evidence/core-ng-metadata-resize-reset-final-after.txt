@@ -1,0 +1,157 @@
+## Latest page snapshot
+uid=148_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Adrian/Images/Surgical_Gloves_Catalog_Brochure_2021-05.pdf?view=view"
+  uid=148_1 complementary "Application navigation"
+    uid=148_2 button "Dashboard"
+    uid=148_3 navigation "Main navigation"
+      uid=148_4 button "AI search" expandable
+      uid=148_5 button "Browse" expandable
+      uid=148_6 button "Recently Viewed" expandable
+      uid=148_7 button "Search" expandable
+      uid=148_8 button "Expired" expandable
+      uid=148_9 button "Assets" expandable
+      uid=148_10 button "Tasks" expandable
+      uid=148_11 button "Favorites" expandable
+      uid=148_12 button "Collections" expandable
+      uid=148_13 button "Personal Space" expandable
+      uid=148_14 button "Clipboard" expandable
+      uid=148_15 button "Trash" expandable
+    uid=148_16 navigation "Account and administration"
+      uid=148_17 button "Administration" expandable
+      uid=148_18 button "User menu" expandable
+  uid=148_19 banner "Application actions"
+    uid=148_20 button "Quick Search" expandable haspopup="dialog"
+    uid=148_21 generic
+      uid=148_22 button "Add Content" haspopup="dialog"
+  uid=148_23 region "Application activity"
+    uid=148_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=148_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=148_26 banner
+    uid=148_27 heading "McKesson Surgical Gloves" level="1"
+    uid=148_28 navigation "Document location"
+      uid=148_29 link "Domain" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain"
+      uid=148_31 link "Workspaces" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces"
+      uid=148_33 link "Adrian" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Adrian"
+      uid=148_35 link "Images" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/workspaces/Adrian/Images"
+    uid=148_37 DisclosureTriangle "AI Metadata" description="AI Metadata" expandable
+    uid=148_38 button "Edit document"
+    uid=148_39 button "More actions" expandable haspopup="dialog"
+  uid=148_40 tablist "Document views" orientation="horizontal"
+    uid=148_41 tab "View" selectable selected
+    uid=148_42 tab "AI" selectable
+    uid=148_43 tab "More Like This" selectable
+    uid=148_44 tab "Permissions" selectable
+    uid=148_45 tab "History" selectable
+    uid=148_46 tab "Publishing" selectable
+  uid=148_47 tabpanel "View"
+    uid=148_48 main
+      uid=148_49 button "Table of contents"
+      uid=148_50 button "First page" disableable disabled
+      uid=148_51 button "Previous page" disableable disabled
+      uid=148_52 spinbutton "Current page" value="1" valuemax="12" valuemin="0" valuetext="1"
+      uid=148_53 "of ⁨12⁩"
+      uid=148_54 button "Next page"
+      uid=148_55 button "Last page"
+      uid=148_56 button "Fullscreen"
+      uid=148_57 group "Zoom in/out" haspopup="menu"
+      uid=148_58 button "Rotate clockwise"
+      uid=148_59 button "Rotate counter clockwise"
+      uid=148_60 radiogroup
+        uid=148_61 radio "Hand tool" checked
+        uid=148_62 radio "Select text"
+      uid=148_63 button "Find in document..."
+      uid=148_64 button "Print this file"
+      uid=148_65 region "Page ⁨1⁩"
+        uid=148_66 "Find the right fit with"
+        uid=148_67 "McKesson Surgical Gloves"
+        uid=148_68 generic
+      uid=148_69 region "Page ⁨2⁩"
+        uid=148_70 "At McKesson Medical-Surgical, we understand that today’s ambulatory"
+        uid=148_71 "surgery center and physician office settings have unique business and"
+        uid=148_72 "product needs. That’s why we offer a wide variety of quality, cost-effective"
+        uid=148_73 "products within our own McKesson Brands portfolio, including surgical"
+        uid=148_74 "gloves. Our selection of surgical gloves features the tactile sensitivity and"
+        uid=148_75 "dexterity you want in a glove, while offering the protection you need."
+        uid=148_76 "Never Compromise on Care"
+        uid=148_77 " "
+        uid=148_78 "SM"
+        uid=148_79 "With McKesson Brands, you’ll never have to compromise. We deliver"
+        uid=148_80 "quality products at competitive prices, backed by our 100%"
+        uid=148_81 "satisfaction guarantee. We have decades of experience in the"
+        uid=148_82 "market, and we offer you support and work to help ensure you"
+        uid=148_83 "have the products you need, when you need them — making"
+        uid=148_84 "it even easier for you to provide the best care for your patients."
+        uid=148_85 generic
+      uid=148_86 region "Page ⁨3⁩"
+      uid=148_87 region "Page ⁨4⁩"
+      uid=148_88 region "Page ⁨5⁩"
+      uid=148_89 region "Page ⁨6⁩"
+      uid=148_90 region "Page ⁨7⁩"
+      uid=148_91 region "Page ⁨8⁩"
+      uid=148_92 region "Page ⁨9⁩"
+      uid=148_93 region "Page ⁨10⁩"
+      uid=148_94 region "Page ⁨11⁩"
+      uid=148_95 region "Page ⁨12⁩"
+      uid=148_96 "Surgical_Gloves_Catalog_Brochure_2021-05.pdf"
+      uid=148_97 "1.19 MB"
+      uid=148_98 button "Download file" description="Download file"
+      uid=148_99 button "Preview" description="Preview"
+      uid=148_100 button "Replace file" description="You can either manually select files or drag them over"
+      uid=148_101 button "Remove file" description="Remove file"
+    uid=148_102 complementary
+      uid=148_103 separator "Resize the information pane. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." description="Resize the information pane. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." focusable focused orientation="vertical" value="446" valuemax="697" valuemin="280" valuetext=""
+      uid=148_104 heading "Metadata" level="2"
+      uid=148_105 button "Edit metadata"
+      uid=148_106 DisclosureTriangle "Metadata settings" description="Metadata settings" expandable
+      uid=148_107 button "Hide metadata"
+      uid=148_108 region "Document details"
+        uid=148_109 region "Document information"
+          uid=148_110 "State"
+          uid=148_111 "Project"
+          uid=148_112 "Version"
+          uid=148_113 button "Create Version"
+          uid=148_114 "Last modified"
+          uid=148_115 "June 4, 2025"
+          uid=148_116 "Created"
+          uid=148_117 "April 24, 2025"
+          uid=148_118 "By"
+          uid=148_119 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Administrator"
+          uid=148_121 "Contributors"
+          uid=148_122 link "devnull@nuxeo.com" url="https://demo.maretha.io/nuxeo/ng/page/user?id=Administrator"
+        uid=148_124 "Title"
+        uid=148_125 " McKesson Surgical Gloves "
+        uid=148_126 "Description"
+        uid=148_127 " McKesson Surgical Gloves product catalog "
+        uid=148_128 "Nature"
+        uid=148_129 " Booklet "
+        uid=148_130 region "Attachments"
+          uid=148_131 heading "Attachments" level="3"
+          uid=148_132 "Click to upload files"
+          uid=148_133 button "Click to upload files" value="No file chosen"
+        uid=148_134 DisclosureTriangle "Collections" expandable
+        uid=148_135 heading "Tags" level="5"
+        uid=148_136 "Perry"
+        uid=148_137 button "Remove Perry"
+        uid=148_138 "Polyisoprene"
+        uid=148_139 button "Remove Polyisoprene"
+        uid=148_140 "Neoprene"
+        uid=148_141 button "Remove Neoprene"
+        uid=148_142 "McKesson"
+        uid=148_143 button "Remove McKesson"
+        uid=148_144 "AquaTouch"
+        uid=148_145 button "Remove AquaTouch"
+        uid=148_146 "surgical gloves"
+        uid=148_147 button "Remove surgical gloves"
+        uid=148_148 "Micro-Thin"
+        uid=148_149 button "Remove Micro-Thin"
+        uid=148_150 "Latex"
+        uid=148_151 button "Remove Latex"
+        uid=148_152 combobox "Search or create a tag" autocomplete="list" expandable haspopup="listbox"
+        uid=148_153 status atomic live="polite" relevant="additions text"
+        uid=148_154 "Search or create a tag"
+        uid=148_155 tab "COMMENTS" selectable selected
+        uid=148_156 tab "ACTIVITY" selectable
+        uid=148_157 form
+          uid=148_158 textbox "Write a comment" multiline
+          uid=148_159 button "Post your comment" disableable disabled
+          uid=148_160 button "Cancel" disableable disabled
+  uid=148_161 generic live="polite" relevant="additions text"

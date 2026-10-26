@@ -1,0 +1,83 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=3_0 RootWebArea "Default - Search - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/search/default"
+  uid=3_1 banner
+    uid=3_2 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=3_4 button "Quick Search" expandable
+  uid=3_5 complementary
+    uid=3_6 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=3_7 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=3_8 listbox "Drawer" orientation="vertical"
+      uid=3_9 option "AI search"
+        uid=3_10 button "AI search" expandable
+      uid=3_11 generic
+      uid=3_12 option "Browse"
+        uid=3_13 button "Browse" expandable
+      uid=3_14 option "Recently Viewed"
+        uid=3_15 button "Recently Viewed" expandable
+      uid=3_16 option "Search" selected
+        uid=3_17 button "Search" expandable expanded
+      uid=3_18 option "Expired"
+        uid=3_19 button "Expired" expandable
+      uid=3_20 option "Assets"
+        uid=3_21 button "Assets" expandable
+      uid=3_22 option "Inventory"
+        uid=3_23 button "Inventory" expandable
+      uid=3_24 option "Requests"
+        uid=3_25 button "Requests" expandable
+      uid=3_26 option "Tasks"
+        uid=3_27 button "Tasks" expandable
+      uid=3_28 option "MSA Work Queue"
+        uid=3_29 button "MSA Work Queue" expandable
+      uid=3_30 option "Favorites"
+        uid=3_31 button "Favorites" expandable
+      uid=3_32 option "Collections"
+        uid=3_33 button "Collections" expandable
+      uid=3_34 option "Personal Space"
+        uid=3_35 button "Personal Space" expandable
+      uid=3_36 option "Clipboard"
+        uid=3_37 button "Clipboard" expandable
+      uid=3_38 option "Trash"
+        uid=3_39 button "Trash" expandable
+      uid=3_40 generic
+      uid=3_41 option "Administration"
+        uid=3_42 button "Administration" expandable
+      uid=3_43 option "User Settings"
+        uid=3_44 button "User Settings" expandable
+    uid=14_0 "Search Filters"
+    uid=14_1 generic
+      uid=14_2 combobox "Search Filters" autocomplete="list" expandable haspopup="listbox"
+      uid=14_3 "Select a saved search"
+    uid=14_4 button "Switch to Queue View"
+    uid=14_5 "Full Text"
+    uid=14_6 group "Full Text"
+      uid=14_7 searchbox "Full Text" focusable focused value="core-note"
+    uid=14_8 button "Modification Date" expandable
+    uid=14_9 "Authors"
+    uid=14_10 generic
+      uid=14_11 combobox "Search for authors..." autocomplete="list" expandable haspopup="listbox"
+    uid=14_12 "Collections"
+    uid=14_13 generic
+      uid=14_14 combobox "Select a value." autocomplete="list" expandable haspopup="listbox"
+    uid=14_15 "Tags"
+    uid=14_16 generic
+      uid=14_17 combobox "e.g. events, boston" autocomplete="list" expandable haspopup="listbox"
+    uid=14_18 button "Nature" expandable
+    uid=14_19 button "Subjects" expandable
+    uid=14_20 button "Coverage" expandable
+    uid=14_21 button "Size" expandable
+    uid=14_22 button "Reset"
+    uid=14_23 button "Collapse the side navigation panel" expandable expanded
+    uid=14_24 separator "Resize the side navigation panel. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." orientation="vertical" value="350" valuemax="720" valuemin="350" valuetext=""
+  uid=3_45 main
+    uid=15_0 "Search Results"
+    uid=15_1 button "Save As"
+    uid=15_2 navigation
+    uid=15_3 "404"
+    uid=15_4 "Not Found"
+    uid=15_5 "https://demo.maretha.io/nuxeo/ui/-20261024/node_modules/@nuxeo/nuxeo-ui-elements/search/default/nuxeo-default-search-results.html"
+    uid=15_6 "Failed to find results layout for default."
+  uid=3_160 button
+  uid=3_161 tooltip
+  uid=3_162 status atomic live="polite" relevant="additions text"
+  uid=3_163 generic live="polite" relevant="additions text"

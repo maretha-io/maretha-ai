@@ -1,0 +1,31 @@
+[
+  {
+    "file": "maretha-ai-package-1.0.33.zip",
+    "name": "maretha-ai",
+    "version": "1.0.33",
+    "sha256": "416bcedb0c111729c2fa89b7fde95fdbadd84daf7e51c15980c75c83757fc260",
+    "bundles": {
+      "maretha-ai-core-1.0.33.jar": "e5cf7418bb01a9feee3ac56e6b8d3e45ae8346cec7682ca881c5cb55d1185a12",
+      "maretha-ai-web-1.0.33.jar": "9c4d4316f626103c4d94ab620177f2e7786e259f03f27d6a126943cd7f8ca3be"
+    }
+  },
+  {
+    "file": "maretha-angular-webui-package-3.21.7.zip",
+    "name": "maretha-angular-webui",
+    "version": "3.21.7",
+    "sha256": "70325330355ee71245ebc448007068b3c16814f78a402a1498953a6d434acc37",
+    "bundles": {
+      "maretha-angular-webui-server-3.21.7.jar": "9315b6d3270c705bfaaefcc2da7b65d7d309756481dd50d20b58895fecad5e5a",
+      "maretha-angular-webui-ui-3.21.7.jar": "c308ef86b168c215edca16511d6b40d9af8cfc0667f7acc849d33ddb79fbe939"
+    }
+  },
+  {
+    "file": "nuxeo-web-ui-marketplace-2025.21.3.zip",
+    "name": "nuxeo-web-ui",
+    "version": "2025.21.3",
+    "sha256": "ecda281f3bc45f59b198f6f44b1f11b6dbd92279fd76b3d4f628c79ec62b24ae",
+    "bundles": {
+      "nuxeo-web-ui-2025.21.3.jar": "1c52e7ba4d8a2e50b386e062107a95cfc42e47ac71097b3a06d04031710e337c"
+    }
+  }
+]

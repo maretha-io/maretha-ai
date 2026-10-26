@@ -1,0 +1,216 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=93_0 RootWebArea "Default - Search - Nuxeo Platform" url="https://demo.maretha.io/nuxeo/ui/#!/search/default"
+  uid=93_1 banner
+    uid=93_2 link "Skip to main content" url="https://demo.maretha.io/nuxeo/ui/#mainContent"
+    uid=93_4 button "Quick Search" expandable
+  uid=93_5 complementary
+    uid=93_6 link "Home" url="https://demo.maretha.io/nuxeo/ui/#!/home"
+      uid=93_7 image "Application Logo" url="https://demo.maretha.io/nuxeo/ui/themes/default/logo.png"
+    uid=93_8 listbox "Drawer" orientation="vertical"
+      uid=93_9 option "AI search"
+        uid=93_10 button "AI search" expandable
+      uid=93_11 generic
+      uid=93_12 option "Browse"
+        uid=93_13 button "Browse" expandable
+      uid=93_14 option "Recently Viewed"
+        uid=93_15 button "Recently Viewed" expandable
+      uid=93_16 option "Search" selected
+        uid=93_17 button "Search" expandable expanded
+      uid=93_18 option "Expired"
+        uid=93_19 button "Expired" expandable
+      uid=93_20 option "Assets"
+        uid=93_21 button "Assets" expandable
+      uid=93_22 option "Inventory"
+        uid=93_23 button "Inventory" expandable
+      uid=93_24 option "Requests"
+        uid=93_25 button "Requests" expandable
+      uid=93_26 option "Tasks 1"
+        uid=93_27 button "Tasks" expandable
+        uid=93_28 status "1" atomic live="polite" relevant="additions text"
+      uid=93_29 option "MSA Work Queue"
+        uid=93_30 button "MSA Work Queue" expandable
+      uid=93_31 option "Favorites"
+        uid=93_32 button "Favorites" expandable
+      uid=93_33 option "Collections"
+        uid=93_34 button "Collections" expandable
+      uid=93_35 option "Personal Space"
+        uid=93_36 button "Personal Space" expandable
+      uid=93_37 option "Clipboard"
+        uid=93_38 button "Clipboard" expandable
+      uid=93_39 option "Trash"
+        uid=93_40 button "Trash" expandable
+      uid=93_41 generic
+      uid=93_42 option "Administration"
+        uid=93_43 button "Administration" expandable
+      uid=93_44 option "User Settings"
+        uid=93_45 button "User Settings" expandable
+    uid=97_0 "Search Filters"
+    uid=97_1 generic
+      uid=97_2 combobox "Search Filters" autocomplete="list" expandable haspopup="listbox"
+      uid=97_3 "Select a saved search"
+    uid=97_4 button "Switch to Queue View"
+    uid=97_5 "Full Text"
+    uid=97_6 group "Full Text"
+      uid=97_7 searchbox "Full Text" focusable focused value="core-note"
+    uid=97_8 button "Modification Date" expandable
+    uid=97_9 "Authors"
+    uid=97_10 generic
+      uid=97_11 combobox "Search for authors..." autocomplete="list" expandable haspopup="listbox"
+    uid=97_12 "Collections"
+    uid=97_13 generic
+      uid=97_14 combobox "Select a value." autocomplete="list" expandable haspopup="listbox"
+    uid=97_15 "Tags"
+    uid=97_16 generic
+      uid=97_17 combobox "e.g. events, boston" autocomplete="list" expandable haspopup="listbox"
+    uid=97_18 button "Nature" expandable
+    uid=97_19 button "Subjects" expandable
+    uid=97_20 button "Coverage" expandable
+    uid=97_21 button "Size" expandable
+    uid=97_22 button "Reset"
+    uid=97_23 button "Collapse the side navigation panel" expandable expanded
+    uid=97_24 separator "Resize the side navigation panel. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset." orientation="vertical" value="350" valuemax="720" valuemin="350" valuetext=""
+  uid=93_46 main
+    uid=111_0 "Search Results"
+    uid=111_1 button "Save As"
+    uid=111_2 navigation
+    uid=111_3 generic live="polite" relevant="additions text"
+      uid=111_4 "8 result(s)"
+    uid=111_5 button "No Containers"
+    uid=111_6 button "Most Recent"
+    uid=111_7 button "Validated"
+    uid=111_8 button "Export CSV"
+    uid=111_9 button "Switch to Grid View"
+    uid=111_10 button "Switch to Table View"
+    uid=111_11 button "Switch to List view" disableable disabled
+    uid=111_12 "Sort by"
+    uid=111_13 generic "Sort by"
+      uid=111_14 button "Sort by" haspopup="listbox" value="Created"
+    uid=111_15 button "Reverse sort order"
+    uid=111_16 generic
+      uid=111_17 image "core-note" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/e8463058-9fcb-4bd4-97b3-0a2ed5d4b171/@rendition/thumbnail?changeToken=3-0&sync=true&clientReason=view"
+      uid=111_18 generic
+        uid=111_19 "core-note"
+        uid=111_20 "Note"
+      uid=111_21 "Title"
+      uid=111_22 "core "
+      uid=111_23 "- "
+      uid=111_24 "note"
+    uid=111_25 generic
+      uid=111_26 image "core-note" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/83275c60-b30c-4643-a3d7-da6f88657f1a/@rendition/thumbnail?changeToken=3-0&sync=true&clientReason=view"
+      uid=111_27 generic
+        uid=111_28 "core-note"
+        uid=111_29 "Note"
+      uid=111_30 "Title"
+      uid=111_31 "core "
+      uid=111_32 "- "
+      uid=111_33 "note"
+    uid=111_34 generic
+      uid=111_35 image "core-note" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/6abd63c4-b629-4e61-8448-8dbd4273fea0/@rendition/thumbnail?changeToken=5-0&sync=true&clientReason=view"
+      uid=111_36 generic
+        uid=111_37 "core-note"
+        uid=111_38 "Note"
+      uid=111_39 "Title"
+      uid=111_40 "core "
+      uid=111_41 "- "
+      uid=111_42 "note"
+    uid=111_43 generic
+      uid=111_44 image "Dicaeidae Flowerpeckers" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/41977576-f6d0-49c1-b066-f2d59e97db21/@rendition/thumbnail?changeToken=14-0&sync=true&clientReason=view"
+      uid=111_45 generic
+        uid=111_46 "Dicaeidae Flowerpeckers"
+        uid=111_47 "File"
+      uid=111_48 "File"
+      uid=111_49 "With a series of emphatic chip "
+      uid=111_50 "notes "
+      uid=111_51 ", shrieks, chatters, and twitters, they herald their presence above "
+      "..."
+      uid=111_52 "Outside this "
+      uid=111_53 "core "
+      uid=111_54 "sister relationship, there is a range of possible polytomies and closer relationships"
+    uid=111_55 generic
+      uid=111_56 image "AWS S3 Glacier Developer Guide" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/17cb23c8-4585-444b-870e-0aa2e6aad1db/@rendition/thumbnail?changeToken=9-0&sync=true&clientReason=view"
+      uid=111_57 generic
+        uid=111_58 "AWS S3 Glacier Developer Guide"
+        uid=111_59 "File"
+      uid=111_60 "File"
+      uid=111_61 "Note "
+      uid=111_62 "This section is about the S3 Glacier service. "
+      "..."
+      uid=111_63 "Amazon S3 Glacier Data Model The Amazon S3 Glacier data model "
+      uid=111_64 "core "
+      uid=111_65 "components include vaults and archives "
+      "..."
+      uid=111_66 "These resources complement the "
+      uid=111_67 "core "
+      uid=111_68 "resources. "
+      "..."
+      uid=111_69 "SDK for Java 2.x "
+      uid=111_70 "Note "
+      uid=111_71 "There's more on GitHub. "
+      "..."
+      uid=111_72 "About the Inventory API Version 2012-06-01 57 Amazon S3 Glacier Developer Guide "
+      uid=111_73 "Note "
+      uid=111_74 "Note "
+      uid=111_75 "that if"
+    uid=111_76 generic
+      uid=111_77 image "pro dev plan.pdf" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/4d5d1d17-f933-4660-a3f1-5ac870819002/@rendition/thumbnail?changeToken=2-0&sync=true&clientReason=view"
+      uid=111_78 generic
+        uid=111_79 "pro dev plan.pdf"
+        uid=111_80 "File"
+      uid=111_81 "File"
+      uid=111_82 "The "
+      uid=111_83 "core "
+      uid=111_84 "objective of the research is to form ulate a product development plan for the company so they "
+      "..."
+      uid=111_85 "(Fan 2007, 32-38) 32 The "
+      uid=111_86 "core "
+      uid=111_87 "plan for this research is to summarize a product developm ent strategy "
+      "..."
+      uid=111_88 "Moreover, as the "
+      uid=111_89 "core "
+      uid=111_90 "idea of this thesis is to pro vide a package trip to Vietnam destinations, this "
+      "..."
+      uid=111_91 "In addition with that MT should handle customer’s complaints with its "
+      uid=111_92 "core "
+      uid=111_93 "product partners. "
+      "..."
+      uid=111_94 "Vietnam air HO CHI MINH FRANKFURT 2310 Finn air 0800+1 0630+1 FRANKFURT HELSINKI 1045 1410 Please "
+      uid=111_95 "note"
+    uid=111_96 generic
+      uid=111_97 image "UK Fair Treatment - fg21-1.pdf" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/8731d64c-49f8-4e0b-b344-b137c0c3ee9d/@rendition/thumbnail?changeToken=3-0&sync=true&clientReason=view"
+      uid=111_98 generic
+        uid=111_99 "UK Fair Treatment - fg21-1.pdf"
+        uid=111_100 "File"
+      uid=111_101 "File"
+      uid=111_102 "place systems and processes that support the delivery of good customer service, including systems to "
+      uid=111_103 "note "
+      "..."
+      uid=111_104 "Alongside the Principles, these outcomes are at the "
+      uid=111_105 "core "
+      uid=111_106 "of what we expect of firms for all consumers "
+      "..."
+      uid=111_107 "other outcomes we have communicated are important for consumers in their sector. 1.29 Firms should "
+      uid=111_108 "note "
+      "..."
+      uid=111_109 "support, while maintaining robust safeguards to reduce the risk of abuse. 4.51 It is important to "
+      uid=111_110 "note "
+      "..."
+      uid=111_111 "Adding a free-text box on systems or "
+      uid=111_112 "notes "
+      uid=111_113 "on a customer file that allows staff to describe the customer"
+    uid=111_114 generic
+      uid=111_115 image "UK Guidance_for_businesses_on_making_environmental_claims_.pdf" url="https://demo.maretha.io/nuxeo/api/v1/repo/default/id/246771f0-0019-4682-8ff2-089accaa1f21/@rendition/thumbnail?changeToken=3-0&sync=true&clientReason=view"
+      uid=111_116 generic
+        uid=111_117 "UK Guidance_for_businesses_on_making_environmental_claims_.pdf"
+        uid=111_118 "File"
+      uid=111_119 "File"
+      uid=111_120 "3.18 Similarly, businesses should not focus claims on a minor part of what they do, if their main or "
+      uid=111_121 "core "
+      "..."
+      uid=111_122 "It is important to "
+      uid=111_123 "note "
+      uid=111_124 "that the standards of professional diligence in a particular sector are the objective"
+  uid=93_129 button
+  uid=93_130 tooltip
+  uid=93_131 status atomic live="polite" relevant="additions text"
+  uid=93_132 generic live="polite" relevant="additions text"

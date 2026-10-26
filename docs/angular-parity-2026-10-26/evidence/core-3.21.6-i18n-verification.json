@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "scope": "Built-in runtime catalogue and source review; no linguistic or installed-browser acceptance implied.",
+  "locales": [
+    "en-US",
+    "es",
+    "fr",
+    "ar",
+    "ro",
+    "pt-PT",
+    "it"
+  ],
+  "catalogueErrors": [],
+  "missingReferences": [],
+  "missingSdkReferences": [],
+  "sourceErrors": [],
+  "unreviewedSource": [],
+  "passed": true
+}

@@ -1,0 +1,96 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=92_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/tasks/d0434c84-63fb-4474-9514-db67a26edba6"
+  uid=92_1 complementary "Application navigation"
+    uid=92_2 button "Dashboard"
+    uid=92_3 navigation "Main navigation"
+      uid=92_4 button "AI search" expandable
+      uid=92_5 button "Browse" expandable
+      uid=92_6 button "Recently Viewed" expandable
+      uid=92_7 button "Search" expandable expanded
+      uid=92_8 button "Expired" expandable
+      uid=92_9 button "Assets" expandable
+      uid=92_10 button "Tasks" expandable
+      uid=92_11 button "Favorites" expandable
+      uid=92_12 button "Collections" expandable
+      uid=92_13 button "Personal Space" expandable
+      uid=92_14 button "Clipboard" expandable
+      uid=92_15 button "Trash" expandable
+    uid=92_16 navigation "Account and administration"
+      uid=92_17 button "Administration" expandable
+      uid=92_18 button "User menu" expandable
+  uid=96_0 region "Navigation details"
+    uid=96_1 heading "Search Filters" level="6"
+    uid=101_0 form
+      uid=101_1 combobox "Select a saved search" expandable haspopup="menu" value="Select a saved search"
+        uid=101_2 option "Select a saved search" selected
+        uid=101_3 option "Parity audit 2026-10-26 saved search"
+      uid=101_4 button "Switch to Queue View"
+      uid=101_5 "Full Text"
+      uid=101_6 searchbox "Full Text" value="core-note"
+      uid=101_7 DisclosureTriangle "Modification Date ⌄" expandable
+      uid=101_8 "Authors"
+      uid=101_9 "Search for authors..."
+      uid=101_10 combobox "Authors Search for authors..." autocomplete="list" expandable haspopup="listbox"
+      uid=101_11 status atomic live="polite" relevant="additions text"
+      uid=101_12 "Collections"
+      uid=101_13 "Select a value."
+      uid=101_14 combobox "Collections Select a value." autocomplete="list" expandable haspopup="listbox"
+      uid=101_15 status atomic live="polite" relevant="additions text"
+      uid=101_16 "Tags"
+      uid=101_17 "e.g. events, boston"
+      uid=101_18 combobox "Tags e.g. events, boston" autocomplete="list" expandable haspopup="listbox"
+      uid=101_19 status atomic live="polite" relevant="additions text"
+      uid=101_20 DisclosureTriangle "Nature ⌄" expandable
+      uid=101_21 DisclosureTriangle "Subjects ⌄" expandable
+      uid=101_22 DisclosureTriangle "Coverage ⌄" expandable
+      uid=101_23 DisclosureTriangle "Size ⌄" expandable
+      uid=101_24 DisclosureTriangle "Save As" expandable
+      uid=101_25 checkbox "Auto-search" checked
+      uid=101_26 "Auto-search"
+      uid=101_27 button " Reset"
+  uid=96_30 navigation "Drawer controls"
+    uid=96_31 separator "Resize navigation drawer" description="Drag to resize. Use arrow keys to adjust; press Enter or double-click to reset." orientation="vertical" value="298" valuemax="640" valuemin="200" valuetext=""
+    uid=96_32 button "Close navigation"
+  uid=92_19 banner "Application actions"
+    uid=92_20 button "Quick Search" expandable haspopup="dialog"
+    uid=92_21 generic
+      uid=92_22 button "Add Content" haspopup="dialog"
+  uid=92_23 region "Application activity"
+    uid=92_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=92_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=103_0 main
+    uid=103_1 heading "core-note" level="1"
+    uid=103_2 navigation "Document location"
+      uid=103_3 link "Domain" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain"
+      uid=103_5 link "UserWorkspaces" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces"
+      uid=103_7 link "gpt" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt"
+      uid=103_9 link "Parity audit 2026-10-26" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%2520audit%25202026-10-26"
+    uid=103_11 link "All tasks" url="https://demo.maretha.io/nuxeo/ng/tasks"
+    uid=103_13 heading "Choose participants" level="2"
+    uid=103_14 "Please select the participants"
+    uid=103_15 "Workflow"
+    uid=103_16 "Serial document review"
+    uid=103_17 "Document"
+    uid=103_18 link "core-note" url="https://demo.maretha.io/nuxeo/ng/browse/documents/6abd63c4-b629-4e61-8448-8dbd4273fea0"
+    uid=103_20 "Due date"
+    uid=103_21 "Oct 31, 2026, 4:00:14 PM"
+    uid=103_22 "Assigned actors"
+    uid=103_23 "gpt"
+    uid=103_24 "Participants "
+    uid=103_25 textbox "Participants" description="Search users and groups."
+    uid=103_26 "Search users and groups."
+    uid=103_27 generic live="polite" relevant="additions text"
+      uid=107_0 button "Remove user:gpt"
+    uid=103_28 "Review type"
+    uid=103_29 combobox "Review type" expandable haspopup="menu" value="Validation"
+      uid=103_30 option "Simple review"
+      uid=103_31 option "Validation" selected
+    uid=103_32 "Comment"
+    uid=103_33 textbox "Comment" multiline
+    uid=107_1 button "Discard changes"
+    uid=103_34 button "Abandon workflow"
+    uid=103_35 button "Start review"
+    uid=103_36 button "Delegate"
+    uid=103_37 button "View Graph"
+  uid=92_137 generic live="polite" relevant="additions text"

@@ -1,0 +1,97 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=42_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26/core-note?view=view"
+  uid=42_1 complementary "Application navigation"
+    uid=42_2 button "Dashboard"
+    uid=42_3 navigation "Main navigation"
+      uid=42_4 button "AI search" expandable
+      uid=42_5 button "Browse" expandable
+      uid=42_6 button "Recently Viewed" expandable
+      uid=42_7 button "Search" expandable
+      uid=42_8 button "Expired" expandable
+      uid=42_9 button "Assets" expandable
+      uid=42_10 button "Tasks" expandable
+      uid=42_11 button "Favorites" expandable
+      uid=42_12 button "Collections" expandable
+      uid=42_13 button "Personal Space" expandable
+      uid=42_14 button "Clipboard" expandable
+      uid=42_15 button "Trash" expandable
+    uid=42_16 navigation "Account and administration"
+      uid=42_17 button "Administration" expandable
+      uid=42_18 button "User menu" expandable
+  uid=42_19 banner "Application actions"
+    uid=42_20 button "Quick Search" expandable haspopup="dialog"
+    uid=42_21 generic
+      uid=42_22 button "Add Content" haspopup="dialog"
+  uid=42_23 region "Application activity"
+    uid=42_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=42_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=42_26 banner
+    uid=42_27 heading "core-note" level="1"
+    uid=42_28 navigation "Document location"
+      uid=42_29 link "Domain" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain"
+      uid=42_31 link "UserWorkspaces" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces"
+      uid=42_33 link "gpt" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt"
+      uid=42_35 link "Parity audit 2026-10-26" url="https://demo.maretha.io/nuxeo/ng/browse/default-domain/UserWorkspaces/gpt/Parity%20audit%202026-10-26"
+    uid=42_37 button "Edit document"
+    uid=42_38 button "Compare Versions"
+    uid=42_39 button "More actions" expandable haspopup="dialog"
+  uid=42_40 tablist "Document views" orientation="horizontal"
+    uid=42_41 tab "View" selectable selected
+    uid=42_42 tab "AI" selectable
+    uid=42_43 tab "Permissions" selectable
+    uid=42_44 tab "History" selectable
+    uid=42_45 tab "Publishing" selectable
+  uid=42_46 tabpanel "View"
+    uid=42_47 main
+      uid=42_48 region "Note"
+        uid=42_49 button "Edit note" description="Edit note"
+        uid=42_50 "Parity audit text. Created only for reversible action checks."
+    uid=42_51 complementary "Document details"
+      uid=42_52 button "Hide metadata"
+      uid=42_53 region "Document details"
+        uid=42_54 region "Document information"
+          uid=42_55 "State"
+          uid=42_56 "Project"
+          uid=42_57 "Version"
+          uid=42_58 DisclosureTriangle "0.1 " expandable
+          uid=42_59 "Last modified"
+          uid=42_60 "October 26, 2026"
+          uid=42_61 "Created"
+          uid=42_62 "October 26, 2026"
+          uid=42_63 "By"
+          uid=42_64 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+          uid=42_66 "Contributors"
+          uid=42_67 link "gpt@maretha.io" url="https://demo.maretha.io/nuxeo/ng/page/user?id=gpt"
+        uid=42_69 heading "Details" level="3"
+        uid=42_70 button "Edit metadata"
+        uid=42_71 "Title"
+        uid=42_72 " core-note "
+        uid=42_73 "Format"
+        uid=42_74 " Text "
+        uid=42_75 region "Attachments"
+          uid=42_76 heading "Attachments" level="3"
+          uid=42_77 "Click to upload files"
+          uid=42_78 button "Click to upload files" value="No file chosen"
+        uid=42_79 DisclosureTriangle "Collections" expandable
+        uid=42_80 heading "Tags" level="5"
+        uid=42_81 combobox "Search or create a tag" autocomplete="list" expandable haspopup="listbox"
+        uid=42_82 status atomic live="polite" relevant="additions text"
+        uid=42_83 "Search or create a tag"
+        uid=42_84 tab "COMMENTS" selectable selected
+        uid=42_85 tab "ACTIVITY" selectable
+        uid=42_86 form
+          uid=42_87 textbox "Write a comment" multiline
+          uid=42_88 button disableable disabled
+          uid=42_89 button disableable disabled
+  uid=42_90 generic live="polite" relevant="additions text"
+  uid=44_0 dialog modal
+    uid=44_1 heading "Add to Collection" level="2"
+    uid=44_2 form
+      uid=44_3 "Collections *"
+      uid=44_5 combobox "Collections *" autocomplete="list" expandable expanded focusable focused haspopup="listbox"
+      uid=45_0 button "Clear all"
+      uid=45_1 listbox "Options List" orientation="vertical"
+      uid=44_6 status atomic live="polite" relevant="additions text"
+      uid=44_7 button "Cancel"
+      uid=44_8 button "Add" disableable disabled

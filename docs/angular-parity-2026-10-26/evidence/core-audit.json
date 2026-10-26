@@ -1,0 +1,283 @@
+{
+  "date": "2026-10-26",
+  "status": "Completed for the recorded stock and CP browser coverage. Confirmed Angular behavior gaps are fixed and deployed; unavailable flows and remaining visual variation are documented below.",
+  "runtimeBefore": {
+    "webui": "2025.21.1",
+    "angular": "3.21.3",
+    "cp": "1.0.29",
+    "backend": "2025.20-SNAPSHOT",
+    "image": "nuxeo-maretha:lab-d4f6919-93-1"
+  },
+  "target": {
+    "webui": "2025.21.3",
+    "angular": "3.21.7",
+    "sdk": "0.1.2",
+    "cp": "1.0.33"
+  },
+  "coverage": [
+    {
+      "area": "Search",
+      "actions": [
+        "Open drawer while in Folder",
+        "Auto-search and Enter",
+        "Save new search via UI",
+        "Switch queue and open result",
+        "Reset filters"
+      ],
+      "outcome": "Search worked; drawer initialization changed folder list before navigation; fixed in source. Search queue leaked bulk-query controls to leaf header; fix delegated. Baseline results blocked by malformed dynamic asset path.",
+      "afterDeploymentVerification": "PASS: opening a pristine Search drawer retained all six folder children; typing navigated to search/default before publishing results. Polymer results loaded after Enter; malformed dynamic asset paths are fixed. Saved search creation verified in UI; exact fixture removed after audit."
+    },
+    {
+      "area": "Clipboard baseline",
+      "actions": [
+        "Select core-note in audit folder",
+        "Add to clipboard",
+        "Open core-target",
+        "Copy"
+      ],
+      "outcome": "Copy successful; new child core-target/core-note created via UI."
+    },
+    {
+      "area": "Import",
+      "actions": [
+        "Open Import",
+        "Choose two synthetic fixture files via native file-input change event",
+        "Add Properties",
+        "Edit description",
+        "Next file",
+        "Create"
+      ],
+      "outcome": "File and Picture created through browser import. Apply-to-other-files does not copy properties across different document types. OS file picker automation could not access its configured roots, so synthetic in-memory File objects were delivered to the observed input; the remaining creation flow used the UI."
+    },
+    {
+      "area": "Collections and favorites",
+      "actions": [
+        "Add core-note to core-collection via picker",
+        "Verify collectionMember:collectionIds",
+        "Add imported fixture to Favorites",
+        "Open Favorites drawer",
+        "Remove fixture from Favorites"
+      ],
+      "outcome": "Collection add and favorites add/remove persisted. Removing from Favorites left the open document header stale; source now refreshes the matching document after membership changes.",
+      "afterDeploymentVerification": "PASS: collection membership persisted. Header favorite added, drawer removed it, and open document header immediately returned to Add to Favorites without reload."
+    },
+    {
+      "area": "Comments",
+      "actions": [
+        "Create comment on imported fixture",
+        "Edit comment",
+        "Reply to comment"
+      ],
+      "outcome": "All succeeded. Icon-only Post, Cancel and More controls lacked accessible names; labels added using existing translations."
+    },
+    {
+      "area": "Workflow",
+      "actions": [
+        "Start Serial Document Review on core-note",
+        "Open Choose Participants task",
+        "Open process graph in both UIs"
+      ],
+      "outcome": "Baseline task form rendered. Angular exposed untranslated task labels and a legacy task editor; fixed with the standard embedded editor and resolved document link. Completion/rejection not yet exercised.",
+      "afterDeploymentVerification": "PASS: localized inline task form, readable document link and single-encoded breadcrumb. Selected gpt, started review, then approved with a comment through Angular. Navigation returned to Tasks and REST confirmed zero remaining assigned tasks."
+    },
+    {
+      "area": "Share and download",
+      "actions": [
+        "Open Share dialog",
+        "Copy link",
+        "Click Download on imported File"
+      ],
+      "outcome": "Share dialog and copy action ran. Download grant returned HTTP 200; local downloaded bytes were not checked."
+    },
+    {
+      "area": "Lock",
+      "actions": [
+        "Lock imported File",
+        "Unlock from inline notice",
+        "Unlock from More actions",
+        "Confirm final lockOwner absent through REST"
+      ],
+      "outcome": "Fixture finished unlocked. Before-release inline notice briefly retained a lock state; repeat after deployment.",
+      "afterDeploymentVerification": "PASS on disposable File: locked, unlocked, and inline lock notice cleared after response; final lockOwner absent."
+    },
+    {
+      "area": "File action menu",
+      "actions": [
+        "Open More on disposable imported File"
+      ],
+      "outcome": "PASS: stock clipboard, collections/favorites, lock, share, export and trash controls available. Existing legitimate PDF was left read-only."
+    },
+    {
+      "area": "Trash, restore and cleanup",
+      "actions": [
+        "Move audit folder to Trash",
+        "Restore only audit folder",
+        "Move it to Trash again",
+        "Permanently delete only approved audit folder"
+      ],
+      "outcome": "PASS: restore verified isTrashed false; purge verified folder404 and zero descendants. Named saved search separately removed by identity-checked REST and verified absent."
+    },
+    {
+      "area": "Range-loaded PDF",
+      "actions": [
+        "Open 12-page PDF",
+        "Wait beyond former60-second timeout",
+        "Next page1 to2",
+        "Open Find and type gloves"
+      ],
+      "outcome": "PASS3.21.6: full toolbar remains visible and canvas stays rendered beyond four minutes; page navigation and Find bar work. Final readiness resolves on first page render with stale-generation and failure guards.",
+      "screenshots": [
+        "core-ng-file-pdf-range-final-after.jpg",
+        "core-ng-file-pdf-find-final-after.jpg"
+      ]
+    },
+    {
+      "area": "Metadata pane resizing",
+      "actions": [
+        "Pointer drag",
+        "Arrow keys and Shift increment",
+        "Home and End bounds",
+        "Enter, Space and double-click reset",
+        "Persist width",
+        "Hide on mobile and hidden pane"
+      ],
+      "outcome": "Source implemented with baseline bounds, accessible separator, RTL direction and pointer cleanup. Fourteen focused resize/viewer tests pass; final live check pending.",
+      "afterDeploymentVerification": "PASS live3.21.7: drag,10px/Shift50px keyboard increments, Home280px, End697px, Enter/double-click reset, saved width, hide/show and mobile390px disabled separator. No document metadata was changed."
+    }
+  ],
+  "fixtures": {
+    "root": "5df82eb8-9809-43ca-b9fa-3264a2d7111b",
+    "path": "/default-domain/UserWorkspaces/gpt/Parity audit 2026-10-26",
+    "note": "6abd63c4-b629-4e61-8448-8dbd4273fea0",
+    "target": "1a036368-a5ca-4687-9df7-d92c0b5c149a",
+    "collection": "f60a70f9-68f2-4f4c-ae38-a2028ecd4b8d",
+    "docsNote": "424a0d6f-cd85-4a96-9771-df5d7c2e2a24",
+    "savedSearchTitle": "Parity audit 2026-10-26 saved search",
+    "serialTask": "d0434c84-63fb-4474-9514-db67a26edba6",
+    "cleanup": "Complete. Approved folder and descendants permanently deleted through Angular Trash after restore verification; exact named saved search deleted through authenticated REST. Final reads: folder HTTP404, zero descendants, saved search absent. Existing demo documents were not deleted.",
+    "upload": "5ab62049-3af0-417b-8366-02be1163f8a9",
+    "picture": "e9e1d536-c8a2-4fdf-8c02-d83fa4e7a0df",
+    "purgeAuthorized": "User explicitly approved deleting only the October26 audit folder/test documents and named saved search on2026-10-26.",
+    "cleanupVerification": {
+      "checkedAt": "2026-10-26T20:57:12.836Z",
+      "rootStatus": 404,
+      "descendantCount": 0,
+      "savedSearchAbsent": true,
+      "savedSearchId": "6476cde2-2a38-4db2-bdf2-8c7cdaf73bc6",
+      "workflowTasksRemaining": 0
+    }
+  },
+  "checks": [
+    {
+      "name": "Angular tests",
+      "result": "Final Angular3.21.7: 1,509/1,509 passed; includes PDF readiness, metadata resize and task-card regressions."
+    },
+    {
+      "name": "CP library tests",
+      "result": "Final CP1.0.33: 45/45 tests passed, including query-scoped CSV export and assembly guards."
+    },
+    {
+      "name": "Core production build",
+      "result": "Earlier plain core build passed at5.95MB under unchanged6MB ceiling. Final3.21.7 CP-composed build passed at6.16MB under6.5MB."
+    },
+    {
+      "name": "TypeScript, scoped ESLint and localization",
+      "result": "Passed; broad lint includes a pre-existing ignored local planning HTML parse error, excluded from source checks"
+    },
+    {
+      "name": "SDK consumer/API/IDs",
+      "result": "Passed"
+    },
+    {
+      "name": "Custom architecture guards",
+      "result": "67/67 passed"
+    },
+    {
+      "name": "Polymer production build and Maven",
+      "result": "Passed; 10 Java tests passed"
+    },
+    {
+      "name": "Deployment pipeline tests",
+      "result": "17/17 passed"
+    },
+    {
+      "name": "Coordinated CP/Angular assembly",
+      "result": "Final3.21.7/CP1.0.33 assembly passed: Angular backend66Java tests; CP103Java tests (101passed,2skipped), CP library/assembly45tests; composed initial bundle within6.5MB ceiling."
+    }
+  ],
+  "sourceRevisions": {
+    "angular": "72c34333d37204992161bf049f04093c175622e3",
+    "cp": "43f01827560e616a7642716a8484ff250b3e2230",
+    "polymer": "e4cda0c8772a768de91f5ed5b970bb7fc55192d7"
+  },
+  "deploymentHistory": [
+    {
+      "status": "Succeeded",
+      "pipelineCommit": "20df1b83b3d94f55cd5db8095ef862a45f045e59",
+      "workflowRun": "https://github.com/maretha-io/hetzner-remote/actions/runs/40395179564",
+      "backendPreservation": "Verified after rollout; see runtime-jar-comparison.json."
+    },
+    {
+      "status": "Succeeded",
+      "pipelineCommit": "a55f952d1d5469b7329a4572869f437fc3c32e57",
+      "workflowRun": "https://github.com/maretha-io/hetzner-remote/actions/runs/40397518470",
+      "image": "nuxeo-maretha:lab-a55f952-95-1",
+      "pod": "nuxeo-6f775c684f-rvkzq",
+      "versions": {
+        "webui": "2025.21.3",
+        "angular": "3.21.5",
+        "cp": "1.0.31",
+        "backend": "2025.20-SNAPSHOT"
+      },
+      "backendPreservation": "565 unrelated runtime JARs byte-identical; exactly5UI/CP bundles replaced and matched locked ZIP hashes.",
+      "stableAssetHeaders": "main.bundle.js (with and without ts) and sw.js?ts return200 with private,no-cache,no-store,must-revalidate."
+    },
+    {
+      "status": "Succeeded",
+      "pipelineCommit": "6ad1553ac8bf744126f54c6619ce72751c71c576",
+      "workflowRun": "https://github.com/maretha-io/hetzner-remote/actions/runs/40399225349",
+      "versions": {
+        "webui": "2025.21.3",
+        "angular": "3.21.6",
+        "cp": "1.0.32",
+        "backend": "2025.20-SNAPSHOT"
+      },
+      "image": "nuxeo-maretha:lab-6ad1553-96-1",
+      "pod": "nuxeo-7f57cd6d58-p8x2b",
+      "backendPreservation": "565 unrelated runtime JARs byte-identical; exactly5UI/CP bundles replaced, all payloads match locked ZIPs. See runtime-final-verification.json."
+    }
+  ],
+  "deployment": {
+    "status": "Succeeded",
+    "pipelineCommit": "4f9af2f95a951c6b9700acf061139955177e64fb",
+    "workflowRun": "https://github.com/maretha-io/hetzner-remote/actions/runs/40401856241",
+    "versions": {
+      "webui": "2025.21.3",
+      "angular": "3.21.7",
+      "cp": "1.0.33",
+      "backend": "2025.20-SNAPSHOT"
+    },
+    "image": "nuxeo-maretha:lab-4f9af2f-97-1",
+    "pod": "nuxeo-5cc76cd4d7-md7ft",
+    "backendPreservation": "All565unrelated runtime JARs byte-identical; five UI/CP bundles match exact locked package payloads. See runtime-final-verification.json."
+  },
+  "limitations": [
+    "Browser actions were exercised with gpt. Global account/provider/vocabulary configuration writes and other role combinations were not performed.",
+    "CP chat executed once only on disposable content; backend SDK read timeout prevented response-save persistence verification. CP similarity returned zero results at both tested confidence values, so actual CSV download could not be exercised.",
+    "Existing demo documents were read-only; destructive blob actions and publishing were not exercised on them.",
+    "Screenshots intentionally retain intermediate deployment states and differing fixture data; release provenance is recorded per scope.",
+    "Other demo add-ons are excluded and listed as unavailable. Approximate typography and placement differences are distinguished from missing behavior."
+  ],
+  "afterDeploymentVerification": {
+    "runtime": "Angular3.21.7, CP1.0.33, Web UI2025.21.3 on preserved2025.20-SNAPSHOT backend.",
+    "pdf": "Full toolbar and preview still visible231seconds after final3.21.7 navigation; prior3.21.6 navigation to page2 and Find reporting3of29matches verified beyond370seconds.",
+    "metadataResize": "Pointer drag and10px/Shift50px keyboard steps passed. Home280px; End697px; Enter/double-click reset445.7px and remove saved override. Hide/show works;390px viewport hides separator and removes keyboard focus.",
+    "cpExport": "Export CSV appears disabled for empty similarity results; absent without an applied vector query. No nonempty results available to verify actual CSV download.",
+    "cleanup": "Approved audit folder HTTP404, zero descendants, exact saved search absent; assigned workflow tasks0.",
+    "polymer": "Ordinary final reload hydrated Search and results without stale chunks; User Settings menu opened. Screenshot core-ui-user-menu-release-final-after.jpg."
+  },
+  "releaseLinks": {
+    "angular": "https://github.com/maretha-io/maretha-angular-webui/releases/tag/v3.21.7",
+    "cp": "https://github.com/maretha-io/maretha-ai/releases/tag/v1.0.33"
+  }
+}

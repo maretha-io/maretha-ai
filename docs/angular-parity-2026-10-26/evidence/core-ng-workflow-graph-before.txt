@@ -1,0 +1,61 @@
+Emulating viewport: {"deviceScaleFactor":1,"isMobile":false,"hasTouch":false,"isLandscape":false,"width":1440,"height":900}
+## Latest page snapshot
+uid=60_0 RootWebArea "Maretha Angular WebUI" url="https://demo.maretha.io/nuxeo/ng/tasks/d0434c84-63fb-4474-9514-db67a26edba6"
+  uid=60_1 complementary "Application navigation"
+    uid=60_2 button "Dashboard"
+    uid=60_3 navigation "Main navigation"
+      uid=60_4 button "AI search" expandable
+      uid=60_5 button "Browse" expandable
+      uid=60_6 button "Recently Viewed" expandable
+      uid=60_7 button "Search" expandable
+      uid=60_8 button "Expired" expandable
+      uid=60_9 button "Assets" expandable
+      uid=60_10 button "Tasks" expandable
+      uid=60_11 button "Favorites" expandable
+      uid=60_12 button "Collections" expandable
+      uid=60_13 button "Personal Space" expandable
+      uid=60_14 button "Clipboard" expandable
+      uid=60_15 button "Trash" expandable
+    uid=60_16 navigation "Account and administration"
+      uid=60_17 button "Administration" expandable
+      uid=60_18 button "User menu" expandable
+  uid=60_19 banner "Application actions"
+    uid=60_20 button "Quick Search" expandable haspopup="dialog"
+    uid=60_21 generic
+      uid=60_22 button "Add Content" haspopup="dialog"
+  uid=60_23 region "Application activity"
+    uid=60_24 progressbar "Loading content" valuemax="100" valuemin="0" valuetext=""
+    uid=60_25 progressbar "Loading page" valuemax="100" valuemin="0" valuetext=""
+  uid=60_26 main
+    uid=60_27 heading "wf.serialDocumentReview.chooseParticipants" level="1"
+    uid=60_28 link "All tasks" url="https://demo.maretha.io/nuxeo/ng/tasks"
+    uid=60_30 "wf.serialDocumentReview.pleaseSelect"
+    uid=60_31 "Workflow"
+    uid=60_32 "SerialDocumentReview"
+    uid=60_33 "Document"
+    uid=60_34 link "6abd63c4-b629-4e61-8448-8dbd4273fea0" url="https://demo.maretha.io/nuxeo/ng/browse/documents/6abd63c4-b629-4e61-8448-8dbd4273fea0"
+    uid=60_36 "Due date"
+    uid=60_37 "Oct 31, 2026, 4:00:14 PM"
+    uid=60_38 "Assigned actors"
+    uid=60_39 "gpt"
+    uid=60_40 button "wf.serialDocumentReview.cancel"
+    uid=60_41 button "wf.serialDocumentReview.startReview"
+    uid=60_42 button "Delegate"
+    uid=60_43 button "Hide workflow graph" focusable focused
+    uid=62_0 region "Workflow graph"
+      uid=62_1 heading "Workflow graph" level="2"
+      uid=62_2 "Start (ready)"
+      uid=62_3 "Choose Participants (suspended)"
+      uid=62_4 "Update the Document (ready)"
+      uid=62_5 "Stop (ready)"
+      uid=62_6 "Validate the Document (ready)"
+      uid=62_7 "Task375f → next → Task38e"
+      uid=62_8 "Task38e → Cancelation → Task5c1"
+      uid=62_9 "Task38e → Review Start → Task6d8"
+      uid=62_10 "Task542 → Cancelation → Task5c1"
+      uid=62_11 "Task542 → Document Re-Submission → Task6d8"
+      uid=62_12 "Task6d8 → End → Task5c1"
+      uid=62_13 "Task6d8 → Rejection → Task6d8"
+      uid=62_14 "Task6d8 → Document Update Request → Task542"
+      uid=62_15 "Task6d8 → Validation → Task6d8"
+  uid=60_44 generic live="polite" relevant="additions text"

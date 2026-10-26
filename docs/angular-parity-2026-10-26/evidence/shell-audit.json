@@ -1,0 +1,451 @@
+{
+  "date": "2026-10-26",
+  "origin": "https://demo.maretha.io/nuxeo",
+  "baseline": "Polymer 2025.21.1",
+  "candidateBefore": "Angular 3.21.3",
+  "method": "Fresh browser audit in regular Chrome through CUA. Own tabs only. Dedicated short desktop and mobile views. Chrome DevTools agent server could not open due shared browser-profile conflict; root retained DevTools. No live account, credential, security, vocabulary, or repository document writes in this shell subtask.",
+  "coverage": [
+    {
+      "area": "Dashboard",
+      "checked": [
+        "Four stock cards",
+        "Recently edited rows",
+        "Empty tasks and favorites",
+        "Desktop1280x640 footer geometry",
+        "Desktop1440x900 comparison",
+        "390x844 stacked cards and hamburger"
+      ],
+      "result": "Deployed dashboard metrics and both viewport footer bounds verified; see afterDeployment."
+    },
+    {
+      "area": "Stock navigation",
+      "checked": [
+        "Browse",
+        "Recently Viewed",
+        "Search",
+        "Expired",
+        "Assets",
+        "Tasks",
+        "Favorites",
+        "Collections",
+        "Personal Space",
+        "Clipboard",
+        "Trash"
+      ],
+      "result": "All11stock Angular drawers reopened on deployed3.21.4; initial paired audit retained. See shell-ng-drawers-after.json."
+    },
+    {
+      "area": "Account",
+      "checked": [
+        "User menu open/close",
+        "Profile and group/permissions display",
+        "Authorized Applications",
+        "Cloud Services connected accounts",
+        "Four themes listed without applying",
+        "390x844 account drawer"
+      ],
+      "result": "Read-only profile/apps/cloud/themes and mobile drawer reopened on deployed3.21.4. No preference/credential/token writes."
+    },
+    {
+      "area": "Administration",
+      "checked": [
+        "Users & Groups default list",
+        "Search gpt",
+        "Nature vocabulary selected and entries read",
+        "Audit page and records",
+        "Analytics Document Distribution",
+        "Analytics Repository Content",
+        "Analytics Search",
+        "Analytics Workflow",
+        "Cloud Services Providers/Tokens/Consumers baseline"
+      ],
+      "result": "Users, vocabulary, audit, analytics and cloud tabs reopened on deployed3.21.4. No admin CRUD writes."
+    }
+  ],
+  "findings": [
+    {
+      "id": "shell-01",
+      "severity": "high",
+      "finding": "At1280x640 Angular account trigger lies y678-726 and Administration y630-678, beyond viewport; main rail twelve items requires726px total.",
+      "fix": "Main navigation now flexible and scrollable with min-height0; account/footer never shrinks. Added actualDOM layout regression.",
+      "status": "verified in deployed lab-20df1b8-94-1; see afterDeployment and shell-after-checks.json; compact final3.21.5 recheck recorded in shell-final-release-checks.json"
+    },
+    {
+      "id": "shell-02",
+      "severity": "medium",
+      "finding": "Dashboard title14px vs26px; square cards vs14pxradius; heading icons24px vs14px; title column50% vs37.5%; broken custom thumbnails.",
+      "fix": "Scoped typography/radius/icon/column changes and hide failed image glyph while preserving thumbnail space. Added error-event regression.",
+      "status": "verified in deployed lab-20df1b8-94-1; see afterDeployment and shell-after-checks.json; compact final3.21.5 recheck recorded in shell-final-release-checks.json"
+    },
+    {
+      "id": "shell-03",
+      "severity": "medium",
+      "finding": "Drawer headings approx15px bold vs26px regular and account/admin rows have different height/selection shape.",
+      "fix": "Shared26pxregular drawer headings and48pxpill account/admin items. Collections dates longDate.",
+      "status": "verified in deployed lab-20df1b8-94-1; see afterDeployment and shell-after-checks.json"
+    },
+    {
+      "id": "shell-04",
+      "severity": "medium",
+      "finding": "Themes page lacked stock53px titlebar and selected-theme outline; generic Apply names were repeated.",
+      "fix": "Restored compact titlebar, selected outline, and distinct theme action accessible names. No preferences changed.",
+      "status": "verified in deployed lab-20df1b8-94-1; see afterDeployment and shell-after-checks.json; compact final3.21.5 recheck recorded in shell-final-release-checks.json"
+    },
+    {
+      "id": "shell-05",
+      "severity": "medium",
+      "finding": "Cloud administration rendered four legacy cards simultaneously vs stock Providers/Tokens/Consumers tabs; default provider URLs replaced stock description; empty states missing; token creation dates relative; icon controls unnamed.",
+      "fix": "Accessible tabs with arrow/Home/End navigation; default Description provider column; token/account empty rows and calendar dates; named controls and unique menu ids. Existing editors retained.",
+      "status": "verified in deployed lab-20df1b8-94-1; see afterDeployment and shell-after-checks.json; compact final3.21.5 recheck recorded in shell-final-release-checks.json"
+    },
+    {
+      "id": "shell-06",
+      "severity": "medium",
+      "finding": "Extension page can duplicate the administration host header when supplying its own title.",
+      "fix": "Generic pageHeading host/component contribution metadata and host conditional. Regression preserves panel accessible name. CP agent opts in.",
+      "status": "implemented; CP-agent deployed recheck owns extension header coverage"
+    },
+    {
+      "id": "shell-07",
+      "severity": "high",
+      "finding": "Ordinary Folder used GenericFolderish legacy results, while the outer toolbar suppressed actions assuming a scoped body. Wrong columns and no selection actionbar followed.",
+      "fix": "FolderishDetailsLayout now uses shared STANDARD_FOLDER_RESULTS_TYPES, so Folder mounts the existing scoped provider and table with3defaultcolumns/headerfilters/columnsettings/RESULTS_SELECTION_ACTIONS. Custom fallback remains generic.",
+      "status": "verified in deployed lab-20df1b8-94-1; see afterDeployment and shell-after-checks.json"
+    },
+    {
+      "id": "shell-08",
+      "severity": "high",
+      "finding": "Warm Polymer browser retained an entry bundle referencing a removed hashed lazy chunk after rollout. Timestamp cache grant applied one year caching to stable entry/worker requests.",
+      "fix": "WebUI2025.21.3 first-match private/no-store main+worker rule, startup-keyed JSP main URL, query-preserving service worker ts replacement. Four focused regressions plus linked-asset regression and10Java tests pass; finalZIP verified.",
+      "status": "warm ordinary reload plus dashboard/Themes route verified on lab-a55f952-95-1; root owns exact response-header verification",
+      "evidence": "polymer-entry-cache-fix.json"
+    },
+    {
+      "id": "shell-09",
+      "severity": "medium",
+      "finding": "Dashboard task title used mismatched existing English translation; targetDocumentIds were strings because Angular omitted fetch-task enrichment so document subtitle was empty.",
+      "fix": "Match baseline fetch-task:targetDocumentIds,actors. Correct existing English validation title and conditionally render enriched subtitle verbatim. Locale-switch/taskactivation regression plus taskAPIheader assertion.",
+      "status": "Focused20/20andfull1509PASS; root owns3.21.7 deployedrecheck.",
+      "files": [
+        "app/helpers/workflows.service.ts",
+        "app/helpers/workflows.service.spec.ts",
+        "app/components/dashboard/dashboard.component.html",
+        "app/components/dashboard/dashboard.component.spec.ts",
+        "assets/i18n/en-US.json",
+        "scripts/i18n/source-exceptions-components.json"
+      ]
+    }
+  ],
+  "limitations": [
+    "This is a read-only audit of live account/admin data. No claim that user/group/provider/vocabulary CRUD was exercised.",
+    "Analytics tabs and stock controls were opened; first-load screenshots may retain loading state. This does not prove complete chart/pixel parity.",
+    "Custom Polymer Inventory/Requests/MSA/Workflows contributions were observed but are outside default Angular scope.",
+    "Polymer lists saCreativeCommons/saRightsStatements custom directories while Angular schema whitelist does not. Recorded as custom-schema extension coverage limitation, not patched.",
+    "Recently Viewed differs in already-open tabs because each interface initializes local history independently. Fresh Angular mobile tab loaded shared recent entries; no server-history gap established.",
+    "Some cosmetic/structural differences remain in stock tables and controls; no claim of pixel-perfect parity.",
+    "Some table typography/column behavior and dashboard task-card text/subtitle differences remain visible; recorded final screenshots are not a pixel-perfect parity claim."
+  ],
+  "tests": {
+    "command": "MARETHA_KARMA_PORT=9882 npm run test:ci -- --include=app/extensions/webui-themes.spec.ts --include=app/modules/shared/components/sidebar/sidebar-user-menu.spec.ts --include=app/modules/shared/components/sidebar/administration-drawer.component.spec.ts --include=app/modules/shared/components/sidebar/collections-drawer.component.spec.ts --include=app/components/dashboard/dashboard.component.spec.ts --include=app/extensions/paired-views.spec.ts --include=app/modules/settings/components/cloud/cloud.component.spec.ts",
+    "result": "58 SUCCESS; ChromeHeadless155",
+    "format": "All18owned files Prettier check passed; git diff --check passed",
+    "lint": "Targeted TypeScript and templates ESLint passed",
+    "additionalFolderCommand": "MARETHA_KARMA_PORT=9882 npm run test:ci -- --include=app/modules/explorer/components/viewers/folderish-details-layout.component.spec.ts --include=app/modules/explorer/components/default-document-layouts.spec.ts",
+    "additionalFolderResult": "21SUCCESS (2newowner tests plus19existing defaultlayout/scopedprovidertests)",
+    "releaseAssembly": "5SUCCESS: scoped dependency link isolation, matching ZIPs, oldhost rejection, oldCP rejection, oldSDK prebuild rejection",
+    "sdk": "SDK0.1.2 built successfully; public API and contribution identity checks pass; core nuxeo-package --check passes. No fullproduction build run by shell subtask.",
+    "fullSuite": "Final3.21.7 source72c3433:1509/1509SUCCESS; TypeScript+scopedESLint+i18nvalidator+25guardsPASS. Manifestmatchesall1645lockedfiles. See core-final-validation.json."
+  },
+  "screenshots": [
+    "shell-ng-account-1280-after.jpg",
+    "shell-ng-account-1280-final-after.jpg",
+    "shell-ng-account-1440-before.jpg",
+    "shell-ng-account-mobile-after.jpg",
+    "shell-ng-account-mobile-before.jpg",
+    "shell-ng-account-mobile-final-after.jpg",
+    "shell-ng-admin-analytics-after.jpg",
+    "shell-ng-admin-analytics-before.jpg",
+    "shell-ng-admin-audit-after.jpg",
+    "shell-ng-admin-audit-before.jpg",
+    "shell-ng-admin-cloud-after.jpg",
+    "shell-ng-admin-cloud-before.jpg",
+    "shell-ng-admin-cloud-consumers-after.jpg",
+    "shell-ng-admin-cloud-consumers-final-after.jpg",
+    "shell-ng-admin-cloud-final-after.jpg",
+    "shell-ng-admin-cloud-tokens-after.jpg",
+    "shell-ng-admin-cloud-tokens-final-after.jpg",
+    "shell-ng-admin-users-after.jpg",
+    "shell-ng-admin-users-before.jpg",
+    "shell-ng-admin-users-search-before.jpg",
+    "shell-ng-admin-vocabulary-after.jpg",
+    "shell-ng-admin-vocabulary-before.jpg",
+    "shell-ng-analytics-repository-content-before.jpg",
+    "shell-ng-analytics-search-before.jpg",
+    "shell-ng-analytics-workflow-before.jpg",
+    "shell-ng-authorized-apps-after.jpg",
+    "shell-ng-authorized-apps-before.jpg",
+    "shell-ng-cloud-services-after.jpg",
+    "shell-ng-cloud-services-before.jpg",
+    "shell-ng-dashboard-1280-after.jpg",
+    "shell-ng-dashboard-1280-before.jpg",
+    "shell-ng-dashboard-1280-final-after.jpg",
+    "shell-ng-dashboard-1440-after.jpg",
+    "shell-ng-dashboard-mobile-after.jpg",
+    "shell-ng-dashboard-mobile-before.jpg",
+    "shell-ng-dashboard-mobile-final-after.jpg",
+    "shell-ng-drawer-assets-before.jpg",
+    "shell-ng-drawer-browse-after.jpg",
+    "shell-ng-drawer-browse-before.jpg",
+    "shell-ng-drawer-clipboard-after.jpg",
+    "shell-ng-drawer-clipboard-before.jpg",
+    "shell-ng-drawer-collections-after.jpg",
+    "shell-ng-drawer-collections-before.jpg",
+    "shell-ng-drawer-expired-before.jpg",
+    "shell-ng-drawer-favorites-before.jpg",
+    "shell-ng-drawer-personal-space-before.jpg",
+    "shell-ng-drawer-recently-viewed-before.jpg",
+    "shell-ng-drawer-search-before.jpg",
+    "shell-ng-drawer-tasks-before.jpg",
+    "shell-ng-drawer-trash-before.jpg",
+    "shell-ng-folder-after.jpg",
+    "shell-ng-folder-selection-after.jpg",
+    "shell-ng-navigation-mobile-before.jpg",
+    "shell-ng-profile-after.jpg",
+    "shell-ng-profile-before.jpg",
+    "shell-ng-themes-after.jpg",
+    "shell-ng-themes-before.jpg",
+    "shell-ng-themes-final-after.jpg",
+    "shell-ui-account-1280-after.jpg",
+    "shell-ui-account-1280-final-after.jpg",
+    "shell-ui-account-before.jpg",
+    "shell-ui-admin-analytics-before.jpg",
+    "shell-ui-admin-audit-before.jpg",
+    "shell-ui-admin-cloud-before.jpg",
+    "shell-ui-admin-cloud-consumers-before.jpg",
+    "shell-ui-admin-cloud-tokens-before.jpg",
+    "shell-ui-admin-users-search-before.jpg",
+    "shell-ui-admin-vocabulary-before.jpg",
+    "shell-ui-analytics-repository-content-before.jpg",
+    "shell-ui-analytics-search-before.jpg",
+    "shell-ui-analytics-workflow-before.jpg",
+    "shell-ui-authorized-apps-before.jpg",
+    "shell-ui-cloud-services-before.jpg",
+    "shell-ui-dashboard-1280-after.jpg",
+    "shell-ui-dashboard-1280-before.jpg",
+    "shell-ui-dashboard-1280-final-after.jpg",
+    "shell-ui-dashboard-1440-before.jpg",
+    "shell-ui-dashboard-mobile-before.jpg",
+    "shell-ui-drawer-assets-before.jpg",
+    "shell-ui-drawer-browse-before.jpg",
+    "shell-ui-drawer-clipboard-before.jpg",
+    "shell-ui-drawer-collections-before.jpg",
+    "shell-ui-drawer-expired-before.jpg",
+    "shell-ui-drawer-favorites-before.jpg",
+    "shell-ui-drawer-personal-space-before.jpg",
+    "shell-ui-drawer-recently-viewed-before.jpg",
+    "shell-ui-drawer-search-before.jpg",
+    "shell-ui-drawer-tasks-before.jpg",
+    "shell-ui-drawer-trash-before.jpg",
+    "shell-ui-profile-before.jpg",
+    "shell-ui-themes-before.jpg",
+    "shell-ui-themes-final-after.jpg"
+  ],
+  "graftTokensSaved": 62091,
+  "editedFiles": [
+    "app/components/application-pages/themes-page.component.ts",
+    "app/components/dashboard/dashboard-document-table.component.scss",
+    "app/components/dashboard/dashboard.component.html",
+    "app/components/dashboard/dashboard.component.scss",
+    "app/components/dashboard/dashboard.component.spec.ts",
+    "app/extensions/contribution.ts",
+    "app/extensions/document-views.component.html",
+    "app/extensions/paired-views.spec.ts",
+    "app/extensions/webui-themes.ts",
+    "app/modules/settings/components/cloud/cloud.component.html",
+    "app/modules/settings/components/cloud/cloud.component.scss",
+    "app/modules/settings/components/cloud/cloud.component.spec.ts",
+    "app/modules/settings/components/cloud/cloud.component.ts",
+    "app/modules/shared/components/sidebar/administration-drawer.component.ts",
+    "app/modules/shared/components/sidebar/collections-drawer.component.ts",
+    "app/modules/shared/components/sidebar/sidebar-user-menu.spec.ts",
+    "app/modules/shared/components/sidebar/sidebar.component.scss",
+    "app/modules/shared/components/sidebar/user-menu/user-menu-row.scss",
+    "app/modules/explorer/components/viewers/folderish-details-layout.component.ts",
+    "app/modules/explorer/components/viewers/folderish-details-layout.component.spec.ts",
+    "app/app-routing.module.ts",
+    "app/app-routing.module.spec.ts"
+  ],
+  "coreReleaseFiles": [
+    "package.json",
+    "package-lock.json",
+    "app/extensions/package.json",
+    "nuxeo/pom.xml",
+    "nuxeo/ui/pom.xml",
+    "nuxeo/server/pom.xml",
+    "nuxeo/package/pom.xml",
+    "nuxeo/ui/src/main/resources/META-INF/MANIFEST.MF",
+    "nuxeo/server/src/main/resources/META-INF/MANIFEST.MF"
+  ],
+  "cpReleaseFiles": [
+    "pom.xml",
+    "maretha-ai-core/pom.xml",
+    "maretha-ai-web/pom.xml",
+    "maretha-ai-package/pom.xml",
+    "maretha-ai-core/src/main/resources/META-INF/MANIFEST.MF",
+    "maretha-ai-web/src/main/resources/META-INF/MANIFEST.MF",
+    "maretha-ai-web/angular/package.json",
+    "maretha-ai-web/angular/README.md",
+    "maretha-ai-web/angular/scripts/assemble-host.mjs",
+    "maretha-ai-web/angular/scripts/assemble-host.test.mjs",
+    "maretha-ai-web/angular/scripts/prepare-demo-context.sh",
+    "maretha-ai-web/angular/scripts/Dockerfile.demo-patch",
+    "docs/angular-release-1.0.30.md"
+  ],
+  "releasePreparation": {
+    "proposedVersions": {
+      "core": "3.21.4",
+      "cp": "1.0.30",
+      "sdk": "0.1.2"
+    },
+    "sdkReason": "New optional public pageHeading metadata is additive. CP now uses it; a0.1.2 artifact plus CPpeer ^0.1.2 records required contract and avoids accepting old0.1.1 declarations. Existing repo policy requires reviewed API snapshot, not automatic semantic classification.",
+    "coreVersionFiles": [
+      "package.json",
+      "package-lock.json root+packages[empty].version",
+      "nuxeo/pom.xml",
+      "nuxeo/ui/pom.xml",
+      "nuxeo/server/pom.xml",
+      "nuxeo/package/pom.xml",
+      "nuxeo/ui/src/main/resources/META-INF/MANIFEST.MF",
+      "nuxeo/server/src/main/resources/META-INF/MANIFEST.MF",
+      "app/extensions/package.json"
+    ],
+    "cpVersionFiles": [
+      "pom.xml",
+      "maretha-ai-core/pom.xml",
+      "maretha-ai-web/pom.xml",
+      "maretha-ai-package/pom.xml",
+      "maretha-ai-web/angular/package.json"
+    ],
+    "cpAssemblyLiteralFiles": [
+      "maretha-ai-web/angular/scripts/assemble-host.mjs",
+      "maretha-ai-web/angular/scripts/assemble-host.test.mjs",
+      "maretha-ai-web/angular/scripts/prepare-demo-context.sh",
+      "maretha-ai-web/angular/scripts/Dockerfile.demo-patch"
+    ],
+    "assemblySteps": [
+      "Bump intended versions and CPpeer dependency together; package.xml files use @VERSION@ and do not need direct substitution.",
+      "Build/pack SDK; verify API and IDs. Run SDKconsumer+upgrade checks from docs/sdk-compatibility.md; preserve frozen compatibility baseline.",
+      "After all source changes regenerate core.manifest.json using npm run release:core-manifest; check it.",
+      "From CPcheckout node maretha-ai-web/angular/scripts/assemble-host.mjs CORE_CHECKOUT NEW_ASSEMBLY_OUTPUT. This builds SDK, tests/builds isolated CPlibrary, stages core with CPcontribution, packages host, then Mavenverifies CP.",
+      "Review assembled host/core and CPZIP package.xml versions plus SHA256 hashes/release-manifest.json.",
+      "prepare-demo-context.sh coordinates both ZIPs; image must inherit freshly captured current deployment image to preserve unrelated packages.",
+      "Root owns production build, publishing/deployment and live image acceptance. Shell subtask prepared versions/scripts/docs and SDK only."
+    ],
+    "observation": "CPcore/web OSGi manifests now Bundle-Version1.0.30. Core OSGi3.21.4. No unrelated dependency versions changed. Core lockfile changed only the two root version entries.",
+    "sourceDocs": [
+      "docs/angular-release-1.0.29.md (CP)",
+      "docs/sdk-compatibility.md (core)",
+      "scripts/nuxeo-package.mjs (core)"
+    ],
+    "status": "Root subsequently authorized coordinated releaseprep; versions applied in both repos."
+  },
+  "finalValidation": "core-final-validation.json",
+  "i18nRemediationFiles": [
+    "app/components/tasks/tasks-page.component.html",
+    "app/modules/explorer/components/viewers/generic-non-folderish-viewer/generic-non-folderish-viewer.component.html",
+    "assets/i18n/en-US.json",
+    "assets/i18n/es.json",
+    "assets/i18n/fr.json",
+    "assets/i18n/ar.json",
+    "assets/i18n/ro.json",
+    "assets/i18n/pt-PT.json",
+    "assets/i18n/it.json",
+    "scripts/i18n/viewer.english-draft.json",
+    "scripts/i18n/legacy-supplements.json",
+    "scripts/i18n/source-exceptions-components.json",
+    "scripts/i18n/source-exceptions-core.json",
+    "scripts/i18n/source-exceptions-sdk.json",
+    "scripts/i18n/source-exceptions-settings-shared.json"
+  ],
+  "candidateAfter": {
+    "image": "lab-20df1b8-94-1",
+    "angular": "3.21.4",
+    "cp": "1.0.30",
+    "polymer": "2025.21.2",
+    "scope": "Shell recheck of deployed image; followup cache and CP projection corrections pending separate rollout."
+  },
+  "afterDeployment": {
+    "checks": "shell-after-checks.json",
+    "drawers": "shell-ng-drawers-after.json",
+    "viewport": "1280x640 and1440x900 desktop;390x844 mobile",
+    "results": [
+      "Both UIs administration y544\u2013592 and account y592\u2013640 fit1280x640 viewport; account menu opens.",
+      "Angular dashboard title26px,card radius14px,heading icon14px confirmed in rendered DOM. Failed custom thumbnails hidden.",
+      "All11stock drawer triggers opened; profile, authorized applications, connected accounts, themes, nature vocabulary, audit, users and analytics reached read-only.",
+      "Cloud Providers/Tokens/Consumers tabs switch; default descriptions, empty states, calendar dates and accessible control names rendered.",
+      "Folder now renders Title/Last modified/Last contributor, title filter, quick filters and column settings. Selecting core-note exposes Display selection, Clear, ZIP, clipboard, collection and trash actions. Selection cleared without data mutation.",
+      "Mobile account footer button y796\u2013844 and account drawer opens/closes."
+    ],
+    "caveats": [
+      "CP component-owned heading verification remains CP-agent owned.",
+      "Warm Polymer browser hit a stale chunk after rollout; root reproduced and fresh ignore-cache reload succeeded. Targeted persistent-entry cache correction in progress for WebUI2025.21.3.",
+      "Publish absence in the selected core-note live fixture is not proof of missing registration; fixture had active workflow. Parent owns deeper selection action eligibility checks."
+    ]
+  },
+  "polymerCacheFix": "polymer-entry-cache-fix.json",
+  "candidateFinal": {
+    "image": "lab-a55f952-95-1",
+    "polymer": "2025.21.3",
+    "angular": "3.21.5",
+    "cp": "1.0.31"
+  },
+  "finalDeploymentVerification": {
+    "checks": "shell-final-release-checks.json",
+    "warmBefore": "polymer-warm-before-followup.json",
+    "method": "Ordinary reload of existing Chrome Polymer tab, no cache/storage clearing or cache-busting navigation. Server restart required the authorized normal gpt login. Separate fresh Angular tab used for exact viewport overrides.",
+    "result": [
+      "Warm Polymer bootstrapped with main.bundle.js?ts=1793047204310 and hydrated dashboard; Themes lazy route opened; captured CUAerrorlogs empty.",
+      "Polymer and Angular account button bounds592\u2013640 at1280x640; Profile menu visible in both.",
+      "Angular dashboard title26px, current Nuxeo theme button, Providers/Tokens/Consumers navigation and tables confirmed.",
+      "Angular390x844 main navigation and account drawer open; footer bounds796\u2013844.",
+      "All temporary viewport overrides reset. No preference/admin/data writes by shell."
+    ],
+    "screenshots": [
+      "shell-ng-account-1280-final-after.jpg",
+      "shell-ng-account-mobile-final-after.jpg",
+      "shell-ng-admin-cloud-consumers-final-after.jpg",
+      "shell-ng-admin-cloud-final-after.jpg",
+      "shell-ng-admin-cloud-tokens-final-after.jpg",
+      "shell-ng-dashboard-1280-final-after.jpg",
+      "shell-ng-dashboard-mobile-final-after.jpg",
+      "shell-ng-themes-final-after.jpg",
+      "shell-ui-account-1280-final-after.jpg",
+      "shell-ui-dashboard-1280-final-after.jpg",
+      "shell-ui-themes-final-after.jpg"
+    ],
+    "limitations": [
+      "Network header and backend/runtime identity verification owned by root; CUA read-only DOM does not expose network response headers.",
+      "Live audit fixture workflow state changed during parallel verification. Desktop task cards and later mobile empty task state therefore have different fixture data.",
+      "Desktop task card visible difference recorded: baseline Validate the Document plus core-note versus Angular Document validation without document subtitle. Parent notified; not claimed fixed."
+    ]
+  },
+  "followupReleasePreparation": {
+    "core": "3.21.6",
+    "cp": "1.0.32",
+    "sdk": "0.1.2 unchanged",
+    "polymer": "2025.21.3 unchanged",
+    "reason": "PDF readiness now resolves after first rendered page instead of full download; root owns sourcefix and live verification.",
+    "files": "Same8core versionfiles and CP source/manifests/assembly hardpins/README; new docs/angular-release-1.0.32.md. Historical release docs preserved.",
+    "guardTests": "6/6PASS",
+    "status": "Versions prepared; root committed frozen source and owns assembly/deploy."
+  },
+  "followupReleasePreparation3.21.7": {
+    "core": "3.21.7",
+    "cp": "1.0.33 rootowned",
+    "sdk": "0.1.2 unchanged",
+    "polymer": "2025.21.3 unchanged",
+    "source": "72c34333d37204992161bf049f04093c175622e3",
+    "scope": "Combined docs-owned metadata pane resize and shell-owned taskcard fix; eightcoreversionfiles, regeneratedcoremanifest; rootownsCPsourcehardpins/docs.",
+    "status": "CommittedasEthan; fullchecksPASS; rolloutpending."
+  }
+}

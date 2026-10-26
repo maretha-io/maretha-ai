@@ -1,0 +1,21 @@
+{
+  "beforeCount": 570,
+  "afterCount": 570,
+  "unchangedCount": 565,
+  "changed": [],
+  "removed": [
+    "/opt/nuxeo/server/nxserver/bundles/maretha-ai-core-1.0.29.jar",
+    "/opt/nuxeo/server/nxserver/bundles/maretha-ai-web-1.0.29.jar",
+    "/opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-server-3.21.3.jar",
+    "/opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-ui-3.21.3.jar",
+    "/opt/nuxeo/server/nxserver/bundles/nuxeo-web-ui-2025.21.1.jar"
+  ],
+  "added": [
+    "/opt/nuxeo/server/nxserver/bundles/maretha-ai-core-1.0.31.jar",
+    "/opt/nuxeo/server/nxserver/bundles/maretha-ai-web-1.0.31.jar",
+    "/opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-server-3.21.5.jar",
+    "/opt/nuxeo/server/nxserver/bundles/maretha-angular-webui-ui-3.21.5.jar",
+    "/opt/nuxeo/server/nxserver/bundles/nuxeo-web-ui-2025.21.3.jar"
+  ],
+  "lockedPayloadsVerified": true
+}

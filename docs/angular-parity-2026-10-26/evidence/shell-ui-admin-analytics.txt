@@ -1,0 +1,109 @@
+- banner:
+  - link "Skip to main content":
+    - /url: "#mainContent"
+  - button "Quick Search":
+- complementary:
+  - list:
+    - link "Home":
+      - /url: /nuxeo/ui/#!/home
+      - img "Application Logo"
+    - listbox "Drawer":
+      - option "AI search":
+        - button "AI search":
+      - option "Browse":
+        - button "Browse":
+      - option "Recently Viewed":
+        - button "Recently Viewed":
+      - option "Search":
+        - button "Search":
+      - option "Expired":
+        - button "Expired":
+      - option "Assets":
+        - button "Assets":
+      - option "Inventory":
+        - button "Inventory":
+      - option "Requests":
+        - button "Requests":
+      - option "Tasks":
+        - button "Tasks":
+      - option "MSA Work Queue":
+        - button "MSA Work Queue":
+      - option "Favorites":
+        - button "Favorites":
+      - option "Collections":
+        - button "Collections":
+      - option "Personal Space":
+        - button "Personal Space":
+      - option "Clipboard":
+        - button "Clipboard":
+      - option "Trash":
+        - button "Trash":
+      - option "Administration" [selected]:
+        - button "Administration" [expanded]:
+      - option "User Settings":
+        - button "User Settings":
+    - text: "0.8"
+    - heading "Administration" [level=5]
+    - link "AI Settings":
+      - /url: /nuxeo/ui/#!/maretha-cp-interactions
+    - link "Analytics":
+      - /url: /nuxeo/ui/#!/admin/analytics
+    - link "Workflows":
+      - /url: /nuxeo/ui/#!/admin/maretha-workflow
+    - link "Users & Groups":
+      - /url: /nuxeo/ui/#!/admin/user-group-management
+    - link "Vocabularies":
+      - /url: /nuxeo/ui/#!/admin/vocabulary-management
+    - link "Audit":
+      - /url: /nuxeo/ui/#!/admin/audit
+    - link "Cloud Services":
+      - /url: /nuxeo/ui/#!/admin/cloud-services
+    - link "NXQL Search":
+      - /url: /nuxeo/ui/#!/admin/nxql
+    - button "Collapse the side navigation panel" [expanded]:
+    - separator "Resize the side navigation panel. Use Left/Right arrow keys to adjust width, Home or End for minimum or maximum, Enter or Space to reset."
+- main:
+  - generic: Analytics
+  - navigation:
+    - listbox:
+      - tab "Document Distribution" [selected]:
+        - generic: Document Distribution
+      - tab "Repository Content":
+        - generic: Repository Content
+      - tab "Search":
+        - generic: Search
+      - tab "Workflow":
+        - generic: Workflow
+  - generic /default-domain/:
+    - textbox: /default-domain/
+    - option /default-domain/sections/:
+      - generic: /default-domain/sections/
+    - option /default-domain/templates/:
+      - generic: /default-domain/templates/
+    - option /default-domain/workspaces/:
+      - generic: /default-domain/workspaces/
+  - radiogroup:
+    - radio "Size":
+      - generic: Size
+    - radio "Document count" [checked]:
+      - generic: Document count
+  - paragraph:
+    - checkbox "Include hidden documents":
+      - generic: Include hidden documents
+  - paragraph:
+    - checkbox "Include deleted documents":
+      - generic: Include deleted documents
+  - paragraph:
+    - checkbox "Include versions":
+      - generic: Include versions
+  - paragraph:
+    - checkbox "Only folders":
+      - generic: Only folders
+  - paragraph
+  - slider:
+    - progressbar
+    - generic: "1"
+  - text: "* * * * * * * * * * * * * *"
+  - text: "* * *"
+- generic: "*"
+- status
