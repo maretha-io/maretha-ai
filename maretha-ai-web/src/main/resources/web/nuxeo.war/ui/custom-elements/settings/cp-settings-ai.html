@@ -33,6 +33,20 @@
 
 					<div style="position: relative; display: inline-block;">
 						<nuxeo-input
+								id="embeddingImageModelInput"
+								role="widget"
+								value="{{aiSettings.embeddingImageModel}}"
+								label="embeddingImageModel"
+								type="text"
+								on-input="_markAsDirty">
+						</nuxeo-input>
+						<paper-tooltip for="embeddingImageModelInput" position="bottom" offset="6">
+							The AI model used for generating image vector embeddings (e.g., amazon.titan-embed-image-v1)
+						</paper-tooltip>
+					</div>
+
+					<div style="position: relative; display: inline-block;">
+						<nuxeo-input
 								id="mimeTypesInput"
 								role="widget"
 								value="{{aiSettings.mimeTypes}}"

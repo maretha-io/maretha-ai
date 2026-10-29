@@ -41,23 +41,34 @@ public class EmbeddingsHelper {
      */
     public static DocumentModel addEmbeddings(DocumentModel doc, CoreSession session, Blob blob,
             boolean waitForCompletion, boolean lowPriority) {
+        return addEmbeddings(doc, session, blob, waitForCompletion, lowPriority, false);
+    }
+
+    /**
+     * Adds (or regenerates) embeddings on a document based on its blob type.
+     *
+     * @param force When true, (re)computes embeddings even if already present, overwriting existing values.
+     *              When false, only fills in embeddings that are currently empty.
+     */
+    public static DocumentModel addEmbeddings(DocumentModel doc, CoreSession session, Blob blob,
+            boolean waitForCompletion, boolean lowPriority, boolean force) {
         try {
             boolean isImage = BlobExtractor.isImage(blob);
 
-            // Add image embeddings if image and not already present
-            if (isImage && isEmpty(doc, SCHEMA_EMBEDDINGS_IMAGE)) {
+            // Add image embeddings if image and (forced or not already present)
+            if (isImage && (force || isEmpty(doc, SCHEMA_EMBEDDINGS_IMAGE))) {
                 addImageEmbeddings(doc, blob);
                 doc = session.saveDocument(doc);
             }
 
-            // Add text embeddings from image description if image and not already present
-            if (isImage && isEmpty(doc, SCHEMA_EMBEDDINGS_TEXT)) {
+            // Add text embeddings from image description if image and (forced or not already present)
+            if (isImage && (force || isEmpty(doc, SCHEMA_EMBEDDINGS_TEXT))) {
                 addImageTextEmbeddings(doc, blob);
                 doc = session.saveDocument(doc);
             }
 
-            // Add text embeddings from PDF if PDF and not already present
-            if ("application/pdf".equalsIgnoreCase(blob.getMimeType()) && isEmpty(doc, SCHEMA_EMBEDDINGS_TEXT)) {
+            // Add text embeddings from PDF if PDF and (forced or not already present)
+            if ("application/pdf".equalsIgnoreCase(blob.getMimeType()) && (force || isEmpty(doc, SCHEMA_EMBEDDINGS_TEXT))) {
                 addTextEmbeddings(doc, blob);
                 doc = session.saveDocument(doc);
             }

@@ -34,6 +34,11 @@
 							<iron-icon icon="custom-icons:ai-metadata-missing"></iron-icon>
 							Enhance metadata
 						</paper-item>
+
+						<paper-item name="regenerateEmbeddings" on-tap="_regenerateEmbeddings">
+							<iron-icon icon="custom-icons:ai-metadata-update"></iron-icon>
+							Regenerate embeddings
+						</paper-item>
 					</paper-listbox>
 				</paper-menu-button>
 				<nuxeo-tooltip for="dropdownButtonAi">AI Metadata</nuxeo-tooltip>
@@ -44,6 +49,9 @@
 		</nuxeo-operation>
 
 		<nuxeo-operation id="runInteractionOperation" op="RunInteractionOperation" input="[[document.uid]]">
+		</nuxeo-operation>
+
+		<nuxeo-operation id="regenerateEmbeddingsOperation" op="RegenerateEmbeddingsOperation" input="[[document.uid]]">
 		</nuxeo-operation>
 	</template>
 
@@ -197,6 +205,24 @@
 			_toggleDialog()
 			{
 				this.$.dialog.toggle();
+			},
+
+			_regenerateEmbeddings()
+			{
+				this.set('_popupMenuVisible', false);
+
+				const operation = this.$.regenerateEmbeddingsOperation;
+				operation.params = {};
+				this.fire('notify', { message: 'Regenerating embeddings...' });
+				operation.execute().then((response) =>
+				{
+					this.fire('notify', { message: response.value });
+					this.fire('document-updated');
+				}).catch((error) =>
+				{
+					console.error('Error regenerating embeddings:', error);
+					this.fire('notify', { message: 'Cannot regenerate embeddings.' });
+				});
 			},
 
 		});

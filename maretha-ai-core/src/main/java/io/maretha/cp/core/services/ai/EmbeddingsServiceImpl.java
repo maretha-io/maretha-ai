@@ -7,7 +7,10 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
+import io.maretha.cp.core.models.Settings;
+import io.maretha.cp.core.services.RepositoryService;
 import io.maretha.cp.core.services.helper.EmbeddingsHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -29,6 +32,8 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
 
     private static final String AMAZON_TITAN_EMBED_TEXT_V_2_0 = "amazon.titan-embed-text-v2:0";
     private static final String AMAZON_TITAN_EMBED_IMAGE_V_1 = "amazon.titan-embed-image-v1";
+    private static final String AI_SETTINGS_EMBEDDING_MODEL = "embeddingModel";
+    private static final String AI_SETTINGS_EMBEDDING_IMAGE_MODEL = "embeddingImageModel";
     private final BedrockRuntimeClient client = BedrockRuntimeClient.builder()
             .credentialsProvider(
                     StaticCredentialsProvider.create(
@@ -57,7 +62,7 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
         String nativeRequest = req.toString();
 
         var response = client.invokeModel(r -> r
-                .modelId(AMAZON_TITAN_EMBED_IMAGE_V_1)
+                .modelId(getImageModelId())
                 .body(SdkBytes.fromUtf8String(nativeRequest)));
         String bodyStr = response.body().asUtf8String();
         JSONObject respJson = new JSONObject(bodyStr);
@@ -132,7 +137,7 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
             // Encode and send the request to the Bedrock Runtime.
             var response = client.invokeModel(request -> request
                     .body(SdkBytes.fromUtf8String(json))
-                    .modelId(AMAZON_TITAN_EMBED_TEXT_V_2_0));
+                    .modelId(getTextModelId()));
 
             // Decode the response body.
             JSONObject responseBody = new JSONObject(response.body().asUtf8String());
@@ -147,5 +152,19 @@ public class EmbeddingsServiceImpl implements EmbeddingsService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getTextModelId() {
+        return getAiSetting(AI_SETTINGS_EMBEDDING_MODEL, AMAZON_TITAN_EMBED_TEXT_V_2_0);
+    }
+
+    private String getImageModelId() {
+        return getAiSetting(AI_SETTINGS_EMBEDDING_IMAGE_MODEL, AMAZON_TITAN_EMBED_IMAGE_V_1);
+    }
+
+    private String getAiSetting(String key, String defaultValue) {
+        Settings savedSettings = Framework.getService(RepositoryService.class).getSavedSettings(null, true);
+        Object value = savedSettings.getAiSettings() != null ? savedSettings.getAiSettings().get(key) : null;
+        return value instanceof String && StringUtils.isNotBlank((String) value) ? (String) value : defaultValue;
     }
 }
